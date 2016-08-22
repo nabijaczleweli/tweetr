@@ -1,0 +1,12 @@
+[package]
+name = "not-stakkr"
+description = "Tool for making/verifying not-stakkr of directory trees"
+documentation = "https://cdn.rawgit.com/nabijaczleweli/not-stakkr/doc/not-stakkr/index.html"
+repository = "https://github.com/nabijaczleweli/not-stakkr"
+readme = "README.md"
+keywords = ["stakkr", "twitter", "tweets", "queue", "content"]
+license = "MIT"
+# Remember to also update in appveyor.yml
+version = "0.1.0"
+authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
+exclude = ["*.enc"]
