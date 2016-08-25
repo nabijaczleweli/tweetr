@@ -1,6 +1,6 @@
 [package]
 name = "not-stakkr"
-description = "Tool for making/verifying not-stakkr of directory trees"
+description = "not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically."
 documentation = "https://cdn.rawgit.com/nabijaczleweli/not-stakkr/doc/not-stakkr/index.html"
 repository = "https://github.com/nabijaczleweli/not-stakkr"
 readme = "README.md"
@@ -10,3 +10,7 @@ license = "MIT"
 version = "0.1.0"
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
+
+
+[dependencies]
+clap = "2.10"
