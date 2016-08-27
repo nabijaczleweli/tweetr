@@ -1,12 +1,11 @@
+extern crate egg_mode;
 #[macro_use]
 extern crate clap;
 
-mod options;
-
-pub use options::Options;
+pub mod options;
 
 
 fn main() {
-    let opts = Options::parse();
+    let opts = options::Options::parse();
     println!("{:#?}", opts);
 }

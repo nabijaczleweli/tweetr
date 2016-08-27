@@ -1,7 +1,16 @@
-use clap::{self, App, Arg, AppSettings};
+use clap::{self, App, SubCommand, Arg, AppSettings};
 use std::path::PathBuf;
 use std::env::home_dir;
 use std::fs;
+
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub enum Subsystem {
+    /// Initialise global app data
+    Init,
+    /// Add and authorise a user
+    AddUser,
+}
 
 
 /// Representation of the application's all configurable values.
@@ -9,19 +18,25 @@ use std::fs;
 pub struct Options {
     /// Directory containing configuration. Default: `"$HOME/.not-stakkr`
     pub config_dir: PathBuf,
+    /// Directory containing configuration.
+    pub subsystem: Subsystem,
 }
 
 impl Options {
     /// Parse `env`-wide command-line arguments into an `Options` instance
     pub fn parse() -> Options {
         let matches = App::new("checksums")
-            .setting(AppSettings::ColoredHelp)
             .version(crate_version!())
             .author(crate_authors!())
-            .about("not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want.\nYou create content when you have time \
-                    and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically")
+            .setting(AppSettings::ColoredHelp)
+            .setting(AppSettings::SubcommandRequiredElseHelp)
+            .about("not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want.\n\
+                    You create content when you have time  and then use FOSS and NOT pay whatever-ridiculous\n\
+                    amount of $$$ for posting them automatically")
             .arg(Arg::from_usage("-c --config-dir=[CONFIG_DIR] 'Directory containing configuration. Default: $HOME/.not-stakkr'")
                 .validator(Options::config_dir_validator))
+            .subcommand(SubCommand::with_name("init").about("Initialise global app data"))
+            .subcommand(SubCommand::with_name("add-user").about("Add and authorise a user"))
             .get_matches();
 
         Options {
@@ -46,6 +61,11 @@ impl Options {
                         }
                     }
                 }
+            },
+            subsystem: match matches.subcommand() {
+                ("init", Some(_)) => Subsystem::Init,
+                ("add-user", Some(_)) => Subsystem::AddUser,
+                _ => panic!("No subcommand passed"),
             },
         }
     }

@@ -13,4 +13,5 @@ exclude = ["*.enc"]
 
 
 [dependencies]
-clap = "2.10"
+egg-mode = "0.3"
+clap = "2.11"
