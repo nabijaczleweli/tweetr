@@ -1,13 +1,13 @@
-use self::super::Error;
+use self::super::Outcome;
 use std::path::Path;
 
 
-pub fn init(config_dir: &Path, force: bool) -> Error {
+pub fn init(config_dir: &Path, force: bool) -> Outcome {
     let app_data_file = config_dir.join("app.toml");
 
     if !app_data_file.exists() || force {
-        Error::NoError
+        Outcome::NoError
     } else {
-        Error::OverrideNoForce(app_data_file.to_str().unwrap().to_string())
+        Outcome::OverrideNoForce(app_data_file.to_str().unwrap().to_string())
     }
 }

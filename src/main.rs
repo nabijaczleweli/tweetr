@@ -2,12 +2,12 @@ extern crate egg_mode;
 #[macro_use]
 extern crate clap;
 
-mod error;
+mod outcome;
 
 pub mod ops;
 pub mod options;
 
-pub use error::Error;
+pub use outcome::Outcome;
 
 use std::process::exit;
 use std::io::stderr;
@@ -23,8 +23,8 @@ fn actual_main() -> i32 {
     println!("{:#?}", opts);
 
     let err = match opts.subsystem {
-        options::Subsystem::Init{force} => ops::init(&opts.config_dir, force),
-        options::Subsystem::AddUser => Error::NoError,
+        options::Subsystem::Init { force } => ops::init(&opts.config_dir, force),
+        options::Subsystem::AddUser => Outcome::NoError,
     };
     err.print_error(&mut stderr());
     err.exit_value()
