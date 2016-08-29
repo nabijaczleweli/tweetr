@@ -1,4 +1,5 @@
 extern crate not_stakkr;
+
 use self::not_stakkr::util::prompt_exact_len;
 use std::iter::FromIterator;
 use std::io::Cursor;

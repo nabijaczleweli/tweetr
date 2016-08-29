@@ -1,3 +1,16 @@
+//! This module contains the configuration of the application.
+//!
+//! All options are passed individually to each function and are not bundled together.
+//!
+//! # Examples
+//!
+//! ```no_run
+//! # use not_stakkr::options::Options;
+//! let options = Options::parse();
+//! println!("Config directory: {}", options.config_dir.0);
+//! ```
+
+
 use clap::{self, App, SubCommand, Arg, AppSettings};
 use std::path::PathBuf;
 use std::env::home_dir;
@@ -9,7 +22,7 @@ use std::fs;
 pub enum Subsystem {
     /// Initialise global app data
     Init {
-        /// Whether to override current app configuration. Default: false
+        /// Whether to override current app configuration. Default: `false`
         force: bool,
     },
     /// Add and authorise a user
@@ -20,9 +33,9 @@ pub enum Subsystem {
 /// Representation of the application's all configurable values.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Options {
-    /// Directory containing configuration. Default: `"$HOME/.not-stakkr`
+    /// Directory containing configuration. Default: `"$HOME/.not-stakkr"`
     pub config_dir: (String, PathBuf),
-    /// Directory containing configuration.
+    /// The specified subsystem.
     pub subsystem: Subsystem,
 }
 

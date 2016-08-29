@@ -1,3 +1,6 @@
+//! Module containing various utility functions.
+
+
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 
 
@@ -7,12 +10,9 @@ use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # extern crate not_stakkr;
 /// # use not_stakkr::util::prompt_exact_len;
-/// # fn main() {
 /// assert_eq!(prompt_exact_len(&mut Cursor::new(b"0123456789"), &mut Vec::new(), "Allowed chars", 10).unwrap(),
 ///            "0123456789".to_string());
-/// # }
 /// ```
 pub fn prompt_exact_len<R: BufRead, W: Write>(input: &mut R, output: &mut W, prompt: &str, desired_len: usize) -> IoResult<String> {
     let mut out = String::new();

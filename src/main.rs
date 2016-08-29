@@ -17,7 +17,6 @@ fn actual_main() -> i32 {
         not_stakkr::options::Subsystem::Init { force } => {
             match not_stakkr::ops::init::verify(&opts.config_dir, force) {
                 Ok(pb) => {
-                    println!("{:?}", pb);
                     let stdin = stdin();
                     let mut lock = stdin.lock();
 
