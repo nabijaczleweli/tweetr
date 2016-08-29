@@ -4,10 +4,14 @@ use std::env::home_dir;
 use std::fs;
 
 
+/// All possible subsystems, think `cargo` or `git`.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum Subsystem {
     /// Initialise global app data
-    Init,
+    Init {
+        /// Whether to override current app configuration. Default: false
+        force: bool,
+    },
     /// Add and authorise a user
     AddUser,
 }
@@ -35,7 +39,9 @@ impl Options {
                     amount of $$$ for posting them automatically")
             .arg(Arg::from_usage("-c --config-dir=[CONFIG_DIR] 'Directory containing configuration. Default: $HOME/.not-stakkr'")
                 .validator(Options::config_dir_validator))
-            .subcommand(SubCommand::with_name("init").about("Initialise global app data"))
+            .subcommand(SubCommand::with_name("init")
+                .about("Initialise global app data")
+                .arg(Arg::from_usage("-f --force 'Override current app configuration'")))
             .subcommand(SubCommand::with_name("add-user").about("Add and authorise a user"))
             .get_matches();
 
@@ -63,7 +69,7 @@ impl Options {
                 }
             },
             subsystem: match matches.subcommand() {
-                ("init", Some(_)) => Subsystem::Init,
+                ("init", Some(init_matches)) => Subsystem::Init { force: init_matches.is_present("force") },
                 ("add-user", Some(_)) => Subsystem::AddUser,
                 _ => panic!("No subcommand passed"),
             },
