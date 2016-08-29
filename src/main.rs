@@ -1,16 +1,4 @@
-extern crate rustc_serialize;
-extern crate egg_mode;
-#[macro_use]
-extern crate clap;
-extern crate toml;
-
-mod outcome;
-
-pub mod ops;
-pub mod util;
-pub mod options;
-
-pub use outcome::Outcome;
+extern crate not_stakkr;
 
 use std::process::exit;
 use std::io::{stdin, stdout, stderr};
@@ -22,25 +10,25 @@ fn main() {
 }
 
 fn actual_main() -> i32 {
-    let opts = options::Options::parse();
+    let opts = not_stakkr::options::Options::parse();
     println!("{:#?}", opts);
 
     let err = match opts.subsystem {
-        options::Subsystem::Init { force } => {
-            match ops::init::verify(&opts.config_dir, force) {
+        not_stakkr::options::Subsystem::Init { force } => {
+            match not_stakkr::ops::init::verify(&opts.config_dir, force) {
                 Ok(pb) => {
                     println!("{:?}", pb);
                     let stdin = stdin();
                     let mut lock = stdin.lock();
 
-                    let data = ops::init::get_data(&mut lock, &mut stdout());
+                    let data = not_stakkr::ops::init::get_data(&mut lock, &mut stdout());
                     data.write(&pb);
-                    Outcome::NoError
+                    not_stakkr::Outcome::NoError
                 }
                 Err(out) => out,
             }
         }
-        options::Subsystem::AddUser => Outcome::NoError,
+        not_stakkr::options::Subsystem::AddUser => not_stakkr::Outcome::NoError,
     };
     err.print_error(&mut stderr());
     err.exit_value()
