@@ -21,7 +21,7 @@ pub enum Subsystem {
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Options {
     /// Directory containing configuration. Default: `"$HOME/.not-stakkr`
-    pub config_dir: PathBuf,
+    pub config_dir: (String, PathBuf),
     /// Directory containing configuration.
     pub subsystem: Subsystem,
 }
@@ -47,7 +47,7 @@ impl Options {
 
         Options {
             config_dir: match matches.value_of("config-dir") {
-                Some(dirs) => fs::canonicalize(dirs).unwrap(),
+                Some(dirs) => (dirs.to_string(), fs::canonicalize(dirs).unwrap()),
                 None => {
                     match home_dir() {
                         Some(mut hd) => {
@@ -55,7 +55,7 @@ impl Options {
                             hd.push(".not-stakkr");
 
                             fs::create_dir_all(&hd).unwrap();
-                            hd
+                            ("$HOME/.not_stakkr".to_string(), hd)
                         }
                         None => {
                             clap::Error {

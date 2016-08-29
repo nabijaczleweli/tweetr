@@ -1,17 +1,17 @@
 use self::super::super::util::prompt_exact_len;
 use self::super::super::Outcome;
-use self::super::AppTokens;
-use std::path::{PathBuf, Path};
 use std::io::{BufRead, Write};
+use self::super::AppTokens;
+use std::path::PathBuf;
 
 
-pub fn verify(config_dir: &Path, force: bool) -> Result<PathBuf, Outcome> {
-    let app_data_file = config_dir.join("app.toml");
+pub fn verify(config_dir: &(String, PathBuf), force: bool) -> Result<PathBuf, Outcome> {
+    let app_data_file = config_dir.1.join("app.toml");
 
     if force || !app_data_file.exists() {
         Ok(app_data_file)
     } else {
-        Err(Outcome::OverrideNoForce(app_data_file.to_str().unwrap().to_string()))
+        Err(Outcome::OverrideNoForce(PathBuf::from(&config_dir.0).join("app.toml").to_str().unwrap().replace("\\", "/")))
     }
 }
 
