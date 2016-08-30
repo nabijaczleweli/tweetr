@@ -8,6 +8,15 @@ pub enum Outcome {
     NoError,
     /// The specified file would need to be overriden but was not allowed to.
     OverrideNoForce(String),
+    /// The specified subsystem needs to be run beforehand to produce the specified file.
+    RequiredFileFromSubsystemNonexistant {
+        /// The subsystem that needs to be run.
+        subsys: &'static str,
+        /// The file the specified subsystem produces.
+        fname: String,
+    },
+    /// The specified subsystem needs to be run beforehand to produce the specified file.
+    TwitterAPIError(String),
 }
 
 impl Outcome {
@@ -31,6 +40,10 @@ impl Outcome {
                 writeln!(err_out, "File \"{}\" was not overriden to prevent data loss.", fname).unwrap();
                 writeln!(err_out, "Pass --force to override it.").unwrap();
             }
+            Outcome::RequiredFileFromSubsystemNonexistant { ref subsys, ref fname } => {
+                writeln!(err_out, "Run the {} subsystem first to produce \"{}\".", subsys, fname).unwrap()
+            }
+            Outcome::TwitterAPIError(ref error) => writeln!(err_out, "Twitter API error: {}", error).unwrap(),
         }
     }
 
@@ -47,6 +60,8 @@ impl Outcome {
         match *self {
             Outcome::NoError => 0,
             Outcome::OverrideNoForce(_) => 1,
+            Outcome::RequiredFileFromSubsystemNonexistant { subsys: _, fname: _ } => 2,
+            Outcome::TwitterAPIError(_) => 3,
         }
     }
 }
