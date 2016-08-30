@@ -35,7 +35,7 @@ fn actual_main() -> i32 {
 
                     let app = not_stakkr::ops::AppTokens::read(&app_path).unwrap();
 
-                    match not_stakkr::ops::add_user::authorise(&mut lock, &mut stdout(), app) {
+                    match not_stakkr::ops::add_user::authorise(&mut lock, &mut stdout(), app, verbose) {
                         Ok(user) => {
                             println!("");
                             not_stakkr::ops::add_user::print_success_message(&mut stdout(), &user, verbose);

@@ -79,22 +79,41 @@ pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outc
 /// assert!(add_user::authorise(&mut BufReader::new(b"1234567\n" as &[u8]), &mut Vec::new(), AppTokens {
 ///     key: "GeVFiYk7q8DhUmgMXE0iODrFa".to_string(),
 ///     secret: "bH3VIvYEwwVmMXkTnXB8N3HEQf4ShOf2Z4e1dkaqSJNGorK2pe".to_string(),
-/// }).is_ok());
+/// }, false).is_ok());
 /// ```
-pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T) -> Result<User, Outcome>
+pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T, verbose: bool) -> Result<User, Outcome>
     where R: BufRead,
           W: Write,
           T: Into<Token<'t>>
 {
     let conn_token = conn_token.into();
-    let req_token = try!(request_token(&conn_token, "oob").map_err(|e| Outcome::TwitterAPIError(format!("{}", e))));
-    let url = authorize_url(&req_token);
+
+    let req_token = try!(wrap_network_op_in_ellipsis_done(output,
+                                                          || {
+                                                              let req_token = request_token(&conn_token, "oob")
+                                                                  .map_err(|e| Outcome::TwitterAPIError(format!("{}", e)));
+                                                              (req_token.is_ok(), req_token)
+                                                          },
+                                                          "request token",
+                                                          verbose,
+                                                          false,
+                                                          false));
+    let url = wrap_network_op_in_ellipsis_done(output, || (true, authorize_url(&req_token)), "authorisation URL", verbose, false, true);
 
     writeln!(output, "Visit this URL: {}", url).unwrap();
 
     let pin = prompt_exact_len(input, output, "Enter the PIN from that page", |s| u32::from_str(s).is_ok(), 7).unwrap();
 
-    let access_token_data = try!(access_token(&conn_token, &req_token, pin).map_err(|e| Outcome::TwitterAPIError(format!("{}", e))));
+    let access_token_data = try!(wrap_network_op_in_ellipsis_done(output,
+                                                                  || {
+                                                                      let access_token_data = access_token(&conn_token, &req_token, pin)
+                                                                          .map_err(|e| Outcome::TwitterAPIError(format!("{}", e)));
+                                                                      (access_token_data.is_ok(), access_token_data)
+                                                                  },
+                                                                  "access token",
+                                                                  verbose,
+                                                                  true,
+                                                                  false));
     Ok(User::from_raw_access_token(access_token_data))
 }
 
@@ -155,5 +174,34 @@ pub fn print_success_message<W: Write>(output: &mut W, user: &User, verbose: boo
         writeln!(output, "Access tokens:").unwrap();
         writeln!(output, "  Key   : {}", user.access_token_key).unwrap();
         writeln!(output, "  Secret: {}", user.access_token_secret).unwrap();
+    }
+}
+
+
+fn wrap_network_op_in_ellipsis_done<W, T, F>(output: &mut W, f: F, desc: &str, verbose: bool, nl_before: bool, nl_after: bool) -> T
+    where W: Write,
+          F: FnOnce() -> (bool, T)
+{
+    if verbose {
+        if nl_before {
+            writeln!(output, "").unwrap();
+        }
+        write!(output, "Getting {}...", desc).unwrap();
+        output.flush().unwrap();
+
+        let (succeeded, res) = f();
+
+        if succeeded {
+            writeln!(output, " DONE").unwrap();
+        } else {
+            writeln!(output, " FAILED").unwrap();
+        }
+        if nl_after {
+            writeln!(output, "").unwrap();
+        }
+
+        res
+    } else {
+        f().1
     }
 }
