@@ -6,11 +6,16 @@ use std::path::Path;
 use std::fs::File;
 
 
+/// All user data required to connect to the Twitter API.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, RustcEncodable, RustcDecodable)]
 pub struct User {
+    /// The user's name (not display name)
     pub name: String,
+    /// User id
     pub id: i64,
+    /// The key part of the access token (the one actually used to access the API)
     pub access_token_key: String,
+    /// The key part of the access token (the one actually used to access the API)
     pub access_token_secret: String,
 }
 
@@ -21,6 +26,7 @@ struct Users {
 
 
 impl User {
+    /// Create a `User` instance straight from the return value of `egg_mode::access_token()`
     pub fn from_raw_access_token<'t>(raw: (Token<'t>, i64, String)) -> User {
         let (access_token, user_id, username) = raw;
         User {
@@ -31,6 +37,7 @@ impl User {
         }
     }
 
+    /// Read all user data from the specified file.
     pub fn read(p: &Path) -> Result<Vec<User>, Option<IoError>> {
         let mut buf = String::new();
         try!(try!(File::open(p).map_err(Some)).read_to_string(&mut buf).map_err(Some));
@@ -39,6 +46,7 @@ impl User {
         Ok(users.user)
     }
 
+    /// Save all user data to the specified file.
     pub fn write(users: Vec<User>, p: &Path) {
         File::create(p).unwrap().write_all(encode_str(&Users { user: users }).as_bytes()).unwrap();
     }

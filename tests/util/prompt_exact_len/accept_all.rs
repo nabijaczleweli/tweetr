@@ -5,7 +5,6 @@ use std::iter::FromIterator;
 use std::io::Cursor;
 
 
-
 #[test]
 fn optimistic() {
     let mut out = Vec::new();

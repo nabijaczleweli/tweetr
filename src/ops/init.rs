@@ -17,9 +17,9 @@ use std::io::{BufRead, Write};
 use std::path::PathBuf;
 
 
-/// Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `init` subsystems.
+/// Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `init` subsystem.
 ///
-/// The return value contains either the path to the file containing the global app configuration or why it failed.
+/// The return value contains either the path to the file containing the global app configuration or why getting it failed.
 ///
 /// # Examples
 ///
@@ -28,8 +28,8 @@ use std::path::PathBuf;
 /// ```
 /// # use not_stakkr::ops::init;
 /// # use std::env::temp_dir;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-0");
-/// assert_eq!(init::verify(&("$TEMP/ops-init-0".to_string(), tf.clone()), true),
+/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-verify-0");
+/// assert_eq!(init::verify(&("$TEMP/ops-init-verify-0".to_string(), tf.clone()), true),
 ///            Ok(tf.join("app.toml")));
 /// ```
 ///
@@ -41,12 +41,12 @@ use std::path::PathBuf;
 /// # use not_stakkr::Outcome;
 /// # use std::env::temp_dir;
 /// # use std::io::Write;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-1");
+/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-verify-1");
 /// fs::create_dir_all(&tf).unwrap();
 /// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
 ///
-/// assert_eq!(init::verify(&("$TEMP/ops-init-1".to_string(), tf), false),
-///            Err(Outcome::OverrideNoForce("$TEMP/ops-init-1/app.toml".to_string())));
+/// assert_eq!(init::verify(&("$TEMP/ops-init-verify-1".to_string(), tf), false),
+///            Err(Outcome::OverrideNoForce("$TEMP/ops-init-verify-1/app.toml".to_string())));
 /// ```
 pub fn verify(config_dir: &(String, PathBuf), force: bool) -> Result<PathBuf, Outcome> {
     verify_file("app.toml", false, config_dir, force).map_err(Outcome::OverrideNoForce)

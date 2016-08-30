@@ -1,3 +1,16 @@
+//! This module contains the functions used only by the `add-user` subsystem.
+//!
+//! The flow of the `add-user` subsystem is as follows:
+//!
+//! ```plaintext
+//! Options::parse()
+//! |> ops::add_user::verify()
+//! |> ops::AppTokens::read()
+//! |> ops::add_user::authorise()
+//! |> ops::add_user::append_user()
+//! |> ops::add_user::print_success_message()
+//! ```
+
 use egg_mode::{Token, request_token, authorize_url, access_token};
 use self::super::super::util::prompt_exact_len;
 use self::super::{User, verify_file};
@@ -7,6 +20,42 @@ use std::io::{BufRead, Write};
 use std::str::FromStr;
 
 
+/// Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `add-user`
+/// subsystem.
+///
+/// The return value contains either the path to the file containing the global app configuration and the path to the file
+/// containing the global users data or why getting them failed.
+///
+/// # Examples
+///
+/// Verifying with existing global app configuration.
+///
+/// ```
+/// # use not_stakkr::ops::add_user;
+/// # use std::fs::{self, File};
+/// # use std::env::temp_dir;
+/// # use std::io::Write;
+/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-verify-0");
+/// fs::create_dir_all(&tf).unwrap();
+/// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
+///
+/// assert_eq!(add_user::verify(&("$TEMP/ops-add-user-verify-0".to_string(), tf.clone())),
+///            Ok((tf.join("app.toml"), tf.join("users.toml"))));
+/// ```
+///
+/// Verifying when the global app configuration doesn't exist.
+///
+/// ```
+/// # use not_stakkr::ops::add_user;
+/// # use not_stakkr::Outcome;
+/// # use std::env::temp_dir;
+/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-verify-1");
+/// assert_eq!(add_user::verify(&("$TEMP/ops-add-user-verify-1".to_string(), tf)),
+///            Err(Outcome::RequiredFileFromSubsystemNonexistant {
+///                subsys: "init",
+///                fname: "$TEMP/ops-add-user-verify-1/app.toml".to_string(),
+///            }));
+/// ```
 pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outcome> {
     let app = try!(verify_file("app.toml", true, config_dir, false).map_err(|f| {
         Outcome::RequiredFileFromSubsystemNonexistant {
@@ -18,6 +67,20 @@ pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outc
     Ok((app, config_dir.1.join("users.toml")))
 }
 
+/// Direct the user towards the authorisation URL and prompt it for the PIN.
+///
+/// Returns `Err()` if accessing the Twitter API failed for whatever reason.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use not_stakkr::ops::{add_user, AppTokens};
+/// # use std::io::BufReader;
+/// assert!(add_user::authorise(&mut BufReader::new(b"1234567\n" as &[u8]), &mut Vec::new(), AppTokens {
+///     key: "GeVFiYk7q8DhUmgMXE0iODrFa".to_string(),
+///     secret: "bH3VIvYEwwVmMXkTnXB8N3HEQf4ShOf2Z4e1dkaqSJNGorK2pe".to_string(),
+/// }).is_ok());
+/// ```
 pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T) -> Result<User, Outcome>
     where R: BufRead,
           W: Write,
@@ -35,6 +98,26 @@ pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T) -> R
     Ok(User::from_raw_access_token(access_token_data))
 }
 
+/// Append the specified user to the authenticated users list at the specified path.
+///
+/// # Examples
+///
+/// ```
+/// # use not_stakkr::ops::{add_user, User};
+/// # use std::env::temp_dir;
+/// # use std::fs;
+/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-append_users");
+/// fs::create_dir_all(&tf).unwrap();
+///
+/// let tf = tf.join("users.toml");
+/// add_user::append_user(&tf, User {
+///     name: "random-test-name".to_string(),
+///     id: 0x969696969,
+///     access_token_key: "40423221609-Y0klmK9nWNRAScBuumWvAtSOzmIvBIBLJpc3Ept".to_string(),
+///     access_token_secret: "zFYbEO5wQtST3eK84pGuzSmmEByZbQ0EVY8uAS4BCM1mx".to_string(),
+/// });
+/// assert!(tf.exists());
+/// ```
 pub fn append_user(users_path: &Path, user: User) {
     let mut users = if users_path.exists() {
         User::read(users_path).unwrap()
@@ -50,6 +133,22 @@ pub fn append_user(users_path: &Path, user: User) {
     User::write(users, &users_path);
 }
 
+/// Print the success message mentioning the specified user's name and ID, optionally also mentioning tokens.
+///
+/// # Examples
+///
+/// ```
+/// # use not_stakkr::ops::{add_user, User};
+/// # use std::iter::FromIterator;
+/// let mut out = Vec::new();
+/// add_user::print_success_message(&mut out, &User {
+///     name: "random-test-name".to_string(),
+///     id: 0x42069,
+///     access_token_key: "270441-N48kdEQFWtj7cUyWomNeE2AsNQw8pnmOaQbcwnV".to_string(),
+///     access_token_secret: "jCcBthGzve36QMt3RAV6jOEg4qtHt7laMV2YFA3qKCRzw".to_string(),
+/// }, false);
+/// assert_eq!(out, Vec::from_iter(b"Successfully authenticated user random-test-name#270441\n".iter().cloned()));
+/// ```
 pub fn print_success_message<W: Write>(output: &mut W, user: &User, verbose: bool) {
     writeln!(output, "Successfully authenticated user {}#{}", user.name, user.id).unwrap();
     if verbose {

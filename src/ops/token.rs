@@ -8,7 +8,9 @@ use std::fs::File;
 /// The tokens needed to authenticate the app itself.
 #[derive(Debug, Clone, Hash, PartialEq, Eq, RustcEncodable, RustcDecodable)]
 pub struct AppTokens {
+    /// Key part of the authentication token
     pub key: String,
+    /// Secret part of the authentication token
     pub secret: String,
 }
 
