@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["add_user",""],["init","This module contains the functions used only by the `init` subsystem."]],"struct":[["AppTokens","The tokens needed to authenticate the app itself."],["User",""]]});

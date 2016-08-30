@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ResizeMode",""]],"struct":[["HashtagEntity",""],["MediaEntity",""],["MediaSize",""],["MediaSizes",""],["MentionEntity",""],["UrlEntity","Represents a link extracted from another piece of text."]]});

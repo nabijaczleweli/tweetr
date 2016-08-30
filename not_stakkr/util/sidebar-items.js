@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["prompt_exact_len","Ask the user to input a string of the exact length of `desired_len`, (re)prompting as necessary."],["prompt_nonzero_len","Ask the user to input a string of non-zero length, (re)prompting as necessary."]]});
