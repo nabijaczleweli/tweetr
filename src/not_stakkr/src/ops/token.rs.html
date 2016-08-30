@@ -84,6 +84,8 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>Read</span>, <span class='ident'>Write</span>, <span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>IoError</span>};
 <span class='kw'>use</span> <span class='ident'>toml</span>::{<span class='ident'>encode_str</span>, <span class='ident'>decode_str</span>};
@@ -95,7 +97,9 @@
 <span class='doccomment'>/// The tokens needed to authenticate the app itself.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>, <span class='ident'>Hash</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>RustcEncodable</span>, <span class='ident'>RustcDecodable</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>AppTokens</span> {
+    <span class='doccomment'>/// Key part of the authentication token</span>
     <span class='kw'>pub</span> <span class='ident'>key</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>/// Secret part of the authentication token</span>
     <span class='kw'>pub</span> <span class='ident'>secret</span>: <span class='ident'>String</span>,
 }
 

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_data","Prompt the user for application data."],["verify","Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `init` subsystems."]]});
+initSidebarItems({"fn":[["get_data","Prompt the user for application data."],["verify","Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `init` subsystem."]]});

@@ -47,35 +47,47 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-395' class='srclink' href='../../../src/not_stakkr/src/ops/add_user.rs.html#1-60' title='goto source code'>[src]</a></span></h1>
-<h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+               </span><a id='src-395' class='srclink' href='../../../src/not_stakkr/src/ops/add_user.rs.html#1-159' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>This module contains the functions used only by the <code>add-user</code> subsystem.</p>
+
+<p>The flow of the <code>add-user</code> subsystem is as follows:</p>
+
+<pre><code class="language-plaintext">Options::parse()
+|&gt; ops::add_user::verify()
+|&gt; ops::AppTokens::read()
+|&gt; ops::add_user::authorise()
+|&gt; ops::add_user::append_user()
+|&gt; ops::add_user::print_success_message()
+</code></pre>
+</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.append_user.html'
                                   title='not_stakkr::ops::add_user::append_user'>append_user</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Append the specified user to the authenticated users list at the specified path.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.authorise.html'
                                   title='not_stakkr::ops::add_user::authorise'>authorise</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Direct the user towards the authorisation URL and prompt it for the PIN.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.print_success_message.html'
                                   title='not_stakkr::ops::add_user::print_success_message'>print_success_message</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Print the success message mentioning the specified user&#39;s name and ID, optionally also mentioning tokens.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.verify.html'
                                   title='not_stakkr::ops::add_user::verify'>verify</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the <code>add-user</code>
+subsystem.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

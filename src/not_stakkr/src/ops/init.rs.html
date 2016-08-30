@@ -138,9 +138,9 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>PathBuf</span>;
 
 
-<span class='doccomment'>/// Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the `init` subsystems.</span>
+<span class='doccomment'>/// Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the `init` subsystem.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// The return value contains either the path to the file containing the global app configuration or why it failed.</span>
+<span class='doccomment'>/// The return value contains either the path to the file containing the global app configuration or why getting it failed.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples</span>
 <span class='doccomment'>///</span>
@@ -149,8 +149,8 @@
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>/// # use not_stakkr::ops::init;</span>
 <span class='doccomment'>/// # use std::env::temp_dir;</span>
-<span class='doccomment'>/// let tf = temp_dir().join(&quot;not-stakkr-doctest&quot;).join(&quot;ops-init-0&quot;);</span>
-<span class='doccomment'>/// assert_eq!(init::verify(&amp;(&quot;$TEMP/ops-init-0&quot;.to_string(), tf.clone()), true),</span>
+<span class='doccomment'>/// let tf = temp_dir().join(&quot;not-stakkr-doctest&quot;).join(&quot;ops-init-verify-0&quot;);</span>
+<span class='doccomment'>/// assert_eq!(init::verify(&amp;(&quot;$TEMP/ops-init-verify-0&quot;.to_string(), tf.clone()), true),</span>
 <span class='doccomment'>///            Ok(tf.join(&quot;app.toml&quot;)));</span>
 <span class='doccomment'>/// ```</span>
 <span class='doccomment'>///</span>
@@ -162,12 +162,12 @@
 <span class='doccomment'>/// # use not_stakkr::Outcome;</span>
 <span class='doccomment'>/// # use std::env::temp_dir;</span>
 <span class='doccomment'>/// # use std::io::Write;</span>
-<span class='doccomment'>/// let tf = temp_dir().join(&quot;not-stakkr-doctest&quot;).join(&quot;ops-init-1&quot;);</span>
+<span class='doccomment'>/// let tf = temp_dir().join(&quot;not-stakkr-doctest&quot;).join(&quot;ops-init-verify-1&quot;);</span>
 <span class='doccomment'>/// fs::create_dir_all(&amp;tf).unwrap();</span>
 <span class='doccomment'>/// File::create(tf.join(&quot;app.toml&quot;)).unwrap().write(&amp;[]).unwrap();</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// assert_eq!(init::verify(&amp;(&quot;$TEMP/ops-init-1&quot;.to_string(), tf), false),</span>
-<span class='doccomment'>///            Err(Outcome::OverrideNoForce(&quot;$TEMP/ops-init-1/app.toml&quot;.to_string())));</span>
+<span class='doccomment'>/// assert_eq!(init::verify(&amp;(&quot;$TEMP/ops-init-verify-1&quot;.to_string(), tf), false),</span>
+<span class='doccomment'>///            Err(Outcome::OverrideNoForce(&quot;$TEMP/ops-init-verify-1/app.toml&quot;.to_string())));</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>verify</span>(<span class='ident'>config_dir</span>: <span class='kw-2'>&amp;</span>(<span class='ident'>String</span>, <span class='ident'>PathBuf</span>), <span class='ident'>force</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span>, <span class='ident'>Outcome</span><span class='op'>&gt;</span> {
     <span class='ident'>verify_file</span>(<span class='string'>&quot;app.toml&quot;</span>, <span class='bool-val'>false</span>, <span class='ident'>config_dir</span>, <span class='ident'>force</span>).<span class='ident'>map_err</span>(<span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>)

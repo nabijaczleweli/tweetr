@@ -48,27 +48,27 @@
                        [<span class='inner'>&#x2212;</span>]
                    </a>
                </span><a id='src-385' class='srclink' href='../../../src/not_stakkr/src/ops/init.rs.html#51-53' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn verify(config_dir: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>, force: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>,&nbsp;<a class='enum' href='../../../not_stakkr/enum.Outcome.html' title='not_stakkr::Outcome'>Outcome</a>&gt;</pre><div class='docblock'><p>Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the <code>init</code> subsystems.</p>
+<pre class='rust fn'>pub fn verify(config_dir: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>, force: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.PathBuf.html' title='std::path::PathBuf'>PathBuf</a>,&nbsp;<a class='enum' href='../../../not_stakkr/enum.Outcome.html' title='not_stakkr::Outcome'>Outcome</a>&gt;</pre><div class='docblock'><p>Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the <code>init</code> subsystem.</p>
 
-<p>The return value contains either the path to the file containing the global app configuration or why it failed.</p>
+<p>The return value contains either the path to the file containing the global app configuration or why getting it failed.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <p>Verifying a nonexistant file or an existing file with forcing.</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='kw'>let</span> <span class='ident'>tf</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>().<span class='ident'>join</span>(<span class='string'>&quot;not-stakkr-doctest&quot;</span>).<span class='ident'>join</span>(<span class='string'>&quot;ops-init-0&quot;</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>init</span>::<span class='ident'>verify</span>(<span class='kw-2'>&amp;</span>(<span class='string'>&quot;$TEMP/ops-init-0&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>tf</span>.<span class='ident'>clone</span>()), <span class='bool-val'>true</span>),
+<span class='kw'>let</span> <span class='ident'>tf</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>().<span class='ident'>join</span>(<span class='string'>&quot;not-stakkr-doctest&quot;</span>).<span class='ident'>join</span>(<span class='string'>&quot;ops-init-verify-0&quot;</span>);
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>init</span>::<span class='ident'>verify</span>(<span class='kw-2'>&amp;</span>(<span class='string'>&quot;$TEMP/ops-init-verify-0&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>tf</span>.<span class='ident'>clone</span>()), <span class='bool-val'>true</span>),
            <span class='prelude-val'>Ok</span>(<span class='ident'>tf</span>.<span class='ident'>join</span>(<span class='string'>&quot;app.toml&quot;</span>)));</pre>
 
 <p>Verifying an existing file without forcing.</p>
 
 <pre class='rust rust-example-rendered'>
-<span class='kw'>let</span> <span class='ident'>tf</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>().<span class='ident'>join</span>(<span class='string'>&quot;not-stakkr-doctest&quot;</span>).<span class='ident'>join</span>(<span class='string'>&quot;ops-init-1&quot;</span>);
+<span class='kw'>let</span> <span class='ident'>tf</span> <span class='op'>=</span> <span class='ident'>temp_dir</span>().<span class='ident'>join</span>(<span class='string'>&quot;not-stakkr-doctest&quot;</span>).<span class='ident'>join</span>(<span class='string'>&quot;ops-init-verify-1&quot;</span>);
 <span class='ident'>fs</span>::<span class='ident'>create_dir_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>tf</span>).<span class='ident'>unwrap</span>();
 <span class='ident'>File</span>::<span class='ident'>create</span>(<span class='ident'>tf</span>.<span class='ident'>join</span>(<span class='string'>&quot;app.toml&quot;</span>)).<span class='ident'>unwrap</span>().<span class='ident'>write</span>(<span class='kw-2'>&amp;</span>[]).<span class='ident'>unwrap</span>();
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>init</span>::<span class='ident'>verify</span>(<span class='kw-2'>&amp;</span>(<span class='string'>&quot;$TEMP/ops-init-1&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>tf</span>), <span class='bool-val'>false</span>),
-           <span class='prelude-val'>Err</span>(<span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>(<span class='string'>&quot;$TEMP/ops-init-1/app.toml&quot;</span>.<span class='ident'>to_string</span>())));</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>init</span>::<span class='ident'>verify</span>(<span class='kw-2'>&amp;</span>(<span class='string'>&quot;$TEMP/ops-init-verify-1&quot;</span>.<span class='ident'>to_string</span>(), <span class='ident'>tf</span>), <span class='bool-val'>false</span>),
+           <span class='prelude-val'>Err</span>(<span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>(<span class='string'>&quot;$TEMP/ops-init-verify-1/app.toml&quot;</span>.<span class='ident'>to_string</span>())));</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 
