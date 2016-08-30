@@ -26,7 +26,10 @@ pub enum Subsystem {
         force: bool,
     },
     /// Add and authorise a user
-    AddUser,
+    AddUser {
+        /// Whether to print more user data. Default: `false`
+        verbose: bool,
+    },
 }
 
 
@@ -55,7 +58,9 @@ impl Options {
             .subcommand(SubCommand::with_name("init")
                 .about("Initialise global app data")
                 .arg(Arg::from_usage("-f --force 'Override current app configuration'")))
-            .subcommand(SubCommand::with_name("add-user").about("Add and authorise a user"))
+            .subcommand(SubCommand::with_name("add-user")
+                .about("Add and authorise a user")
+                .arg(Arg::from_usage("-v --verbose 'Print more user data'")))
             .get_matches();
 
         Options {
@@ -83,7 +88,7 @@ impl Options {
             },
             subsystem: match matches.subcommand() {
                 ("init", Some(init_matches)) => Subsystem::Init { force: init_matches.is_present("force") },
-                ("add-user", Some(_)) => Subsystem::AddUser,
+                ("add-user", Some(add_user_matches)) => Subsystem::AddUser { verbose: add_user_matches.is_present("verbose") },
                 _ => panic!("No subcommand passed"),
             },
         }

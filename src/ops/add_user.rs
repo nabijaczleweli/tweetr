@@ -18,7 +18,11 @@ pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outc
     Ok((app, config_dir.1.join("users.toml")))
 }
 
-pub fn authorise<'t, R: BufRead, W: Write, T: Into<Token<'t>>>(input: &mut R, output: &mut W, conn_token: T) -> Result<User, Outcome> {
+pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T) -> Result<User, Outcome>
+    where R: BufRead,
+          W: Write,
+          T: Into<Token<'t>>
+{
     let conn_token = conn_token.into();
     let req_token = try!(request_token(&conn_token, "oob").map_err(|e| Outcome::TwitterAPIError(format!("{}", e))));
     let url = authorize_url(&req_token);
@@ -44,4 +48,13 @@ pub fn append_user(users_path: &Path, user: User) {
     }
 
     User::write(users, &users_path);
+}
+
+pub fn print_success_message<W: Write>(output: &mut W, user: &User, verbose: bool) {
+    writeln!(output, "Successfully authenticated user {}#{}", user.name, user.id).unwrap();
+    if verbose {
+        writeln!(output, "Access tokens:").unwrap();
+        writeln!(output, "  Key   : {}", user.access_token_key).unwrap();
+        writeln!(output, "  Secret: {}", user.access_token_secret).unwrap();
+    }
 }

@@ -27,7 +27,7 @@ fn actual_main() -> i32 {
                 Err(out) => out,
             }
         }
-        not_stakkr::options::Subsystem::AddUser => {
+        not_stakkr::options::Subsystem::AddUser { verbose } => {
             match not_stakkr::ops::add_user::verify(&opts.config_dir) {
                 Ok((app_path, users_path)) => {
                     let stdin = stdin();
@@ -37,7 +37,11 @@ fn actual_main() -> i32 {
 
                     match not_stakkr::ops::add_user::authorise(&mut lock, &mut stdout(), app) {
                         Ok(user) => {
+                            println!("");
+                            not_stakkr::ops::add_user::print_success_message(&mut stdout(), &user, verbose);
+
                             not_stakkr::ops::add_user::append_user(&users_path, user);
+
                             not_stakkr::Outcome::NoError
                         }
                         Err(out) => out,
