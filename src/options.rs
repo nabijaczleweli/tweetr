@@ -17,7 +17,7 @@ use std::env::home_dir;
 use std::fs;
 
 
-/// All possible subsystems, think `cargo` or `git`.
+/// All possible subsystems, think `cargo`'s or `git`'s.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub enum Subsystem {
     /// Initialise global app data
