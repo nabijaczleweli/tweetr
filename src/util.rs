@@ -39,8 +39,11 @@ use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 ///                          |s| u64::from_str(s).is_ok(),
 ///                          10).is_err());
 /// ```
-pub fn prompt_exact_len<R: BufRead, W: Write, F: Fn(&String) -> bool>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F, desired_len: usize)
-                                                                      -> IoResult<String> {
+pub fn prompt_exact_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F, desired_len: usize) -> IoResult<String>
+    where R: BufRead,
+          W: Write,
+          F: Fn(&String) -> bool
+{
     let mut out = String::new();
 
     while out.len() != desired_len {
@@ -82,7 +85,11 @@ pub fn prompt_exact_len<R: BufRead, W: Write, F: Fn(&String) -> bool>(input: &mu
 ///                            "Number",
 ///                            |s| u64::from_str(s).is_ok()).is_err());
 /// ```
-pub fn prompt_nonzero_len<R: BufRead, W: Write, F: Fn(&String) -> bool>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F) -> IoResult<String> {
+pub fn prompt_nonzero_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F) -> IoResult<String>
+    where R: BufRead,
+          W: Write,
+          F: Fn(&String) -> bool
+{
     let mut out = String::new();
 
     while out.is_empty() {
@@ -93,7 +100,11 @@ pub fn prompt_nonzero_len<R: BufRead, W: Write, F: Fn(&String) -> bool>(input: &
 }
 
 
-fn prompt<R: BufRead, W: Write, F: Fn(&String) -> bool>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, out: &mut String) -> IoResult<()> {
+fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, out: &mut String) -> IoResult<()>
+    where R: BufRead,
+          W: Write,
+          F: Fn(&String) -> bool
+{
     try!(write!(output, "{}: ", prompt_s));
     try!(output.flush());
 
