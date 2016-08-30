@@ -201,6 +201,54 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! This module contains the functions used only by the `add-user` subsystem.</span>
 <span class='doccomment'>//!</span>
@@ -283,22 +331,41 @@
 <span class='doccomment'>/// assert!(add_user::authorise(&amp;mut BufReader::new(b&quot;1234567\n&quot; as &amp;[u8]), &amp;mut Vec::new(), AppTokens {</span>
 <span class='doccomment'>///     key: &quot;GeVFiYk7q8DhUmgMXE0iODrFa&quot;.to_string(),</span>
 <span class='doccomment'>///     secret: &quot;bH3VIvYEwwVmMXkTnXB8N3HEQf4ShOf2Z4e1dkaqSJNGorK2pe&quot;.to_string(),</span>
-<span class='doccomment'>/// }).is_ok());</span>
+<span class='doccomment'>/// }, false).is_ok());</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>authorise</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span>, <span class='ident'>R</span>, <span class='ident'>W</span>, <span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>R</span>, <span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>W</span>, <span class='ident'>conn_token</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>User</span>, <span class='ident'>Outcome</span><span class='op'>&gt;</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>authorise</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span>, <span class='ident'>R</span>, <span class='ident'>W</span>, <span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>R</span>, <span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>W</span>, <span class='ident'>conn_token</span>: <span class='ident'>T</span>, <span class='ident'>verbose</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>User</span>, <span class='ident'>Outcome</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>R</span>: <span class='ident'>BufRead</span>,
           <span class='ident'>W</span>: <span class='ident'>Write</span>,
           <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span><span class='op'>&gt;&gt;</span>
 {
     <span class='kw'>let</span> <span class='ident'>conn_token</span> <span class='op'>=</span> <span class='ident'>conn_token</span>.<span class='ident'>into</span>();
-    <span class='kw'>let</span> <span class='ident'>req_token</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>request_token</span>(<span class='kw-2'>&amp;</span><span class='ident'>conn_token</span>, <span class='string'>&quot;oob&quot;</span>).<span class='ident'>map_err</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>))));
-    <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>authorize_url</span>(<span class='kw-2'>&amp;</span><span class='ident'>req_token</span>);
+
+    <span class='kw'>let</span> <span class='ident'>req_token</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>wrap_network_op_in_ellipsis_done</span>(<span class='ident'>output</span>,
+                                                          <span class='op'>||</span> {
+                                                              <span class='kw'>let</span> <span class='ident'>req_token</span> <span class='op'>=</span> <span class='ident'>request_token</span>(<span class='kw-2'>&amp;</span><span class='ident'>conn_token</span>, <span class='string'>&quot;oob&quot;</span>)
+                                                                  .<span class='ident'>map_err</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>)));
+                                                              (<span class='ident'>req_token</span>.<span class='ident'>is_ok</span>(), <span class='ident'>req_token</span>)
+                                                          },
+                                                          <span class='string'>&quot;request token&quot;</span>,
+                                                          <span class='ident'>verbose</span>,
+                                                          <span class='bool-val'>false</span>,
+                                                          <span class='bool-val'>false</span>));
+    <span class='kw'>let</span> <span class='ident'>url</span> <span class='op'>=</span> <span class='ident'>wrap_network_op_in_ellipsis_done</span>(<span class='ident'>output</span>, <span class='op'>||</span> (<span class='bool-val'>true</span>, <span class='ident'>authorize_url</span>(<span class='kw-2'>&amp;</span><span class='ident'>req_token</span>)), <span class='string'>&quot;authorisation URL&quot;</span>, <span class='ident'>verbose</span>, <span class='bool-val'>false</span>, <span class='bool-val'>true</span>);
 
     <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;Visit this URL: {}&quot;</span>, <span class='ident'>url</span>).<span class='ident'>unwrap</span>();
 
     <span class='kw'>let</span> <span class='ident'>pin</span> <span class='op'>=</span> <span class='ident'>prompt_exact_len</span>(<span class='ident'>input</span>, <span class='ident'>output</span>, <span class='string'>&quot;Enter the PIN from that page&quot;</span>, <span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>u32</span>::<span class='ident'>from_str</span>(<span class='ident'>s</span>).<span class='ident'>is_ok</span>(), <span class='number'>7</span>).<span class='ident'>unwrap</span>();
 
-    <span class='kw'>let</span> <span class='ident'>access_token_data</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>access_token</span>(<span class='kw-2'>&amp;</span><span class='ident'>conn_token</span>, <span class='kw-2'>&amp;</span><span class='ident'>req_token</span>, <span class='ident'>pin</span>).<span class='ident'>map_err</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>))));
+    <span class='kw'>let</span> <span class='ident'>access_token_data</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>wrap_network_op_in_ellipsis_done</span>(<span class='ident'>output</span>,
+                                                                  <span class='op'>||</span> {
+                                                                      <span class='kw'>let</span> <span class='ident'>access_token_data</span> <span class='op'>=</span> <span class='ident'>access_token</span>(<span class='kw-2'>&amp;</span><span class='ident'>conn_token</span>, <span class='kw-2'>&amp;</span><span class='ident'>req_token</span>, <span class='ident'>pin</span>)
+                                                                          .<span class='ident'>map_err</span>(<span class='op'>|</span><span class='ident'>e</span><span class='op'>|</span> <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>e</span>)));
+                                                                      (<span class='ident'>access_token_data</span>.<span class='ident'>is_ok</span>(), <span class='ident'>access_token_data</span>)
+                                                                  },
+                                                                  <span class='string'>&quot;access token&quot;</span>,
+                                                                  <span class='ident'>verbose</span>,
+                                                                  <span class='bool-val'>true</span>,
+                                                                  <span class='bool-val'>false</span>));
     <span class='prelude-val'>Ok</span>(<span class='ident'>User</span>::<span class='ident'>from_raw_access_token</span>(<span class='ident'>access_token_data</span>))
 }
 
@@ -359,6 +426,35 @@
         <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;Access tokens:&quot;</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;  Key   : {}&quot;</span>, <span class='ident'>user</span>.<span class='ident'>access_token_key</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;  Secret: {}&quot;</span>, <span class='ident'>user</span>.<span class='ident'>access_token_secret</span>).<span class='ident'>unwrap</span>();
+    }
+}
+
+
+<span class='kw'>fn</span> <span class='ident'>wrap_network_op_in_ellipsis_done</span><span class='op'>&lt;</span><span class='ident'>W</span>, <span class='ident'>T</span>, <span class='ident'>F</span><span class='op'>&gt;</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>W</span>, <span class='ident'>f</span>: <span class='ident'>F</span>, <span class='ident'>desc</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>verbose</span>: <span class='ident'>bool</span>, <span class='ident'>nl_before</span>: <span class='ident'>bool</span>, <span class='ident'>nl_after</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>
+    <span class='kw'>where</span> <span class='ident'>W</span>: <span class='ident'>Write</span>,
+          <span class='ident'>F</span>: <span class='ident'>FnOnce</span>() <span class='op'>-&gt;</span> (<span class='ident'>bool</span>, <span class='ident'>T</span>)
+{
+    <span class='kw'>if</span> <span class='ident'>verbose</span> {
+        <span class='kw'>if</span> <span class='ident'>nl_before</span> {
+            <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;&quot;</span>).<span class='ident'>unwrap</span>();
+        }
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;Getting {}...&quot;</span>, <span class='ident'>desc</span>).<span class='ident'>unwrap</span>();
+        <span class='ident'>output</span>.<span class='ident'>flush</span>().<span class='ident'>unwrap</span>();
+
+        <span class='kw'>let</span> (<span class='ident'>succeeded</span>, <span class='ident'>res</span>) <span class='op'>=</span> <span class='ident'>f</span>();
+
+        <span class='kw'>if</span> <span class='ident'>succeeded</span> {
+            <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot; DONE&quot;</span>).<span class='ident'>unwrap</span>();
+        } <span class='kw'>else</span> {
+            <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;&quot;</span>).<span class='ident'>unwrap</span>();
+        }
+        <span class='kw'>if</span> <span class='ident'>nl_after</span> {
+            <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;&quot;</span>).<span class='ident'>unwrap</span>();
+        }
+
+        <span class='ident'>res</span>
+    } <span class='kw'>else</span> {
+        <span class='ident'>f</span>().<span class='number'>1</span>
     }
 }
 </pre>
