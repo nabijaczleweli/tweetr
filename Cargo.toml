@@ -18,6 +18,10 @@ egg-mode = "0.3"
 clap = "2.11"
 toml = "0.2"
 
+[dependencies.chrono]
+version = "0.2"
+features = ["rustc-serialize"]
+
 
 [[bin]]
 name = "not-stakkr"

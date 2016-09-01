@@ -7,12 +7,14 @@ use std::path::PathBuf;
 
 mod user;
 mod token;
+mod queued_tweet;
 
 pub mod init;
 pub mod add_user;
 
 pub use self::user::User;
 pub use self::token::AppTokens;
+pub use self::queued_tweet::QueuedTweet;
 
 
 fn verify_file(fname: &str, should_exist: bool, config_dir: &(String, PathBuf), force: bool) -> Result<PathBuf, String> {
