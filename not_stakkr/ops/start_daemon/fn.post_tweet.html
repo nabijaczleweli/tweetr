@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `util` mod in crate `not_stakkr`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, util">
+    <meta name="description" content="API documentation for the Rust `post_tweet` fn in crate `not_stakkr`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, post_tweet">
 
-    <title>not_stakkr::util - Rust</title>
+    <title>not_stakkr::ops::start_daemon::post_tweet - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
     
 
     
@@ -28,7 +28,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../index.html'>not_stakkr</a></p><script>window.sidebarCurrent = {name: 'util', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'><a href='../../index.html'>not_stakkr</a>::<wbr><a href='../index.html'>ops</a>::<wbr><a href='index.html'>start_daemon</a></p><script>window.sidebarCurrent = {name: 'post_tweet', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -42,29 +42,13 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>not_stakkr</a>::<wbr><a class='mod' href=''>util</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content fn">
+<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>not_stakkr</a>::<wbr><a href='../index.html'>ops</a>::<wbr><a href='index.html'>start_daemon</a>::<wbr><a class='fn' href=''>post_tweet</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-873' class='srclink' href='../../src/not_stakkr/src/util.rs.html#1-122' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Module containing various utility functions.</p>
-</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.prompt_exact_len.html'
-                                  title='not_stakkr::util::prompt_exact_len'>prompt_exact_len</a></td>
-                           <td class='docblock short'>
-                                <p>Ask the user to input a string of the exact length of <code>desired_len</code>, (re)prompting as necessary.</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='fn' href='fn.prompt_nonzero_len.html'
-                                  title='not_stakkr::util::prompt_nonzero_len'>prompt_nonzero_len</a></td>
-                           <td class='docblock short'>
-                                <p>Ask the user to input a string of non-zero length, (re)prompting as necessary.</p>
-                           </td>
-                       </tr></table></section>
+               </span><a id='src-852' class='srclink' href='../../../src/not_stakkr/src/ops/start_daemon.rs.html#56-64' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn post_tweet&lt;W:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>&gt;(tweet: &amp;mut <a class='struct' href='../../../not_stakkr/ops/struct.QueuedTweet.html' title='not_stakkr::ops::QueuedTweet'>QueuedTweet</a>, on_behalf_of: &amp;<a class='struct' href='../../../not_stakkr/ops/struct.User.html' title='not_stakkr::ops::User'>User</a>, verbose: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>, output: &amp;mut W) -&gt; <a class='enum' href='../../../not_stakkr/enum.Outcome.html' title='not_stakkr::Outcome'>Outcome</a></pre></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -118,13 +102,13 @@
     
 
     <script>
-        window.rootPath = "../../";
+        window.rootPath = "../../../";
         window.currentCrate = "not_stakkr";
         window.playgroundUrl = "";
     </script>
-    <script src="../../jquery.js"></script>
-    <script src="../../main.js"></script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
     
-    <script defer src="../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>
