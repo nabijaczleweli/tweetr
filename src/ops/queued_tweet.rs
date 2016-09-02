@@ -13,6 +13,7 @@
 use chrono::{DateTime, FixedOffset, ParseError};
 use std::io::{Read, Write, Error as IoError};
 use toml::{encode_str, decode_str};
+use std::iter::FromIterator;
 use std::cmp::Ordering;
 use std::path::Path;
 use std::fs::File;
@@ -25,7 +26,7 @@ pub struct QueuedTweet {
     ///
     /// Has to have been previously added via the `add-user` subsystem.
     pub author: String,
-    /// The time to post at.
+    /// The time to post the tweet at.
     pub time: DateTime<FixedOffset>,
 
     /// The string content of the tweet.
@@ -67,15 +68,7 @@ impl QueuedTweet {
         try!(try!(File::open(p).map_err(Some)).read_to_string(&mut buf).map_err(Some));
 
         let queued_tweets: QueuedTweets = try!(decode_str(&buf).ok_or(None));
-
-        let mut msgs = Vec::with_capacity(queued_tweets.tweet.len());
-        for qms in queued_tweets.tweet {
-            match qms.into() {
-                Ok(qm) => msgs.push(qm),
-                Err(_) => return Err(None),
-            }
-        }
-        Ok(msgs)
+        Result::from_iter(queued_tweets.tweet.into_iter().map(|qts| qts.into()).collect::<Vec<_>>()).map_err(|_| None)
     }
 
     /// Save all queued tweets to the specified file.
@@ -101,13 +94,13 @@ impl PartialOrd for QueuedTweet {
 
 
 impl From<QueuedTweet> for QueuedTweetForSerialisation {
-    fn from(qm: QueuedTweet) -> QueuedTweetForSerialisation {
+    fn from(qt: QueuedTweet) -> QueuedTweetForSerialisation {
         QueuedTweetForSerialisation {
-            author: qm.author,
-            time: qm.time.to_rfc3339(),
-            content: qm.content,
-            time_posted: qm.time_posted.map(|dt| dt.to_rfc3339()),
-            id: qm.id,
+            author: qt.author,
+            time: qt.time.to_rfc3339(),
+            content: qt.content,
+            time_posted: qt.time_posted.map(|dt| dt.to_rfc3339()),
+            id: qt.id,
         }
     }
 }
