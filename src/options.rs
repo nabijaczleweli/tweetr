@@ -12,8 +12,10 @@
 
 
 use clap::{self, App, SubCommand, Arg, AppSettings};
+use std::time::Duration;
 use std::path::PathBuf;
 use std::env::home_dir;
+use std::str::FromStr;
 use std::fs;
 
 
@@ -28,6 +30,13 @@ pub enum Subsystem {
     /// Add and authorise a user
     AddUser {
         /// Whether to print more user data. Default: `false`
+        verbose: bool,
+    },
+    /// Start the tweet-posting daemon.
+    StartDaemon {
+        /// How long to wait between trying to post again. Default: 60s
+        delay: Duration,
+        /// Whether to log all network requests. Default: `false`
         verbose: bool,
     },
 }
@@ -61,6 +70,12 @@ impl Options {
             .subcommand(SubCommand::with_name("add-user")
                 .about("Add and authorise a user")
                 .arg(Arg::from_usage("-v --verbose 'Print more user data'")))
+            .subcommand(SubCommand::with_name("start-daemon")
+                .about("Start the tweet-posting daemon")
+                .args(&[Arg::from_usage("-v --verbose 'Log all network requests'"),
+                        Arg::from_usage("--delay=<delay> 'How long to wait between trying to post again [ms]'")
+                            .default_value("60000")
+                            .validator(Options::duration_validator)]))
             .get_matches();
 
         Options {
@@ -89,6 +104,12 @@ impl Options {
             subsystem: match matches.subcommand() {
                 ("init", Some(init_matches)) => Subsystem::Init { force: init_matches.is_present("force") },
                 ("add-user", Some(add_user_matches)) => Subsystem::AddUser { verbose: add_user_matches.is_present("verbose") },
+                ("start-daemon", Some(start_daemon_matches)) => {
+                    Subsystem::StartDaemon {
+                        delay: Duration::from_millis(u64::from_str(start_daemon_matches.value_of("delay").unwrap()).unwrap()),
+                        verbose: start_daemon_matches.is_present("verbose"),
+                    }
+                }
                 _ => panic!("No subcommand passed"),
             },
         }
@@ -96,5 +117,9 @@ impl Options {
 
     fn config_dir_validator(s: String) -> Result<(), String> {
         fs::canonicalize(&s).map(|_| ()).map_err(|_| format!("Configuration directory \"{}\" not found", s))
+    }
+
+    fn duration_validator(s: String) -> Result<(), String> {
+        u64::from_str(&s).map(|_| ()).map_err(|_| format!("\"{}\" is not a valid amount of milliseconds", s))
     }
 }

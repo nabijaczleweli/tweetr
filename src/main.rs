@@ -1,5 +1,6 @@
 extern crate not_stakkr;
 
+use std::thread;
 use std::process::exit;
 use std::io::{stdin, stdout, stderr};
 
@@ -46,6 +47,32 @@ fn actual_main() -> i32 {
                         }
                         Err(out) => out,
                     }
+                }
+                Err(out) => out,
+            }
+        }
+        not_stakkr::options::Subsystem::StartDaemon { delay, verbose } => {
+            match not_stakkr::ops::start_daemon::verify(&opts.config_dir) {
+                Ok((users_path, tweets_path)) => {
+                    let users = not_stakkr::ops::User::read(&users_path).unwrap();
+
+                    let result = None;
+                    while result.is_none() {
+                        let mut tweets = not_stakkr::ops::QueuedTweet::read(&tweets_path).unwrap();
+                        let tweets_to_post = not_stakkr::ops::start_daemon::tweet_indices_to_post(&tweets);
+
+                        for i in tweets_to_post {
+                            let tweet_to_post = &mut tweets[i];
+
+                            if let Some(user_i) = not_stakkr::ops::start_daemon::find_user_index_for_tweet(tweet_to_post, &users, &mut stderr()) {
+                                not_stakkr::ops::start_daemon::post_tweet(tweet_to_post, &users[user_i], verbose, &mut stdout()).print_error(&mut stderr());
+                            }
+                        }
+
+                        thread::sleep(delay);
+                    }
+
+                    result.unwrap()
                 }
                 Err(out) => out,
             }

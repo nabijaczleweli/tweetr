@@ -31,7 +31,7 @@ fn multi_eq() {
                             access_token_secret: "GVQDq88qLtJ45KR6u44A6AljW31JSSippjdipQg6gPYE5".to_string(),
                         },
                         User {
-                            name: "danerang".to_string(),
+                            name: "danerangLP".to_string(),
                             id: 334776,
                             access_token_key: "334776-WTRvsJI4DQgvzYwDYT8YYdEBxnpCQpQB2t4SrEK".to_string(),
                             access_token_secret: "qbOzYrP9bwcOEGAUnuiPVfA7JqAAsWhrd8DcbwDH5RwTA".to_string(),
