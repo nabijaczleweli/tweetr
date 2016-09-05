@@ -109,6 +109,17 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Write</span>;
 
@@ -126,6 +137,13 @@
         <span class='ident'>subsys</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
         <span class='doccomment'>/// The file the specified subsystem produces.</span>
         <span class='ident'>fname</span>: <span class='ident'>String</span>,
+    },
+    <span class='doccomment'>/// The specified subsystem needs to be run beforehand to produce the specified data.</span>
+    <span class='ident'>RequiredDataFromSubsystemNonexistant</span> {
+        <span class='doccomment'>/// The subsystem that needs to be run.</span>
+        <span class='ident'>subsys</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
+        <span class='doccomment'>/// The description of what needs to be produced.</span>
+        <span class='ident'>desc</span>: <span class='ident'>String</span>,
     },
     <span class='doccomment'>/// The specified subsystem needs to be run beforehand to produce the specified file.</span>
     <span class='ident'>TwitterAPIError</span>(<span class='ident'>String</span>),
@@ -155,6 +173,9 @@
             <span class='ident'>Outcome</span>::<span class='ident'>RequiredFileFromSubsystemNonexistant</span> { <span class='kw-2'>ref</span> <span class='ident'>subsys</span>, <span class='kw-2'>ref</span> <span class='ident'>fname</span> } <span class='op'>=&gt;</span> {
                 <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>err_out</span>, <span class='string'>&quot;Run the {} subsystem first to produce \&quot;{}\&quot;.&quot;</span>, <span class='ident'>subsys</span>, <span class='ident'>fname</span>).<span class='ident'>unwrap</span>()
             }
+            <span class='ident'>Outcome</span>::<span class='ident'>RequiredDataFromSubsystemNonexistant</span> { <span class='kw-2'>ref</span> <span class='ident'>subsys</span>, <span class='kw-2'>ref</span> <span class='ident'>desc</span> } <span class='op'>=&gt;</span> {
+                <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>err_out</span>, <span class='string'>&quot;Run the {} subsystem first to {}.&quot;</span>, <span class='ident'>subsys</span>, <span class='ident'>desc</span>).<span class='ident'>unwrap</span>()
+            }
             <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(<span class='kw-2'>ref</span> <span class='ident'>error</span>) <span class='op'>=&gt;</span> <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>err_out</span>, <span class='string'>&quot;Twitter API error: {}&quot;</span>, <span class='ident'>error</span>).<span class='ident'>unwrap</span>(),
         }
     }
@@ -172,7 +193,8 @@
         <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>Outcome</span>::<span class='ident'>NoError</span> <span class='op'>=&gt;</span> <span class='number'>0</span>,
             <span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>(_) <span class='op'>=&gt;</span> <span class='number'>1</span>,
-            <span class='ident'>Outcome</span>::<span class='ident'>RequiredFileFromSubsystemNonexistant</span> { <span class='ident'>subsys</span>: _, <span class='ident'>fname</span>: _ } <span class='op'>=&gt;</span> <span class='number'>2</span>,
+            <span class='ident'>Outcome</span>::<span class='ident'>RequiredFileFromSubsystemNonexistant</span> { <span class='ident'>subsys</span>: _, <span class='ident'>fname</span>: _ } <span class='op'>|</span>
+            <span class='ident'>Outcome</span>::<span class='ident'>RequiredDataFromSubsystemNonexistant</span> { <span class='ident'>subsys</span>: _, <span class='ident'>desc</span>: _ } <span class='op'>=&gt;</span> <span class='number'>2</span>,
             <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(_) <span class='op'>=&gt;</span> <span class='number'>3</span>,
         }
     }
