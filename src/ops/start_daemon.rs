@@ -36,19 +36,19 @@ pub fn tweet_indices_to_post(tweets: &Vec<QueuedTweet>) -> Vec<usize> {
         .collect()
 }
 
-pub fn find_user_index_for_tweet<W: Write>(tweet: &QueuedTweet, users: &Vec<User>, err: &mut W) -> Option<usize> {
-    let res = users.iter().enumerate().find(|&iu| iu.1.name == tweet.author).map(|iu| iu.0);
-
-    if res.is_none() {
-        writeln!(err,
-                 "Couldn't find user with name \"{}\" for tweet \"{}\" scheduled for {:?}",
-                 tweet.author,
-                 tweet.content,
-                 tweet.time)
-            .unwrap();
+pub fn find_user_index_for_tweet(tweet: &QueuedTweet, users: &Vec<User>) -> Result<usize, Outcome> {
+    match users.iter().enumerate().find(|&iu| iu.1.name == tweet.author).map(|iu| iu.0) {
+        Some(uid) => Ok(uid),
+        None => {
+            Err(Outcome::RequiredDataFromSubsystemNonexistant {
+                subsys: "add-user",
+                desc: format!("add and authorise user with name \"{}\" (required for tweet \"{}\" scheduled for {:?})",
+                              tweet.author,
+                              tweet.content,
+                              tweet.time),
+            })
+        }
     }
-
-    res
 }
 
 // TODO: remove

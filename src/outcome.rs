@@ -15,6 +15,13 @@ pub enum Outcome {
         /// The file the specified subsystem produces.
         fname: String,
     },
+    /// The specified subsystem needs to be run beforehand to produce the specified data.
+    RequiredDataFromSubsystemNonexistant {
+        /// The subsystem that needs to be run.
+        subsys: &'static str,
+        /// The description of what needs to be produced.
+        desc: String,
+    },
     /// The specified subsystem needs to be run beforehand to produce the specified file.
     TwitterAPIError(String),
 }
@@ -43,6 +50,9 @@ impl Outcome {
             Outcome::RequiredFileFromSubsystemNonexistant { ref subsys, ref fname } => {
                 writeln!(err_out, "Run the {} subsystem first to produce \"{}\".", subsys, fname).unwrap()
             }
+            Outcome::RequiredDataFromSubsystemNonexistant { ref subsys, ref desc } => {
+                writeln!(err_out, "Run the {} subsystem first to {}.", subsys, desc).unwrap()
+            }
             Outcome::TwitterAPIError(ref error) => writeln!(err_out, "Twitter API error: {}", error).unwrap(),
         }
     }
@@ -60,7 +70,8 @@ impl Outcome {
         match *self {
             Outcome::NoError => 0,
             Outcome::OverrideNoForce(_) => 1,
-            Outcome::RequiredFileFromSubsystemNonexistant { subsys: _, fname: _ } => 2,
+            Outcome::RequiredFileFromSubsystemNonexistant { subsys: _, fname: _ } |
+            Outcome::RequiredDataFromSubsystemNonexistant { subsys: _, desc: _ } => 2,
             Outcome::TwitterAPIError(_) => 3,
         }
     }

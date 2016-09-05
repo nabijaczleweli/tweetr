@@ -64,8 +64,11 @@ fn actual_main() -> i32 {
                         for i in tweets_to_post {
                             let tweet_to_post = &mut tweets[i];
 
-                            if let Some(user_i) = not_stakkr::ops::start_daemon::find_user_index_for_tweet(tweet_to_post, &users, &mut stderr()) {
-                                not_stakkr::ops::start_daemon::post_tweet(tweet_to_post, &users[user_i], verbose, &mut stdout()).print_error(&mut stderr());
+                            match not_stakkr::ops::start_daemon::find_user_index_for_tweet(tweet_to_post, &users) {
+                                Ok(user_i) => {
+                                    not_stakkr::ops::start_daemon::post_tweet(tweet_to_post, &users[user_i], verbose, &mut stdout()).print_error(&mut stderr());
+                                }
+                                Err(out) => out.print_error(&mut stderr()),
                             }
                         }
 
