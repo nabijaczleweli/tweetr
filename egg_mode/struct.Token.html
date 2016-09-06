@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-139' class='srclink' href='../src/egg_mode/auth.rs.html#139-144' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-138' class='srclink' href='../src/egg_mode/auth.rs.html#136-141' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Token&lt;'a&gt; {
     pub key: <a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'a,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;,
     pub secret: <a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'a,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;,
@@ -56,7 +56,7 @@
                            </span><span class='stab '></span><div class='docblock'><p>A key used to identify an application or user.</p>
 </div><span id='structfield.secret' class='structfield'><code>secret: <a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'a,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code>
                            </span><span class='stab '></span><div class='docblock'><p>A private key used to sign messages from an application or user.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-143' class='srclink' href='../src/egg_mode/auth.rs.html#146-162' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-142' class='srclink' href='../src/egg_mode/auth.rs.html#143-159' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>&lt;K,&nbsp;S&gt;(key: K, secret: S) -&gt; <a class='struct' href='../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>&lt;'a&gt; <span class='where'>where K: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'a,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;, S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'a,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;</span></code></h4>
 <div class='docblock'><p>Creates a Token with the given key and secret.</p>
 

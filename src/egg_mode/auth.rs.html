@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.3.0/src/auth.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.4.0/src/auth.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>auth.rs.html -- source</title>
@@ -464,14 +464,10 @@
 <span id="420">420</span>
 <span id="421">421</span>
 <span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Cow</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::{<span class='ident'>UNIX_EPOCH</span>, <span class='ident'>SystemTime</span>};
 <span class='kw'>use</span> <span class='ident'>url</span>::<span class='ident'>percent_encoding</span>::{<span class='ident'>EncodeSet</span>, <span class='ident'>utf8_percent_encode</span>};
 <span class='kw'>use</span> <span class='ident'>hyper</span>;
@@ -495,10 +491,8 @@
 <span class='kw'>impl</span> <span class='ident'>EncodeSet</span> <span class='kw'>for</span> <span class='ident'>TwitterEncodeSet</span> {
     <span class='kw'>fn</span> <span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>byte</span>: <span class='ident'>u8</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='ident'>byte</span> {
-            <span class='string'>b&#39;a&#39;</span> ... <span class='string'>b&#39;z&#39;</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
-            <span class='string'>b&#39;A&#39;</span> ... <span class='string'>b&#39;Z&#39;</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
-            <span class='string'>b&#39;0&#39;</span> ... <span class='string'>b&#39;9&#39;</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
-            <span class='string'>b&#39;-&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;.&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;_&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;~&#39;</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            <span class='string'>b&#39;a&#39;</span> ... <span class='string'>b&#39;z&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;A&#39;</span> ... <span class='string'>b&#39;Z&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;0&#39;</span> ... <span class='string'>b&#39;9&#39;</span>
+                <span class='op'>|</span> <span class='string'>b&#39;-&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;.&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;_&#39;</span> <span class='op'>|</span> <span class='string'>b&#39;~&#39;</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
             _ <span class='op'>=&gt;</span> <span class='bool-val'>true</span>
         }
     }
@@ -640,7 +634,7 @@
         <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>Token</span>,
         <span class='ident'>access_token</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Token</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>TwitterOAuth</span> {
     <span class='kw'>let</span> <span class='ident'>query_string</span> <span class='op'>=</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sig_params</span> <span class='op'>=</span> <span class='ident'>params</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> <span class='ident'>p</span>.<span class='ident'>clone</span>()).<span class='ident'>unwrap_or</span>(<span class='ident'>HashMap</span>::<span class='ident'>new</span>());
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sig_params</span> <span class='op'>=</span> <span class='ident'>params</span>.<span class='ident'>cloned</span>().<span class='ident'>unwrap_or_default</span>();
 
         <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>sig_params</span>, <span class='string'>&quot;oauth_consumer_key&quot;</span>, <span class='ident'>header</span>.<span class='ident'>consumer_key</span>.<span class='ident'>as_str</span>());
         <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>sig_params</span>, <span class='string'>&quot;oauth_nonce&quot;</span>, <span class='ident'>header</span>.<span class='ident'>nonce</span>.<span class='ident'>as_str</span>());
@@ -797,7 +791,7 @@
             <span class='prelude-val'>Some</span>(<span class='string'>&quot;oauth_token&quot;</span>) <span class='op'>=&gt;</span> <span class='ident'>key</span> <span class='op'>=</span> <span class='ident'>kv</span>.<span class='ident'>next</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>to_string</span>()),
             <span class='prelude-val'>Some</span>(<span class='string'>&quot;oauth_token_secret&quot;</span>) <span class='op'>=&gt;</span> <span class='ident'>secret</span> <span class='op'>=</span> <span class='ident'>kv</span>.<span class='ident'>next</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>to_string</span>()),
             <span class='prelude-val'>Some</span>(_) <span class='op'>=&gt;</span> (),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>),
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;unexpected end of request_token response&quot;</span>, <span class='prelude-val'>None</span>)),
         }
     }
 
@@ -875,7 +869,7 @@
             <span class='prelude-val'>Some</span>(<span class='string'>&quot;user_id&quot;</span>) <span class='op'>=&gt;</span> <span class='ident'>id</span> <span class='op'>=</span> <span class='ident'>kv</span>.<span class='ident'>next</span>().<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>i64</span>::<span class='ident'>from_str_radix</span>(<span class='ident'>s</span>, <span class='number'>10</span>).<span class='ident'>ok</span>()),
             <span class='prelude-val'>Some</span>(<span class='string'>&quot;screen_name&quot;</span>) <span class='op'>=&gt;</span> <span class='ident'>username</span> <span class='op'>=</span> <span class='ident'>kv</span>.<span class='ident'>next</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>to_string</span>()),
             <span class='prelude-val'>Some</span>(_) <span class='op'>=&gt;</span> (),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>),
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;unexpected end of response in access_token&quot;</span>, <span class='prelude-val'>None</span>)),
         }
     }
 
@@ -887,7 +881,7 @@
 
 <span class='doccomment'>///If the given tokens are valid, return the user information for the authenticated user.</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>verify_tokens</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&lt;</span><span class='kw'>super</span>::<span class='ident'>user</span>::<span class='ident'>TwitterUser</span><span class='op'>&gt;</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>
+    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span>::<span class='ident'>user</span>::<span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
 {
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>auth</span>::<span class='ident'>VERIFY_CREDENTIALS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>));
 

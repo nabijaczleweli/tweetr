@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-485' class='srclink' href='../../src/egg_mode/user/mod.rs.html#1-455' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-497' class='srclink' href='../../src/egg_mode/user/mod.rs.html#1-506' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Structs and methods for pulling user information from Twitter.</p>
 
 <p>Everything in here acts on users in some way, whether looking up user information, finding the
@@ -55,6 +55,8 @@ relations between two users, or actions like following or blocking a user.</p>
 
 <h2 id='types' class='section-header'><a href='#types'>Types</a></h2>
 <ul>
+<li><code>UserID</code>: used as a generic input to many functions, this enum allows you to refer to a user
+by a numeric ID or by their screen name.</li>
 <li><code>Relationship</code>/<code>RelationSource</code>/<code>RelationTarget</code>: returned by <code>relation</code>, these types
 (<code>Relationship</code> contains the other two) show the ways two accounts relate to each other.</li>
 <li><code>RelationLookup</code>/<code>Connection</code>: returned as part of a collection by <code>relation_lookup</code>, these
@@ -168,6 +170,13 @@ target user.</p>
                            <td class='docblock short'>
                                 <p>Represents the ways a target account can be connected to another account.</p>
                            </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.UserID.html'
+                                  title='egg_mode::user::UserID'>UserID</a></td>
+                           <td class='docblock short'>
+                                <p>Convenience enum to generalize between referring to an account by numeric ID or by screen name.</p>
+                           </td>
                        </tr></table><h2 id='functions-1' class='section-header'><a href="#functions-1">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -247,21 +256,21 @@ return their user IDs.</p>
                            <td><a class='fn' href='fn.lookup.html'
                                   title='egg_mode::user::lookup'>lookup</a></td>
                            <td class='docblock short'>
-                                <p>Lookup a set of Twitter users by both ID and screen name, as applicable.</p>
+                                <p>Lookup a set of Twitter users by either ID and screen name, as applicable.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.lookup_ids.html'
                                   title='egg_mode::user::lookup_ids'>lookup_ids</a></td>
                            <td class='docblock short'>
-                                <p>Lookup a set of Twitter users by their numerical ID.</p>
+                               [<em class='stab deprecated'>Deprecated</em>] <p>Lookup a set of Twitter users by their numerical ID.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.lookup_names.html'
                                   title='egg_mode::user::lookup_names'>lookup_names</a></td>
                            <td class='docblock short'>
-                                <p>Lookup a set of Twitter users by their screen name.</p>
+                               [<em class='stab deprecated'>Deprecated</em>] <p>Lookup a set of Twitter users by their screen name.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>

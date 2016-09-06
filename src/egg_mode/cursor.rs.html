@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.3.0/src/cursor.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.4.0/src/cursor.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>cursor.rs.html -- source</title>
@@ -370,13 +370,6 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Types and traits to navigate cursored collections.</span>
 <span class='doccomment'>//!</span>
@@ -385,7 +378,6 @@
 <span class='doccomment'>//! this module. The rest of it is available to make sure consumers of the API can understand</span>
 <span class='doccomment'>//! precisely what types come out of functions that return `CursorIter`.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
 <span class='kw'>use</span> <span class='ident'>rustc_serialize</span>::<span class='ident'>json</span>;
 <span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
@@ -431,7 +423,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>UserCursor</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;UserCursor received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>UserCursor</span> {
@@ -476,7 +468,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>IDCursor</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;IDCursor received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>IDCursor</span> {
@@ -537,7 +529,7 @@
 <span class='doccomment'>///`start_at_page` lets you start your search at a specific page. Calling either of these after</span>
 <span class='doccomment'>///starting iteration will clear any current results.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>///(A note about `with_page_size`/`page_size`: While the CursorIter struct always has this method</span>
+<span class='doccomment'>///(A note about `with_page_size`/`page_size`: While the `CursorIter` struct always has this method</span>
 <span class='doccomment'>///and field available, not every cursored call supports changing page size. Check the individual</span>
 <span class='doccomment'>///method documentation for notes on what page sizes are allowed.)</span>
 <span class='doccomment'>///</span>
@@ -580,7 +572,7 @@
     <span class='ident'>link</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
     <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
     <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='ident'>user_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>params_base</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ParamList</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
     <span class='doccomment'>///The number of results returned in one network call.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>///Certain calls set their own minimums and maximums for what this value can be. Furthermore,</span>
@@ -618,15 +610,11 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_page_size</span>(<span class='self'>self</span>, <span class='ident'>page_size</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>page_size</span>.<span class='ident'>is_some</span>() {
             <span class='ident'>CursorIter</span> {
-                <span class='ident'>link</span>: <span class='self'>self</span>.<span class='ident'>link</span>,
-                <span class='ident'>con_token</span>: <span class='self'>self</span>.<span class='ident'>con_token</span>,
-                <span class='ident'>access_token</span>: <span class='self'>self</span>.<span class='ident'>access_token</span>,
-                <span class='ident'>user_id</span>: <span class='self'>self</span>.<span class='ident'>user_id</span>,
                 <span class='ident'>page_size</span>: <span class='prelude-val'>Some</span>(<span class='ident'>page_size</span>),
                 <span class='ident'>previous_cursor</span>: <span class='op'>-</span><span class='number'>1</span>,
                 <span class='ident'>next_cursor</span>: <span class='op'>-</span><span class='number'>1</span>,
                 <span class='ident'>iter</span>: <span class='prelude-val'>None</span>,
-                <span class='ident'>_marker</span>: <span class='self'>self</span>.<span class='ident'>_marker</span>,
+                ..<span class='self'>self</span>
             }
         }
         <span class='kw'>else</span> {
@@ -638,11 +626,9 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>///This is intended to be used as part of this struct&#39;s Iterator implementation. It is provided</span>
     <span class='doccomment'>///as a convenience for those who wish to manage network calls and pagination manually.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>id</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>user_id</span> {
-            <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='ident'>id</span>);
-        }
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>params_base</span>.<span class='ident'>as_ref</span>().<span class='ident'>cloned</span>().<span class='ident'>unwrap_or_default</span>();
+
         <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;cursor&quot;</span>, <span class='self'>self</span>.<span class='ident'>next_cursor</span>.<span class='ident'>to_string</span>());
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>count</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>page_size</span> {
             <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;count&quot;</span>, <span class='ident'>count</span>.<span class='ident'>to_string</span>());
@@ -658,12 +644,12 @@
     <span class='doccomment'>///This is essentially an internal infrastructure function, not meant to be used from consumer</span>
     <span class='doccomment'>///code.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>link</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>,
-               <span class='ident'>user_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>, <span class='ident'>page_size</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+               <span class='ident'>params_base</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ParamList</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>, <span class='ident'>page_size</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>CursorIter</span> {
             <span class='ident'>link</span>: <span class='ident'>link</span>,
             <span class='ident'>con_token</span>: <span class='ident'>con_token</span>,
             <span class='ident'>access_token</span>: <span class='ident'>access_token</span>,
-            <span class='ident'>user_id</span>: <span class='ident'>user_id</span>,
+            <span class='ident'>params_base</span>: <span class='ident'>params_base</span>,
             <span class='ident'>page_size</span>: <span class='ident'>page_size</span>,
             <span class='ident'>previous_cursor</span>: <span class='op'>-</span><span class='number'>1</span>,
             <span class='ident'>next_cursor</span>: <span class='op'>-</span><span class='number'>1</span>,
@@ -676,7 +662,7 @@
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Cursor</span> <span class='op'>+</span> <span class='ident'>FromJson</span>
 {
-    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&lt;</span><span class='ident'>T</span>::<span class='ident'>Item</span><span class='op'>&gt;</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
+    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>T</span>::<span class='ident'>Item</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Item</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter</span> {

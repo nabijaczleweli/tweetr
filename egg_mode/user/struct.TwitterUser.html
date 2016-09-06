@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-548' class='srclink' href='../../src/egg_mode/user/structs.rs.html#62-198' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-602' class='srclink' href='../../src/egg_mode/user/structs.rs.html#102-242' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct TwitterUser {
     pub contributors_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
     pub created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
@@ -81,6 +81,7 @@
     pub protected: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
     pub screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
     pub show_all_inline_media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;,
+    pub status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;,
     pub statuses_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>,
     pub time_zone: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
     pub url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
@@ -236,6 +237,15 @@ for an account.</p>
 names.</p>
 </div><span id='structfield.show_all_inline_media' class='structfield'><code>show_all_inline_media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
                            </span><span class='stab '></span><div class='docblock'><p>Indicates that the user would like to see media inline. &quot;Somewhat disused.&quot;</p>
+</div><span id='structfield.status' class='structfield'><code>status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</code>
+                           </span><span class='stab '></span><div class='docblock'><p>If possible, the most recent tweet or retweet from this user.</p>
+
+<p>&quot;In some circumstances, this data cannot be provided and this field will be omitted, null,
+or empty.&quot; Do not depend on this field being filled. Also note that this is actually their
+most-recent tweet, not the status pinned to their profile.</p>
+
+<p>&quot;Perspectival&quot; items within this tweet that depend on the authenticating user
+<a href="https://dev.twitter.com/docs/faq/basics/why-are-embedded-objects-stale-or-inaccurate">may not be completely reliable</a> in this embed.</p>
 </div><span id='structfield.statuses_count' class='structfield'><code>statuses_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
                            </span><span class='stab '></span><div class='docblock'><p>The number of tweets (including retweets) posted by this user.</p>
 </div><span id='structfield.time_zone' class='structfield'><code>time_zone: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
@@ -250,7 +260,7 @@ names.</p>
                            </span><span class='stab '></span><div class='docblock'><p>When present, lists the countries this user has been withheld from.</p>
 </div><span id='structfield.withheld_scope' class='structfield'><code>withheld_scope: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
                            </span><span class='stab '></span><div class='docblock'><p>When present, indicates whether the content being withheld is a &quot;status&quot; or &quot;user&quot;.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-502' class='srclink' href='../../src/egg_mode/user/structs.rs.html#61' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-555' class='srclink' href='../../src/egg_mode/user/structs.rs.html#101' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>

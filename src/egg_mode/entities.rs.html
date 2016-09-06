@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.3.0/src/entities.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.4.0/src/entities.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>entities.rs.html -- source</title>
@@ -240,6 +240,170 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Data structures containing extracted URL, mention, tag, and media information.</span>
 <span class='doccomment'>//!</span>
@@ -252,56 +416,163 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! [Entities]: https://dev.twitter.com/overview/api/entities</span>
 <span class='doccomment'>//! [obj]: https://dev.twitter.com/overview/api/entities-in-twitter-objects</span>
-
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ## Using indices and URLs</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! When displaying text with accompanied entities, be wary about how you use the accompanied</span>
+<span class='doccomment'>//! indices. The indices given by Twitter reference the *graphemes* in the tweet, so something like</span>
+<span class='doccomment'>//! `char_indices` will fall flat when faced with text that uses combining characters. The</span>
+<span class='doccomment'>//! [unicode-segmentation][] crate provides a means to iterate over the graphemes of a string,</span>
+<span class='doccomment'>//! allowing you to make sure you hyperlink the right range of characters in the text.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! [unicode-segmentation]: https://crates.io/crates/unicode-segmentation</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! Alternately, when substituting URLs for display, `str::replace` works just fine.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ### Shortened, Display, and Expanded URLs</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! URL and Media entities contain references to a URL within their parent text. However, due to</span>
+<span class='doccomment'>//! the nature of how Twitter handles URLs in tweets and user bios, each entity struct has three</span>
+<span class='doccomment'>//! URLs within it:</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! - `url`: This is the `t.co` shortened URL as returned directly from twitter. This is what</span>
+<span class='doccomment'>//!   contributes to character count in tweets and user bios.</span>
+<span class='doccomment'>//! - `expanded_url`: This is the original URL the user entered in their tweet. While it is given</span>
+<span class='doccomment'>//!   to API client, Twitter recommends still sending users to the shortened link, for analytics</span>
+<span class='doccomment'>//!   purposes. Twitter Web uses this field to supply hover-text for where the URL resolves to.</span>
+<span class='doccomment'>//! - `display_url`: This is a truncated version of `expanded_url`, meant to be displayed inline</span>
+<span class='doccomment'>//!   with the parent text. This is useful to show users where the link resolves to, without</span>
+<span class='doccomment'>//!   potentially filling up a lot of space with the fullly expanded URL.</span>
 <span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>error</span>;
 <span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>;
 <span class='kw'>use</span> <span class='ident'>rustc_serialize</span>::<span class='ident'>json</span>;
+<span class='kw'>use</span> <span class='ident'>mime</span>;
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represents a hashtag or symbol extracted from another piece of text.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HashtagEntity</span> {
+    <span class='doccomment'>///The character indices where the hashtag is located. The first index is the location of the #</span>
+    <span class='doccomment'>///or $ character; the second is the location of the first character following the hashtag.</span>
     <span class='kw'>pub</span> <span class='ident'>indices</span>: (<span class='ident'>i32</span>, <span class='ident'>i32</span>),
+    <span class='doccomment'>///The text of the hashtag, without the leading # or $ character.</span>
     <span class='kw'>pub</span> <span class='ident'>text</span>: <span class='ident'>String</span>,
 }
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represents a piece of media attached to a tweet.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>///The information in this struct is subtly different depending on what media is being referenced,</span>
+<span class='doccomment'>///and which entity container is holding this instance. For videos and GIFs, the `media_url` and</span>
+<span class='doccomment'>///`media_url_https` fields each link to a thumbnail image of the media, typically of the first</span>
+<span class='doccomment'>///frame. The real video information can be found on the `video_info` field, including various</span>
+<span class='doccomment'>///encodings if available.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>///Image links available in `media_url` and `media_url_https` can be obtained in different sizes by</span>
+<span class='doccomment'>///appending a colon and one of the available sizes in the `MediaSizes` struct. For example, the</span>
+<span class='doccomment'>///cropped thumbnail can be viewed by appending `:thumb` to the end of the URL, and the full-size</span>
+<span class='doccomment'>///image can be viewed by appending `:large`.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MediaEntity</span> {
+    <span class='doccomment'>///A shortened URL to display to clients.</span>
     <span class='kw'>pub</span> <span class='ident'>display_url</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///An expanded version of `display_url`; links to the media display page.</span>
     <span class='kw'>pub</span> <span class='ident'>expanded_url</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///A numeric ID for the media.</span>
     <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
+    <span class='doccomment'>///Character indices where the media URL is located. The first index is the location of the</span>
+    <span class='doccomment'>///first character of the URL; the second is the location of the first character following the</span>
+    <span class='doccomment'>///URL.</span>
     <span class='kw'>pub</span> <span class='ident'>indices</span>: (<span class='ident'>i32</span>, <span class='ident'>i32</span>),
+    <span class='doccomment'>///A URL pointing directly to the media file. Uses HTTP as the protocol.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>///For videos and GIFs, this link will be to a thumbnail of the media, and the real video link</span>
+    <span class='doccomment'>///will be contained in `video_info`.</span>
     <span class='kw'>pub</span> <span class='ident'>media_url</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///A URL pointing directly to the media file. Uses HTTPS as the protocol.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>///For videos and GIFs, this link will be to a thumbnail of the media, and the real video link</span>
+    <span class='doccomment'>///will be contained in `video_info`.</span>
     <span class='kw'>pub</span> <span class='ident'>media_url_https</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///Various sizes available for the media file.</span>
     <span class='kw'>pub</span> <span class='ident'>sizes</span>: <span class='ident'>MediaSizes</span>,
-    <span class='kw'>pub</span> <span class='ident'>source_status_id</span>: <span class='ident'>i64</span>,
-    <span class='kw'>pub</span> <span class='ident'>media_type</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///For tweets containing media that was originally associated with a different tweet, this</span>
+    <span class='doccomment'>///contains the ID of the original tweet.</span>
+    <span class='kw'>pub</span> <span class='ident'>source_status_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
+    <span class='doccomment'>///The type of media being represented.</span>
+    <span class='kw'>pub</span> <span class='ident'>media_type</span>: <span class='ident'>MediaType</span>,
+    <span class='doccomment'>///The t.co link from the original text.</span>
     <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///For media entities corresponding to videos, this contains extra information about the linked</span>
+    <span class='doccomment'>///video.</span>
+    <span class='kw'>pub</span> <span class='ident'>video_info</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>VideoInfo</span><span class='op'>&gt;</span>,
 }
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represents the types of media that can be attached to a tweet.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>MediaType</span> {
+    <span class='doccomment'>///A static image.</span>
+    <span class='ident'>Photo</span>,
+    <span class='doccomment'>///A video.</span>
+    <span class='ident'>Video</span>,
+    <span class='doccomment'>///An animated GIF, delivered as a video without audio.</span>
+    <span class='ident'>Gif</span>,
+}
+
+<span class='doccomment'>///Represents the available sizes for a media file.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MediaSizes</span> {
+    <span class='doccomment'>///Information for a thumbnail-sized version of the media.</span>
     <span class='kw'>pub</span> <span class='ident'>thumb</span>: <span class='ident'>MediaSize</span>,
+    <span class='doccomment'>///Information for a small-sized version of the media.</span>
     <span class='kw'>pub</span> <span class='ident'>small</span>: <span class='ident'>MediaSize</span>,
+    <span class='doccomment'>///Information for a medium-sized version of the media.</span>
     <span class='kw'>pub</span> <span class='ident'>medium</span>: <span class='ident'>MediaSize</span>,
+    <span class='doccomment'>///Information for a large-sized version of the media.</span>
     <span class='kw'>pub</span> <span class='ident'>large</span>: <span class='ident'>MediaSize</span>,
 }
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represents how an image has been resized for a given size variant.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ResizeMode</span> {
+    <span class='doccomment'>///The media was resized to fit one dimension, keeping its aspect ratio.</span>
     <span class='ident'>Fit</span>,
+    <span class='doccomment'>///The media was cropped to fit a specific resolution.</span>
     <span class='ident'>Crop</span>,
 }
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represents the dimensions of a media file.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MediaSize</span> {
+    <span class='doccomment'>///The size variant&#39;s width in pixels.</span>
     <span class='kw'>pub</span> <span class='ident'>w</span>: <span class='ident'>i32</span>,
+    <span class='doccomment'>///The size variant&#39;s height in pixels.</span>
     <span class='kw'>pub</span> <span class='ident'>h</span>: <span class='ident'>i32</span>,
+    <span class='doccomment'>///The method used to obtain the given dimensions.</span>
     <span class='kw'>pub</span> <span class='ident'>resize</span>: <span class='ident'>ResizeMode</span>,
+}
+
+<span class='doccomment'>///Represents metadata specific to videos.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>VideoInfo</span> {
+    <span class='doccomment'>///The aspect ratio of the video.</span>
+    <span class='kw'>pub</span> <span class='ident'>aspect_ratio</span>: (<span class='ident'>i32</span>, <span class='ident'>i32</span>),
+    <span class='doccomment'>///The duration of the video, in milliseconds.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>///This field is not given for animated GIFs.</span>
+    <span class='kw'>pub</span> <span class='ident'>duration_millis</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>,
+    <span class='doccomment'>///Information about various encodings available for the video.</span>
+    <span class='kw'>pub</span> <span class='ident'>variants</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>VideoVariant</span><span class='op'>&gt;</span>,
+}
+
+<span class='doccomment'>///Represents information about a specific encoding of a video.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>VideoVariant</span> {
+    <span class='doccomment'>///The bitrate of the video. This value is present for GIFs, but it will be zero.</span>
+    <span class='kw'>pub</span> <span class='ident'>bitrate</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>,
+    <span class='doccomment'>///The file format of the video variant.</span>
+    <span class='kw'>pub</span> <span class='ident'>content_type</span>: <span class='ident'>mime</span>::<span class='ident'>Mime</span>,
+    <span class='doccomment'>///The URL for the video variant.</span>
+    <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='ident'>String</span>,
 }
 
 <span class='doccomment'>///Represents a link extracted from another piece of text.</span>
@@ -319,19 +590,25 @@
     <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='ident'>String</span>,
 }
 
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class='doccomment'>///Represnts a user mention extracted from another piece of text.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MentionEntity</span> {
+    <span class='doccomment'>///Numeric ID of the mentioned user.</span>
     <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
+    <span class='doccomment'>///Character indices where the user mention is located in the original text. The first index is</span>
+    <span class='doccomment'>///the location of the @ symbol; the second is the location of the first character following</span>
+    <span class='doccomment'>///the user screen name.</span>
     <span class='kw'>pub</span> <span class='ident'>indices</span>: (<span class='ident'>i32</span>, <span class='ident'>i32</span>),
+    <span class='doccomment'>///Display name of the mentioned user.</span>
     <span class='kw'>pub</span> <span class='ident'>name</span>: <span class='ident'>String</span>,
+    <span class='doccomment'>///Screen name of the mentioned user, without the leading @ symbol.</span>
     <span class='kw'>pub</span> <span class='ident'>screen_name</span>: <span class='ident'>String</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>HashtagEntity</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;HashtagEntity received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>HashtagEntity</span> {
@@ -344,7 +621,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>MediaEntity</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;MediaEntity received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>MediaEntity</span> {
@@ -355,10 +632,33 @@
             <span class='ident'>media_url</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;media_url&quot;</span>)),
             <span class='ident'>media_url_https</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;media_url_https&quot;</span>)),
             <span class='ident'>sizes</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;sizes&quot;</span>)),
-            <span class='ident'>source_status_id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;source_status_id&quot;</span>)),
+            <span class='ident'>source_status_id</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;source_status_id&quot;</span>).<span class='ident'>ok</span>(),
             <span class='ident'>media_type</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;type&quot;</span>)),
             <span class='ident'>url</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;url&quot;</span>)),
+            <span class='ident'>video_info</span>: <span class='prelude-val'>None</span>,
         })
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>MediaType</span> {
+    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>s</span>) <span class='op'>=</span> <span class='ident'>input</span>.<span class='ident'>as_string</span>() {
+            <span class='kw'>if</span> <span class='ident'>s</span> <span class='op'>==</span> <span class='string'>&quot;photo&quot;</span> {
+                <span class='prelude-val'>Ok</span>(<span class='ident'>MediaType</span>::<span class='ident'>Photo</span>)
+            }
+            <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>s</span> <span class='op'>==</span> <span class='string'>&quot;video&quot;</span> {
+                <span class='prelude-val'>Ok</span>(<span class='ident'>MediaType</span>::<span class='ident'>Video</span>)
+            }
+            <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>s</span> <span class='op'>==</span> <span class='string'>&quot;animated_gif&quot;</span> {
+                <span class='prelude-val'>Ok</span>(<span class='ident'>MediaType</span>::<span class='ident'>Gif</span>)
+            }
+            <span class='kw'>else</span> {
+                <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;unexpected string for MediaType&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>s</span>.<span class='ident'>to_string</span>())))
+            }
+        }
+        <span class='kw'>else</span> {
+            <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;MediaType received json that wasn&#39;t a string&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())))
+        }
     }
 }
 
@@ -372,11 +672,11 @@
                 <span class='prelude-val'>Ok</span>(<span class='ident'>ResizeMode</span>::<span class='ident'>Crop</span>)
             }
             <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>)
+                <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;unexpected string for ResizeMode&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>s</span>.<span class='ident'>to_string</span>())))
             }
         }
         <span class='kw'>else</span> {
-            <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>)
+            <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;ResizeMode received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())))
         }
     }
 }
@@ -384,7 +684,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>MediaSize</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;MediaSize received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>MediaSize</span> {
@@ -398,7 +698,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>MediaSizes</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;MediaSizes received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>MediaSizes</span> {
@@ -413,7 +713,7 @@
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>UrlEntity</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;UrlEntity received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>UrlEntity</span> {
@@ -425,10 +725,38 @@
     }
 }
 
+<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>VideoInfo</span> {
+    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;VideoInfo received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+        }
+
+        <span class='prelude-val'>Ok</span>(<span class='ident'>VideoInfo</span> {
+            <span class='ident'>aspect_ratio</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;aspect_ratio&quot;</span>)),
+            <span class='ident'>duration_millis</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;duration_millis&quot;</span>).<span class='ident'>ok</span>(),
+            <span class='ident'>variants</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;variants&quot;</span>)),
+        })
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>VideoVariant</span> {
+    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;VideoVariant received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+        }
+
+        <span class='prelude-val'>Ok</span>(<span class='ident'>VideoVariant</span> {
+            <span class='ident'>bitrate</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;bitrate&quot;</span>).<span class='ident'>ok</span>(),
+            <span class='ident'>content_type</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;content_type&quot;</span>)),
+            <span class='ident'>url</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;url&quot;</span>)),
+        })
+    }
+}
+
 <span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>MentionEntity</span> {
     <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>);
+            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;MentionEntity received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
         }
 
         <span class='prelude-val'>Ok</span>(<span class='ident'>MentionEntity</span> {

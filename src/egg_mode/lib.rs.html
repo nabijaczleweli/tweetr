@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.3.0/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/egg-mode-0.4.0/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -125,6 +125,8 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! A library for interacting with Twitter.</span>
 <span class='doccomment'>//!</span>
@@ -204,11 +206,13 @@
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>user</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>entities</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cursor</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>tweet</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>search</span>;
 <span class='kw'>mod</span> <span class='ident'>links</span>;
 <span class='kw'>mod</span> <span class='ident'>common</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>auth</span>::{<span class='ident'>Token</span>, <span class='ident'>request_token</span>, <span class='ident'>authorize_url</span>, <span class='ident'>authenticate_url</span>, <span class='ident'>access_token</span>, <span class='ident'>verify_tokens</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>common</span>::{<span class='ident'>Response</span>, <span class='ident'>UserID</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>common</span>::{<span class='ident'>Response</span>, <span class='ident'>WebResponse</span>};
 </pre>
 </section>
     <section id='search' class="content hidden"></section>

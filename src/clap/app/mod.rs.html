@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.11.0/src/app/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.11.2/src/app/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>mod.rs.html -- source</title>
@@ -1592,6 +1592,19 @@
 <span id="1548">1548</span>
 <span id="1549">1549</span>
 <span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
 </pre><pre class='rust '>
 <span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>dead_code</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>settings</span>;
@@ -1601,27 +1614,29 @@
 <span class='kw'>mod</span> <span class='ident'>meta</span>;
 <span class='kw'>mod</span> <span class='ident'>help</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>settings</span>::<span class='ident'>AppSettings</span>;
-
+<span class='comment'>// Std</span>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Borrow</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>env</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsString</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='self'>self</span>, <span class='ident'>BufRead</span>, <span class='ident'>BufWriter</span>, <span class='ident'>Write</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>process</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::<span class='ident'>OsString</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Borrow</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>result</span>::<span class='prelude-ty'>Result</span> <span class='kw'>as</span> <span class='ident'>StdResult</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>rc</span>::<span class='ident'>Rc</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>result</span>::<span class='prelude-ty'>Result</span> <span class='kw'>as</span> <span class='ident'>StdResult</span>;
 
+<span class='comment'>// Third Party</span>
+<span class='kw'>use</span> <span class='ident'>vec_map</span>::<span class='ident'>VecMap</span>;
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;yaml&quot;</span>)]</span>
 <span class='kw'>use</span> <span class='ident'>yaml_rust</span>::<span class='ident'>Yaml</span>;
-<span class='kw'>use</span> <span class='ident'>vec_map</span>::<span class='ident'>VecMap</span>;
 
-<span class='kw'>use</span> <span class='ident'>args</span>::{<span class='ident'>AnyArg</span>, <span class='ident'>Arg</span>, <span class='ident'>ArgGroup</span>, <span class='ident'>ArgMatcher</span>, <span class='ident'>ArgMatches</span>, <span class='ident'>ArgSettings</span>};
-<span class='kw'>use</span> <span class='ident'>app</span>::<span class='ident'>parser</span>::<span class='ident'>Parser</span>;
+<span class='comment'>// Internal</span>
 <span class='kw'>use</span> <span class='ident'>app</span>::<span class='ident'>help</span>::<span class='ident'>Help</span>;
+<span class='kw'>use</span> <span class='ident'>app</span>::<span class='ident'>parser</span>::<span class='ident'>Parser</span>;
+<span class='kw'>use</span> <span class='ident'>args</span>::{<span class='ident'>AnyArg</span>, <span class='ident'>Arg</span>, <span class='ident'>ArgGroup</span>, <span class='ident'>ArgMatcher</span>, <span class='ident'>ArgMatches</span>, <span class='ident'>ArgSettings</span>};
 <span class='kw'>use</span> <span class='ident'>errors</span>::<span class='ident'>Error</span>;
 <span class='kw'>use</span> <span class='ident'>errors</span>::<span class='prelude-ty'>Result</span> <span class='kw'>as</span> <span class='ident'>ClapResult</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>settings</span>::<span class='ident'>AppSettings</span>;
 <span class='kw'>use</span> <span class='ident'>shell</span>::<span class='ident'>Shell</span>;
 
 <span class='doccomment'>/// Used to create a representation of a command line program and all possible command line</span>
@@ -2681,7 +2696,10 @@
     <span class='doccomment'>/// `&lt;project&gt;/target/debug/build/myapp-&lt;hash&gt;/out/myapp.bash-completion`.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Fish shell completions will use the file format `{bin_name}.fish`</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>gen_completions</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>OsString</span><span class='op'>&gt;</span>, <span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>bin_name</span>: <span class='ident'>S</span>, <span class='ident'>for_shell</span>: <span class='ident'>Shell</span>, <span class='ident'>out_dir</span>: <span class='ident'>T</span>) {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>gen_completions</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>OsString</span><span class='op'>&gt;</span>, <span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
+                                                               <span class='ident'>bin_name</span>: <span class='ident'>S</span>,
+                                                               <span class='ident'>for_shell</span>: <span class='ident'>Shell</span>,
+                                                               <span class='ident'>out_dir</span>: <span class='ident'>T</span>) {
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>meta</span>.<span class='ident'>bin_name</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>bin_name</span>.<span class='ident'>into</span>());
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>gen_completions</span>(<span class='ident'>for_shell</span>, <span class='ident'>out_dir</span>.<span class='ident'>into</span>());
     }
@@ -2719,7 +2737,10 @@
     <span class='doccomment'>/// ```shell</span>
     <span class='doccomment'>/// $ myapp generate-bash-completions &gt; /etc/bash_completion.d/myapp</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>gen_completions_to</span><span class='op'>&lt;</span><span class='ident'>W</span>: <span class='ident'>Write</span>, <span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>bin_name</span>: <span class='ident'>S</span>, <span class='ident'>for_shell</span>: <span class='ident'>Shell</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>W</span>) {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>gen_completions_to</span><span class='op'>&lt;</span><span class='ident'>W</span>: <span class='ident'>Write</span>, <span class='ident'>S</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
+                                                         <span class='ident'>bin_name</span>: <span class='ident'>S</span>,
+                                                         <span class='ident'>for_shell</span>: <span class='ident'>Shell</span>,
+                                                         <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>W</span>) {
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>meta</span>.<span class='ident'>bin_name</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>bin_name</span>.<span class='ident'>into</span>());
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>gen_completions_to</span>(<span class='ident'>for_shell</span>, <span class='ident'>buf</span>);
     }
@@ -2869,9 +2890,10 @@
     {
         <span class='comment'>// Verify all positional assertions pass</span>
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>verify_positionals</span>();
-        <span class='comment'>// If there are global arguments, we need to propgate them down to subcommands</span>
+        <span class='comment'>// If there are global arguments, or settings we need to propgate them down to subcommands</span>
         <span class='comment'>// before parsing incase we run into a subcommand</span>
         <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>propogate_globals</span>();
+        <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>propogate_settings</span>();
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>matcher</span> <span class='op'>=</span> <span class='ident'>ArgMatcher</span>::<span class='ident'>new</span>();
 
@@ -2937,11 +2959,7 @@
             <span class='ident'>is_sc</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>yaml_hash</span>.<span class='ident'>get</span>(<span class='ident'>sc_key</span>).<span class='ident'>unwrap</span>());
             <span class='ident'>App</span>::<span class='ident'>new</span>(<span class='ident'>sc_key</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>())
         };
-        <span class='ident'>yaml</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>sc</span>) <span class='op'>=</span> <span class='ident'>is_sc</span> {
-            <span class='ident'>sc</span>
-        } <span class='kw'>else</span> {
-            <span class='ident'>yaml</span>
-        };
+        <span class='ident'>yaml</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>sc</span>) <span class='op'>=</span> <span class='ident'>is_sc</span> { <span class='ident'>sc</span> } <span class='kw'>else</span> { <span class='ident'>yaml</span> };
 
         <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>yaml_str</span> {
             (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>y</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span>:<span class='ident'>ident</span>) <span class='op'>=&gt;</span> {
@@ -2969,12 +2987,14 @@
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;display_order&quot;</span>].<span class='ident'>as_i64</span>() {
             <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>display_order</span>(<span class='ident'>v</span> <span class='kw'>as</span> <span class='ident'>usize</span>);
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>yaml</span>[<span class='string'>&quot;display_order&quot;</span>] <span class='op'>!=</span> <span class='ident'>Yaml</span>::<span class='ident'>BadValue</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a u64&quot;</span>, <span class='ident'>yaml</span>[<span class='string'>&quot;display_order&quot;</span>]);
+            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a u64&quot;</span>,
+                   <span class='ident'>yaml</span>[<span class='string'>&quot;display_order&quot;</span>]);
         }
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>].<span class='ident'>as_str</span>() {
             <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>setting</span>(<span class='ident'>v</span>.<span class='ident'>parse</span>().<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>] <span class='op'>!=</span> <span class='ident'>Yaml</span>::<span class='ident'>BadValue</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to an AppSetting&quot;</span>, <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>]);
+            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to an AppSetting&quot;</span>,
+                   <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>]);
         }
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;settings&quot;</span>].<span class='ident'>as_vec</span>() {
             <span class='kw'>for</span> <span class='ident'>ys</span> <span class='kw'>in</span> <span class='ident'>v</span> {
@@ -2986,25 +3006,30 @@
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;settings&quot;</span>].<span class='ident'>as_str</span>() {
                 <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>setting</span>(<span class='ident'>v</span>.<span class='ident'>parse</span>().<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
             } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>yaml</span>[<span class='string'>&quot;settings&quot;</span>] <span class='op'>!=</span> <span class='ident'>Yaml</span>::<span class='ident'>BadValue</span> {
-                <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a string&quot;</span>, <span class='ident'>yaml</span>[<span class='string'>&quot;settings&quot;</span>]);
+                <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a string&quot;</span>,
+                       <span class='ident'>yaml</span>[<span class='string'>&quot;settings&quot;</span>]);
             }
         }
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;global_setting&quot;</span>].<span class='ident'>as_str</span>() {
             <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>setting</span>(<span class='ident'>v</span>.<span class='ident'>parse</span>().<span class='ident'>ok</span>().<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>yaml</span>[<span class='string'>&quot;global_setting&quot;</span>] <span class='op'>!=</span> <span class='ident'>Yaml</span>::<span class='ident'>BadValue</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to an AppSetting&quot;</span>, <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>]);
+            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to an AppSetting&quot;</span>,
+                   <span class='ident'>yaml</span>[<span class='string'>&quot;setting&quot;</span>]);
         }
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;global_settings&quot;</span>].<span class='ident'>as_vec</span>() {
             <span class='kw'>for</span> <span class='ident'>ys</span> <span class='kw'>in</span> <span class='ident'>v</span> {
                 <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>s</span>) <span class='op'>=</span> <span class='ident'>ys</span>.<span class='ident'>as_str</span>() {
-                    <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>global_setting</span>(<span class='ident'>s</span>.<span class='ident'>parse</span>().<span class='ident'>ok</span>().<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
+                    <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>global_setting</span>(<span class='ident'>s</span>.<span class='ident'>parse</span>()
+                        .<span class='ident'>ok</span>()
+                        .<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
                 }
             }
         } <span class='kw'>else</span> {
             <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='ident'>yaml</span>[<span class='string'>&quot;global_settings&quot;</span>].<span class='ident'>as_str</span>() {
                 <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>global_setting</span>(<span class='ident'>v</span>.<span class='ident'>parse</span>().<span class='ident'>expect</span>(<span class='string'>&quot;unknown AppSetting found in YAML file&quot;</span>));
             } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>yaml</span>[<span class='string'>&quot;global_settings&quot;</span>] <span class='op'>!=</span> <span class='ident'>Yaml</span>::<span class='ident'>BadValue</span> {
-                <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a string&quot;</span>, <span class='ident'>yaml</span>[<span class='string'>&quot;global_settings&quot;</span>]);
+                <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Failed to convert YAML value {:?} to a string&quot;</span>,
+                       <span class='ident'>yaml</span>[<span class='string'>&quot;global_settings&quot;</span>]);
             }
         }
 
@@ -3126,7 +3151,8 @@
     }
     <span class='kw'>fn</span> <span class='ident'>aliases</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;e</span> <span class='ident'>str</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>aliases</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>p</span>.<span class='ident'>meta</span>.<span class='ident'>aliases</span> {
-            <span class='kw'>let</span> <span class='ident'>vis_aliases</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>aliases</span>.<span class='ident'>iter</span>().<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='ident'>n</span>,<span class='ident'>v</span>)<span class='op'>|</span> <span class='kw'>if</span> <span class='ident'>v</span> { <span class='prelude-val'>Some</span>(<span class='ident'>n</span>) } <span class='kw'>else</span> {<span class='prelude-val'>None</span>}).<span class='ident'>collect</span>();
+            <span class='kw'>let</span> <span class='ident'>vis_aliases</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span>
+                <span class='ident'>aliases</span>.<span class='ident'>iter</span>().<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='ident'>n</span>, <span class='ident'>v</span>)<span class='op'>|</span> <span class='kw'>if</span> <span class='ident'>v</span> { <span class='prelude-val'>Some</span>(<span class='ident'>n</span>) } <span class='kw'>else</span> { <span class='prelude-val'>None</span> }).<span class='ident'>collect</span>();
             <span class='kw'>if</span> <span class='ident'>vis_aliases</span>.<span class='ident'>is_empty</span>() {
                 <span class='prelude-val'>None</span>
             } <span class='kw'>else</span> {
