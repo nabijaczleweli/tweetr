@@ -57,8 +57,7 @@ fn actual_main() -> i32 {
                     let app = not_stakkr::ops::AppTokens::read(&app_path).unwrap();
                     let app_tokens = app.raw_token();
 
-                    let result = None;
-                    while result.is_none() {
+                    loop {
                         let users = not_stakkr::ops::User::read(&users_path).unwrap();
 
                         let mut tweets = not_stakkr::ops::QueuedTweet::read(&tweets_path).unwrap();
@@ -80,8 +79,6 @@ fn actual_main() -> i32 {
 
                         thread::sleep(delay);
                     }
-
-                    result.unwrap()
                 }
                 Err(out) => out,
             }
