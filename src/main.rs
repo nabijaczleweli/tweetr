@@ -53,11 +53,14 @@ fn actual_main() -> i32 {
         }
         not_stakkr::options::Subsystem::StartDaemon { delay, verbose } => {
             match not_stakkr::ops::start_daemon::verify(&opts.config_dir) {
-                Ok((users_path, tweets_path)) => {
-                    let users = not_stakkr::ops::User::read(&users_path).unwrap();
+                Ok((app_path, users_path, tweets_path)) => {
+                    let app = not_stakkr::ops::AppTokens::read(&app_path).unwrap();
+                    let app_tokens = app.raw_token();
 
                     let result = None;
                     while result.is_none() {
+                        let users = not_stakkr::ops::User::read(&users_path).unwrap();
+
                         let mut tweets = not_stakkr::ops::QueuedTweet::read(&tweets_path).unwrap();
                         let tweets_to_post = not_stakkr::ops::start_daemon::tweet_indices_to_post(&tweets);
 
@@ -66,11 +69,14 @@ fn actual_main() -> i32 {
 
                             match not_stakkr::ops::start_daemon::find_user_index_for_tweet(tweet_to_post, &users) {
                                 Ok(user_i) => {
-                                    not_stakkr::ops::start_daemon::post_tweet(tweet_to_post, &users[user_i], verbose, &mut stdout()).print_error(&mut stderr());
+                                    not_stakkr::ops::start_daemon::post_tweet(tweet_to_post, &users[user_i], &app_tokens, verbose, &mut stdout())
+                                        .print_error(&mut stderr());
                                 }
                                 Err(out) => out.print_error(&mut stderr()),
                             }
                         }
+
+                        not_stakkr::ops::QueuedTweet::write(tweets, &tweets_path);
 
                         thread::sleep(delay);
                     }

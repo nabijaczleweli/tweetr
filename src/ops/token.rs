@@ -26,6 +26,11 @@ impl AppTokens {
     pub fn write(&self, p: &Path) {
         File::create(p).unwrap().write_all(encode_str(&self).as_bytes()).unwrap();
     }
+
+    /// Borrows the current key and secret into an `egg_mode::Token`.
+    pub fn raw_token<'a>(&'a self) -> Token<'a> {
+        Token::new(&self.key[..], &self.secret[..])
+    }
 }
 
 impl<'a> Into<Token<'a>> for AppTokens {

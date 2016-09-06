@@ -4,6 +4,23 @@
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 
 
+/// The datetime format returned by Twitter when posting.
+///
+/// # Examples
+///
+/// ```
+/// # extern crate not_stakkr;
+/// # extern crate chrono;
+/// # use not_stakkr::util::TWEET_DATETIME_FORMAT;
+/// # use chrono::DateTime;
+/// # fn main() {
+/// assert_eq!(DateTime::parse_from_str("Mon Sep 05 20:30:51 +0000 2016", TWEET_DATETIME_FORMAT),
+///            DateTime::parse_from_rfc3339("2016-09-05T20:30:51+00:00"));
+/// # }
+/// ```
+pub static TWEET_DATETIME_FORMAT: &'static str = "%a %b %d %T %z %Y";
+
+
 /// Ask the user to input a string of the exact length of `desired_len`, (re)prompting as necessary.
 ///
 /// # Examples
