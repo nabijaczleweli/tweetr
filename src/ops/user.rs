@@ -1,8 +1,10 @@
-use std::io::{Read, Write, Error as IoError};
-use toml::{encode_str, decode_str};
+use self::super::super::Outcome;
+use self::super::read_toml_file;
 use std::cmp::Ordering;
+use toml::encode_str;
 use egg_mode::Token;
 use std::path::Path;
+use std::io::Write;
 use std::fs::File;
 
 
@@ -38,12 +40,8 @@ impl User {
     }
 
     /// Read all user data from the specified file.
-    pub fn read(p: &Path) -> Result<Vec<User>, Option<IoError>> {
-        let mut buf = String::new();
-        try!(try!(File::open(p).map_err(Some)).read_to_string(&mut buf).map_err(Some));
-
-        let users: Users = try!(decode_str(&buf).ok_or(None));
-        Ok(users.user)
+    pub fn read(p: &Path) -> Result<Vec<User>, Option<Outcome>> {
+        read_toml_file(p, "users").map(|us: Users| us.user)
     }
 
     /// Save all user data to the specified file.

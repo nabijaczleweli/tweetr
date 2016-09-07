@@ -1,7 +1,9 @@
-use std::io::{Read, Write, Error as IoError};
-use toml::{encode_str, decode_str};
+use self::super::super::Outcome;
+use self::super::read_toml_file;
+use toml::encode_str;
 use egg_mode::Token;
 use std::path::Path;
+use std::io::Write;
 use std::fs::File;
 
 
@@ -16,10 +18,8 @@ pub struct AppTokens {
 
 impl AppTokens {
     /// Read the application tokens from the specified file.
-    pub fn read(p: &Path) -> Result<AppTokens, Option<IoError>> {
-        let mut buf = String::new();
-        try!(try!(File::open(p).map_err(Some)).read_to_string(&mut buf).map_err(Some));
-        decode_str(&buf).ok_or(None)
+    pub fn read(p: &Path) -> Result<AppTokens, Option<Outcome>> {
+        read_toml_file(p, "application tokens")
     }
 
     /// Save the application tokens to the specified file.

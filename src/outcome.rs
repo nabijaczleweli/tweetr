@@ -22,8 +22,15 @@ pub enum Outcome {
         /// The description of what needs to be produced.
         desc: String,
     },
-    /// The specified subsystem needs to be run beforehand to produce the specified file.
+    /// The Twitter API returned an error.
     TwitterAPIError(String),
+    /// Failed to parse the specified file because of the specified errors.
+    FileParsingFailed {
+        /// The file that failed to parse.
+        desc: &'static str,
+        /// The parsing errors that occured.
+        errors: Vec<String>,
+    },
 }
 
 impl Outcome {
@@ -54,6 +61,12 @@ impl Outcome {
                 writeln!(err_out, "Run the {} subsystem first to {}.", subsys, desc).unwrap()
             }
             Outcome::TwitterAPIError(ref error) => writeln!(err_out, "Twitter API error: {}", error).unwrap(),
+            Outcome::FileParsingFailed { ref desc, ref errors } => {
+                writeln!(err_out, "Failed to parse {}{}", desc, if errors.is_empty() { '.' } else { ':' }).unwrap();
+                for err in errors {
+                    writeln!(err_out, "  {}", err).unwrap()
+                }
+            }
         }
     }
 
@@ -73,6 +86,7 @@ impl Outcome {
             Outcome::RequiredFileFromSubsystemNonexistant { subsys: _, fname: _ } |
             Outcome::RequiredDataFromSubsystemNonexistant { subsys: _, desc: _ } => 2,
             Outcome::TwitterAPIError(_) => 3,
+            Outcome::FileParsingFailed { desc: _, errors: _ } => 4,
         }
     }
 }

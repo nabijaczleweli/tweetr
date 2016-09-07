@@ -131,9 +131,12 @@ pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T, verb
 /// });
 /// assert!(tf.exists());
 /// ```
-pub fn append_user(users_path: &Path, user: User) {
+pub fn append_user(users_path: &Path, user: User) -> Outcome {
     let mut users = if users_path.exists() {
-        User::read(users_path).unwrap()
+        match User::read(users_path).map_err(Option::unwrap) {
+            Ok(users) => users,
+            Err(out) => return out,
+        }
     } else {
         vec![]
     };
@@ -144,6 +147,7 @@ pub fn append_user(users_path: &Path, user: User) {
     }
 
     User::write(users, &users_path);
+    Outcome::NoError
 }
 
 /// Print the success message mentioning the specified user's name and ID, optionally also mentioning tokens.

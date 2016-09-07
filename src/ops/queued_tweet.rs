@@ -11,11 +11,13 @@
 
 
 use chrono::{DateTime, FixedOffset, ParseError};
-use std::io::{Read, Write, Error as IoError};
-use toml::{encode_str, decode_str};
+use self::super::super::Outcome;
+use self::super::read_toml_file;
 use std::iter::FromIterator;
 use std::cmp::Ordering;
+use toml::encode_str;
 use std::path::Path;
+use std::io::Write;
 use std::fs::File;
 
 
@@ -63,11 +65,8 @@ struct QueuedTweets {
 
 impl QueuedTweet {
     /// Read all queued tweets from the specified file.
-    pub fn read(p: &Path) -> Result<Vec<QueuedTweet>, Option<IoError>> {
-        let mut buf = String::new();
-        try!(try!(File::open(p).map_err(Some)).read_to_string(&mut buf).map_err(Some));
-
-        let queued_tweets: QueuedTweets = try!(decode_str(&buf).ok_or(None));
+    pub fn read(p: &Path) -> Result<Vec<QueuedTweet>, Option<Outcome>> {
+        let queued_tweets: QueuedTweets = try!(read_toml_file(p, "queued tweets"));
         Result::from_iter(queued_tweets.tweet.into_iter().map(|qts| qts.into()).collect::<Vec<_>>()).map_err(|_| None)
     }
 
