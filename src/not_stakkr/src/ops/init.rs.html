@@ -170,7 +170,7 @@
 <span class='doccomment'>///            Err(Outcome::OverrideNoForce(&quot;$TEMP/ops-init-verify-1/app.toml&quot;.to_string())));</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>verify</span>(<span class='ident'>config_dir</span>: <span class='kw-2'>&amp;</span>(<span class='ident'>String</span>, <span class='ident'>PathBuf</span>), <span class='ident'>force</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>PathBuf</span>, <span class='ident'>Outcome</span><span class='op'>&gt;</span> {
-    <span class='ident'>verify_file</span>(<span class='string'>&quot;app.toml&quot;</span>, <span class='bool-val'>false</span>, <span class='ident'>config_dir</span>, <span class='ident'>force</span>).<span class='ident'>map_err</span>(<span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>)
+    <span class='ident'>verify_file</span>(<span class='string'>&quot;app.toml&quot;</span>, <span class='bool-val'>false</span>, <span class='ident'>config_dir</span>, <span class='ident'>force</span>, <span class='string'>&quot;&quot;</span>)
 }
 
 <span class='doccomment'>/// Prompt the user for application data.</span>
