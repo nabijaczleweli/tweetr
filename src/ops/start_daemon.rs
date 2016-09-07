@@ -9,24 +9,9 @@ use std::io::Write;
 
 
 pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf, PathBuf), Outcome> {
-    let app = try!(verify_file("app.toml", true, config_dir, false).map_err(|f| {
-        Outcome::RequiredFileFromSubsystemNonexistant {
-            subsys: "init",
-            fname: f,
-        }
-    }));
-    let users = try!(verify_file("users.toml", true, config_dir, false).map_err(|f| {
-        Outcome::RequiredFileFromSubsystemNonexistant {
-            subsys: "add-user",
-            fname: f,
-        }
-    }));
-    let tweets = try!(verify_file("tweets.toml", true, config_dir, false).map_err(|f| {
-        Outcome::RequiredFileFromSubsystemNonexistant {
-            subsys: "queue-tweet",
-            fname: f,
-        }
-    }));
+    let app = try!(verify_file("app.toml", true, config_dir, false, "init"));
+    let users = try!(verify_file("users.toml", true, config_dir, false, "add-user"));
+    let tweets = try!(verify_file("tweets.toml", true, config_dir, false, "queue-tweet"));
 
     Ok((app, users, tweets))
 }

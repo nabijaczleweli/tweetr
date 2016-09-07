@@ -49,7 +49,7 @@ use std::path::PathBuf;
 ///            Err(Outcome::OverrideNoForce("$TEMP/ops-init-verify-1/app.toml".to_string())));
 /// ```
 pub fn verify(config_dir: &(String, PathBuf), force: bool) -> Result<PathBuf, Outcome> {
-    verify_file("app.toml", false, config_dir, force).map_err(Outcome::OverrideNoForce)
+    verify_file("app.toml", false, config_dir, force, "")
 }
 
 /// Prompt the user for application data.

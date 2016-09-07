@@ -57,13 +57,7 @@ use std::str::FromStr;
 ///            }));
 /// ```
 pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outcome> {
-    let app = try!(verify_file("app.toml", true, config_dir, false).map_err(|f| {
-        Outcome::RequiredFileFromSubsystemNonexistant {
-            subsys: "init",
-            fname: f,
-        }
-    }));
-
+    let app = try!(verify_file("app.toml", true, config_dir, false, "init"));
     Ok((app, config_dir.1.join("users.toml")))
 }
 
