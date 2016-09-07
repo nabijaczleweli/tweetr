@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.11.2/src/args/arg.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.11.3/src/args/arg.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>arg.rs.html -- source</title>
@@ -2396,7 +2396,6 @@
 <span id="2352">2352</span>
 <span id="2353">2353</span>
 <span id="2354">2354</span>
-<span id="2355">2355</span>
 </pre><pre class='rust '>
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;yaml&quot;</span>)]</span>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
@@ -2564,6 +2563,7 @@
                 <span class='string'>&quot;min_values&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_u64</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>min_values</span>),
                 <span class='string'>&quot;value_name&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_str</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>value_name</span>),
                 <span class='string'>&quot;use_delimiter&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_bool</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>use_delimiter</span>),
+                <span class='string'>&quot;require_delimiter&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_bool</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>require_delimiter</span>),
                 <span class='string'>&quot;value_delimiter&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_str</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>value_delimiter</span>),
                 <span class='string'>&quot;required_unless&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_str</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>required_unless</span>),
                 <span class='string'>&quot;display_order&quot;</span> <span class='op'>=&gt;</span> <span class='macro'>yaml_to_usize</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>v</span>, <span class='ident'>display_order</span>),
@@ -2815,9 +2815,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Any valid UTF-8 is allowed in the help text. The one exception is when one wishes to</span>
     <span class='doccomment'>/// include a newline in the help text and have the following text be properly aligned with all</span>
-    <span class='doccomment'>/// the other help text. To include a newline **and** be properly aligned with all other</span>
-    <span class='doccomment'>/// arguments help text, it must be specified via a tag inside curly braces, like so `{n}`.</span>
-    <span class='doccomment'>/// Using the standard `\n` will produce a newline, but it will not be properly aligned.</span>
+    <span class='doccomment'>/// the other help text.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```rust</span>
     <span class='doccomment'>/// # use clap::{App, Arg};</span>
@@ -4572,8 +4570,8 @@
     <span class='doccomment'>///         .short(&quot;o&quot;)</span>
     <span class='doccomment'>///         .takes_value(true)</span>
     <span class='doccomment'>///         .value_names(&amp;[&quot;value1&quot;, &quot;value2&quot;])</span>
-    <span class='doccomment'>///         .help(&quot;Some really long help and complex{n}\</span>
-    <span class='doccomment'>///                help that makes more sense to be{n}\</span>
+    <span class='doccomment'>///         .help(&quot;Some really long help and complex\n\</span>
+    <span class='doccomment'>///                help that makes more sense to be\n\</span>
     <span class='doccomment'>///                on a line after the option&quot;)</span>
     <span class='doccomment'>///         .next_line_help(true))</span>
     <span class='doccomment'>///     .get_matches_from(vec![</span>

@@ -92,10 +92,12 @@
 <span id="48">48</span>
 <span id="49">49</span>
 </pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>Read</span>, <span class='ident'>Write</span>, <span class='ident'>Error</span> <span class='kw'>as</span> <span class='ident'>IoError</span>};
-<span class='kw'>use</span> <span class='ident'>toml</span>::{<span class='ident'>encode_str</span>, <span class='ident'>decode_str</span>};
+<span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>Outcome</span>;
+<span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::<span class='ident'>read_toml_file</span>;
+<span class='kw'>use</span> <span class='ident'>toml</span>::<span class='ident'>encode_str</span>;
 <span class='kw'>use</span> <span class='ident'>egg_mode</span>::<span class='ident'>Token</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Write</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fs</span>::<span class='ident'>File</span>;
 
 
@@ -110,10 +112,8 @@
 
 <span class='kw'>impl</span> <span class='ident'>AppTokens</span> {
     <span class='doccomment'>/// Read the application tokens from the specified file.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>read</span>(<span class='ident'>p</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>AppTokens</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>IoError</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>File</span>::<span class='ident'>open</span>(<span class='ident'>p</span>).<span class='ident'>map_err</span>(<span class='prelude-val'>Some</span>)).<span class='ident'>read_to_string</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>map_err</span>(<span class='prelude-val'>Some</span>));
-        <span class='ident'>decode_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>ok_or</span>(<span class='prelude-val'>None</span>)
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>read</span>(<span class='ident'>p</span>: <span class='kw-2'>&amp;</span><span class='ident'>Path</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>AppTokens</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Outcome</span><span class='op'>&gt;&gt;</span> {
+        <span class='ident'>read_toml_file</span>(<span class='ident'>p</span>, <span class='string'>&quot;application tokens&quot;</span>)
     }
 
     <span class='doccomment'>/// Save the application tokens to the specified file.</span>
