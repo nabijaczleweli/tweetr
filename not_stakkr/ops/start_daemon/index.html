@@ -47,35 +47,57 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-864' class='srclink' href='../../../src/not_stakkr/src/ops/start_daemon.rs.html#1-85' title='goto source code'>[src]</a></span></h1>
-<h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+               </span><a id='src-864' class='srclink' href='../../../src/not_stakkr/src/ops/start_daemon.rs.html#1-295' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>This module contains the functions used only by the <code>start-daemon</code> subsystem.</p>
+
+<p>The flow of the <code>start-daemon</code> subsystem is as follows:</p>
+
+<p>Initialisation:</p>
+
+<pre><code class="language-plaintext">Options::parse()
+|&gt; ops::start_daemon::verify()
+|&gt; ops::AppTokens::read()
+</code></pre>
+
+<p>Then, in a loop:</p>
+
+<pre><code class="language-plaintext">init_data
+|&gt; ops::User::read()
+|&gt; ops::QueuedTweet::read()
+|&gt; ops::start_daemon::tweet_indices_to_post()
+|&gt; ops::start_daemon::find_user_index_for_tweet()
+|&gt; ops::start_daemon::post_tweet()
+</code></pre>
+</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.find_user_index_for_tweet.html'
                                   title='not_stakkr::ops::start_daemon::find_user_index_for_tweet'>find_user_index_for_tweet</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Try to get the index of the user to post the given tweet.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.post_tweet.html'
                                   title='not_stakkr::ops::start_daemon::post_tweet'>post_tweet</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Post the specified tweet on behalf of the specified user and application, optionally printing progress.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.tweet_indices_to_post.html'
                                   title='not_stakkr::ops::start_daemon::tweet_indices_to_post'>tweet_indices_to_post</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Get the indices of tweets to post now from the provided batch based on whether thy&#39;ve been posted already and the current
+time.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.verify.html'
                                   title='not_stakkr::ops::start_daemon::verify'>verify</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the <code>start-daemon</code>
+subsystem.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>

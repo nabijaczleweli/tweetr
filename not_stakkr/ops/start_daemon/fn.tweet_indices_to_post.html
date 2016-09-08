@@ -47,8 +47,41 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-884' class='srclink' href='../../../src/not_stakkr/src/ops/start_daemon.rs.html#19-31' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn tweet_indices_to_post(tweets: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../not_stakkr/ops/struct.QueuedTweet.html' title='not_stakkr::ops::QueuedTweet'>QueuedTweet</a>&gt;) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>&gt;</pre></section>
+               </span><a id='src-884' class='srclink' href='../../../src/not_stakkr/src/ops/start_daemon.rs.html#130-142' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn tweet_indices_to_post(tweets: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../not_stakkr/ops/struct.QueuedTweet.html' title='not_stakkr::ops::QueuedTweet'>QueuedTweet</a>&gt;) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>&gt;</pre><div class='docblock'><p>Get the indices of tweets to post now from the provided batch based on whether thy&#39;ve been posted already and the current
+time.</p>
+
+<p>All returned indices are guaranteed to be valid.</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>let</span> <span class='ident'>now</span> <span class='op'>=</span> <span class='ident'>Local</span>::<span class='ident'>now</span>();
+<span class='kw'>let</span> <span class='ident'>now</span> <span class='op'>=</span> <span class='ident'>now</span>.<span class='ident'>with_timezone</span>(<span class='ident'>now</span>.<span class='ident'>offset</span>());
+
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>start_daemon</span>::<span class='ident'>tweet_indices_to_post</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[
+    <span class='ident'>QueuedTweet</span> {
+        <span class='ident'>author</span>: <span class='string'>&quot;nabijaczleweli&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time</span>: <span class='ident'>now</span> <span class='op'>+</span> <span class='ident'>Duration</span>::<span class='ident'>hours</span>(<span class='number'>1</span>),
+        <span class='ident'>content</span>: <span class='string'>&quot;This tweet is not going to be posted (it&#39;s too early)&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time_posted</span>: <span class='prelude-val'>None</span>,
+        <span class='ident'>id</span>: <span class='prelude-val'>None</span>,
+    },
+    <span class='ident'>QueuedTweet</span> {
+        <span class='ident'>author</span>: <span class='string'>&quot;nabijaczleweli&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time</span>: <span class='ident'>now</span> <span class='op'>-</span> <span class='ident'>Duration</span>::<span class='ident'>hours</span>(<span class='number'>1</span>),
+        <span class='ident'>content</span>: <span class='string'>&quot;This tweet is going to be posted&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time_posted</span>: <span class='prelude-val'>None</span>,
+        <span class='ident'>id</span>: <span class='prelude-val'>None</span>,
+    },
+    <span class='ident'>QueuedTweet</span> {
+        <span class='ident'>author</span>: <span class='string'>&quot;nabijaczleweli&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time</span>: <span class='ident'>now</span> <span class='op'>-</span> <span class='ident'>Duration</span>::<span class='ident'>hours</span>(<span class='number'>1</span>),
+        <span class='ident'>content</span>: <span class='string'>&quot;This tweet is not going to be posted (it already was)&quot;</span>.<span class='ident'>to_string</span>(),
+        <span class='ident'>time_posted</span>: <span class='prelude-val'>Some</span>(<span class='ident'>now</span> <span class='op'>-</span> <span class='ident'>Duration</span>::<span class='ident'>minutes</span>(<span class='number'>30</span>)),
+        <span class='ident'>id</span>: <span class='prelude-val'>Some</span>(<span class='number'>6908265</span>),
+    },
+]), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>]);</pre>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
