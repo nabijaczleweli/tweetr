@@ -64,7 +64,7 @@ pub fn prompt_exact_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, 
     let mut out = String::new();
 
     while out.len() != desired_len {
-        try!(prompt(input, output, prompt_s, &verifier, &mut out));
+        try!(prompt(input, output, prompt_s, &verifier, false, &mut out));
     }
 
     Ok(out)
@@ -110,14 +110,69 @@ pub fn prompt_nonzero_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str
     let mut out = String::new();
 
     while out.is_empty() {
-        try!(prompt(input, output, prompt_s, &verifier, &mut out));
+        try!(prompt(input, output, prompt_s, &verifier, false, &mut out));
     }
 
     Ok(out)
 }
 
+/// Ask the user to input a string of any length after printing a prompt prompting.
+///
+/// Will return `None` if the string is empty.
+///
+/// # Examples
+///
+/// Allow anything:
+///
+/// ```
+/// # use std::io::Cursor;
+/// # use not_stakkr::util::prompt_any_len;
+/// assert_eq!(prompt_any_len(&mut Cursor::new(b"123456789"),
+///                           &mut Vec::new(),
+///                           "Allowed chars",
+///                           |_| true).unwrap().unwrap(),
+///            "123456789".to_string());
+/// assert_eq!(prompt_any_len(&mut Cursor::new(b""),
+///                           &mut Vec::new(),
+///                           "Allowed chars",
+///                           |_| true).unwrap(),
+///            None);
+/// ```
+///
+/// Allow valid `u64`s:
+///
+/// ```
+/// # use std::io::Cursor;
+/// # use std::str::FromStr;
+/// # use not_stakkr::util::prompt_any_len;
+/// assert_eq!(prompt_any_len(&mut Cursor::new(b"123456789"),
+///                           &mut Vec::new(),
+///                           "Number",
+///                           |s| u64::from_str(s).is_ok()).unwrap().unwrap(),
+///            "123456789".to_string());
+/// assert_eq!(prompt_any_len(&mut Cursor::new(b"123abcdef"),
+///                           &mut Vec::new(),
+///                           "Number",
+///                           |s| u64::from_str(s).is_ok()).map_err(|_| ()),
+///            Ok(None));
+/// ```
+pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F) -> IoResult<Option<String>>
+    where R: BufRead,
+          W: Write,
+          F: Fn(&String) -> bool
+{
+    let mut out = String::new();
+    try!(prompt(input, output, prompt_s, &verifier, true, &mut out));
 
-fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, out: &mut String) -> IoResult<()>
+    if out.is_empty() {
+        Ok(None)
+    } else {
+        Ok(Some(out))
+    }
+}
+
+
+fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, allow_empty: bool, out: &mut String) -> IoResult<()>
     where R: BufRead,
           W: Write,
           F: Fn(&String) -> bool
@@ -126,7 +181,7 @@ fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, 
     try!(output.flush());
 
     out.clear();
-    if try!(input.read_line(out)) == 0 {
+    if try!(input.read_line(out)) == 0 && !allow_empty {
         return Err(Error::new(ErrorKind::UnexpectedEof, "Input too short"));
     }
 
