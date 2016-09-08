@@ -337,6 +337,7 @@
 <span id="293">293</span>
 <span id="294">294</span>
 <span id="295">295</span>
+<span id="296">296</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! This module contains the functions used only by the `start-daemon` subsystem.</span>
 <span class='doccomment'>//!</span>
@@ -581,7 +582,7 @@
 <span class='doccomment'>///     id: None,</span>
 <span class='doccomment'>/// };</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// start_daemon::post_tweet(&amp;mut tweet, &amp;User {</span>
+<span class='doccomment'>/// let result = start_daemon::post_tweet(&amp;mut tweet, &amp;User {</span>
 <span class='doccomment'>///     name: &quot;nabijaczleweli&quot;.to_string(),</span>
 <span class='doccomment'>///     id: 0x81423,</span>
 <span class='doccomment'>///     access_token_key: &quot;529443-FNlJkpZCE7a4Bbd7f1k65GtgaH7SmHlReWSESD4&quot;.to_string(),</span>
@@ -591,6 +592,7 @@
 <span class='doccomment'>///     secret: &quot;HW4YG3Kdcap5ovcZ5fZfBJFedKR6GQe9MtZDS9Gm34hXiirkU5&quot;.to_string(),</span>
 <span class='doccomment'>/// }.into(), false, &amp;mut vec![]);</span>
 <span class='doccomment'>///</span>
+<span class='doccomment'>/// assert_eq!(result.exit_value(), 0);</span>
 <span class='doccomment'>/// assert!(tweet.time_posted.is_some());</span>
 <span class='doccomment'>/// assert!(tweet.id.is_some());</span>
 <span class='doccomment'>/// # }</span>
