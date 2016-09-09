@@ -47,21 +47,31 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-864' class='srclink' href='../../../src/not_stakkr/src/ops/queue_tweet.rs.html#1-30' title='goto source code'>[src]</a></span></h1>
-<h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+               </span><a id='src-864' class='srclink' href='../../../src/not_stakkr/src/ops/queue_tweet.rs.html#1-86' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>This module contains the functions used only by the <code>queue-tweet</code> subsystem.</p>
+
+<p>The flow of the <code>queue-tweet</code> subsystem is as follows:</p>
+
+<pre><code class="language-plaintext">Options::parse()
+|&gt; ops::queue_tweet::tweets_path()
+|&gt; ops::queue_tweet::get_tweet()
+|&gt; ops::QueuedTweet::read()
+|&gt; ops::QueuedTweet::write()
+</code></pre>
+</div><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.get_tweet.html'
                                   title='not_stakkr::ops::queue_tweet::get_tweet'>get_tweet</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Prompt the user for application data.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.tweets_path.html'
                                   title='not_stakkr::ops::queue_tweet::tweets_path'>tweets_path</a></td>
                            <td class='docblock short'>
-                                
+                                <p>Get the path to the file containing the global tweet queue.</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
