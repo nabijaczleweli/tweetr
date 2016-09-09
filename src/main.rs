@@ -52,6 +52,29 @@ fn actual_main() -> i32 {
                 Err(out) => out,
             }
         }
+        not_stakkr::options::Subsystem::QueueTweet => {
+            let tweets_path = not_stakkr::ops::queue_tweet::tweets_path(&opts.config_dir);
+
+            let stdin = stdin();
+            let mut lock = stdin.lock();
+
+            let mut tweets_to_queue = Vec::new();
+            while let Some(tweet) = not_stakkr::ops::queue_tweet::get_tweet(&mut lock, &mut stdout()) {
+                tweets_to_queue.push(tweet);
+            }
+
+            match not_stakkr::ops::QueuedTweet::read(&tweets_path).map_err(Option::unwrap) {
+                Ok(mut tweets) => {
+                    tweets.append(&mut tweets_to_queue);
+                    tweets.sort();
+
+                    not_stakkr::ops::QueuedTweet::write(tweets, &tweets_path);
+
+                    not_stakkr::Outcome::NoError
+                }
+                Err(out) => out,
+            }
+        }
         not_stakkr::options::Subsystem::StartDaemon { delay, verbose } => {
             match not_stakkr::ops::start_daemon::verify(&opts.config_dir) {
                 Ok((app_path, users_path, tweets_path)) => {

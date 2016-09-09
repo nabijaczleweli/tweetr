@@ -16,6 +16,7 @@ mod queued_tweet;
 
 pub mod init;
 pub mod add_user;
+pub mod queue_tweet;
 pub mod start_daemon;
 
 pub use self::user::User;

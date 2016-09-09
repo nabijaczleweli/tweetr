@@ -40,7 +40,7 @@ pub struct QueuedTweet {
     pub time_posted: Option<DateTime<FixedOffset>>,
     /// The numeric ID of the posted tweet.
     ///
-    /// The tweet is accessible via the standard `https://twitter.com/{author}/{id}` URL.
+    /// The tweet is accessible via the standard `https://twitter.com/status/{author}/{id}` URL.
     ///
     /// Becomes non-empty when posted.
     pub id: Option<i64>,

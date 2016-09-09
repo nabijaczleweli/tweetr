@@ -32,6 +32,8 @@ pub enum Subsystem {
         /// Whether to print more user data. Default: `false`
         verbose: bool,
     },
+    /// Add a tweet to the queue
+    QueueTweet,
     /// Start the tweet-posting daemon.
     StartDaemon {
         /// How long to wait between trying to post again. Default: 60s
@@ -70,6 +72,8 @@ impl Options {
             .subcommand(SubCommand::with_name("add-user")
                 .about("Add and authorise a user")
                 .arg(Arg::from_usage("-v --verbose 'Print more user data'")))
+            .subcommand(SubCommand::with_name("queue-tweet")
+                .about("Add a tweet to the queue"))
             .subcommand(SubCommand::with_name("start-daemon")
                 .about("Start the tweet-posting daemon")
                 .args(&[Arg::from_usage("-v --verbose 'Log all network requests'"),
@@ -104,6 +108,7 @@ impl Options {
             subsystem: match matches.subcommand() {
                 ("init", Some(init_matches)) => Subsystem::Init { force: init_matches.is_present("force") },
                 ("add-user", Some(add_user_matches)) => Subsystem::AddUser { verbose: add_user_matches.is_present("verbose") },
+                ("queue-tweet", Some(_)) => Subsystem::QueueTweet,
                 ("start-daemon", Some(start_daemon_matches)) => {
                     Subsystem::StartDaemon {
                         delay: Duration::from_millis(u64::from_str(start_daemon_matches.value_of("delay").unwrap()).unwrap()),
