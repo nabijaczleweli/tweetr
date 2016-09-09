@@ -53,7 +53,7 @@ fn actual_main() -> i32 {
             }
         }
         not_stakkr::options::Subsystem::QueueTweet => {
-            let tweets_path = not_stakkr::ops::queue_tweet::tweets_path(&opts.config_dir);
+            let tweets_path = not_stakkr::ops::queue_tweet::tweets_path(&opts.config_dir.1);
 
             let stdin = stdin();
             let mut lock = stdin.lock();
