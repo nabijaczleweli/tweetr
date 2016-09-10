@@ -1,0 +1,69 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "NOT\-STAKKR\-QUEUE\-TWEET" "1" "September 2016" "not-stakkr developers" ""
+.
+.SH "NAME"
+\fBnot\-stakkr\-queue\-tweet\fR \- Self\-hosted automatic tweet posting software \- tweet queueing
+.
+.SH "SYNOPSIS"
+\fBnot\-stakkr\fR \fIOPTIONS\fR \fBqueue\-tweet\fR
+.
+.SH "DESCRIPTION"
+Add a tweet to the queue with the values provided via \fBstdin\fR\.
+.
+.P
+Queued tweets can then be posted via \fBnot\-stakkr\-start\-daemon(1)\fR\.
+.
+.P
+The required data (in order):
+.
+.IP "\(bu" 4
+username \- will need to be authorised by the time the tweet is posted,
+.
+.IP "\(bu" 4
+tweet text content,
+.
+.IP "\(bu" 4
+time to post in RFC2822 or RFC3339 format\.
+.
+.IP "" 0
+.
+.P
+For description of \fBnot\-stakkr\fR itself see \fBnot\-stakkr(1)\fR\.
+.
+.SH "OPTIONS"
+See \fBnot\-stakkr(1)\fR\.
+.
+.SH "EXAMPLES"
+\fBnot\-stakkr queue\-tweet\fR
+.
+.P
+This will queue two tweets for the same time\.
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Capitalism
+Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Abolish the bourgeoisie!
+Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/nabijaczleweli/not\-stakkr/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/nabijaczleweli/not\-stakkr\fR>

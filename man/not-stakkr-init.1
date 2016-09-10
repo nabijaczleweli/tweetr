@@ -1,0 +1,64 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "NOT\-STAKKR\-INIT" "1" "September 2016" "not-stakkr developers" ""
+.
+.SH "NAME"
+\fBnot\-stakkr\-init\fR \- Self\-hosted automatic tweet posting software \- setting application
+.
+.SH "SYNOPSIS"
+\fBnot\-stakkr\fR \fIOPTIONS\fR \fBinit\fR \fIINIT_OPTIONS\fR
+.
+.SH "DESCRIPTION"
+Initialise the global application data with the values provided via \fBstdin\fR\.
+.
+.P
+For description of \fBnot\-stakkr\fR itself see \fBnot\-stakkr(1)\fR\.
+.
+.SH "OPTIONS"
+See \fBnot\-stakkr(1)\fR\.
+.
+.SH "INIT_OPTIONS"
+\-f \-\-force
+.
+.IP "" 4
+.
+.nf
+
+Override current app configuration\.
+
+By default the init subsystem will fail if app data already exists
+to prevent data loss, use this option to override that\.
+.
+.fi
+.
+.IP "" 0
+.
+.SH "EXAMPLES"
+\fBnot\-stakkr init\fR [\fB\-f\fR]
+.
+.P
+The basic form of initialisation, will fail if an application is already initialised and \fB\-f\fR was not provided\.
+.
+.P
+Full in/output pass:
+.
+.IP "" 4
+.
+.nf
+
+App key: qdPD7N8CcPYDKiNv81QWNWaHK
+App secret: U9A5CM1LzwNliBiHGPIJyx6tFYAGVr3bCMbVkWKu8Zb13kHD4p
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/nabijaczleweli/not\-stakkr/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/nabijaczleweli/not\-stakkr\fR>
