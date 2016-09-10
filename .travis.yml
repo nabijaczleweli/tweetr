@@ -12,6 +12,10 @@ matrix:
     - env: LANGUAGE=Rust
       language: rust
       rust: nightly
+    - env: LANGUAGE=Ruby DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../not-stakkr-man-$TRAVIS_TAG.tbz2"
+      language: ruby
+      rust: []
+      rvm: "2.2"
     - env: LANGUAGE=Rust-doc DEPLOY=true DEPLOY_FILE="$TRAVIS_BUILD_DIR/../not-stakkr-doc-$TRAVIS_TAG.tbz2"
       language: rust
       rust: stable
@@ -20,12 +24,22 @@ matrix:
     - rust: nightly
 
 before_install:
-  - openssl aes-256-cbc -K $encrypted_045b50fdfbe0_key -iv $encrypted_045b50fdfbe0_iv -in gh_rsa.enc -out gh_rsa -d
+  - if [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
+      openssl aes-256-cbc -K $encrypted_045b50fdfbe0_key -iv $encrypted_045b50fdfbe0_iv -in gh_rsa.enc -out gh_rsa -d;
+    fi
+
+install:
+  - if [ "$LANGUAGE" == "Ruby" ]; then gem install ronn; fi
 
 script:
   - if [ "$LANGUAGE" == "Rust" ]; then cargo build --verbose; fi
   - if [ "$LANGUAGE" == "Rust" ]; then cargo test  --verbose; fi
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then cargo build --verbose --release; fi
+  -
+  - if [ "$LANGUAGE" == "Ruby" ]; then
+      cp -r man "$TRAVIS_BUILD_DIR/../man";
+      ronn --organization="not-stakkr developers" $TRAVIS_BUILD_DIR/../man/*.md;
+    fi
 
 after_success:
   - if [ "$LANGUAGE" == "Rust" ] && [ "$DEPLOY" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
@@ -41,6 +55,32 @@ after_success:
       pushd "$TRAVIS_BUILD_DIR/..";
       tar -caf "not-stakkr-doc-$TRAVIS_TAG.tbz2" "not-stakkr-doc-$TRAVIS_TAG";
       rm -rf "not-stakkr-doc-$TRAVIS_TAG";
+      popd;
+    fi
+  - if [ "$LANGUAGE" == "Ruby" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
+      (
+        echo "Update manual for commits $TRAVIS_COMMIT_RANGE";
+        echo;
+        git log $TRAVIS_COMMIT_RANGE --pretty=oneline;
+      ) >> $TRAVIS_BUILD_DIR/../MAN_UPDATE_MSG;
+      mkdir -p ~/.ssh && cp gh_rsa ~/.ssh/id_rsa && chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa;
+      git clone -b man git@github.com:$TRAVIS_REPO_SLUG.git "$TRAVIS_BUILD_DIR-man";
+      cp -r "$TRAVIS_BUILD_DIR/../man" "$TRAVIS_BUILD_DIR-man/";
+      pushd "$TRAVIS_BUILD_DIR-man";
+      ./create_index.sh man index.html
+      git config --global user.email "nabijaczleweli@gmail.com";
+      git config --global user.name "Nabijaczleweli Autouploader Bot";
+      git config --global push.default simple;
+      git add *;
+      git commit -F $TRAVIS_BUILD_DIR/../MAN_UPDATE_MSG;
+      git push;
+      popd;
+    fi
+  - if [ "$LANGUAGE" == "Ruby" ] && [ "$TRAVIS_TAG" ]; then
+      cp -r "$TRAVIS_BUILD_DIR/../man" "$TRAVIS_BUILD_DIR/../not-stakkr-man-$TRAVIS_TAG";
+      pushd "$TRAVIS_BUILD_DIR/..";
+      tar -caf "not-stakkr-man-$TRAVIS_TAG.tbz2" "not-stakkr-man-$TRAVIS_TAG";
+      rm -rf "not-stakkr-man-$TRAVIS_TAG";
       popd;
     fi
 
