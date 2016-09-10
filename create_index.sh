@@ -1,6 +1,6 @@
 #!/bin/bash
 
-out="$(pwd)$2"
+out="$(pwd)/$2"
 tempfile=$(mktemp -t "not-stakkr-man-create_index.XXXXXXXXXX" --suffix=".html")
 
 (
