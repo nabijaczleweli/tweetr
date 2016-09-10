@@ -17,3 +17,4 @@ curl -X POST -s --data-urlencode "input@$(basename "$tempfile")" http://html-min
 popd > /dev/null
 
 sed -i -e 's/> />/g' -e 's/ </</g' "$out"
+echo "Built $out"
