@@ -7,7 +7,7 @@ tempfile=$(mktemp -t "not-stakkr-man-create_index.XXXXXXXXXX" --suffix=".html")
     cat index_head.htm
     for f in $(find "$1" -name "*.md" | awk '{ print length, $0 }' | sort -n -s | cut -d" " -f2-); do
         f=$(basename "$f" .md)
-        echo '<li><a href="man/'"$f"'.1.html"><strong>'"$f"'(1)</strong></a></li>'
+        echo '<li><a class="man" href="man/'"$f"'.1.html"><strong>'"$f"'(1)</strong></a></li>'
     done
     cat index_tail.htm
 ) > "$tempfile"
