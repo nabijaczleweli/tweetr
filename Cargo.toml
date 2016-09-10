@@ -8,6 +8,7 @@ keywords = ["stakkr", "twitter", "tweets", "queue", "content"]
 license = "MIT"
 # Remember to also update in appveyor.yml
 version = "0.1.0"
+# Remember to also update in mod/*.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
 

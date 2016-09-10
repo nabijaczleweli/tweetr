@@ -13,7 +13,6 @@ fn main() {
 
 fn actual_main() -> i32 {
     let opts = not_stakkr::options::Options::parse();
-    println!("{:#?}", opts);
 
     let err = match opts.subsystem {
             not_stakkr::options::Subsystem::Init { force } => init_main(opts, force),

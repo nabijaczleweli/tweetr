@@ -72,8 +72,7 @@ impl Options {
             .subcommand(SubCommand::with_name("add-user")
                 .about("Add and authorise a user")
                 .arg(Arg::from_usage("-v --verbose 'Print more user data'")))
-            .subcommand(SubCommand::with_name("queue-tweet")
-                .about("Add a tweet to the queue"))
+            .subcommand(SubCommand::with_name("queue-tweet").about("Add a tweet to the queue"))
             .subcommand(SubCommand::with_name("start-daemon")
                 .about("Start the tweet-posting daemon")
                 .args(&[Arg::from_usage("-v --verbose 'Log all network requests'"),
