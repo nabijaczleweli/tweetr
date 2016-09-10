@@ -47,8 +47,30 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/not_stakkr/src/lib.rs.html#1-14' title='goto source code'>[src]</a></span></h1>
-<h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+               </span><a id='src-0' class='srclink' href='../src/not_stakkr/src/lib.rs.html#1-43' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you
+have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically.</p>
+
+<p>IOW it&#39;s self-hosted automatic tweet posting software..</p>
+
+<h1 id='library-doc' class='section-header'><a href='#library-doc'>Library doc</a></h1>
+<p>This library is used by <code>not-stakkr</code> itself for all its function and is therefore contains all necessary functions.</p>
+
+<h2 id='data-flow' class='section-header'><a href='#data-flow'>Data flow</a></h2>
+<p>See documentation for <code>ops::*</code> submodules as each one has a distinct data flow.</p>
+
+<h1 id='executable-doc' class='section-header'><a href='#executable-doc'>Executable doc</a></h1>
+<p>Exit values and possible errors:</p>
+
+<pre><code class="language-plaintext">1 - a file would need to be overriden, but was not allowed to
+2 - required data or file needs to be created by running the specified filesysstem
+3 - an error was returned by the Twitter API
+4 - failed to parse the specified file
+</code></pre>
+
+<h2 id='executable-manpage' class='section-header'><a href='#executable-manpage'>Executable manpage</a></h2>
+<p><a href="https://cdn.rawgit.com/nabijaczleweli/not-stakkr/man/index.html">All manpages</a></p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='mod' href='ops/index.html'

@@ -56,7 +56,65 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class='rust '>
+<span class='doccomment'>//! not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you</span>
+<span class='doccomment'>//! have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! IOW it&#39;s self-hosted automatic tweet posting software..</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! # Library doc</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! This library is used by `not-stakkr` itself for all its function and is therefore contains all necessary functions.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ## Data flow</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! See documentation for `ops::*` submodules as each one has a distinct data flow.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! # Executable doc</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! Exit values and possible errors:</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ```plaintext</span>
+<span class='doccomment'>//! 1 - a file would need to be overriden, but was not allowed to</span>
+<span class='doccomment'>//! 2 - required data or file needs to be created by running the specified filesysstem</span>
+<span class='doccomment'>//! 3 - an error was returned by the Twitter API</span>
+<span class='doccomment'>//! 4 - failed to parse the specified file</span>
+<span class='doccomment'>//! ```</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ## Executable manpage</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! [All manpages](https://cdn.rawgit.com/nabijaczleweli/not-stakkr/man/index.html)</span>
+
+
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>egg_mode</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>chrono</span>;
