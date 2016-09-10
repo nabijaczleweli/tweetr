@@ -6,3 +6,42 @@ not-stakkr is a platform that allows you to create and queue tweets to be shared
 
 ## Stock values
 If you want to use an already set-up application decrypt (and [verify](https://heybase.io/nabijaczleweli)) `assets/stock-app.toml.asc` into `$CONFIG_DIR/app.toml`.
+
+## Simple usage
+
+First, enter the app data you got when making a Twitter app on https://dev.twitter.com (or use the [stock values](#stock-values) for a pre-set app):
+
+```sh
+not-stakkr init
+App key: ...
+App secret: ...
+```
+
+Then, authorise users by pasting the provided link into a logged-in browser the nentering the resulting PIN:
+
+```sh
+not-stakkr add-user
+Visit this URL: ...
+Enter the PIN from that page: ...
+```
+
+Afterwards add tweets:
+
+```sh
+not-stakkr queue-tweets
+Author (or empty to finish): ...
+Tweet content: ...
+Time to post the tweet (RFC2822 or RFC3339): ...
+
+Author (or empty to finish):
+```
+
+At any point after `init` you can start the daemon, which will be posting tweets:
+
+```sh
+not-stakkr start-daemon
+Posted tweet "..." scheduled for ... by ... at ... with ID ...
+Posted tweet "..." scheduled for ... by ... at ... with ID ...
+```
+
+For more detailed information see the [manpages](#manpages).
