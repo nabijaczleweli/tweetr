@@ -258,12 +258,7 @@ pub fn find_user_index_for_tweet(tweet: &QueuedTweet, users: &Vec<User>) -> Resu
 /// ```
 pub fn post_tweet<'a, W: Write>(tweet: &mut QueuedTweet, on_behalf_of: &User, app: &Token<'a>, verbose: bool, output: &mut W) -> Outcome {
     if verbose {
-        write!(output,
-               "Posting tweet \"{}\" scheduled for {:?} by {}...",
-               tweet.content,
-               tweet.time,
-               tweet.author)
-            .unwrap();
+        write!(output, "Posting tweet scheduled for {:?}...", tweet.time).unwrap();
         output.flush().unwrap();
     }
     match DraftTweet::new(&tweet.content).send(app, &Token::new(&on_behalf_of.access_token_key[..], &on_behalf_of.access_token_secret[..])) {

@@ -46,13 +46,11 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
 
   `not-stakkr start-daemon -v`
 
-    Posting tweet "Capitalism" scheduled for
-    2016-09-09T00:33:30+02:00 by not_stakkr_test... SUCCESS
+    Posting tweet scheduled for 2016-09-09T00:33:30+02:00... SUCCESS
     Posted tweet "Capitalism" scheduled for
     2016-09-09T00:33:30+02:00 by not_stakkr_test at 2016-09-10T10:53:11+00:00
     with ID 774561353273147392
-    Posting tweet "Abolish the burgeoisie!" scheduled for
-    2016-09-10T00:33:30+02:00 by not_stakkr_test... SUCCESS
+    Posting tweet scheduled for 2016-09-10T00:33:30+02:00... SUCCESS
     Posted tweet "Abolish the burgeoisie!" scheduled for
     2016-09-10T00:33:30+02:00 by not_stakkr_test at 2016-09-10T10:53:12+00:00
     with ID 774561355886108674
