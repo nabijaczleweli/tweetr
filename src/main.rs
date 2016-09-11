@@ -2,6 +2,7 @@ extern crate tweetr;
 
 use std::thread;
 use std::process::exit;
+use std::path::PathBuf;
 use std::time::Duration;
 use std::io::{stdin, stdout, stderr};
 
@@ -14,10 +15,10 @@ fn main() {
 fn actual_main() -> i32 {
     let opts = tweetr::options::Options::parse();
 
-    let err = match opts.subsystem {
+    let err = match opts.subsystem.clone() {
             tweetr::options::Subsystem::Init { force } => init_main(opts, force),
             tweetr::options::Subsystem::AddUser { verbose } => add_user_main(opts, verbose),
-            tweetr::options::Subsystem::QueueTweet => queue_tweet_main(opts),
+            tweetr::options::Subsystem::QueueTweet { file_to_load } => queue_tweet_main(opts, file_to_load),
             tweetr::options::Subsystem::StartDaemon { delay, verbose } => start_daemon_main(opts, delay, verbose),
         }
         .err()
@@ -52,16 +53,22 @@ fn add_user_main(opts: tweetr::options::Options, verbose: bool) -> Result<(), tw
     Err(tweetr::ops::add_user::append_user(&users_path, user))
 }
 
-fn queue_tweet_main(opts: tweetr::options::Options) -> Result<(), tweetr::Outcome> {
+fn queue_tweet_main(opts: tweetr::options::Options, file_to_load: Option<PathBuf>) -> Result<(), tweetr::Outcome> {
     let tweets_path = tweetr::ops::queue_tweet::tweets_path(&opts.config_dir.1);
 
-    let stdin = stdin();
-    let mut lock = stdin.lock();
+    let mut tweets_to_queue = match file_to_load {
+        Some(ftl) => try!(tweetr::ops::QueuedTweet::read(&ftl).map_err(Option::unwrap)),
+        None => {
+            let stdin = stdin();
+            let mut lock = stdin.lock();
 
-    let mut tweets_to_queue = Vec::new();
-    while let Some(tweet) = tweetr::ops::queue_tweet::get_tweet(&mut lock, &mut stdout()) {
-        tweets_to_queue.push(tweet);
-    }
+            let mut ttq = Vec::new();
+            while let Some(tweet) = tweetr::ops::queue_tweet::get_tweet(&mut lock, &mut stdout()) {
+                ttq.push(tweet);
+            }
+            ttq
+        }
+    };
 
     let mut tweets = try!(tweetr::ops::QueuedTweet::read(&tweets_path).map_err(Option::unwrap));
     tweets.append(&mut tweets_to_queue);

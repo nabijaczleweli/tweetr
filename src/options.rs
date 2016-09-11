@@ -33,7 +33,10 @@ pub enum Subsystem {
         verbose: bool,
     },
     /// Add a tweet to the queue
-    QueueTweet,
+    QueueTweet {
+        /// File to load tweets from, if any. Default: `None`
+        file_to_load: Option<PathBuf>,
+    },
     /// Start the tweet-posting daemon.
     StartDaemon {
         /// How long to wait between trying to post again. Default: 60s
@@ -73,7 +76,9 @@ impl Options {
             .subcommand(SubCommand::with_name("add-user")
                 .about("Add and authorise a user")
                 .arg(Arg::from_usage("-v --verbose 'Print more user data'")))
-            .subcommand(SubCommand::with_name("queue-tweet").about("Add a tweet to the queue"))
+            .subcommand(SubCommand::with_name("queue-tweet")
+                .about("Add a tweet to the queue")
+                .arg(Arg::from_usage("-f --file=[file] 'Load tweets from the specified file'").validator(Options::tweets_file_validator)))
             .subcommand(SubCommand::with_name("start-daemon")
                 .about("Start the tweet-posting daemon")
                 .args(&[Arg::from_usage("-v --verbose 'Log all network requests'"),
@@ -108,7 +113,9 @@ impl Options {
             subsystem: match matches.subcommand() {
                 ("init", Some(init_matches)) => Subsystem::Init { force: init_matches.is_present("force") },
                 ("add-user", Some(add_user_matches)) => Subsystem::AddUser { verbose: add_user_matches.is_present("verbose") },
-                ("queue-tweet", Some(_)) => Subsystem::QueueTweet,
+                ("queue-tweet", Some(queue_tweet_matches)) => {
+                    Subsystem::QueueTweet { file_to_load: queue_tweet_matches.value_of("file").map(fs::canonicalize).map(Result::unwrap) }
+                }
                 ("start-daemon", Some(start_daemon_matches)) => {
                     Subsystem::StartDaemon {
                         delay: Duration::from_millis(u64::from_str(start_daemon_matches.value_of("delay").unwrap()).unwrap()),
@@ -122,6 +129,10 @@ impl Options {
 
     fn config_dir_validator(s: String) -> Result<(), String> {
         fs::canonicalize(&s).map(|_| ()).map_err(|_| format!("Configuration directory \"{}\" not found", s))
+    }
+
+    fn tweets_file_validator(s: String) -> Result<(), String> {
+        fs::canonicalize(&s).map(|_| ()).map_err(|_| format!("File with tweets \"{}\" not found", s))
     }
 
     fn duration_validator(s: String) -> Result<(), String> {

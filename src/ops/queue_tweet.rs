@@ -9,6 +9,16 @@
 //! |> ops::QueuedTweet::read()
 //! |> ops::QueuedTweet::write()
 //! ```
+//!
+//! When queueing from file:
+//!
+//! ```plaintext
+//! Options::parse()
+//! |> ops::queue_tweet::tweets_path()
+//! |> ops::QueuedTweet::read()
+//! |> ops::QueuedTweet::read()
+//! |> ops::QueuedTweet::write()
+//! ```
 
 use self::super::super::util::{prompt_any_len, prompt_nonzero_len, prompt_multiline, parse_relative_time};
 use chrono::{ParseResult, FixedOffset, DateTime, Duration, Local};
