@@ -56,7 +56,7 @@ pub struct Options {
 impl Options {
     /// Parse `env`-wide command-line arguments into an `Options` instance
     pub fn parse() -> Options {
-        let matches = App::new("checksums")
+        let matches = App::new("tweetr")
             .version(crate_version!())
             .author(crate_authors!())
             .setting(AppSettings::ColoredHelp)
