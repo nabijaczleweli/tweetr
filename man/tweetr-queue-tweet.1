@@ -1,0 +1,121 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "TWEETR\-QUEUE\-TWEET" "1" "September 2016" "tweetr developers" ""
+.
+.SH "NAME"
+\fBtweetr\-queue\-tweet\fR \- Self\-hosted automatic tweet posting software \- tweet queueing
+.
+.SH "SYNOPSIS"
+\fBtweetr\fR \fIOPTIONS\fR \fBqueue\-tweet\fR
+.
+.SH "DESCRIPTION"
+Add a tweet to the queue with the values provided via \fBstdin\fR\.
+.
+.P
+Queued tweets can then be posted via \fBtweetr\-start\-daemon(1)\fR\.
+.
+.P
+The required data (in order):
+.
+.IP "\(bu" 4
+username \- will need to be authorised by the time the tweet is posted,
+.
+.IP "\(bu" 4
+tweet text content,
+.
+.IP "\(bu" 4
+time to post in RFC2822, RFC3339 or a custom relative format\.
+.
+.IP "" 0
+.
+.P
+Relative format:
+.
+.IP "\(bu" 4
+\fBnow\fR \- current datetime
+.
+.IP "\(bu" 4
+\fBin\fR \fIn\fR [\fBsecond\fR|\fBminute\fR|\fBhour\fR|\fBday\fR|\fBweek\fR]{,\fBs\fR} (case\-insensitive) \- current datetime plus the specified amount of time
+.
+.IP "" 0
+.
+.P
+One can queue a tweet with multiple lines by suffixing a non\-ending line with a \fB\e\fR, which can be escaped with a \fB\e\e\fR\.
+.
+.P
+For description of \fBtweetr\fR itself see \fBtweetr(1)\fR\.
+.
+.SH "OPTIONS"
+See \fBtweetr(1)\fR\.
+.
+.SH "EXAMPLES"
+\fBtweetr queue\-tweet\fR
+.
+.P
+This will queue two tweets for the same time\.
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Capitalism
+Time to post the tweet (RFC2822, RFC3339 or custom):
+2016\-09\-10T12:00:00+02:00
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Abolish the bourgeoisie!
+Time to post the tweet (RFC2822, RFC3339 or custom):
+Sat, 10 Sep 2016 12:00:00 +0200
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This will queue a multiline tweet with content \fI"Abolish\enthe\enburgeoisie!"\fR five minutes from now:
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Abolish\e
+               the\e
+               burgeoisie!
+Time to post the tweet (RFC2822, RFC3339 or custom): in 5 minutes
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This will queue a multiline tweet with content \fI"Escaped\e"\fR an hour from now:
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Escaped\e\e
+Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/nabijaczleweli/tweetr/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/nabijaczleweli/tweetr\fR>

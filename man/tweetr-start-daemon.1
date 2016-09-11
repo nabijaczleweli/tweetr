@@ -1,0 +1,98 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "TWEETR\-START\-DAEMON" "1" "September 2016" "tweetr developers" ""
+.
+.SH "NAME"
+\fBtweetr\-start\-daemon\fR \- Self\-hosted automatic tweet posting software \- tweet posting
+.
+.SH "SYNOPSIS"
+\fBtweetr\fR \fIOPTIONS\fR \fBstart\-daemon\fR \fISTART_DAEMON_OPTIONS\fR
+.
+.SH "DESCRIPTION"
+Start the daemon that will post queued tweets to Twitter,
+.
+.P
+The user needs to be authorised for the application set via \fBtweetr\-init(1)\fR before posting a tweet from its account, use \fBtweetr\-add\-user(1)\fR to do that\. Queue tweets using \fBtweetr\-queue\-tweet(1)\fR\.
+.
+.P
+For description of \fBtweetr\fR itself see \fBtweetr(1)\fR\.
+.
+.SH "OPTIONS"
+See \fBtweetr(1)\fR\.
+.
+.SH "START_DAEMON_OPTIONS"
+\-v \-\-verbose
+.
+.IP "" 4
+.
+.nf
+
+Log network accesses, useful if your internet connection is failing\.
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\-\-delay <\fIsleep_time\fR>
+.
+.IP "" 4
+.
+.nf
+
+Time to wait between checking for and posting tweets\.
+
+Unit: milliseconds\.
+Default: 60000\.
+.
+.fi
+.
+.IP "" 0
+.
+.SH "EXAMPLES"
+\fBtweetr start\-daemon\fR
+.
+.IP "" 4
+.
+.nf
+
+Posted tweet "Capitalism" scheduled for
+2016\-09\-09T00:33:30+02:00 by tweetr_test at 2016\-09\-10T10:49:38+00:00
+with ID 774560457755590656
+Posted tweet "Abolish the burgeoisie!" scheduled for
+2016\-09\-10T00:33:30+02:00 by tweetr_test at 2016\-09\-10T10:49:39+00:00
+with ID 774560460511248384
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBtweetr start\-daemon \-v\fR
+.
+.IP "" 4
+.
+.nf
+
+Posting tweet scheduled for 2016\-09\-09T00:33:30+02:00\.\.\. SUCCESS
+Posted tweet "Capitalism" scheduled for
+2016\-09\-09T00:33:30+02:00 by tweetr_test at 2016\-09\-10T10:53:11+00:00
+with ID 774561353273147392
+Posting tweet scheduled for 2016\-09\-10T00:33:30+02:00\.\.\. SUCCESS
+Posted tweet "Abolish the burgeoisie!" scheduled for
+2016\-09\-10T00:33:30+02:00 by tweetr_test at 2016\-09\-10T10:53:12+00:00
+with ID 774561355886108674
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/nabijaczleweli/tweetr/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/nabijaczleweli/tweetr\fR>

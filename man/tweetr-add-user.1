@@ -1,0 +1,108 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "TWEETR\-ADD\-USER" "1" "September 2016" "tweetr developers" ""
+.
+.SH "NAME"
+\fBtweetr\-add\-user\fR \- Self\-hosted automatic tweet posting software \- user authorisation
+.
+.SH "SYNOPSIS"
+\fBtweetr\fR \fIOPTIONS\fR \fBadd\-user\fR \fIADD_USER_OPTIONS\fR
+.
+.SH "DESCRIPTION"
+Add and authorise a user via Twitter\'s PIN authorisation pipeline\.
+.
+.P
+Authorising a new user with the same name doesn\'t require forcing as the new tokens are the only valid ones at that point\.
+.
+.P
+For description of \fBtweetr\fR itself see \fBtweetr(1)\fR\.
+.
+.SH "OPTIONS"
+See \fBtweetr(1)\fR\.
+.
+.SH "ADD_USER_OPTIONS"
+\-v \-\-verbose
+.
+.IP "" 4
+.
+.nf
+
+Log network events and user tokens\.
+
+By default the add\-user subsystem will print enough of information for
+normal usage, but usign this can help one troubleshoot network problems\.
+.
+.fi
+.
+.IP "" 0
+.
+.SH "EXAMPLES"
+\fBtweetr add\-user\fR
+.
+.P
+Normal:
+.
+.IP "" 4
+.
+.nf
+
+Visit this URL: https://api\.twitter\.com/oauth/authorize?oauth_token=3JBg\-BAV
+Enter the PIN from that page: 9530177
+
+Successfully authenticated user nabijaczleweli#1246428073
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Entering the wrong PIN:
+.
+.IP "" 4
+.
+.nf
+
+Visit this URL: https://api\.twitter\.com/oauth/authorize?oauth_token=3JBg\-BAV
+Enter the PIN from that page: 9530178
+Twitter API error: Error status received: 401 Unauthorized
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBtweetr add\-user \-v\fR
+.
+.P
+This will also print network data and user access tokens:
+.
+.IP "" 4
+.
+.nf
+
+Getting request token\.\.\. DONE
+Getting authorisation URL\.\.\. DONE
+
+Visit this URL: https://api\.twitter\.com/oauth/authorize?oauth_token=3JBg\-BAV
+Enter the PIN from that page: 9530177
+
+Getting access token\.\.\. DONE
+
+Successfully authenticated user nabijaczleweli#1246428073
+Access tokens:
+  Key   : 1246428073\-KhiuVzAS41GS0V3hCBA7VFnHHNdwQpUDCaNfiOn
+  Secret: 3cx12ULmXYkhcnEiPXBbpoilLPdQOVd8KigUoPQmaw8f5
+.
+.fi
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>
+.
+.SH "REPORTING BUGS"
+<\fIhttps://github\.com/nabijaczleweli/tweetr/issues\fR>
+.
+.SH "SEE ALSO"
+<\fIhttps://github\.com/nabijaczleweli/tweetr\fR>
