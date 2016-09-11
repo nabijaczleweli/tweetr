@@ -97,6 +97,8 @@
 
 <ul>
 <li><code>now</code> - current datetime</li>
+<li><code>in</code> <em>n</em> [<code>second</code>|<code>minute</code>|<code>hour</code>|<code>day</code>|<code>week</code>]{,<code>s</code>} (case-insensitive) -
+  current datetime plus the specified amount of time</li>
 </ul>
 
 
@@ -117,38 +119,41 @@ with a <code>\</code>, which can be escaped with a <code>\\</code>.</p>
 
 <pre><code>Author (or empty to finish): nabijaczleweli
 Tweet content: Capitalism
-Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom):
+2016-09-10T12:00:00+02:00
 
 Author (or empty to finish): nabijaczleweli
 Tweet content: Abolish the bourgeoisie!
-Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+Time to post the tweet (RFC2822, RFC3339 or custom):
+Sat, 10 Sep 2016 12:00:00 +0200
 
 Author (or empty to finish):
 </code></pre>
 
-<p>  This will queue a multiline tweet with content <em>"Abolish\nthe\nburgeoisie!"</em>:</p>
+<p>  This will queue a multiline tweet with content <em>"Abolish\nthe\nburgeoisie!"</em>
+  five minutes from now:</p>
 
 <pre><code>Author (or empty to finish): nabijaczleweli
 Tweet content: Abolish\
                the\
                burgeoisie!
-Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom): in 5 minutes
 
 Author (or empty to finish):
 </code></pre>
 
-<p>  This will queue a multiline tweet with content <em>"Escaped\"</em>:</p>
+<p>  This will queue a multiline tweet with content <em>"Escaped\"</em> an hour from now:</p>
 
 <pre><code>Author (or empty to finish): nabijaczleweli
 Tweet content: Escaped\\
-Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
 
 Author (or empty to finish):
 </code></pre>
 
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#109;&#x61;&#x69;&#x6c;&#116;&#x6f;&#58;&#110;&#97;&#98;&#105;&#106;&#97;&#99;&#x7a;&#108;&#101;&#x77;&#x65;&#x6c;&#105;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;" data-bare-link="true">&#x6e;&#97;&#98;&#105;&#x6a;&#x61;&#x63;&#x7a;&#x6c;&#x65;&#x77;&#x65;&#x6c;&#x69;&#64;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#111;&#109;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#109;&#x61;&#105;&#x6c;&#116;&#111;&#58;&#x6e;&#x61;&#x62;&#105;&#x6a;&#97;&#99;&#x7a;&#x6c;&#x65;&#119;&#101;&#108;&#105;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#111;&#109;" data-bare-link="true">&#x6e;&#x61;&#98;&#x69;&#x6a;&#x61;&#x63;&#x7a;&#108;&#101;&#x77;&#x65;&#108;&#x69;&#x40;&#x67;&#109;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#109;</a>&gt;</p>
 
 <h2 id="REPORTING-BUGS">REPORTING BUGS</h2>
 

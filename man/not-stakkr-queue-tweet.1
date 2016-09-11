@@ -35,6 +35,9 @@ Relative format:
 .IP "\(bu" 4
 \fBnow\fR \- current datetime
 .
+.IP "\(bu" 4
+\fBin\fR \fIn\fR [\fBsecond\fR|\fBminute\fR|\fBhour\fR|\fBday\fR|\fBweek\fR]{,\fBs\fR} (case\-insensitive) \- current datetime plus the specified amount of time
+.
 .IP "" 0
 .
 .P
@@ -58,11 +61,13 @@ This will queue two tweets for the same time\.
 
 Author (or empty to finish): nabijaczleweli
 Tweet content: Capitalism
-Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom):
+2016\-09\-10T12:00:00+02:00
 
 Author (or empty to finish): nabijaczleweli
 Tweet content: Abolish the bourgeoisie!
-Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+Time to post the tweet (RFC2822, RFC3339 or custom):
+Sat, 10 Sep 2016 12:00:00 +0200
 
 Author (or empty to finish):
 .
@@ -71,7 +76,7 @@ Author (or empty to finish):
 .IP "" 0
 .
 .P
-This will queue a multiline tweet with content \fI"Abolish\enthe\enburgeoisie!"\fR:
+This will queue a multiline tweet with content \fI"Abolish\enthe\enburgeoisie!"\fR five minutes from now:
 .
 .IP "" 4
 .
@@ -81,7 +86,7 @@ Author (or empty to finish): nabijaczleweli
 Tweet content: Abolish\e
                the\e
                burgeoisie!
-Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom): in 5 minutes
 
 Author (or empty to finish):
 .
@@ -90,7 +95,7 @@ Author (or empty to finish):
 .IP "" 0
 .
 .P
-This will queue a multiline tweet with content \fI"Escaped\e"\fR:
+This will queue a multiline tweet with content \fI"Escaped\e"\fR an hour from now:
 .
 .IP "" 4
 .
@@ -98,7 +103,7 @@ This will queue a multiline tweet with content \fI"Escaped\e"\fR:
 
 Author (or empty to finish): nabijaczleweli
 Tweet content: Escaped\e\e
-Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
+Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
 
 Author (or empty to finish):
 .
