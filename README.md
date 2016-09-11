@@ -17,7 +17,7 @@ App key: ...
 App secret: ...
 ```
 
-Then, authorise users by pasting the provided link into a logged-in browser the nentering the resulting PIN:
+Then, authorise users by pasting the provided link into a logged-in browser then entering the resulting PIN:
 
 ```sh
 not-stakkr add-user
