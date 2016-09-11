@@ -2,6 +2,7 @@
 
 
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
+use std::time::Duration;
 use std::iter;
 
 
@@ -32,6 +33,14 @@ pub static TWEET_DATETIME_FORMAT: &'static str = "%a %b %d %T %z %Y";
 /// ```
 pub fn mul_str(what: &str, n: usize) -> String {
     iter::repeat(what).take(n).collect()
+}
+
+pub fn parse_relative_time(delta: &str) -> Result<Duration, ()> {
+    if delta == "now" {
+        Ok(Duration::new(0, 0))
+    } else {
+        Err(())
+    }
 }
 
 /// Ask the user to input a string of the exact length of `desired_len`, (re)prompting as necessary.

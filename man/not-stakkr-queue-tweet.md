@@ -15,7 +15,11 @@ The required data (in order):
 
   * username - will need to be authorised by the time the tweet is posted,
   * tweet text content,
-  * time to post in RFC2822 or RFC3339 format.
+  * time to post in RFC2822, RFC3339 or a custom relative format.
+
+Relative format:
+
+  * `now` - current datetime
 
 One can queue a tweet with multiple lines by suffixing a non-ending line
 with a `\`, which can be escaped with a `\\`.

@@ -10,11 +10,11 @@
 //! |> ops::QueuedTweet::write()
 //! ```
 
-use self::super::super::util::{prompt_any_len, prompt_nonzero_len, prompt_multiline};
+use self::super::super::util::{prompt_any_len, prompt_nonzero_len, prompt_multiline, parse_relative_time};
+use chrono::{ParseResult, FixedOffset, DateTime, Duration, Local};
 use std::path::{PathBuf, Path};
 use std::io::{BufRead, Write};
 use self::super::QueuedTweet;
-use chrono::DateTime;
 
 
 /// Get the path to the file containing the global tweet queue.
@@ -70,14 +70,22 @@ pub fn get_tweet<R: BufRead, W: Write>(input: &mut R, output: &mut W) -> Option<
         let content = prompt_multiline(input, output, "Tweet content", |s| !s.trim().is_empty()).unwrap();
         let time = prompt_nonzero_len(input,
                                       output,
-                                      "Time to post the tweet (RFC2822 or RFC3339)",
-                                      |s| DateTime::parse_from_rfc2822(s).is_ok() || DateTime::parse_from_rfc3339(s).is_ok())
+                                      "Time to post the tweet (RFC2822, RFC3339 or relative)",
+                                      |s| DateTime::parse_from_rfc2822(s).is_ok() || DateTime::parse_from_rfc3339(s).is_ok() || parse_relative_time(s).is_ok())
             .unwrap();
 
         writeln!(output, "").unwrap();
         QueuedTweet {
             author: uname,
-            time: DateTime::parse_from_rfc2822(&time).or_else(|_| DateTime::parse_from_rfc3339(&time)).unwrap(),
+            time: DateTime::parse_from_rfc2822(&time)
+                .or_else(|_| DateTime::parse_from_rfc3339(&time))
+                .or_else(|_| {
+                    let now = Local::now();
+                    let now = now.with_timezone(now.offset());
+
+                    Ok(now + Duration::from_std(parse_relative_time(&time).unwrap()).unwrap()) as ParseResult<DateTime<FixedOffset>>
+                })
+                .unwrap(),
             content: content,
             time_posted: None,
             id: None,
