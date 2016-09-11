@@ -7,7 +7,7 @@
 \fBtweetr\-queue\-tweet\fR \- Self\-hosted automatic tweet posting software \- tweet queueing
 .
 .SH "SYNOPSIS"
-\fBtweetr\fR \fIOPTIONS\fR \fBqueue\-tweet\fR
+\fBtweetr\fR \fIOPTIONS\fR \fBqueue\-tweet\fR \fIQUEUE_TWEET_OPTIONS\fR
 .
 .SH "DESCRIPTION"
 Add a tweet to the queue with the values provided via \fBstdin\fR\.
@@ -48,6 +48,22 @@ For description of \fBtweetr\fR itself see \fBtweetr(1)\fR\.
 .
 .SH "OPTIONS"
 See \fBtweetr(1)\fR\.
+.
+.SH "QUEUE_TWEET_OPTIONS"
+\-f \-\-file=<\fItweets_file\fR>
+.
+.IP "" 4
+.
+.nf
+
+Load tweets from the specified file and don\'t prompt on stdin\.
+
+The specified file must be in the same format as the global tweet queue
+file\.
+.
+.fi
+.
+.IP "" 0
 .
 .SH "EXAMPLES"
 \fBtweetr queue\-tweet\fR
@@ -110,6 +126,15 @@ Author (or empty to finish):
 .fi
 .
 .IP "" 0
+.
+.P
+\fBtweetr queue\-tweet \-f\fR \fItweets_to_queue\.toml\fR
+.
+.P
+Add all tweets from \fItweets_to_queue\.toml\fR to the global tweet queue\.
+.
+.P
+No console I/O\.
 .
 .SH "AUTHOR"
 Written by nabijaczleweli <\fInabijaczleweli@gmail\.com\fR>

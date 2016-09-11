@@ -57,6 +57,7 @@
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
     <a href="#OPTIONS">OPTIONS</a>
+    <a href="#QUEUE_TWEET_OPTIONS">QUEUE_TWEET_OPTIONS</a>
     <a href="#EXAMPLES">EXAMPLES</a>
     <a href="#AUTHOR">AUTHOR</a>
     <a href="#REPORTING-BUGS">REPORTING BUGS</a>
@@ -76,7 +77,7 @@
 
 <h2 id="SYNOPSIS">SYNOPSIS</h2>
 
-<p><code>tweetr</code> <a href="#OPTIONS" title="OPTIONS" data-bare-link="true">OPTIONS</a> <code>queue-tweet</code></p>
+<p><code>tweetr</code> <a href="#OPTIONS" title="OPTIONS" data-bare-link="true">OPTIONS</a> <code>queue-tweet</code> <a href="#QUEUE_TWEET_OPTIONS" title="QUEUE_TWEET_OPTIONS" data-bare-link="true">QUEUE_TWEET_OPTIONS</a></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -110,6 +111,16 @@ with a <code>\</code>, which can be escaped with a <code>\\</code>.</p>
 <h2 id="OPTIONS">OPTIONS</h2>
 
 <p>  See <code>tweetr(1)</code>.</p>
+
+<h2 id="QUEUE_TWEET_OPTIONS">QUEUE_TWEET_OPTIONS</h2>
+
+<p>  -f --file=&lt;<var>tweets_file</var>&gt;</p>
+
+<pre><code>Load tweets from the specified file and don't prompt on stdin.
+
+The specified file must be in the same format as the global tweet queue
+file.
+</code></pre>
 
 <h2 id="EXAMPLES">EXAMPLES</h2>
 
@@ -151,9 +162,15 @@ Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
 Author (or empty to finish):
 </code></pre>
 
+<p>  <code>tweetr queue-tweet -f</code> <em>tweets_to_queue.toml</em></p>
+
+<p>  Add all tweets from <em>tweets_to_queue.toml</em> to the global tweet queue.</p>
+
+<p>  No console I/O.</p>
+
 <h2 id="AUTHOR">AUTHOR</h2>
 
-<p>Written by nabijaczleweli &lt;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#58;&#110;&#97;&#98;&#105;&#x6a;&#x61;&#x63;&#x7a;&#108;&#101;&#x77;&#x65;&#x6c;&#x69;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#111;&#109;" data-bare-link="true">&#x6e;&#x61;&#x62;&#105;&#x6a;&#97;&#99;&#x7a;&#108;&#x65;&#119;&#101;&#108;&#x69;&#x40;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>&gt;</p>
+<p>Written by nabijaczleweli &lt;<a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x6e;&#x61;&#98;&#105;&#x6a;&#97;&#x63;&#x7a;&#x6c;&#101;&#x77;&#101;&#x6c;&#105;&#x40;&#x67;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#111;&#109;" data-bare-link="true">&#110;&#x61;&#98;&#x69;&#x6a;&#97;&#x63;&#x7a;&#x6c;&#101;&#x77;&#x65;&#108;&#x69;&#64;&#x67;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#111;&#109;</a>&gt;</p>
 
 <h2 id="REPORTING-BUGS">REPORTING BUGS</h2>
 

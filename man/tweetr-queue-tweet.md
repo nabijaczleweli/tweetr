@@ -1,9 +1,9 @@
 tweetr-queue-tweet(1) -- Self-hosted automatic tweet posting software - tweet queueing
-==========================================================================================
+======================================================================================
 
 ## SYNOPSIS
 
-`tweetr` [OPTIONS] `queue-tweet`
+`tweetr` [OPTIONS] `queue-tweet` [QUEUE_TWEET_OPTIONS]
 
 ## DESCRIPTION
 
@@ -31,6 +31,15 @@ For description of `tweetr` itself see `tweetr(1)`.
 ## OPTIONS
 
   See `tweetr(1)`.
+
+## QUEUE_TWEET_OPTIONS
+
+  -f --file=&lt;<tweets_file>&gt;
+
+    Load tweets from the specified file and don't prompt on stdin.
+
+    The specified file must be in the same format as the global tweet queue
+    file.
 
 ## EXAMPLES
 
@@ -68,6 +77,12 @@ For description of `tweetr` itself see `tweetr(1)`.
     Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
 
     Author (or empty to finish):
+
+  `tweetr queue-tweet -f` *tweets_to_queue.toml*
+
+  Add all tweets from *tweets_to_queue.toml* to the global tweet queue.
+
+  No console I/O.
 
 ## AUTHOR
 
