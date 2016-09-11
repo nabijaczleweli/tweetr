@@ -171,6 +171,7 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! This module contains the configuration of the application.</span>
 <span class='doccomment'>//!</span>
@@ -234,6 +235,7 @@
             .<span class='ident'>version</span>(<span class='macro'>crate_version</span><span class='macro'>!</span>())
             .<span class='ident'>author</span>(<span class='macro'>crate_authors</span><span class='macro'>!</span>())
             .<span class='ident'>setting</span>(<span class='ident'>AppSettings</span>::<span class='ident'>ColoredHelp</span>)
+            .<span class='ident'>setting</span>(<span class='ident'>AppSettings</span>::<span class='ident'>VersionlessSubcommands</span>)
             .<span class='ident'>setting</span>(<span class='ident'>AppSettings</span>::<span class='ident'>SubcommandRequiredElseHelp</span>)
             .<span class='ident'>about</span>(<span class='string'>&quot;not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want.\n\
                     You create content when you have time  and then use FOSS and NOT pay whatever-ridiculous\n\
