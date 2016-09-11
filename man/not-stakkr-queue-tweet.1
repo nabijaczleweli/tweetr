@@ -30,6 +30,9 @@ time to post in RFC2822 or RFC3339 format\.
 .IP "" 0
 .
 .P
+One can queue a tweet with multiple lines by suffixing a non\-ending line with a \fB\e\fR, which can be escaped with a \fB\e\e\fR\.
+.
+.P
 For description of \fBnot\-stakkr\fR itself see \fBnot\-stakkr(1)\fR\.
 .
 .SH "OPTIONS"
@@ -52,6 +55,42 @@ Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
 Author (or empty to finish): nabijaczleweli
 Tweet content: Abolish the bourgeoisie!
 Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This will queue a multiline tweet with content \fI"Abolish\enthe\enburgeoisie!"\fR:
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Abolish\e
+               the\e
+               burgeoisie!
+Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
+
+Author (or empty to finish):
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This will queue a multiline tweet with content \fI"Escaped\e"\fR:
+.
+.IP "" 4
+.
+.nf
+
+Author (or empty to finish): nabijaczleweli
+Tweet content: Escaped\e\e
+Time to post the tweet (RFC2822 or RFC3339): 2016\-09\-10T12:00:00+02:00
 
 Author (or empty to finish):
 .

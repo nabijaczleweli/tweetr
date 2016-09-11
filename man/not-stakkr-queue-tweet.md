@@ -17,6 +17,9 @@ The required data (in order):
   * tweet text content,
   * time to post in RFC2822 or RFC3339 format.
 
+One can queue a tweet with multiple lines by suffixing a non-ending line
+with a `\`, which can be escaped with a `\\`.
+
 For description of `not-stakkr` itself see `not-stakkr(1)`.
 
 ## OPTIONS
@@ -36,6 +39,24 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
     Author (or empty to finish): nabijaczleweli
     Tweet content: Abolish the bourgeoisie!
     Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+
+    Author (or empty to finish):
+
+  This will queue a multiline tweet with content *"Abolish\nthe\nburgeoisie!"*:
+
+    Author (or empty to finish): nabijaczleweli
+    Tweet content: Abolish\
+                   the\
+                   burgeoisie!
+    Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+
+    Author (or empty to finish):
+
+  This will queue a multiline tweet with content *"Escaped\"*:
+
+    Author (or empty to finish): nabijaczleweli
+    Tweet content: Escaped\\
+    Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
 
     Author (or empty to finish):
 
