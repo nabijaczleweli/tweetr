@@ -16,6 +16,7 @@ exclude = ["*.enc"]
 [dependencies]
 rustc-serialize = "0.3"
 egg-mode = "0.4"
+notify = "2.6"
 clap = "2.11"
 toml = "0.2"
 

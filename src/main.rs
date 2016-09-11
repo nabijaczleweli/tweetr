@@ -1,6 +1,9 @@
 extern crate not_stakkr;
+extern crate notify;
 
 use std::thread;
+use notify::Watcher;
+use std::sync::mpsc;
 use std::process::exit;
 use std::time::Duration;
 use std::io::{stdin, stdout, stderr};
@@ -77,7 +80,17 @@ fn start_daemon_main(opts: not_stakkr::options::Options, delay: Duration, verbos
     let app = try!(not_stakkr::ops::AppTokens::read(&app_path).map_err(Option::unwrap));
     let app_tokens = app.raw_token();
 
-    loop {
+    let (tx, rx) = mpsc::channel();
+    //tx.send(notify::Event {
+    //    path: None,
+    //    op: Ok(notify::Op::empty()),
+    //});
+
+    let mut tweets_watcher = notify::new(tx).unwrap();
+    tweets_watcher.watch(&tweets_path);
+
+    for _ in rx.iter() {
+        println!("Watched");
         match (not_stakkr::ops::User::read(&users_path), not_stakkr::ops::QueuedTweet::read(&tweets_path)) {
             (Ok(users), Ok(mut tweets)) => {
                 let tweets_to_post = not_stakkr::ops::start_daemon::tweet_indices_to_post(&tweets);
@@ -95,11 +108,11 @@ fn start_daemon_main(opts: not_stakkr::options::Options, delay: Duration, verbos
                 }
 
                 not_stakkr::ops::QueuedTweet::write(tweets, &tweets_path);
-
-                thread::sleep(delay);
             }
             (Err(err), _) => err.unwrap().print_error(&mut stderr()),
             (_, Err(err)) => err.unwrap().print_error(&mut stderr()),
         }
     }
+
+    Ok(())
 }
