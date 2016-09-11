@@ -60,6 +60,7 @@ impl Options {
             .version(crate_version!())
             .author(crate_authors!())
             .setting(AppSettings::ColoredHelp)
+            .setting(AppSettings::VersionlessSubcommands)
             .setting(AppSettings::SubcommandRequiredElseHelp)
             .about("not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want.\n\
                     You create content when you have time  and then use FOSS and NOT pay whatever-ridiculous\n\

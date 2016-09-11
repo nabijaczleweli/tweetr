@@ -2,6 +2,7 @@
 
 
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
+use std::iter;
 
 
 /// The datetime format returned by Twitter when posting.
@@ -20,6 +21,18 @@ use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 /// ```
 pub static TWEET_DATETIME_FORMAT: &'static str = "%a %b %d %T %z %Y";
 
+
+/// Create a string consisting of `n` repetitions of `what`.
+///
+/// # Examples
+///
+/// ```
+/// # use not_stakkr::util::mul_str;
+/// assert_eq!(mul_str("Го! ", 3), "Го! Го! Го! ".to_string());
+/// ```
+pub fn mul_str(what: &str, n: usize) -> String {
+    iter::repeat(what).take(n).collect()
+}
 
 /// Ask the user to input a string of the exact length of `desired_len`, (re)prompting as necessary.
 ///
@@ -64,7 +77,7 @@ pub fn prompt_exact_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, 
     let mut out = String::new();
 
     while out.len() != desired_len {
-        try!(prompt(input, output, prompt_s, &verifier, false, &mut out));
+        try!(prompt(input, output, prompt_s, &verifier, false, true, &mut out));
     }
 
     Ok(out)
@@ -110,7 +123,7 @@ pub fn prompt_nonzero_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str
     let mut out = String::new();
 
     while out.is_empty() {
-        try!(prompt(input, output, prompt_s, &verifier, false, &mut out));
+        try!(prompt(input, output, prompt_s, &verifier, false, true, &mut out));
     }
 
     Ok(out)
@@ -162,7 +175,7 @@ pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, ve
           F: Fn(&String) -> bool
 {
     let mut out = String::new();
-    try!(prompt(input, output, prompt_s, &verifier, true, &mut out));
+    try!(prompt(input, output, prompt_s, &verifier, true, true, &mut out));
 
     if out.is_empty() {
         Ok(None)
@@ -171,13 +184,103 @@ pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, ve
     }
 }
 
-
-fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, allow_empty: bool, out: &mut String) -> IoResult<()>
+/// Ask the user to input a multiline string, (re)prompting as necessary.
+///
+/// Each line is separated by a `\`, but can be escaped by `\\`, e.g.
+///
+/// ```plaintext
+/// Prompt: Abolish\
+///         the\
+///         burgeoisie!
+/// ```
+///
+/// Will yield `"Abolish\nthe\nburgeoisie!"`, but
+///
+/// ```plaintext
+/// Prompt: Capitalism\\
+/// ```
+///
+/// Will yield `r"Capitalism\"`.
+///
+/// # Examples
+///
+/// Reading multiple lines:
+///
+/// ```
+/// # use std::io::Cursor;
+/// # use not_stakkr::util::prompt_multiline;
+/// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 1\\\nLine 2\\\nLine 3"),
+///                             &mut Vec::new(),
+///                             "Lines",
+///                             |_| true).unwrap(),
+///            "Line 1\nLine 2\nLine 3".to_string());
+/// ```
+///
+/// Escaping newline:
+///
+/// ```
+/// # use std::io::Cursor;
+/// # use not_stakkr::util::prompt_multiline;
+/// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 0\\\\\n"),
+///                             &mut Vec::new(),
+///                             "Escaped line",
+///                             |_| true).unwrap(),
+///            "Line 0\\".to_string());
+/// ```
+///
+/// Accepting only two-line strings:
+///
+/// ```
+/// # use std::io::Cursor;
+/// # use not_stakkr::util::prompt_multiline;
+/// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 1\\\nLine 2\n"),
+///                             &mut Vec::new(),
+///                             "2 lines",
+///                             |s| s.lines().count() == 2).unwrap(),
+///            "Line 1\nLine 2".to_string());
+/// ```
+pub fn prompt_multiline<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: F) -> IoResult<String>
     where R: BufRead,
           W: Write,
           F: Fn(&String) -> bool
 {
-    try!(write!(output, "{}: ", prompt_s));
+    let reprompt = mul_str(" ", prompt_s.len() + 2);
+    let mut lbuf = String::new();
+    let mut buf = String::new();
+
+    while buf.is_empty() {
+        buf = try!(prompt_nonzero_len(input, output, prompt_s, |_| true));
+
+        while buf.ends_with(r"\") && !buf.ends_with(r"\\") {
+            buf.pop();
+            buf.push('\n');
+
+            try!(prompt(input, output, &reprompt, &|_| true, false, false, &mut lbuf));
+            buf.push_str(&lbuf);
+        }
+
+        if buf.ends_with(r"\\") {
+            buf.pop();
+        }
+
+        if !verifier(&buf) {
+            buf.clear();
+        }
+    }
+
+    Ok(buf)
+}
+
+fn prompt<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, verifier: &F, allow_empty: bool, colon: bool, out: &mut String) -> IoResult<()>
+    where R: BufRead,
+          W: Write,
+          F: Fn(&String) -> bool
+{
+    if colon {
+        try!(write!(output, "{}: ", prompt_s));
+    } else {
+        try!(write!(output, "{}", prompt_s));
+    }
     try!(output.flush());
 
     out.clear();

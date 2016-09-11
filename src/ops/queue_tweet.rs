@@ -10,10 +10,10 @@
 //! |> ops::QueuedTweet::write()
 //! ```
 
-use self::super::super::util::{prompt_any_len, prompt_nonzero_len};
+use self::super::super::util::{prompt_any_len, prompt_nonzero_len, prompt_multiline};
+use std::path::{PathBuf, Path};
 use std::io::{BufRead, Write};
 use self::super::QueuedTweet;
-use std::path::{PathBuf, Path};
 use chrono::DateTime;
 
 
@@ -67,7 +67,7 @@ pub fn tweets_path(config_dir: &Path) -> PathBuf {
 /// ```
 pub fn get_tweet<R: BufRead, W: Write>(input: &mut R, output: &mut W) -> Option<QueuedTweet> {
     prompt_any_len(input, output, "Author (or empty to finish)", |_| true).unwrap().map(|uname| {
-        let content = prompt_nonzero_len(input, output, "Tweet content", |_| true).unwrap();
+        let content = prompt_multiline(input, output, "Tweet content", |_| true).unwrap();
         let time = prompt_nonzero_len(input,
                                       output,
                                       "Time to post the tweet (RFC2822 or RFC3339)",
