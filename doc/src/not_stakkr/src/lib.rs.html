@@ -86,6 +86,9 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! [not-stakkr](https://github.com/nabijaczleweli/not-stakkr) is a platform that allows you to create and queue tweets to be</span>
 <span class='doccomment'>//! shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$</span>
@@ -118,8 +121,11 @@
 
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
+<span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>lazy_static</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>egg_mode</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>chrono</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>regex</span>;
 <span class='attribute'>#[<span class='ident'>macro_use</span>]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>clap</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>toml</span>;

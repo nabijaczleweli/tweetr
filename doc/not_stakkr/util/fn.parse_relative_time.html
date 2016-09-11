@@ -47,8 +47,31 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-994' class='srclink' href='../../src/not_stakkr/src/util.rs.html#38-44' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn parse_relative_time(delta: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</pre></section>
+               </span><a id='src-998' class='srclink' href='../../src/not_stakkr/src/util.rs.html#65-89' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn parse_relative_time(delta: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/std/time/duration/struct.Duration.html' title='std::time::duration::Duration'>Duration</a>,&nbsp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</pre><div class='docblock'><p>Parse a relative datetime into a <code>Duration</code>.</p>
+
+<p>This has the form of</p>
+
+<ul>
+<li><code>now</code> - current datetime</li>
+<li><code>in</code> <em>n</em> [<code>second</code>|<code>minute</code>|<code>hour</code>|<code>day</code>|<code>week</code>]{,<code>s</code>} (case-insensitive) -
+  current datetime plus the specified amount of time</li>
+</ul>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;now&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>0</span>));
+
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in 3 seconds&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>3</span>));
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in 5 MINUTES&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>60</span><span class='op'>*</span><span class='number'>5</span>));
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;iN 1 hOur&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>60</span><span class='op'>*</span><span class='number'>60</span><span class='op'>*</span><span class='number'>1</span>));
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in 2 daYs&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>60</span><span class='op'>*</span><span class='number'>60</span><span class='op'>*</span><span class='number'>24</span><span class='op'>*</span><span class='number'>2</span>));
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in 4 weeks&quot;</span>).<span class='ident'>unwrap</span>(), <span class='ident'>Duration</span>::<span class='ident'>from_secs</span>(<span class='number'>60</span><span class='op'>*</span><span class='number'>60</span><span class='op'>*</span><span class='number'>24</span><span class='op'>*</span><span class='number'>7</span><span class='op'>*</span><span class='number'>4</span>));
+
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in a23d weeks&quot;</span>).<span class='ident'>is_err</span>());
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;in 23 wsfas1eeks&quot;</span>).<span class='ident'>is_err</span>());
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>parse_relative_time</span>(<span class='string'>&quot;23 wsfas1eeks&quot;</span>).<span class='ident'>is_err</span>());</pre>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
