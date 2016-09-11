@@ -2,7 +2,7 @@
 tweetr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically.
 
 ## [Documentation](https://cdn.rawgit.com/nabijaczleweli/tweetr/doc/tweetr/index.html)
-## [Manpages](https://cdn.rawgit.com/nabijaczleweli/tweetr/man/index.html)
+## [Manpages](https://cdn.rawgit.com/nabijaczleweli/tweetr/man/tweetr.1.html)
 
 ## Stock values
 If you want to use an already set-up application decrypt (and [verify](https://heybase.io/nabijaczleweli)) `assets/stock-app.toml.asc` into `$CONFIG_DIR/app.toml`.

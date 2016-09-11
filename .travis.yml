@@ -65,9 +65,8 @@ after_success:
       ) >> $TRAVIS_BUILD_DIR/../MAN_UPDATE_MSG;
       mkdir -p ~/.ssh && cp gh_rsa ~/.ssh/id_rsa && chmod 700 ~/.ssh && chmod 600 ~/.ssh/id_rsa;
       git clone -b man git@github.com:$TRAVIS_REPO_SLUG.git "$TRAVIS_BUILD_DIR-man";
-      cp -r "$TRAVIS_BUILD_DIR/../man" "$TRAVIS_BUILD_DIR-man/";
+      cp -f "$TRAVIS_BUILD_DIR/../man"/* "$TRAVIS_BUILD_DIR-man";
       pushd "$TRAVIS_BUILD_DIR-man";
-      ./create_index.sh man index.html
       git config --global user.email "nabijaczleweli@gmail.com";
       git config --global user.name "Nabijaczleweli Autouploader Bot";
       git config --global push.default simple;
