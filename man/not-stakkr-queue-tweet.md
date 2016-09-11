@@ -20,6 +20,8 @@ The required data (in order):
 Relative format:
 
   * `now` - current datetime
+  * `in` *n* [`second`|`minute`|`hour`|`day`|`week`]{,`s`} (case-insensitive) -
+      current datetime plus the specified amount of time
 
 One can queue a tweet with multiple lines by suffixing a non-ending line
 with a `\`, which can be escaped with a `\\`.
@@ -38,29 +40,32 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
 
     Author (or empty to finish): nabijaczleweli
     Tweet content: Capitalism
-    Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+    Time to post the tweet (RFC2822, RFC3339 or custom):
+    2016-09-10T12:00:00+02:00
 
     Author (or empty to finish): nabijaczleweli
     Tweet content: Abolish the bourgeoisie!
-    Time to post the tweet (RFC2822 or RFC3339): Sat, 10 Sep 2016 12:00:00 +0200
+    Time to post the tweet (RFC2822, RFC3339 or custom):
+    Sat, 10 Sep 2016 12:00:00 +0200
 
     Author (or empty to finish):
 
-  This will queue a multiline tweet with content *"Abolish\nthe\nburgeoisie!"*:
+  This will queue a multiline tweet with content *"Abolish\nthe\nburgeoisie!"*
+  five minutes from now:
 
     Author (or empty to finish): nabijaczleweli
     Tweet content: Abolish\
                    the\
                    burgeoisie!
-    Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+    Time to post the tweet (RFC2822, RFC3339 or custom): in 5 minutes
 
     Author (or empty to finish):
 
-  This will queue a multiline tweet with content *"Escaped\"*:
+  This will queue a multiline tweet with content *"Escaped\"* an hour from now:
 
     Author (or empty to finish): nabijaczleweli
     Tweet content: Escaped\\
-    Time to post the tweet (RFC2822 or RFC3339): 2016-09-10T12:00:00+02:00
+    Time to post the tweet (RFC2822, RFC3339 or custom): in 1 hour
 
     Author (or empty to finish):
 

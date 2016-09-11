@@ -3,6 +3,8 @@
 
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
 use std::time::Duration;
+use std::str::FromStr;
+use regex::Regex;
 use std::iter;
 
 
@@ -35,11 +37,54 @@ pub fn mul_str(what: &str, n: usize) -> String {
     iter::repeat(what).take(n).collect()
 }
 
+/// Parse a relative datetime into a `Duration`.
+///
+/// This has the form of
+///
+///   * `now` - current datetime
+///   * `in` *n* [`second`|`minute`|`hour`|`day`|`week`]{,`s`} (case-insensitive) -
+///       current datetime plus the specified amount of time
+///
+/// # Examples
+///
+/// ```
+/// # use not_stakkr::util::parse_relative_time;
+/// # use std::time::Duration;
+/// assert_eq!(parse_relative_time("now").unwrap(), Duration::from_secs(0));
+///
+/// assert_eq!(parse_relative_time("in 3 seconds").unwrap(), Duration::from_secs(3));
+/// assert_eq!(parse_relative_time("in 5 MINUTES").unwrap(), Duration::from_secs(60*5));
+/// assert_eq!(parse_relative_time("iN 1 hOur").unwrap(), Duration::from_secs(60*60*1));
+/// assert_eq!(parse_relative_time("in 2 daYs").unwrap(), Duration::from_secs(60*60*24*2));
+/// assert_eq!(parse_relative_time("in 4 weeks").unwrap(), Duration::from_secs(60*60*24*7*4));
+///
+/// assert!(parse_relative_time("in a23d weeks").is_err());
+/// assert!(parse_relative_time("in 23 wsfas1eeks").is_err());
+/// assert!(parse_relative_time("23 wsfas1eeks").is_err());
+/// ```
 pub fn parse_relative_time(delta: &str) -> Result<Duration, ()> {
+    lazy_static! {
+        static ref RELATIVE_TIME_REGEX_FUTURE: Regex = Regex::new(r"(?i)in (\d+) (second|minute|hour|day|week)s?").unwrap();
+    }
+
     if delta == "now" {
         Ok(Duration::new(0, 0))
     } else {
-        Err(())
+        match RELATIVE_TIME_REGEX_FUTURE.captures(delta) {
+            Some(capts) => {
+                let n = u64::from_str(capts.at(1).unwrap()).unwrap();
+                let mul: u64 = match &capts.at(2).unwrap().to_lowercase()[..] {
+                    "second" => 1,
+                    "minute" => 60,
+                    "hour" => 60 * 60,
+                    "day" => 60 * 60 * 24,
+                    "week" => 60 * 60 * 24 * 7,
+                    _ => unreachable!(),
+                };
+                Ok(Duration::from_secs(n * mul))
+            }
+            None => Err(()),
+        }
     }
 }
 

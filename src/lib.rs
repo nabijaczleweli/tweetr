@@ -29,8 +29,11 @@
 
 
 extern crate rustc_serialize;
+#[macro_use]
+extern crate lazy_static;
 extern crate egg_mode;
 extern crate chrono;
+extern crate regex;
 #[macro_use]
 extern crate clap;
 extern crate toml;
