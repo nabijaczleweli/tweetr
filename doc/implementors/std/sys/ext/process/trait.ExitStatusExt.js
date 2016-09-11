@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["openssl"] = [];
+implementors["openssl"] = [];implementors["mio"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);
