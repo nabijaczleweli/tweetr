@@ -12,11 +12,11 @@ Add and authorise a user via Twitter's PIN authorisation pipeline.
 Authorising a new user with the same name doesn't require forcing as the new
 tokens are the only valid ones at that point.
 
-For description of `tweetr` itself see `tweetr(1)`.
+For description of `tweetr` itself see tweetr(1).
 
 ## OPTIONS
 
-  See `tweetr(1)`.
+  See tweetr(1).
 
 ## ADD_USER_OPTIONS
 

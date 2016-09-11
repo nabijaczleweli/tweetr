@@ -9,11 +9,11 @@ tweetr-init(1) -- Self-hosted automatic tweet posting software - setting applica
 
 Initialise the global application data with the values provided via `stdin`.
 
-For description of `tweetr` itself see `tweetr(1)`.
+For description of `tweetr` itself see tweetr(1).
 
 ## OPTIONS
 
-  See `tweetr(1)`.
+  See tweetr(1).
 
 ## INIT_OPTIONS
 

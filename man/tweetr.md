@@ -15,10 +15,10 @@ In other words this is self-hosted automatic tweet posting software.
 
 See the subcommands for more information:
 
-  * `tweetr-init(1)` - authorising the application
-  * `tweetr-add-user(1)` - adding and authorising users
-  * `tweetr-queue-tweet(1)` - adding tweets to the queue
-  * `tweetr-start-daemon(1)` - start the tweet-posting daemon
+  * tweetr-init(1) - authorising the application
+  * tweetr-add-user(1) - adding and authorising users
+  * tweetr-queue-tweet(1) - adding tweets to the queue
+  * tweetr-start-daemon(1) - start the tweet-posting daemon
 
 ## OPTIONS
 

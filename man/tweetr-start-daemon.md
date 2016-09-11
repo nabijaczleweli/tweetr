@@ -10,15 +10,15 @@ tweetr-start-daemon(1) -- Self-hosted automatic tweet posting software - tweet p
 Start the daemon that will post queued tweets to Twitter,
 
 The user needs to be authorised for the application set via
-`tweetr-init(1)` before posting a tweet from its account, use
-`tweetr-add-user(1)` to do that.
-Queue tweets using `tweetr-queue-tweet(1)`.
+tweetr-init(1) before posting a tweet from its account, use
+tweetr-add-user(1) to do that.
+Queue tweets using `tweetr-queue-tweet(1).
 
-For description of `tweetr` itself see `tweetr(1)`.
+For description of `tweetr` itself see `tweetr(1).
 
 ## OPTIONS
 
-  See `tweetr(1)`.
+  See tweetr(1).
 
 ## START_DAEMON_OPTIONS
 

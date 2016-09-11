@@ -9,7 +9,7 @@ tweetr-queue-tweet(1) -- Self-hosted automatic tweet posting software - tweet qu
 
 Add a tweet to the queue with the values provided via `stdin`.
 
-Queued tweets can then be posted via `tweetr-start-daemon(1)`.
+Queued tweets can then be posted via tweetr-start-daemon(1).
 
 The required data (in order):
 
@@ -26,11 +26,11 @@ Relative format:
 One can queue a tweet with multiple lines by suffixing a non-ending line
 with a `\`, which can be escaped with a `\\`.
 
-For description of `tweetr` itself see `tweetr(1)`.
+For description of `tweetr` itself see tweetr(1).
 
 ## OPTIONS
 
-  See `tweetr(1)`.
+  See tweetr(1).
 
 ## QUEUE_TWEET_OPTIONS
 
