@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `search` mod in crate `egg_mode`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, search">
+
+    <title>egg_mode::search - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'search', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>egg_mode</a>::<wbr><a class='mod' href=''>search</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1853' class='srclink' href='../../src/egg_mode/search.rs.html#1-248' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Structs and methods for searching for tweets.</p>
+
+<p>Since there are several optional parameters for searches, egg-mode handles it with a builder
+pattern. To begin, call <code>search</code> with your requested search term. Additional parameters can be
+added onto the <code>SearchBuilder</code> struct that is returned. When you&#39;re ready to load the first
+page of results, hand your tokens to <code>call</code>.</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>egg_mode</span>::<span class='ident'>search</span>::{<span class='self'>self</span>, <span class='ident'>ResultType</span>};
+
+<span class='kw'>let</span> <span class='ident'>search</span> <span class='op'>=</span> <span class='ident'>search</span>::<span class='ident'>search</span>(<span class='string'>&quot;rustlang&quot;</span>)
+                    .<span class='ident'>result_type</span>(<span class='ident'>ResultType</span>::<span class='ident'>Recent</span>)
+                    .<span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='ident'>con_token</span>, <span class='kw-2'>&amp;</span><span class='ident'>access_token</span>)
+                    .<span class='ident'>unwrap</span>();
+
+<span class='kw'>for</span> <span class='ident'>tweet</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>search</span>.<span class='ident'>response</span>.<span class='ident'>statuses</span> {
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;(@{}) {}&quot;</span>, <span class='ident'>tweet</span>.<span class='ident'>user</span>.<span class='ident'>screen_name</span>, <span class='ident'>tweet</span>.<span class='ident'>text</span>);
+}</pre>
+
+<p>Once you have your <code>SearchResult</code>, you can navigate the search results by calling <code>older</code> and
+<code>newer</code> to get the next and previous pages, respsectively. In addition, you can see your
+original query in the search result struct as well, so you can categorize multiple searches by
+their query. While this is given as a regular field, note that modifying <code>query</code> will not
+change what is searched for when you call <code>older</code> or <code>newer</code>; the <code>SearchResult</code> keeps its
+search arguments in a separate private field.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.SearchBuilder.html'
+                                  title='egg_mode::search::SearchBuilder'>SearchBuilder</a></td>
+                           <td class='docblock short'>
+                                <p>Represents a tweet search query before being sent.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.SearchResult.html'
+                                  title='egg_mode::search::SearchResult'>SearchResult</a></td>
+                           <td class='docblock short'>
+                                <p>Represents a page of search results, along with metadata to request the next or previous page.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.Distance.html'
+                                  title='egg_mode::search::Distance'>Distance</a></td>
+                           <td class='docblock short'>
+                                <p>Represents a radius around a given location to return search results for.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='enum' href='enum.ResultType.html'
+                                  title='egg_mode::search::ResultType'>ResultType</a></td>
+                           <td class='docblock short'>
+                                <p>Represents what kind of tweets should be included in search results.</p>
+                           </td>
+                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.search.html'
+                                  title='egg_mode::search::search'>search</a></td>
+                           <td class='docblock short'>
+                                <p>Begin setting up a tweet search with the given query.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "egg_mode";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

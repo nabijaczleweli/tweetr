@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `MediaEntity` struct in crate `egg_mode`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, MediaEntity">
+
+    <title>egg_mode::entities::MediaEntity - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>entities</a></p><script>window.sidebarCurrent = {name: 'MediaEntity', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>entities</a>::<wbr><a class='struct' href=''>MediaEntity</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1168' class='srclink' href='../../src/egg_mode/entities.rs.html#68-101' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct MediaEntity {
+    pub display_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub expanded_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>,
+    pub indices: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>,
+    pub media_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub media_url_https: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub sizes: <a class='struct' href='../../egg_mode/entities/struct.MediaSizes.html' title='egg_mode::entities::MediaSizes'>MediaSizes</a>,
+    pub source_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;,
+    pub media_type: <a class='enum' href='../../egg_mode/entities/enum.MediaType.html' title='egg_mode::entities::MediaType'>MediaType</a>,
+    pub url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+    pub video_info: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.VideoInfo.html' title='egg_mode::entities::VideoInfo'>VideoInfo</a>&gt;,
+}</pre><div class='docblock'><p>Represents a piece of media attached to a tweet.</p>
+
+<p>The information in this struct is subtly different depending on what media is being referenced,
+and which entity container is holding this instance. For videos and GIFs, the <code>media_url</code> and
+<code>media_url_https</code> fields each link to a thumbnail image of the media, typically of the first
+frame. The real video information can be found on the <code>video_info</code> field, including various
+encodings if available.</p>
+
+<p>Image links available in <code>media_url</code> and <code>media_url_https</code> can be obtained in different sizes by
+appending a colon and one of the available sizes in the <code>MediaSizes</code> struct. For example, the
+cropped thumbnail can be viewed by appending <code>:thumb</code> to the end of the URL, and the full-size
+image can be viewed by appending <code>:large</code>.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.display_url' class='structfield'><code>display_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>A shortened URL to display to clients.</p>
+</div><span id='structfield.expanded_url' class='structfield'><code>expanded_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>An expanded version of <code>display_url</code>; links to the media display page.</p>
+</div><span id='structfield.id' class='structfield'><code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>A numeric ID for the media.</p>
+</div><span id='structfield.indices' class='structfield'><code>indices: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>Character indices where the media URL is located. The first index is the location of the
+first character of the URL; the second is the location of the first character following the
+URL.</p>
+</div><span id='structfield.media_url' class='structfield'><code>media_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing directly to the media file. Uses HTTP as the protocol.</p>
+
+<p>For videos and GIFs, this link will be to a thumbnail of the media, and the real video link
+will be contained in <code>video_info</code>.</p>
+</div><span id='structfield.media_url_https' class='structfield'><code>media_url_https: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing directly to the media file. Uses HTTPS as the protocol.</p>
+
+<p>For videos and GIFs, this link will be to a thumbnail of the media, and the real video link
+will be contained in <code>video_info</code>.</p>
+</div><span id='structfield.sizes' class='structfield'><code>sizes: <a class='struct' href='../../egg_mode/entities/struct.MediaSizes.html' title='egg_mode::entities::MediaSizes'>MediaSizes</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>Various sizes available for the media file.</p>
+</div><span id='structfield.source_status_id' class='structfield'><code>source_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code>
+                           </span><span class='stab '></span><div class='docblock'><p>For tweets containing media that was originally associated with a different tweet, this
+contains the ID of the original tweet.</p>
+</div><span id='structfield.media_type' class='structfield'><code>media_type: <a class='enum' href='../../egg_mode/entities/enum.MediaType.html' title='egg_mode::entities::MediaType'>MediaType</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>The type of media being represented.</p>
+</div><span id='structfield.url' class='structfield'><code>url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span><span class='stab '></span><div class='docblock'><p>The t.co link from the original text.</p>
+</div><span id='structfield.video_info' class='structfield'><code>video_info: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.VideoInfo.html' title='egg_mode::entities::VideoInfo'>VideoInfo</a>&gt;</code>
+                           </span><span class='stab '></span><div class='docblock'><p>For media entities corresponding to videos, this contains extra information about the linked
+video.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/entities/struct.MediaEntity.html' title='egg_mode::entities::MediaEntity'>MediaEntity</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1152' class='srclink' href='../../src/egg_mode/entities.rs.html#67' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "egg_mode";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

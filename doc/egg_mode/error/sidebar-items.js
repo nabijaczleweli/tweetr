@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Error","A set of errors that can occur when interacting with Twitter."]],"struct":[["TwitterErrorCode","Represents a specific error returned from a Twitter API call."],["TwitterErrors","Represents a collection of errors returned from a Twitter API call."]]});
