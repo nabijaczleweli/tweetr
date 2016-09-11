@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["CHMOD","Permissions changed"],["CREATE","Created"],["IGNORED","Watch has been ignored by the implementation"],["REMOVE","Removed"],["RENAME","Renamed"],["WRITE","Written"]],"struct":[["Op","Detected actions for which an Event is delivered"]]});

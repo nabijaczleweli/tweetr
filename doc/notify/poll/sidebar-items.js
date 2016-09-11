@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["PollWatcher","Polling based `Watcher` implementation"]]});
