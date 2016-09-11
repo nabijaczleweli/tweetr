@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["get_tweet","Prompt the user for application data."],["tweets_path","Get the path to the file containing the global tweet queue."]]});
