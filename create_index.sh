@@ -1,7 +1,7 @@
 #!/bin/bash
 
 out="$(pwd)/$2"
-tempfile=$(mktemp -t "not-stakkr-man-create_index.XXXXXXXXXX" --suffix=".html")
+tempfile=$(mktemp -t "tweetr-man-create_index.XXXXXXXXXX" --suffix=".html")
 
 (
     cat index_head.htm
