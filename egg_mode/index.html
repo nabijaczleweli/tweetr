@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `egg_mode` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, egg_mode">
+
+    <title>egg_mode - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'egg_mode', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>egg_mode</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/egg_mode/lib.rs.html#1-85' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>A library for interacting with Twitter.</p>
+
+<p>Please see <a href="https://github.com/QuietMisdreavus/twitter-rs">the repository</a> and its enclosed examples for tips on working with this library
+while it&#39;s still in progress.</p>
+
+<h2 id='getting-started' class='section-header'><a href='#getting-started'>Getting Started</a></h2>
+<p>The very first thing you&#39;ll need to do to get access to the Twitter API is to head to
+<a href="https://apps.twitter.com/">Twitter&#39;s Application Manager</a> and create an app. Once you&#39;ve done that, there
+are two sets of keys immediately available to you. First are the &quot;consumer key&quot; and &quot;consumer
+secret&quot;, that are used to represent you as the application author when signing requests. These
+keys are given to every single API call regardless of permission level. Related are an &quot;access
+token&quot; and &quot;access token secret&quot;, that can be used to skip the authentication steps if you&#39;re
+only interacting with your own account or with no account in particular. Generally, if you want
+to read or write to a particular user&#39;s stream, you&#39;ll need to request authorization and get an
+access token to work on their behalf.</p>
+
+<p>The process to get an access token for a specific user (with this library) has three basic
+steps:</p>
+
+<ol>
+<li>Log your request with Twitter by getting a <a href="fn.request_token.html">request token</a>.</li>
+<li>Direct the user to grant permission to your application by sending them to an
+<a href="fn.authenticate_url.html">authenticate</a> or <a href="fn.authorize_url.html">authorize</a> URL, depending on the nature of your app.</li>
+<li>Convert the verifier given by the permission request into an <a href="fn.access_token.html">access token</a>.</li>
+</ol>
+
+<p>The process changes some smaller details depending on whether your application is web- or
+mobile-based, as opposed to desktop-based or in another situation where redirecting users to a
+web browser and back automatically is difficult or impossible. In the former case where URLs
+can be used to direct the user into and out of your app, give Twitter a &quot;callback URL&quot; when
+setting up your request token, and redirect the user to an <a href="fn.authenticate_url.html">authenticate</a> URL to grant your
+app permissions. When the user accepts the request, they will be redirected back to this URL to
+get back to your app, with the original request token and a verifier given to your app to
+signify their acceptance.</p>
+
+<p>On the other hand, if you can&#39;t use the callback URL in this fashion, you can instead use the
+&quot;PIN-based Auth&quot; version of the flow. In this version, give a &quot;callback URL&quot; of &quot;oob&quot; when
+setting up your request token, and use an <a href="fn.authorize_url.html">authorize</a> URL. When the user grants the
+permissions request in this fashion, they are given a numeric PIN that can be given back to
+your app to use as a verifier.</p>
+
+<p>Either way, when you have a &quot;verifier&quot; from either of these methods, you can use your Tokens
+from earlier in the process with that verifier to request an <a href="fn.access_token.html">access token</a>. This access
+token can then be saved and cached for future use.</p>
+
+<h2 id='responset' class='section-header'><a href='#responset'><code>Response&lt;T&gt;</code></a></h2>
+<p>Every method that calls Twitter and carries rate-limit information wraps its return value in a
+<a href="struct.Response.html"><code>Response</code></a> struct, that transmits this information to your app. From there, you can handle
+the rate-limit information to hold off on that kind of request, or simply grab its <code>response</code>
+field to get the output of whatever method you called.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='cursor/index.html'
+                                  title='egg_mode::cursor'>cursor</a></td>
+                           <td class='docblock short'>
+                                <p>Types and traits to navigate cursored collections.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='entities/index.html'
+                                  title='egg_mode::entities'>entities</a></td>
+                           <td class='docblock short'>
+                                <p>Data structures containing extracted URL, mention, tag, and media information.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='error/index.html'
+                                  title='egg_mode::error'>error</a></td>
+                           <td class='docblock short'>
+                                <p>A composite error type for errors that can occur while interacting with Twitter.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='search/index.html'
+                                  title='egg_mode::search'>search</a></td>
+                           <td class='docblock short'>
+                                <p>Structs and methods for searching for tweets.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='tweet/index.html'
+                                  title='egg_mode::tweet'>tweet</a></td>
+                           <td class='docblock short'>
+                                <p>Structs and functions for working with statuses and timelines.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='user/index.html'
+                                  title='egg_mode::user'>user</a></td>
+                           <td class='docblock short'>
+                                <p>Structs and methods for pulling user information from Twitter.</p>
+                           </td>
+                       </tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Response.html'
+                                  title='egg_mode::Response'>Response</a></td>
+                           <td class='docblock short'>
+                                <p>A helper struct to wrap response data with accompanying rate limit information.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.Token.html'
+                                  title='egg_mode::Token'>Token</a></td>
+                           <td class='docblock short'>
+                                <p>A key/secret pair representing an OAuth token.</p>
+                           </td>
+                       </tr></table><h2 id='functions-2' class='section-header'><a href="#functions-2">Functions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.access_token.html'
+                                  title='egg_mode::access_token'>access_token</a></td>
+                           <td class='docblock short'>
+                                <p>With the given OAuth tokens and verifier, ask Twitter for an access
+Token that can be used to sign further requests to the Twitter API.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.authenticate_url.html'
+                                  title='egg_mode::authenticate_url'>authenticate_url</a></td>
+                           <td class='docblock short'>
+                                <p>With the given request Token, return a URL to redirect a user to so they
+can accept or reject an authorization request.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.authorize_url.html'
+                                  title='egg_mode::authorize_url'>authorize_url</a></td>
+                           <td class='docblock short'>
+                                <p>With the given request Token, return a URL that a user can access to
+accept or reject an authorization request.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.request_token.html'
+                                  title='egg_mode::request_token'>request_token</a></td>
+                           <td class='docblock short'>
+                                <p>With the given consumer Token, ask Twitter for a request Token that can be
+used to request access to the user&#39;s account.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.verify_tokens.html'
+                                  title='egg_mode::verify_tokens'>verify_tokens</a></td>
+                           <td class='docblock short'>
+                                <p>If the given tokens are valid, return the user information for the authenticated user.</p>
+                           </td>
+                       </tr></table><h2 id='types-2' class='section-header'><a href="#types-2">Type Definitions</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='type' href='type.WebResponse.html'
+                                  title='egg_mode::WebResponse'>WebResponse</a></td>
+                           <td class='docblock short'>
+                                <p>Type alias for responses from Twitter.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "egg_mode";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script defer src="../search-index.js"></script>
+</body>
+</html>
