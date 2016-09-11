@@ -45,11 +45,11 @@ use std::io::Write;
 ///
 /// ```
 /// # use std::fs::{self, File};
-/// # use not_stakkr::ops::start_daemon;
-/// # use not_stakkr::Outcome;
+/// # use tweetr::ops::start_daemon;
 /// # use std::env::temp_dir;
+/// # use tweetr::Outcome;
 /// # use std::io::Write;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-start-daemon-verify-0");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-start-daemon-verify-0");
 /// fs::create_dir_all(&tf).unwrap();
 /// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
 /// File::create(tf.join("users.toml")).unwrap().write(&[]).unwrap();
@@ -63,11 +63,11 @@ use std::io::Write;
 ///
 /// ```
 /// # use std::fs::{self, File};
-/// # use not_stakkr::ops::start_daemon;
-/// # use not_stakkr::Outcome;
+/// # use tweetr::ops::start_daemon;
 /// # use std::env::temp_dir;
+/// # use tweetr::Outcome;
 /// # use std::io::Write;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-start-daemon-verify-1");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-start-daemon-verify-1");
 /// fs::create_dir_all(&tf).unwrap();
 /// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
 /// File::create(tf.join("tweets.toml")).unwrap().write(&[]).unwrap();
@@ -94,9 +94,9 @@ pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf, PathB
 /// # Examples
 ///
 /// ```
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::ops::{QueuedTweet, start_daemon};
+/// # use tweetr::ops::{QueuedTweet, start_daemon};
 /// # use chrono::{Duration, Local};
 /// # fn main() {
 /// let now = Local::now();
@@ -152,9 +152,9 @@ pub fn tweet_indices_to_post(tweets: &Vec<QueuedTweet>) -> Vec<usize> {
 /// Finding a non-existant user:
 ///
 /// ```
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::ops::{QueuedTweet, User, start_daemon};
+/// # use tweetr::ops::{QueuedTweet, User, start_daemon};
 /// # use chrono::{Duration, Local};
 /// # fn main() {
 /// let now = Local::now();
@@ -181,9 +181,9 @@ pub fn tweet_indices_to_post(tweets: &Vec<QueuedTweet>) -> Vec<usize> {
 /// Finding am existing user:
 ///
 /// ```
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::ops::{QueuedTweet, User, start_daemon};
+/// # use tweetr::ops::{QueuedTweet, User, start_daemon};
 /// # use chrono::{Duration, Local};
 /// # fn main() {
 /// let now = Local::now();
@@ -225,9 +225,9 @@ pub fn find_user_index_for_tweet(tweet: &QueuedTweet, users: &Vec<User>) -> Resu
 /// # Examples
 ///
 /// ```no_run
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::ops::{QueuedTweet, AppTokens, User, start_daemon};
+/// # use tweetr::ops::{QueuedTweet, AppTokens, User, start_daemon};
 /// # use chrono::{Duration, Local};
 /// # fn main() {
 /// let now = Local::now();

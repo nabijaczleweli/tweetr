@@ -1,13 +1,13 @@
-extern crate not_stakkr;
+extern crate tweetr;
 
-use self::not_stakkr::ops::AppTokens;
+use self::tweetr::ops::AppTokens;
 use std::env::temp_dir;
 use std::fs;
 
 
 #[test]
 fn trans_eq() {
-    let td = temp_dir().join("not-stakkr-test").join("ops-token-trans_eq");
+    let td = temp_dir().join("tweetr-test").join("ops-token-trans_eq");
     fs::create_dir_all(&td).unwrap();
 
     let tf = td.join("app.toml");

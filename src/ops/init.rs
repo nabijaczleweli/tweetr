@@ -26,9 +26,9 @@ use std::path::PathBuf;
 /// Verifying a nonexistant file or an existing file with forcing.
 ///
 /// ```
-/// # use not_stakkr::ops::init;
 /// # use std::env::temp_dir;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-verify-0");
+/// # use tweetr::ops::init;
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-init-verify-0");
 /// assert_eq!(init::verify(&("$TEMP/ops-init-verify-0".to_string(), tf.clone()), true),
 ///            Ok(tf.join("app.toml")));
 /// ```
@@ -37,11 +37,11 @@ use std::path::PathBuf;
 ///
 /// ```
 /// # use std::fs::{self, File};
-/// # use not_stakkr::ops::init;
-/// # use not_stakkr::Outcome;
 /// # use std::env::temp_dir;
+/// # use tweetr::ops::init;
+/// # use tweetr::Outcome;
 /// # use std::io::Write;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-init-verify-1");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-init-verify-1");
 /// fs::create_dir_all(&tf).unwrap();
 /// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
 ///
@@ -57,7 +57,7 @@ pub fn verify(config_dir: &(String, PathBuf), force: bool) -> Result<PathBuf, Ou
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::ops::{init, AppTokens};
+/// # use tweetr::ops::{init, AppTokens};
 /// # use std::io::BufReader;
 /// assert_eq!(init::get_data(
 ///                 &mut BufReader::new(b"qdPD7N8CcPYDKiNv81QWNWaHK\n\

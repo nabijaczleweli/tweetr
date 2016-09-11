@@ -22,9 +22,9 @@ use self::super::QueuedTweet;
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::ops::queue_tweet;
+/// # use tweetr::ops::queue_tweet;
 /// # use std::env::temp_dir;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-queue_tweets-tweets_path-0");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-queue_tweets-tweets_path-0");
 /// assert_eq!(queue_tweet::tweets_path(&tf), tf.join("tweets.toml"));
 /// ```
 pub fn tweets_path(config_dir: &Path) -> PathBuf {
@@ -38,18 +38,18 @@ pub fn tweets_path(config_dir: &Path) -> PathBuf {
 /// Queueing a tweet.
 ///
 /// ```
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::ops::{queue_tweet, QueuedTweet};
+/// # use tweetr::ops::{queue_tweet, QueuedTweet};
 /// # use std::io::BufReader;
 /// # use chrono::DateTime;
 /// # fn main() {
-/// assert_eq!(queue_tweet::get_tweet(&mut BufReader::new(b"not_stakkr_test\n\
+/// assert_eq!(queue_tweet::get_tweet(&mut BufReader::new(b"tweetr_test\n\
 ///                                   Test tweet\n\
 ///                                   2016-09-09T00:33:30+02:00\n" as &[u8]),
 ///                                   &mut Vec::new()),
 ///            Some(QueuedTweet {
-///                author: "not_stakkr_test".to_string(),
+///                author: "tweetr_test".to_string(),
 ///                time: DateTime::parse_from_rfc3339("2016-09-09T00:33:30+02:00").unwrap(),
 ///                content: "Test tweet".to_string(),
 ///                time_posted: None,
@@ -61,7 +61,7 @@ pub fn tweets_path(config_dir: &Path) -> PathBuf {
 /// Not queueing a tweet.
 ///
 /// ```
-/// # use not_stakkr::ops::{queue_tweet, QueuedTweet};
+/// # use tweetr::ops::{queue_tweet, QueuedTweet};
 /// # use std::io::BufReader;
 /// assert_eq!(queue_tweet::get_tweet(&mut BufReader::new(b"\n" as &[u8]), &mut Vec::new()), None);
 /// ```

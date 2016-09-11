@@ -1,8 +1,8 @@
-extern crate not_stakkr;
+extern crate tweetr;
 extern crate chrono;
 
-use self::not_stakkr::ops::QueuedTweet;
 use self::chrono::{DateTime, Local};
+use self::tweetr::ops::QueuedTweet;
 use std::env::temp_dir;
 use std::fs;
 
@@ -29,7 +29,7 @@ fn mixed_trans_eq() {
 
 
 fn trans_scaffold(name: &str, tweets: Vec<QueuedTweet>) {
-    let td = temp_dir().join("not-stakkr-test").join(format!("ops-queued_tweet-{}", name));
+    let td = temp_dir().join("tweetr-test").join(format!("ops-queued_tweet-{}", name));
     fs::create_dir_all(&td).unwrap();
 
     let tf = td.join("tweets.toml");

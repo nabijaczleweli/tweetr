@@ -13,9 +13,9 @@ use std::iter;
 /// # Examples
 ///
 /// ```
-/// # extern crate not_stakkr;
+/// # extern crate tweetr;
 /// # extern crate chrono;
-/// # use not_stakkr::util::TWEET_DATETIME_FORMAT;
+/// # use tweetr::util::TWEET_DATETIME_FORMAT;
 /// # use chrono::DateTime;
 /// # fn main() {
 /// assert_eq!(DateTime::parse_from_str("Mon Sep 05 20:30:51 +0000 2016", TWEET_DATETIME_FORMAT),
@@ -30,7 +30,7 @@ pub static TWEET_DATETIME_FORMAT: &'static str = "%a %b %d %T %z %Y";
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::util::mul_str;
+/// # use tweetr::util::mul_str;
 /// assert_eq!(mul_str("Го! ", 3), "Го! Го! Го! ".to_string());
 /// ```
 pub fn mul_str(what: &str, n: usize) -> String {
@@ -48,7 +48,7 @@ pub fn mul_str(what: &str, n: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::util::parse_relative_time;
+/// # use tweetr::util::parse_relative_time;
 /// # use std::time::Duration;
 /// assert_eq!(parse_relative_time("now").unwrap(), Duration::from_secs(0));
 ///
@@ -96,7 +96,7 @@ pub fn parse_relative_time(delta: &str) -> Result<Duration, ()> {
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_exact_len;
+/// # use tweetr::util::prompt_exact_len;
 /// assert_eq!(prompt_exact_len(&mut Cursor::new(b"0123456789"),
 ///                             &mut Vec::new(),
 ///                             "Allowed chars",
@@ -110,7 +110,7 @@ pub fn parse_relative_time(delta: &str) -> Result<Duration, ()> {
 /// ```
 /// # use std::io::Cursor;
 /// # use std::str::FromStr;
-/// # use not_stakkr::util::prompt_exact_len;
+/// # use tweetr::util::prompt_exact_len;
 /// assert_eq!(prompt_exact_len(&mut Cursor::new(b"1234567890"),
 ///                             &mut Vec::new(),
 ///                             "Long number",
@@ -145,7 +145,7 @@ pub fn prompt_exact_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, 
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_nonzero_len;
+/// # use tweetr::util::prompt_nonzero_len;
 /// assert_eq!(prompt_nonzero_len(&mut Cursor::new(b"123456789"),
 ///                               &mut Vec::new(),
 ///                               "Allowed chars",
@@ -158,7 +158,7 @@ pub fn prompt_exact_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, 
 /// ```
 /// # use std::io::Cursor;
 /// # use std::str::FromStr;
-/// # use not_stakkr::util::prompt_nonzero_len;
+/// # use tweetr::util::prompt_nonzero_len;
 /// assert_eq!(prompt_nonzero_len(&mut Cursor::new(b"123456789"),
 ///                               &mut Vec::new(),
 ///                               "Number",
@@ -193,7 +193,7 @@ pub fn prompt_nonzero_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_any_len;
+/// # use tweetr::util::prompt_any_len;
 /// assert_eq!(prompt_any_len(&mut Cursor::new(b"123456789"),
 ///                           &mut Vec::new(),
 ///                           "Allowed chars",
@@ -211,7 +211,7 @@ pub fn prompt_nonzero_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str
 /// ```
 /// # use std::io::Cursor;
 /// # use std::str::FromStr;
-/// # use not_stakkr::util::prompt_any_len;
+/// # use tweetr::util::prompt_any_len;
 /// assert_eq!(prompt_any_len(&mut Cursor::new(b"123456789"),
 ///                           &mut Vec::new(),
 ///                           "Number",
@@ -262,7 +262,7 @@ pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, ve
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_multiline;
+/// # use tweetr::util::prompt_multiline;
 /// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 1\\\nLine 2\\\nLine 3"),
 ///                             &mut Vec::new(),
 ///                             "Lines",
@@ -274,7 +274,7 @@ pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, ve
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_multiline;
+/// # use tweetr::util::prompt_multiline;
 /// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 0\\\\\n"),
 ///                             &mut Vec::new(),
 ///                             "Escaped line",
@@ -286,7 +286,7 @@ pub fn prompt_any_len<R, W, F>(input: &mut R, output: &mut W, prompt_s: &str, ve
 ///
 /// ```
 /// # use std::io::Cursor;
-/// # use not_stakkr::util::prompt_multiline;
+/// # use tweetr::util::prompt_multiline;
 /// assert_eq!(prompt_multiline(&mut Cursor::new(b"Line 1\\\nLine 2\n"),
 ///                             &mut Vec::new(),
 ///                             "2 lines",

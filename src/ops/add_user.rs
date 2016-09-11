@@ -31,11 +31,11 @@ use std::str::FromStr;
 /// Verifying with existing global app configuration.
 ///
 /// ```
-/// # use not_stakkr::ops::add_user;
+/// # use tweetr::ops::add_user;
 /// # use std::fs::{self, File};
 /// # use std::env::temp_dir;
 /// # use std::io::Write;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-verify-0");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-add-user-verify-0");
 /// fs::create_dir_all(&tf).unwrap();
 /// File::create(tf.join("app.toml")).unwrap().write(&[]).unwrap();
 ///
@@ -46,10 +46,10 @@ use std::str::FromStr;
 /// Verifying when the global app configuration doesn't exist.
 ///
 /// ```
-/// # use not_stakkr::ops::add_user;
-/// # use not_stakkr::Outcome;
+/// # use tweetr::ops::add_user;
 /// # use std::env::temp_dir;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-verify-1");
+/// # use tweetr::Outcome;
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-add-user-verify-1");
 /// assert_eq!(add_user::verify(&("$TEMP/ops-add-user-verify-1".to_string(), tf)),
 ///            Err(Outcome::RequiredFileFromSubsystemNonexistant {
 ///                subsys: "init",
@@ -68,7 +68,7 @@ pub fn verify(config_dir: &(String, PathBuf)) -> Result<(PathBuf, PathBuf), Outc
 /// # Examples
 ///
 /// ```no_run
-/// # use not_stakkr::ops::{add_user, AppTokens};
+/// # use tweetr::ops::{add_user, AppTokens};
 /// # use std::io::BufReader;
 /// assert!(add_user::authorise(&mut BufReader::new(b"1234567\n" as &[u8]), &mut Vec::new(), AppTokens {
 ///     key: "GeVFiYk7q8DhUmgMXE0iODrFa".to_string(),
@@ -116,10 +116,10 @@ pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T, verb
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::ops::{add_user, User};
+/// # use tweetr::ops::{add_user, User};
 /// # use std::env::temp_dir;
 /// # use std::fs;
-/// let tf = temp_dir().join("not-stakkr-doctest").join("ops-add-user-append_users");
+/// let tf = temp_dir().join("tweetr-doctest").join("ops-add-user-append_users");
 /// fs::create_dir_all(&tf).unwrap();
 ///
 /// let tf = tf.join("users.toml");
@@ -155,7 +155,7 @@ pub fn append_user(users_path: &Path, user: User) -> Outcome {
 /// # Examples
 ///
 /// ```
-/// # use not_stakkr::ops::{add_user, User};
+/// # use tweetr::ops::{add_user, User};
 /// # use std::iter::FromIterator;
 /// let mut out = Vec::new();
 /// add_user::print_success_message(&mut out, &User {

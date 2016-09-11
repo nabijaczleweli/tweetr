@@ -1,6 +1,6 @@
-extern crate not_stakkr;
+extern crate tweetr;
 
-use self::not_stakkr::util::prompt_any_len;
+use self::tweetr::util::prompt_any_len;
 use std::iter::FromIterator;
 use std::io::Cursor;
 

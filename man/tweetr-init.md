@@ -1,19 +1,19 @@
-not-stakkr-init(1) -- Self-hosted automatic tweet posting software - setting application
-========================================================================================
+tweetr-init(1) -- Self-hosted automatic tweet posting software - setting application
+====================================================================================
 
 ## SYNOPSIS
 
-`not-stakkr` [OPTIONS] `init` [INIT_OPTIONS]
+`tweetr` [OPTIONS] `init` [INIT_OPTIONS]
 
 ## DESCRIPTION
 
 Initialise the global application data with the values provided via `stdin`.
 
-For description of `not-stakkr` itself see `not-stakkr(1)`.
+For description of `tweetr` itself see `tweetr(1)`.
 
 ## OPTIONS
 
-  See `not-stakkr(1)`.
+  See `tweetr(1)`.
 
 ## INIT_OPTIONS
 
@@ -26,7 +26,7 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
 
 ## EXAMPLES
 
-  `not-stakkr init` [`-f`]
+  `tweetr init` [`-f`]
 
   The basic form of initialisation, will fail if an application is already
   initialised and `-f` was not provided.
@@ -42,8 +42,8 @@ Written by nabijaczleweli &lt;<nabijaczleweli@gmail.com>&gt;
 
 ## REPORTING BUGS
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr/issues>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr/issues>&gt;
 
 ## SEE ALSO
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr>&gt;

@@ -5,7 +5,7 @@
 //! # Examples
 //!
 //! ```no_run
-//! # use not_stakkr::options::Options;
+//! # use tweetr::options::Options;
 //! let options = Options::parse();
 //! println!("Config directory: {}", options.config_dir.0);
 //! ```
@@ -47,7 +47,7 @@ pub enum Subsystem {
 /// Representation of the application's all configurable values.
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
 pub struct Options {
-    /// Directory containing configuration. Default: `"$HOME/.not-stakkr"`
+    /// Directory containing configuration. Default: `"$HOME/.tweetr"`
     pub config_dir: (String, PathBuf),
     /// The specified subsystem.
     pub subsystem: Subsystem,
@@ -62,10 +62,10 @@ impl Options {
             .setting(AppSettings::ColoredHelp)
             .setting(AppSettings::VersionlessSubcommands)
             .setting(AppSettings::SubcommandRequiredElseHelp)
-            .about("not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want.\n\
+            .about("tweetr is a platform that allows you to create and queue tweets to be shared when YOU want.\n\
                     You create content when you have time  and then use FOSS and NOT pay whatever-ridiculous\n\
                     amount of $$$ for posting them automatically")
-            .arg(Arg::from_usage("-c --config-dir=[CONFIG_DIR] 'Directory containing configuration. Default: $HOME/.not-stakkr'")
+            .arg(Arg::from_usage("-c --config-dir=[CONFIG_DIR] 'Directory containing configuration. Default: $HOME/.tweetr'")
                 .validator(Options::config_dir_validator))
             .subcommand(SubCommand::with_name("init")
                 .about("Initialise global app data")
@@ -89,10 +89,10 @@ impl Options {
                     match home_dir() {
                         Some(mut hd) => {
                             hd = hd.canonicalize().unwrap();
-                            hd.push(".not-stakkr");
+                            hd.push(".tweetr");
 
                             fs::create_dir_all(&hd).unwrap();
-                            ("$HOME/.not_stakkr".to_string(), hd)
+                            ("$HOME/.tweetr".to_string(), hd)
                         }
                         None => {
                             clap::Error {

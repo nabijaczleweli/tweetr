@@ -1,7 +1,7 @@
 mod single_line {
-    extern crate not_stakkr;
+    extern crate tweetr;
 
-    use self::not_stakkr::util::prompt_multiline;
+    use self::tweetr::util::prompt_multiline;
     use std::iter::FromIterator;
     use std::io::Cursor;
 
@@ -33,9 +33,9 @@ mod single_line {
 }
 
 mod multi_line {
-    extern crate not_stakkr;
+    extern crate tweetr;
 
-    use self::not_stakkr::util::prompt_multiline;
+    use self::tweetr::util::prompt_multiline;
     use std::iter::FromIterator;
     use std::io::Cursor;
 

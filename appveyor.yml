@@ -1,4 +1,4 @@
-version: 0.1.0-{build}
+version: 0.2.0-{build}
 
 branches:
   except:
@@ -9,7 +9,7 @@ skip_tags: false
 platform: x64
 configuration: Release
 
-clone_folder: C:\not-stakkr
+clone_folder: C:\tweetr
 
 install:
   - set PATH=C:\msys64\mingw64\bin;C:\msys64\usr\bin;%PATH%;C:\Users\appveyor\.cargo\bin
@@ -24,19 +24,19 @@ build: off
 build_script:
   - git submodule update --init --recursive
   - cargo build --verbose --release
-  - cp target\release\not-stakkr.exe not-stakkr-v0.1.0.exe
-  - strip --strip-all --remove-section=.comment --remove-section=.note not-stakkr-v0.1.0.exe
+  - cp target\release\tweetr.exe tweetr-v0.2.0.exe
+  - strip --strip-all --remove-section=.comment --remove-section=.note tweetr-v0.2.0.exe
 
 test: off
 test_script:
   - cargo test --verbose --release
 
 artifacts:
-  - path: not-stakkr-v0.1.0.exe
+  - path: tweetr-v0.2.0.exe
 
 deploy:
   provider: GitHub
-  artifact: not-stakkr-v0.1.0.exe
+  artifact: tweetr-v0.2.0.exe
   auth_token:
     secure: crD1L8q7MVevqyQ28+lEUhZn8fcePgzJL4fseg6MOYCLrwf1FXp6J+iWGZpJL4/E
   on:

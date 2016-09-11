@@ -1,15 +1,15 @@
-not-stakkr-queue-tweet(1) -- Self-hosted automatic tweet posting software - tweet queueing
+tweetr-queue-tweet(1) -- Self-hosted automatic tweet posting software - tweet queueing
 ==========================================================================================
 
 ## SYNOPSIS
 
-`not-stakkr` [OPTIONS] `queue-tweet`
+`tweetr` [OPTIONS] `queue-tweet`
 
 ## DESCRIPTION
 
 Add a tweet to the queue with the values provided via `stdin`.
 
-Queued tweets can then be posted via `not-stakkr-start-daemon(1)`.
+Queued tweets can then be posted via `tweetr-start-daemon(1)`.
 
 The required data (in order):
 
@@ -26,15 +26,15 @@ Relative format:
 One can queue a tweet with multiple lines by suffixing a non-ending line
 with a `\`, which can be escaped with a `\\`.
 
-For description of `not-stakkr` itself see `not-stakkr(1)`.
+For description of `tweetr` itself see `tweetr(1)`.
 
 ## OPTIONS
 
-  See `not-stakkr(1)`.
+  See `tweetr(1)`.
 
 ## EXAMPLES
 
-  `not-stakkr queue-tweet`
+  `tweetr queue-tweet`
 
   This will queue two tweets for the same time.
 
@@ -75,8 +75,8 @@ Written by nabijaczleweli &lt;<nabijaczleweli@gmail.com>&gt;
 
 ## REPORTING BUGS
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr/issues>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr/issues>&gt;
 
 ## SEE ALSO
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr>&gt;

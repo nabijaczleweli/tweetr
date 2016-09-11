@@ -1,6 +1,6 @@
-extern crate not_stakkr;
+extern crate tweetr;
 
-use self::not_stakkr::ops::User;
+use self::tweetr::ops::User;
 use std::env::temp_dir;
 use std::fs;
 
@@ -46,7 +46,7 @@ fn multi_eq() {
 
 
 fn trans_scaffold(name: &str, users: Vec<User>) {
-    let td = temp_dir().join("not-stakkr-test").join(format!("ops-user-{}", name));
+    let td = temp_dir().join("tweetr-test").join(format!("ops-user-{}", name));
     fs::create_dir_all(&td).unwrap();
 
     let tf = td.join("users.toml");

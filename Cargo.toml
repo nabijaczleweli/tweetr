@@ -1,13 +1,13 @@
 [package]
-name = "not-stakkr"
-description = "not-stakkr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically."
-documentation = "https://cdn.rawgit.com/nabijaczleweli/not-stakkr/doc/not-stakkr/index.html"
-repository = "https://github.com/nabijaczleweli/not-stakkr"
+name = "tweetr"
+description = "tweetr is a platform that allows you to create and queue tweets to be shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$ for posting them automatically."
+documentation = "https://cdn.rawgit.com/nabijaczleweli/tweetr/doc/tweetr/index.html"
+repository = "https://github.com/nabijaczleweli/tweetr"
 readme = "README.md"
-keywords = ["stakkr", "twitter", "tweets", "queue", "content"]
+keywords = ["twitter", "tweets", "queue", "schedule", "content"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "0.1.0"
+version = "0.2.0"
 # Remember to also update in mod/*.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
@@ -27,6 +27,6 @@ features = ["rustc-serialize"]
 
 
 [[bin]]
-name = "not-stakkr"
+name = "tweetr"
 test = false
 doc = false

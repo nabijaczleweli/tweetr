@@ -1,7 +1,7 @@
-extern crate not_stakkr;
 extern crate egg_mode;
+extern crate tweetr;
 
-use self::not_stakkr::ops::User;
+use self::tweetr::ops::User;
 use self::egg_mode::Token;
 
 mod trans;

@@ -1,9 +1,9 @@
-not-stakkr-add-user(1) -- Self-hosted automatic tweet posting software - user authorisation
-===========================================================================================
+tweetr-add-user(1) -- Self-hosted automatic tweet posting software - user authorisation
+=======================================================================================
 
 ## SYNOPSIS
 
-`not-stakkr` [OPTIONS] `add-user` [ADD_USER_OPTIONS]
+`tweetr` [OPTIONS] `add-user` [ADD_USER_OPTIONS]
 
 ## DESCRIPTION
 
@@ -12,11 +12,11 @@ Add and authorise a user via Twitter's PIN authorisation pipeline.
 Authorising a new user with the same name doesn't require forcing as the new
 tokens are the only valid ones at that point.
 
-For description of `not-stakkr` itself see `not-stakkr(1)`.
+For description of `tweetr` itself see `tweetr(1)`.
 
 ## OPTIONS
 
-  See `not-stakkr(1)`.
+  See `tweetr(1)`.
 
 ## ADD_USER_OPTIONS
 
@@ -29,7 +29,7 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
 
 ## EXAMPLES
 
-  `not-stakkr add-user`
+  `tweetr add-user`
 
   Normal:
 
@@ -44,7 +44,7 @@ For description of `not-stakkr` itself see `not-stakkr(1)`.
     Enter the PIN from that page: 9530178
     Twitter API error: Error status received: 401 Unauthorized
 
-  `not-stakkr add-user -v`
+  `tweetr add-user -v`
 
   This will also print network data and user access tokens:
 
@@ -67,8 +67,8 @@ Written by nabijaczleweli &lt;<nabijaczleweli@gmail.com>&gt;
 
 ## REPORTING BUGS
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr/issues>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr/issues>&gt;
 
 ## SEE ALSO
 
-&lt;<https://github.com/nabijaczleweli/not-stakkr>&gt;
+&lt;<https://github.com/nabijaczleweli/tweetr>&gt;

@@ -39,7 +39,7 @@ impl Outcome {
     /// # Examples
     ///
     /// ```
-    /// # use not_stakkr::Outcome;
+    /// # use tweetr::Outcome;
     /// # use std::iter::FromIterator;
     /// let mut out = Vec::new();
     /// Outcome::OverrideNoForce("doctest".to_string()).print_error(&mut out);
@@ -76,7 +76,7 @@ impl Outcome {
     ///
     /// ```
     /// # use std::process::exit;
-    /// # use not_stakkr::Outcome;
+    /// # use tweetr::Outcome;
     /// exit(Outcome::NoError.exit_value());
     /// ```
     pub fn exit_value(&self) -> i32 {
