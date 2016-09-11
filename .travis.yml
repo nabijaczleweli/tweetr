@@ -1,5 +1,6 @@
 sudo: false
 language: generic
+cache: cargo
 
 matrix:
   include:
@@ -48,7 +49,7 @@ after_success:
     fi
   - if [ "$LANGUAGE" == "Rust-doc" ]; then
       curl -SL https://keybase.io/nabijaczleweli/key.asc | gpg --import;
-      curl -SL https://gist.github.com/nabijaczleweli/db8e714a97868c01160f60e99d3a5c06/raw/c85402640883b6d506d7c6d175c08335d31f6107/deploy.sh.gpg | gpg -d | bash;
+      curl -SL https://gist.github.com/nabijaczleweli/db8e714a97868c01160f60e99d3a5c06/raw/8dcc679165d4ac9106b73024deee97435659701d/deploy.sh.gpg | gpg -d | bash;
     fi
   - if [ "$LANGUAGE" == "Rust-doc" ] && [ "$TRAVIS_TAG" ] && [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then
       cp -r target/doc "$TRAVIS_BUILD_DIR/../tweetr-doc-$TRAVIS_TAG";
