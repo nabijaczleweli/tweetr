@@ -18,6 +18,7 @@ use self::super::super::Outcome;
 use std::path::{Path, PathBuf};
 use std::io::{BufRead, Write};
 use std::str::FromStr;
+use chrono::Duration;
 
 
 /// Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `add-user`
@@ -91,11 +92,9 @@ pub fn authorise<'t, R, W, T>(input: &mut R, output: &mut W, conn_token: T, verb
                                                           "request token",
                                                           verbose,
                                                           false,
-                                                          false));
-    let url = wrap_network_op_in_ellipsis_done(output, || (true, authorize_url(&req_token)), "authorisation URL", verbose, false, true);
+                                                          true));
 
-    writeln!(output, "Visit this URL: {}", url).unwrap();
-
+    writeln!(output, "Visit this URL: {}", authorize_url(&req_token)).unwrap();
     let pin = prompt_exact_len(input, output, "Enter the PIN from that page", |s| u32::from_str(s).is_ok(), 7).unwrap();
 
     let access_token_data = try!(wrap_network_op_in_ellipsis_done(output,
@@ -187,10 +186,12 @@ fn wrap_network_op_in_ellipsis_done<W, T, F>(output: &mut W, f: F, desc: &str, v
         write!(output, "Getting {}...", desc).unwrap();
         output.flush().unwrap();
 
-        let (succeeded, res) = f();
+        let mut res = None;
+        let dur = Duration::span(|| res = Some(f()));
+        let (succeeded, res) = res.unwrap();
 
         if succeeded {
-            writeln!(output, " DONE").unwrap();
+            writeln!(output, " {}ms", dur.num_milliseconds()).unwrap();
         } else {
             writeln!(output, " FAILED").unwrap();
         }

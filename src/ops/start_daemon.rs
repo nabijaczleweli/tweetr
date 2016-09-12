@@ -26,7 +26,7 @@ use self::super::super::util::TWEET_DATETIME_FORMAT;
 use self::super::{QueuedTweet, User, verify_file};
 use self::super::super::Outcome;
 use egg_mode::tweet::DraftTweet;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Duration, Local};
 use std::path::PathBuf;
 use egg_mode::Token;
 use std::io::Write;
@@ -261,10 +261,14 @@ pub fn post_tweet<'a, W: Write>(tweet: &mut QueuedTweet, on_behalf_of: &User, ap
         write!(output, "Posting tweet scheduled for {:?}...", tweet.time).unwrap();
         output.flush().unwrap();
     }
-    match DraftTweet::new(&tweet.content).send(app, &Token::new(&on_behalf_of.access_token_key[..], &on_behalf_of.access_token_secret[..])) {
+    let mut dt = None;
+    let dur = Duration::span(|| {
+        dt = Some(DraftTweet::new(&tweet.content).send(app, &Token::new(&on_behalf_of.access_token_key[..], &on_behalf_of.access_token_secret[..])))
+    });
+    match dt.unwrap() {
         Ok(resp) => {
             if verbose {
-                writeln!(output, " SUCCESS").unwrap();
+                writeln!(output, " {}ms", dur.num_milliseconds()).unwrap();
             }
 
             tweet.time_posted = Some(DateTime::parse_from_str(&resp.response.created_at, TWEET_DATETIME_FORMAT).unwrap());
