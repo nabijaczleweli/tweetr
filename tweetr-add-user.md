@@ -48,13 +48,12 @@ For description of `tweetr` itself see tweetr(1).
 
   This will also print network data and user access tokens:
 
-    Getting request token... DONE
-    Getting authorisation URL... DONE
+    Getting request token... 855ms
 
     Visit this URL: https://api.twitter.com/oauth/authorize?oauth_token=3JBg-BAV
     Enter the PIN from that page: 9530177
 
-    Getting access token... DONE
+    Getting access token... 1224ms
 
     Successfully authenticated user nabijaczleweli#1246428073
     Access tokens:

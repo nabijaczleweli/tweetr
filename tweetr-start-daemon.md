@@ -46,11 +46,11 @@ For description of `tweetr` itself see `tweetr(1).
 
   `tweetr start-daemon -v`
 
-    Posting tweet scheduled for 2016-09-09T00:33:30+02:00... SUCCESS
+    Posting tweet scheduled for 2016-09-09T00:33:30+02:00... 1375ms
     Posted tweet "Capitalism" scheduled for
     2016-09-09T00:33:30+02:00 by tweetr_test at 2016-09-10T10:53:11+00:00
     with ID 774561353273147392
-    Posting tweet scheduled for 2016-09-10T00:33:30+02:00... SUCCESS
+    Posting tweet scheduled for 2016-09-10T00:33:30+02:00... 971ms
     Posted tweet "Abolish the burgeoisie!" scheduled for
     2016-09-10T00:33:30+02:00 by tweetr_test at 2016-09-10T10:53:12+00:00
     with ID 774561355886108674
