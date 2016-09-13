@@ -245,9 +245,6 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! This module contains the functions used only by the `add-user` subsystem.</span>
 <span class='doccomment'>//!</span>
@@ -263,13 +260,12 @@
 <span class='doccomment'>//! ```</span>
 
 <span class='kw'>use</span> <span class='ident'>egg_mode</span>::{<span class='ident'>Token</span>, <span class='ident'>request_token</span>, <span class='ident'>authorize_url</span>, <span class='ident'>access_token</span>};
-<span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>util</span>::<span class='ident'>prompt_exact_len</span>;
+<span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>util</span>::{<span class='ident'>prompt_exact_len</span>, <span class='ident'>span_r</span>};
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::{<span class='ident'>User</span>, <span class='ident'>verify_file</span>};
 <span class='kw'>use</span> <span class='self'>self</span>::<span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>Outcome</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::{<span class='ident'>Path</span>, <span class='ident'>PathBuf</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufRead</span>, <span class='ident'>Write</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>chrono</span>::<span class='ident'>Duration</span>;
 
 
 <span class='doccomment'>/// Verify if, given the current configuration, it&#39;s permitted to continue with the subsequent steps of the `add-user`</span>
@@ -437,9 +433,7 @@
         <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot;Getting {}...&quot;</span>, <span class='ident'>desc</span>).<span class='ident'>unwrap</span>();
         <span class='ident'>output</span>.<span class='ident'>flush</span>().<span class='ident'>unwrap</span>();
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-        <span class='kw'>let</span> <span class='ident'>dur</span> <span class='op'>=</span> <span class='ident'>Duration</span>::<span class='ident'>span</span>(<span class='op'>||</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>()));
-        <span class='kw'>let</span> (<span class='ident'>succeeded</span>, <span class='ident'>res</span>) <span class='op'>=</span> <span class='ident'>res</span>.<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> (<span class='ident'>dur</span>, (<span class='ident'>succeeded</span>, <span class='ident'>res</span>)) <span class='op'>=</span> <span class='ident'>span_r</span>(<span class='ident'>f</span>);
 
         <span class='kw'>if</span> <span class='ident'>succeeded</span> {
             <span class='macro'>writeln</span><span class='macro'>!</span>(<span class='ident'>output</span>, <span class='string'>&quot; {}ms&quot;</span>, <span class='ident'>dur</span>.<span class='ident'>num_milliseconds</span>()).<span class='ident'>unwrap</span>();
