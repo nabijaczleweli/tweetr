@@ -22,11 +22,11 @@
 //! ```
 
 
-use self::super::super::util::TWEET_DATETIME_FORMAT;
+use self::super::super::util::{TWEET_DATETIME_FORMAT, span_r};
 use self::super::{QueuedTweet, User, verify_file};
 use self::super::super::Outcome;
 use egg_mode::tweet::DraftTweet;
-use chrono::{DateTime, Duration, Local};
+use chrono::{DateTime, Local};
 use std::path::PathBuf;
 use egg_mode::Token;
 use std::io::Write;
@@ -261,12 +261,9 @@ pub fn post_tweet<'a, W: Write>(tweet: &mut QueuedTweet, on_behalf_of: &User, ap
         write!(output, "Posting tweet scheduled for {:?}...", tweet.time).unwrap();
         output.flush().unwrap();
     }
-    let mut dt = None;
-    let dur = Duration::span(|| {
-        dt = Some(DraftTweet::new(&tweet.content).send(app, &Token::new(&on_behalf_of.access_token_key[..], &on_behalf_of.access_token_secret[..])))
-    });
-    match dt.unwrap() {
-        Ok(resp) => {
+
+    match span_r(|| DraftTweet::new(&tweet.content).send(app, &Token::new(&on_behalf_of.access_token_key[..], &on_behalf_of.access_token_secret[..]))) {
+        (dur, Ok(resp)) => {
             if verbose {
                 writeln!(output, " {}ms", dur.num_milliseconds()).unwrap();
             }
@@ -285,7 +282,7 @@ pub fn post_tweet<'a, W: Write>(tweet: &mut QueuedTweet, on_behalf_of: &User, ap
 
             Outcome::NoError
         }
-        Err(e) => {
+        (_, Err(e)) => {
             if verbose {
                 writeln!(output, " FAILED").unwrap();
             }

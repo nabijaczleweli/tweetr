@@ -2,6 +2,7 @@
 
 
 use std::io::{BufRead, Write, Result as IoResult, Error, ErrorKind};
+use chrono::{Duration as ChronoDuration};
 use std::time::Duration;
 use std::str::FromStr;
 use regex::Regex;
@@ -24,6 +25,32 @@ use std::iter;
 /// ```
 pub static TWEET_DATETIME_FORMAT: &'static str = "%a %b %d %T %z %Y";
 
+
+
+/// Runs a closure, returning the duration of time it took to run the closure and the closure's return value.
+///
+/// Equivalent to https://github.com/rust-lang-deprecated/time/pull/139
+///
+/// # Examples
+///
+/// ```
+/// # use tweetr::util::span_r;
+/// # use std::time::Duration;
+/// # use std::thread;
+/// let (dur, i) = span_r(|| {
+///     thread::sleep(Duration::from_millis(10));
+///     420
+/// });
+/// assert_eq!(i, 420);
+/// assert!(dur.num_milliseconds() >= 10);
+/// ```
+pub fn span_r<F, R>(f: F) -> (ChronoDuration, R)
+    where F: FnOnce() -> R
+{
+    let mut res = None;
+    let span = ChronoDuration::span(|| res = Some(f()));
+    (span, res.unwrap())
+}
 
 /// Create a string consisting of `n` repetitions of `what`.
 ///

@@ -12,13 +12,12 @@
 //! ```
 
 use egg_mode::{Token, request_token, authorize_url, access_token};
-use self::super::super::util::prompt_exact_len;
+use self::super::super::util::{prompt_exact_len, span_r};
 use self::super::{User, verify_file};
 use self::super::super::Outcome;
 use std::path::{Path, PathBuf};
 use std::io::{BufRead, Write};
 use std::str::FromStr;
-use chrono::Duration;
 
 
 /// Verify if, given the current configuration, it's permitted to continue with the subsequent steps of the `add-user`
@@ -186,9 +185,7 @@ fn wrap_network_op_in_ellipsis_done<W, T, F>(output: &mut W, f: F, desc: &str, v
         write!(output, "Getting {}...", desc).unwrap();
         output.flush().unwrap();
 
-        let mut res = None;
-        let dur = Duration::span(|| res = Some(f()));
-        let (succeeded, res) = res.unwrap();
+        let (dur, (succeeded, res)) = span_r(f);
 
         if succeeded {
             writeln!(output, " {}ms", dur.num_milliseconds()).unwrap();
