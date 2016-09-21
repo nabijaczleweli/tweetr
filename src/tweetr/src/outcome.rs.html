@@ -220,10 +220,10 @@
         <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
             <span class='ident'>Outcome</span>::<span class='ident'>NoError</span> <span class='op'>=&gt;</span> <span class='number'>0</span>,
             <span class='ident'>Outcome</span>::<span class='ident'>OverrideNoForce</span>(_) <span class='op'>=&gt;</span> <span class='number'>1</span>,
-            <span class='ident'>Outcome</span>::<span class='ident'>RequiredFileFromSubsystemNonexistant</span> { <span class='ident'>subsys</span>: _, <span class='ident'>fname</span>: _ } <span class='op'>|</span>
-            <span class='ident'>Outcome</span>::<span class='ident'>RequiredDataFromSubsystemNonexistant</span> { <span class='ident'>subsys</span>: _, <span class='ident'>desc</span>: _ } <span class='op'>=&gt;</span> <span class='number'>2</span>,
+            <span class='ident'>Outcome</span>::<span class='ident'>RequiredFileFromSubsystemNonexistant</span> { .. } <span class='op'>|</span>
+            <span class='ident'>Outcome</span>::<span class='ident'>RequiredDataFromSubsystemNonexistant</span> { .. } <span class='op'>=&gt;</span> <span class='number'>2</span>,
             <span class='ident'>Outcome</span>::<span class='ident'>TwitterAPIError</span>(_) <span class='op'>=&gt;</span> <span class='number'>3</span>,
-            <span class='ident'>Outcome</span>::<span class='ident'>FileParsingFailed</span> { <span class='ident'>desc</span>: _, <span class='ident'>errors</span>: _ } <span class='op'>=&gt;</span> <span class='number'>4</span>,
+            <span class='ident'>Outcome</span>::<span class='ident'>FileParsingFailed</span> { .. } <span class='op'>=&gt;</span> <span class='number'>4</span>,
         }
     }
 }
