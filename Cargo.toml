@@ -18,7 +18,7 @@ rustc-serialize = "0.3"
 lazy_static = "0.2"
 egg-mode = "0.4"
 regex = "0.1"
-clap = "2.11"
+clap = "2.13"
 toml = "0.2"
 
 [dependencies.chrono]
