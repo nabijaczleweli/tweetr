@@ -83,10 +83,10 @@ impl Outcome {
         match *self {
             Outcome::NoError => 0,
             Outcome::OverrideNoForce(_) => 1,
-            Outcome::RequiredFileFromSubsystemNonexistant { subsys: _, fname: _ } |
-            Outcome::RequiredDataFromSubsystemNonexistant { subsys: _, desc: _ } => 2,
+            Outcome::RequiredFileFromSubsystemNonexistant { .. } |
+            Outcome::RequiredDataFromSubsystemNonexistant { .. } => 2,
             Outcome::TwitterAPIError(_) => 3,
-            Outcome::FileParsingFailed { desc: _, errors: _ } => 4,
+            Outcome::FileParsingFailed { .. } => 4,
         }
     }
 }
