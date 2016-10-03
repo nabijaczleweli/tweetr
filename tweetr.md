@@ -22,7 +22,7 @@ See the subcommands for more information:
 
 ## OPTIONS
 
-  -c --config-dir &lt;<algorithm>&gt;
+  -c --config-dir &lt;<config_dir>&gt;
 
     Directory with the configuration.
 
