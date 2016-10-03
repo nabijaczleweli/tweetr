@@ -52,7 +52,7 @@
     type <a href='#associatedtype.Item' class='type'>Item</a>;
     fn <a href='#tymethod.previous_cursor_id' class='fnname'>previous_cursor_id</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>;
     fn <a href='#tymethod.next_cursor_id' class='fnname'>next_cursor_id</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>;
-    fn <a href='#tymethod.into_inner' class='fnname'>into_inner</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;Self::<a class='trait' href='../../egg_mode/cursor/trait.Cursor.html' title='egg_mode::cursor::Cursor'>Item</a>&gt;;
+    fn <a href='#tymethod.into_inner' class='fnname'>into_inner</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;Self::Item&gt;;
 }</pre><div class='docblock'><p>Trait to generalize over paginated views of API results.</p>
 
 <p>Types that implement Cursor are used as intermediate steps in <a href="struct.CursorIter.html"><code>CursorIter</code></a>&#39;s Iterator
@@ -67,7 +67,7 @@ with Cursor structs directly, but you can get them via <code>CursorIter</code>&#
             <div class='methods'>
         <h3 id='tymethod.previous_cursor_id' class='method stab '><code>fn <a href='#tymethod.previous_cursor_id' class='fnname'>previous_cursor_id</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></h3><div class='docblock'><p>Returns a numeric reference to the previous page of results.</p>
 </div><h3 id='tymethod.next_cursor_id' class='method stab '><code>fn <a href='#tymethod.next_cursor_id' class='fnname'>next_cursor_id</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></h3><div class='docblock'><p>Returns a numeric reference to the next page of results.</p>
-</div><h3 id='tymethod.into_inner' class='method stab '><code>fn <a href='#tymethod.into_inner' class='fnname'>into_inner</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;Self::<a class='trait' href='../../egg_mode/cursor/trait.Cursor.html' title='egg_mode::cursor::Cursor'>Item</a>&gt;</code></h3><div class='docblock'><p>Consumes the cursor and returns the collection of results from inside.</p>
+</div><h3 id='tymethod.into_inner' class='method stab '><code>fn <a href='#tymethod.into_inner' class='fnname'>into_inner</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;Self::Item&gt;</code></h3><div class='docblock'><p>Consumes the cursor and returns the collection of results from inside.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
