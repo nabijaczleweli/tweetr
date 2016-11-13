@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-831' class='srclink' href='../../src/egg_mode/user/structs.rs.html#584-616' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-816' class='srclink' href='../../src/egg_mode/user/structs.rs.html#584-616' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct RelationSource {
     pub id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>,
     pub screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
@@ -66,33 +66,51 @@ source user.</p>
 visible to the user that set them. While you can see relationships between any two arbitrary
 users, if the &quot;source&quot; account is the same one whose access token you&#39;re using, you can see
 extra information about this relationship.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.id' class='structfield'><code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Numeric ID for this account.</p>
-</div><span id='structfield.screen_name' class='structfield'><code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Screen name for this account.</p>
-</div><span id='structfield.following' class='structfield'><code>following: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account follows the target account.</p>
-</div><span id='structfield.followed_by' class='structfield'><code>followed_by: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether the target account follows this source account.</p>
-</div><span id='structfield.can_dm' class='structfield'><code>can_dm: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account can send a direct message to the target account.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.id' class='structfield'>
+                           <span id='id.v' class='invisible'>
+                           <code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Numeric ID for this account.</p>
+</div><span id='structfield.screen_name' class='structfield'>
+                           <span id='screen_name.v' class='invisible'>
+                           <code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Screen name for this account.</p>
+</div><span id='structfield.following' class='structfield'>
+                           <span id='following.v' class='invisible'>
+                           <code>following: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account follows the target account.</p>
+</div><span id='structfield.followed_by' class='structfield'>
+                           <span id='followed_by.v' class='invisible'>
+                           <code>followed_by: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the target account follows this source account.</p>
+</div><span id='structfield.can_dm' class='structfield'>
+                           <span id='can_dm.v' class='invisible'>
+                           <code>can_dm: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account can send a direct message to the target account.</p>
 
 <p>If <code>followed_by</code> is false but this is true, that could indicate that the target account has
 allowed anyone to direct-message them.</p>
-</div><span id='structfield.blocking' class='structfield'><code>blocking: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account is blocking the target account. If the source account
+</div><span id='structfield.blocking' class='structfield'>
+                           <span id='blocking.v' class='invisible'>
+                           <code>blocking: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account is blocking the target account. If the source account
 is not the authenticated user, holds <code>None</code> instead.</p>
-</div><span id='structfield.marked_spam' class='structfield'><code>marked_spam: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has reported the target account for spam. If the source
+</div><span id='structfield.marked_spam' class='structfield'>
+                           <span id='marked_spam.v' class='invisible'>
+                           <code>marked_spam: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has reported the target account for spam. If the source
 account is not the authenticated user, holds <code>None</code> instead.</p>
-</div><span id='structfield.want_retweets' class='structfield'><code>want_retweets: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has decided to show retweets from the target account.
+</div><span id='structfield.want_retweets' class='structfield'>
+                           <span id='want_retweets.v' class='invisible'>
+                           <code>want_retweets: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has decided to show retweets from the target account.
 If the source account is not the authenticated user, holds <code>None</code> instead.</p>
-</div><span id='structfield.notifications_enabled' class='structfield'><code>notifications_enabled: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has decided to receive mobile notifications for the
+</div><span id='structfield.notifications_enabled' class='structfield'>
+                           <span id='notifications_enabled.v' class='invisible'>
+                           <code>notifications_enabled: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this source account has decided to receive mobile notifications for the
 target account. If the source account is not the authenticated user, holds <code>None</code> instead.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.RelationSource.html' title='egg_mode::user::RelationSource'>RelationSource</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-816' class='srclink' href='../../src/egg_mode/user/structs.rs.html#583' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.RelationSource.html' title='egg_mode::user::RelationSource'>RelationSource</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-827' class='srclink' href='../../src/egg_mode/user/structs.rs.html#583' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

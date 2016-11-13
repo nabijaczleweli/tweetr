@@ -65,7 +65,7 @@ page of results, hand your tokens to <code>call</code>.</p>
 
 <span class='kw'>for</span> <span class='ident'>tweet</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>search</span>.<span class='ident'>response</span>.<span class='ident'>statuses</span> {
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;(@{}) {}&quot;</span>, <span class='ident'>tweet</span>.<span class='ident'>user</span>.<span class='ident'>screen_name</span>, <span class='ident'>tweet</span>.<span class='ident'>text</span>);
-}</pre>
+}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>Once you have your <code>SearchResult</code>, you can navigate the search results by calling <code>older</code> and
 <code>newer</code> to get the next and previous pages, respsectively. In addition, you can see your
@@ -78,14 +78,14 @@ search arguments in a separate private field.</p>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.SearchBuilder.html'
                                   title='egg_mode::search::SearchBuilder'>SearchBuilder</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Represents a tweet search query before being sent.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.SearchResult.html'
                                   title='egg_mode::search::SearchResult'>SearchResult</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Represents a page of search results, along with metadata to request the next or previous page.</p>
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
@@ -93,14 +93,14 @@ search arguments in a separate private field.</p>
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.Distance.html'
                                   title='egg_mode::search::Distance'>Distance</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Represents a radius around a given location to return search results for.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='enum' href='enum.ResultType.html'
                                   title='egg_mode::search::ResultType'>ResultType</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Represents what kind of tweets should be included in search results.</p>
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
@@ -108,7 +108,7 @@ search arguments in a separate private field.</p>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.search.html'
                                   title='egg_mode::search::search'>search</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Begin setting up a tweet search with the given query.</p>
                            </td>
                        </tr></table></section>

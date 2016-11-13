@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1586' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#222-234' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1576' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#222-234' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct TweetEntities {
     pub hashtags: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;,
     pub symbols: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;,
@@ -62,19 +62,29 @@ Vecs will be empty. If there is no media attached to the tweet, that field will 
 <p>Note that for media attached to a tweet, this struct will only contain the first image of a
 photo set, or a thumbnail of a video or GIF. Full media information is available in the tweet&#39;s
 <code>extended_entities</code> field.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.hashtags' class='structfield'><code>hashtags: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Collection of hashtags parsed from the tweet.</p>
-</div><span id='structfield.symbols' class='structfield'><code>symbols: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Collection of financial symbols, or &quot;cashtags&quot;, parsed from the tweet.</p>
-</div><span id='structfield.urls' class='structfield'><code>urls: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.UrlEntity.html' title='egg_mode::entities::UrlEntity'>UrlEntity</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Collection of URLs parsed from the tweet.</p>
-</div><span id='structfield.user_mentions' class='structfield'><code>user_mentions: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.MentionEntity.html' title='egg_mode::entities::MentionEntity'>MentionEntity</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Collection of user mentions parsed from the tweet.</p>
-</div><span id='structfield.media' class='structfield'><code>media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.MediaEntity.html' title='egg_mode::entities::MediaEntity'>MediaEntity</a>&gt;&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>If the tweet contains any attached media, this contains a collection of media information
+</div><h2 class='fields'>Fields</h2><span id='structfield.hashtags' class='structfield'>
+                           <span id='hashtags.v' class='invisible'>
+                           <code>hashtags: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Collection of hashtags parsed from the tweet.</p>
+</div><span id='structfield.symbols' class='structfield'>
+                           <span id='symbols.v' class='invisible'>
+                           <code>symbols: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.HashtagEntity.html' title='egg_mode::entities::HashtagEntity'>HashtagEntity</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Collection of financial symbols, or &quot;cashtags&quot;, parsed from the tweet.</p>
+</div><span id='structfield.urls' class='structfield'>
+                           <span id='urls.v' class='invisible'>
+                           <code>urls: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.UrlEntity.html' title='egg_mode::entities::UrlEntity'>UrlEntity</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Collection of URLs parsed from the tweet.</p>
+</div><span id='structfield.user_mentions' class='structfield'>
+                           <span id='user_mentions.v' class='invisible'>
+                           <code>user_mentions: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.MentionEntity.html' title='egg_mode::entities::MentionEntity'>MentionEntity</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Collection of user mentions parsed from the tweet.</p>
+</div><span id='structfield.media' class='structfield'>
+                           <span id='media.v' class='invisible'>
+                           <code>media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/entities/struct.MediaEntity.html' title='egg_mode::entities::MediaEntity'>MediaEntity</a>&gt;&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>If the tweet contains any attached media, this contains a collection of media information
 from the tweet.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/tweet/struct.TweetEntities.html' title='egg_mode::tweet::TweetEntities'>TweetEntities</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1576' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#221' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/tweet/struct.TweetEntities.html' title='egg_mode::tweet::TweetEntities'>TweetEntities</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1582' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#221' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

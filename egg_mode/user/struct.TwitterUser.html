@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-602' class='srclink' href='../../src/egg_mode/user/structs.rs.html#102-242' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-555' class='srclink' href='../../src/egg_mode/user/structs.rs.html#102-242' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct TwitterUser {
     pub contributors_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
     pub created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
@@ -141,104 +141,170 @@ look like the settings they&#39;ve set on the Twitter website.</li>
 <li><code>time_zone</code>/<code>utc_offset</code></li>
 <li><code>withheld_in_countries</code>/<code>withheld_scope</code></li>
 </ul>
-</div><h2 class='fields'>Fields</h2><span id='structfield.contributors_enabled' class='structfield'><code>contributors_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates this user has an account with &quot;contributor mode&quot; enabled, allowing
+</div><h2 class='fields'>Fields</h2><span id='structfield.contributors_enabled' class='structfield'>
+                           <span id='contributors_enabled.v' class='invisible'>
+                           <code>contributors_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates this user has an account with &quot;contributor mode&quot; enabled, allowing
 for Tweets issued by the user to be co-authored by another account. Rarely <code>true</code>.</p>
-</div><span id='structfield.created_at' class='structfield'><code>created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The UTC datetime that this user account was created on Twitter, formatted like &quot;Tue Jan
+</div><span id='structfield.created_at' class='structfield'>
+                           <span id='created_at.v' class='invisible'>
+                           <code>created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The UTC datetime that this user account was created on Twitter, formatted like &quot;Tue Jan
 13 23:37:34 +0000 2015&quot;.</p>
-</div><span id='structfield.default_profile' class='structfield'><code>default_profile: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>When true, indicates that this user has not altered the theme or background of
+</div><span id='structfield.default_profile' class='structfield'>
+                           <span id='default_profile.v' class='invisible'>
+                           <code>default_profile: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>When true, indicates that this user has not altered the theme or background of
 their user profile.</p>
-</div><span id='structfield.default_profile_image' class='structfield'><code>default_profile_image: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>When true, indicates that the user has not uploaded their own avatar and a default
+</div><span id='structfield.default_profile_image' class='structfield'>
+                           <span id='default_profile_image.v' class='invisible'>
+                           <code>default_profile_image: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>When true, indicates that the user has not uploaded their own avatar and a default
 egg avatar is used instead.</p>
-</div><span id='structfield.description' class='structfield'><code>description: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The user-defined string describing their account.</p>
-</div><span id='structfield.entities' class='structfield'><code>entities: <a class='struct' href='../../egg_mode/user/struct.UserEntities.html' title='egg_mode::user::UserEntities'>UserEntities</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Link information that has been parsed out of the <code>url</code> or <code>description</code> fields given by the
+</div><span id='structfield.description' class='structfield'>
+                           <span id='description.v' class='invisible'>
+                           <code>description: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The user-defined string describing their account.</p>
+</div><span id='structfield.entities' class='structfield'>
+                           <span id='entities.v' class='invisible'>
+                           <code>entities: <a class='struct' href='../../egg_mode/user/struct.UserEntities.html' title='egg_mode::user::UserEntities'>UserEntities</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Link information that has been parsed out of the <code>url</code> or <code>description</code> fields given by the
 user.</p>
-</div><span id='structfield.favourites_count' class='structfield'><code>favourites_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The number of tweets this user has favorited or liked in the account&#39;s lifetime.
+</div><span id='structfield.favourites_count' class='structfield'>
+                           <span id='favourites_count.v' class='invisible'>
+                           <code>favourites_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of tweets this user has favorited or liked in the account&#39;s lifetime.
 The term &quot;favourites&quot; and its British spelling are used for historical reasons.</p>
-</div><span id='structfield.follow_request_sent' class='structfield'><code>follow_request_sent: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>When true, indicates that the authenticating user has issued a follow request to
+</div><span id='structfield.follow_request_sent' class='structfield'>
+                           <span id='follow_request_sent.v' class='invisible'>
+                           <code>follow_request_sent: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>When true, indicates that the authenticating user has issued a follow request to
 this protected account.</p>
-</div><span id='structfield.followers_count' class='structfield'><code>followers_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The number of followers this account has.</p>
+</div><span id='structfield.followers_count' class='structfield'>
+                           <span id='followers_count.v' class='invisible'>
+                           <code>followers_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of followers this account has.</p>
 
 <p>In certain server-stress conditions, this may temporarily mistakenly return 0.</p>
-</div><span id='structfield.friends_count' class='structfield'><code>friends_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The number of users this account follows, aka its &quot;followings&quot;.</p>
+</div><span id='structfield.friends_count' class='structfield'>
+                           <span id='friends_count.v' class='invisible'>
+                           <code>friends_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of users this account follows, aka its &quot;followings&quot;.</p>
 
 <p>In certain server-stress conditions, this may temporarily mistakenly return 0.</p>
-</div><span id='structfield.geo_enabled' class='structfield'><code>geo_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this user as enabled their tweets to be geotagged.</p>
+</div><span id='structfield.geo_enabled' class='structfield'>
+                           <span id='geo_enabled.v' class='invisible'>
+                           <code>geo_enabled: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this user as enabled their tweets to be geotagged.</p>
 
 <p>If this is set for the current user, then they can attach geographic data when
 posting a new Tweet.</p>
-</div><span id='structfield.id' class='structfield'><code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Unique identifier for this user.</p>
-</div><span id='structfield.is_translator' class='structfield'><code>is_translator: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether the user participates in Twitter&#39;s translator community.</p>
-</div><span id='structfield.lang' class='structfield'><code>lang: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Language code for the user&#39;s self-declared interface language.</p>
+</div><span id='structfield.id' class='structfield'>
+                           <span id='id.v' class='invisible'>
+                           <code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Unique identifier for this user.</p>
+</div><span id='structfield.is_translator' class='structfield'>
+                           <span id='is_translator.v' class='invisible'>
+                           <code>is_translator: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the user participates in Twitter&#39;s translator community.</p>
+</div><span id='structfield.lang' class='structfield'>
+                           <span id='lang.v' class='invisible'>
+                           <code>lang: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Language code for the user&#39;s self-declared interface language.</p>
 
 <p>Codes are formatted as a language tag from <a href="https://tools.ietf.org/html/bcp47">BCP 47</a>. Only indicates the user&#39;s
 interface language, not necessarily the content of their Tweets.</p>
-</div><span id='structfield.listed_count' class='structfield'><code>listed_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The number of public lists the user is a member of.</p>
-</div><span id='structfield.location' class='structfield'><code>location: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The user-entered location field from their profile. Not necessarily parseable
+</div><span id='structfield.listed_count' class='structfield'>
+                           <span id='listed_count.v' class='invisible'>
+                           <code>listed_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of public lists the user is a member of.</p>
+</div><span id='structfield.location' class='structfield'>
+                           <span id='location.v' class='invisible'>
+                           <code>location: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The user-entered location field from their profile. Not necessarily parseable
 or even a location.</p>
-</div><span id='structfield.name' class='structfield'><code>name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The user-entered display name.</p>
-</div><span id='structfield.profile_background_color' class='structfield'><code>profile_background_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user for their profile background.</p>
-</div><span id='structfield.profile_background_image_url' class='structfield'><code>profile_background_image_url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing to the background image chosen by the user for their profile. Uses
+</div><span id='structfield.name' class='structfield'>
+                           <span id='name.v' class='invisible'>
+                           <code>name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The user-entered display name.</p>
+</div><span id='structfield.profile_background_color' class='structfield'>
+                           <span id='profile_background_color.v' class='invisible'>
+                           <code>profile_background_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user for their profile background.</p>
+</div><span id='structfield.profile_background_image_url' class='structfield'>
+                           <span id='profile_background_image_url.v' class='invisible'>
+                           <code>profile_background_image_url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>A URL pointing to the background image chosen by the user for their profile. Uses
 HTTP as the protocol.</p>
-</div><span id='structfield.profile_background_image_url_https' class='structfield'><code>profile_background_image_url_https: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing to the background image chosen by the user for their profile. Uses
+</div><span id='structfield.profile_background_image_url_https' class='structfield'>
+                           <span id='profile_background_image_url_https.v' class='invisible'>
+                           <code>profile_background_image_url_https: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>A URL pointing to the background image chosen by the user for their profile. Uses
 HTTPS as the protocol.</p>
-</div><span id='structfield.profile_background_tile' class='structfield'><code>profile_background_tile: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether the user&#39;s <code>profile_background_image_url</code> should be tiled when
+</div><span id='structfield.profile_background_tile' class='structfield'>
+                           <span id='profile_background_tile.v' class='invisible'>
+                           <code>profile_background_tile: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the user&#39;s <code>profile_background_image_url</code> should be tiled when
 displayed.</p>
-</div><span id='structfield.profile_banner_url' class='structfield'><code>profile_banner_url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing to the banner image chosen by the user. Uses HTTPS as the protocol.</p>
+</div><span id='structfield.profile_banner_url' class='structfield'>
+                           <span id='profile_banner_url.v' class='invisible'>
+                           <code>profile_banner_url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>A URL pointing to the banner image chosen by the user. Uses HTTPS as the protocol.</p>
 
 <p>This is a base URL that a size specifier can be appended onto to get variously
 sized images, with size specifiers according to <a href="https://dev.twitter.com/overview/general/user-profile-images-and-banners">Profile Images and Banners</a>.</p>
-</div><span id='structfield.profile_image_url' class='structfield'><code>profile_image_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing to the user&#39;s avatar image. Uses HTTP as the protocol. Size
+</div><span id='structfield.profile_image_url' class='structfield'>
+                           <span id='profile_image_url.v' class='invisible'>
+                           <code>profile_image_url: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>A URL pointing to the user&#39;s avatar image. Uses HTTP as the protocol. Size
 specifiers can be used according to <a href="https://dev.twitter.com/overview/general/user-profile-images-and-banners">Profile Images and Banners</a>.</p>
-</div><span id='structfield.profile_image_url_https' class='structfield'><code>profile_image_url_https: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>A URL pointing to the user&#39;s avatar image. Uses HTTPS as the protocol. Size
+</div><span id='structfield.profile_image_url_https' class='structfield'>
+                           <span id='profile_image_url_https.v' class='invisible'>
+                           <code>profile_image_url_https: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>A URL pointing to the user&#39;s avatar image. Uses HTTPS as the protocol. Size
 specifiers can be used according to <a href="https://dev.twitter.com/overview/general/user-profile-images-and-banners">Profile Images and Banners</a>.</p>
-</div><span id='structfield.profile_link_color' class='structfield'><code>profile_link_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display links in the Twitter UI.</p>
-</div><span id='structfield.profile_sidebar_border_color' class='structfield'><code>profile_sidebar_border_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display sidebar borders in the Twitter UI.</p>
-</div><span id='structfield.profile_sidebar_fill_color' class='structfield'><code>profile_sidebar_fill_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display sidebar backgrounds in the Twitter UI.</p>
-</div><span id='structfield.profile_text_color' class='structfield'><code>profile_text_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display text in the Twitter UI.</p>
-</div><span id='structfield.profile_use_background_image' class='structfield'><code>profile_use_background_image: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether the user wants their uploaded background image to be used.</p>
-</div><span id='structfield.protected' class='structfield'><code>protected: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether the user is a <a href="https://support.twitter.com/articles/14016">protected</a> account.</p>
-</div><span id='structfield.screen_name' class='structfield'><code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The screen name or handle identifying this user.</p>
+</div><span id='structfield.profile_link_color' class='structfield'>
+                           <span id='profile_link_color.v' class='invisible'>
+                           <code>profile_link_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display links in the Twitter UI.</p>
+</div><span id='structfield.profile_sidebar_border_color' class='structfield'>
+                           <span id='profile_sidebar_border_color.v' class='invisible'>
+                           <code>profile_sidebar_border_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display sidebar borders in the Twitter UI.</p>
+</div><span id='structfield.profile_sidebar_fill_color' class='structfield'>
+                           <span id='profile_sidebar_fill_color.v' class='invisible'>
+                           <code>profile_sidebar_fill_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display sidebar backgrounds in the Twitter UI.</p>
+</div><span id='structfield.profile_text_color' class='structfield'>
+                           <span id='profile_text_color.v' class='invisible'>
+                           <code>profile_text_color: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The hex color chosen by the user to display text in the Twitter UI.</p>
+</div><span id='structfield.profile_use_background_image' class='structfield'>
+                           <span id='profile_use_background_image.v' class='invisible'>
+                           <code>profile_use_background_image: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the user wants their uploaded background image to be used.</p>
+</div><span id='structfield.protected' class='structfield'>
+                           <span id='protected.v' class='invisible'>
+                           <code>protected: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the user is a <a href="https://support.twitter.com/articles/14016">protected</a> account.</p>
+</div><span id='structfield.screen_name' class='structfield'>
+                           <span id='screen_name.v' class='invisible'>
+                           <code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The screen name or handle identifying this user.</p>
 
 <p>Screen names are unique per-user but can be changed. Use <code>id</code> for an immutable identifier
 for an account.</p>
 
 <p>Typically a maximum of 15 characters long, but older accounts may exist with longer screen
 names.</p>
-</div><span id='structfield.show_all_inline_media' class='structfield'><code>show_all_inline_media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates that the user would like to see media inline. &quot;Somewhat disused.&quot;</p>
-</div><span id='structfield.status' class='structfield'><code>status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>If possible, the most recent tweet or retweet from this user.</p>
+</div><span id='structfield.show_all_inline_media' class='structfield'>
+                           <span id='show_all_inline_media.v' class='invisible'>
+                           <code>show_all_inline_media: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates that the user would like to see media inline. &quot;Somewhat disused.&quot;</p>
+</div><span id='structfield.status' class='structfield'>
+                           <span id='status.v' class='invisible'>
+                           <code>status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>If possible, the most recent tweet or retweet from this user.</p>
 
 <p>&quot;In some circumstances, this data cannot be provided and this field will be omitted, null,
 or empty.&quot; Do not depend on this field being filled. Also note that this is actually their
@@ -246,22 +312,36 @@ most-recent tweet, not the status pinned to their profile.</p>
 
 <p>&quot;Perspectival&quot; items within this tweet that depend on the authenticating user
 <a href="https://dev.twitter.com/docs/faq/basics/why-are-embedded-objects-stale-or-inaccurate">may not be completely reliable</a> in this embed.</p>
-</div><span id='structfield.statuses_count' class='structfield'><code>statuses_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The number of tweets (including retweets) posted by this user.</p>
-</div><span id='structfield.time_zone' class='structfield'><code>time_zone: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The full name of the time zone the user has set their UI preference to.</p>
-</div><span id='structfield.url' class='structfield'><code>url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The website link given by this user in their profile.</p>
-</div><span id='structfield.utc_offset' class='structfield'><code>utc_offset: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The UTC offset of <code>time_zone</code> in minutes.</p>
-</div><span id='structfield.verified' class='structfield'><code>verified: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>Indicates whether this user is a verified account.</p>
-</div><span id='structfield.withheld_in_countries' class='structfield'><code>withheld_in_countries: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>When present, lists the countries this user has been withheld from.</p>
-</div><span id='structfield.withheld_scope' class='structfield'><code>withheld_scope: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>When present, indicates whether the content being withheld is a &quot;status&quot; or &quot;user&quot;.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-555' class='srclink' href='../../src/egg_mode/user/structs.rs.html#101' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><span id='structfield.statuses_count' class='structfield'>
+                           <span id='statuses_count.v' class='invisible'>
+                           <code>statuses_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The number of tweets (including retweets) posted by this user.</p>
+</div><span id='structfield.time_zone' class='structfield'>
+                           <span id='time_zone.v' class='invisible'>
+                           <code>time_zone: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The full name of the time zone the user has set their UI preference to.</p>
+</div><span id='structfield.url' class='structfield'>
+                           <span id='url.v' class='invisible'>
+                           <code>url: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The website link given by this user in their profile.</p>
+</div><span id='structfield.utc_offset' class='structfield'>
+                           <span id='utc_offset.v' class='invisible'>
+                           <code>utc_offset: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The UTC offset of <code>time_zone</code> in minutes.</p>
+</div><span id='structfield.verified' class='structfield'>
+                           <span id='verified.v' class='invisible'>
+                           <code>verified: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether this user is a verified account.</p>
+</div><span id='structfield.withheld_in_countries' class='structfield'>
+                           <span id='withheld_in_countries.v' class='invisible'>
+                           <code>withheld_in_countries: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>When present, lists the countries this user has been withheld from.</p>
+</div><span id='structfield.withheld_scope' class='structfield'>
+                           <span id='withheld_scope.v' class='invisible'>
+                           <code>withheld_scope: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>When present, indicates whether the content being withheld is a &quot;status&quot; or &quot;user&quot;.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-598' class='srclink' href='../../src/egg_mode/user/structs.rs.html#101' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

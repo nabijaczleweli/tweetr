@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1028' class='srclink' href='../../src/tweetr/src/util.rs.html#153-165' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1002' class='srclink' href='../../src/tweetr/src/util.rs.html#153-165' title='goto source code'>[src]</a></span></h1>
 <pre class='rust fn'>pub fn prompt_exact_len&lt;R,&nbsp;W,&nbsp;F&gt;(input: &amp;mut R, output: &amp;mut W, prompt_s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, verifier: F, desired_len: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>IoResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt; <span class='where'>where R: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html' title='std::io::BufRead'>BufRead</a>, W: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>, F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></span></pre><div class='docblock'><p>Ask the user to input a string of the exact length of <code>desired_len</code>, (re)prompting as necessary.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
@@ -59,7 +59,7 @@
                             <span class='string'>&quot;Allowed chars&quot;</span>,
                             <span class='op'>|</span>_<span class='op'>|</span> <span class='bool-val'>true</span>,
                             <span class='number'>10</span>).<span class='ident'>unwrap</span>(),
-           <span class='string'>&quot;0123456789&quot;</span>.<span class='ident'>to_string</span>());</pre>
+           <span class='string'>&quot;0123456789&quot;</span>.<span class='ident'>to_string</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <p>Allow a 10-character-long <code>u64</code>:</p>
 
@@ -74,7 +74,7 @@
                          <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
                          <span class='string'>&quot;Long number&quot;</span>,
                          <span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>u64</span>::<span class='ident'>from_str</span>(<span class='ident'>s</span>).<span class='ident'>is_ok</span>(),
-                         <span class='number'>10</span>).<span class='ident'>is_err</span>());</pre>
+                         <span class='number'>10</span>).<span class='ident'>is_err</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 

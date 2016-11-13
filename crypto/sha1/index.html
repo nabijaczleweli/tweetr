@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-5347' class='srclink' href='../../src/crypto/sha1.rs.html#11-581' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-5283' class='srclink' href='../../src/crypto/sha1.rs.html#11-581' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>An implementation of the SHA-1 cryptographic hash algorithm.</p>
 
 <p>To use this module, first create a <code>Sha1</code> object using the <code>Sha1</code> constructor,
@@ -77,7 +77,7 @@ algorithms that implement the <code>Digest</code> trait. An example of use is:</
 <span class='comment'>// read hash digest</span>
 <span class='kw'>let</span> <span class='ident'>hex</span> <span class='op'>=</span> <span class='ident'>hasher</span>.<span class='ident'>result_str</span>();
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hex</span>, <span class='string'>&quot;2aae6c35c94fcfb415dbe95f408b9ce91ee846ed&quot;</span>);</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hex</span>, <span class='string'>&quot;2aae6c35c94fcfb415dbe95f408b9ce91ee846ed&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 
 <h1 id='mathematics' class='section-header'><a href='#mathematics'>Mathematics</a></h1>
 <p>The mathematics of the SHA-1 algorithm are quite interesting. In its
@@ -111,7 +111,7 @@ algorithms, but some, like &quot;parity&quot; is only found in SHA-1.</p>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Sha1.html'
                                   title='crypto::sha1::Sha1'>Sha1</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Structure representing the state of a Sha1 computation</p>
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
@@ -119,21 +119,21 @@ algorithms, but some, like &quot;parity&quot; is only found in SHA-1.</p>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_digest_block.html'
                                   title='crypto::sha1::sha1_digest_block'>sha1_digest_block</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Process a block with the SHA-1 algorithm. (See more...)</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_digest_block_u32.html'
                                   title='crypto::sha1::sha1_digest_block_u32'>sha1_digest_block_u32</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Process a block with the SHA-1 algorithm.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_digest_round_x4.html'
                                   title='crypto::sha1::sha1_digest_round_x4'>sha1_digest_round_x4</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Emulates <code>llvm.x86.sha1rnds4</code> intrinsic.
 Performs 4 rounds of the message block digest.</p>
                            </td>
@@ -141,28 +141,28 @@ Performs 4 rounds of the message block digest.</p>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_first.html'
                                   title='crypto::sha1::sha1_first'>sha1_first</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Not an intrinsic, but gets the first element of a vector.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_first_add.html'
                                   title='crypto::sha1::sha1_first_add'>sha1_first_add</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Not an intrinsic, but adds a word to the first element of a vector.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_first_half.html'
                                   title='crypto::sha1::sha1_first_half'>sha1_first_half</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Emulates <code>llvm.x86.sha1nexte</code> intrinsic.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='fn' href='fn.sha1_schedule_x4.html'
                                   title='crypto::sha1::sha1_schedule_x4'>sha1_schedule_x4</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Performs 4 rounds of the message schedule update.</p>
                            </td>
                        </tr></table></section>

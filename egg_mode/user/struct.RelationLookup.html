@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-864' class='srclink' href='../../src/egg_mode/user/structs.rs.html#644-656' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-855' class='srclink' href='../../src/egg_mode/user/structs.rs.html#644-656' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct RelationLookup {
     pub name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
     pub screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
@@ -57,19 +57,27 @@
 
 <p>This is returned by <code>relation_lookup</code>, as opposed to <code>Relationship</code>, which is returned by
 <code>relation</code>.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.name' class='structfield'><code>name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The display name of the target account.</p>
-</div><span id='structfield.screen_name' class='structfield'><code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The screen name of the target account.</p>
-</div><span id='structfield.id' class='structfield'><code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
-                           </span><span class='stab '></span><div class='docblock'><p>The numeric ID of the target account.</p>
-</div><span id='structfield.connections' class='structfield'><code>connections: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../egg_mode/user/enum.Connection.html' title='egg_mode::user::Connection'>Connection</a>&gt;</code>
-                           </span><span class='stab '></span><div class='docblock'><p>The ways the target account is connected to the authenticated user.</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.name' class='structfield'>
+                           <span id='name.v' class='invisible'>
+                           <code>name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The display name of the target account.</p>
+</div><span id='structfield.screen_name' class='structfield'>
+                           <span id='screen_name.v' class='invisible'>
+                           <code>screen_name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The screen name of the target account.</p>
+</div><span id='structfield.id' class='structfield'>
+                           <span id='id.v' class='invisible'>
+                           <code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The numeric ID of the target account.</p>
+</div><span id='structfield.connections' class='structfield'>
+                           <span id='connections.v' class='invisible'>
+                           <code>connections: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../egg_mode/user/enum.Connection.html' title='egg_mode::user::Connection'>Connection</a>&gt;</code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>The ways the target account is connected to the authenticated user.</p>
 
 <p>If the target account has no relation to the authenticated user, this will not be empty; its
 only element will be <code>None</code>.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.RelationLookup.html' title='egg_mode::user::RelationLookup'>RelationLookup</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-855' class='srclink' href='../../src/egg_mode/user/structs.rs.html#643' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/user/struct.RelationLookup.html' title='egg_mode::user::RelationLookup'>RelationLookup</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-860' class='srclink' href='../../src/egg_mode/user/structs.rs.html#643' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
