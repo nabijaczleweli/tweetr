@@ -2,7 +2,7 @@
 //! shared when YOU want. You create content when you have time and then use FOSS and NOT pay whatever-ridiculous amount of $$$
 //! for posting them automatically.
 //!
-//! IOW it's self-hosted automatic tweet posting software..
+//! IOW it's self-hosted automatic tweet posting software.
 //!
 //! # Library doc
 //!
