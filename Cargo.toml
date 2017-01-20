@@ -8,8 +8,8 @@ keywords = ["twitter", "tweets", "queue", "schedule", "content"]
 categories = ["command-line-utilities", "database"]
 license = "MIT"
 # Remember to also update in appveyor.yml
-version = "0.2.0"
-# Remember to also update in mod/*.md
+version = "0.2.1"
+# Remember to also update in man/*.md
 authors = ["nabijaczleweli <nabijaczleweli@gmail.com>"]
 exclude = ["*.enc"]
 
