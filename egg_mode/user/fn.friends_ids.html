@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1006' class='srclink' href='../../src/egg_mode/user/mod.rs.html#272-278' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn friends_ids&lt;'a,&nbsp;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../egg_mode/user/enum.UserID.html' title='egg_mode::user::UserID'>UserID</a>&lt;'a&gt;&gt;&gt;(acct: T, con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a,&nbsp;<a class='struct' href='../../egg_mode/cursor/struct.IDCursor.html' title='egg_mode::cursor::IDCursor'>IDCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users a given account follows, also called their &quot;friends&quot; within the API, but only
+               </span><a id='src-430' class='srclink' href='../../src/egg_mode/user/mod.rs.html#272-278' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn friends_ids&lt;'a, T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../egg_mode/user/enum.UserID.html' title='egg_mode::user::UserID'>UserID</a>&lt;'a&gt;&gt;&gt;(acct: T,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a, <a class='struct' href='../../egg_mode/cursor/struct.IDCursor.html' title='egg_mode::cursor::IDCursor'>IDCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users a given account follows, also called their &quot;friends&quot; within the API, but only
 return their user IDs.</p>
 
 <p>This function returns an iterator over the User IDs returned by Twitter. This method defaults to
@@ -113,11 +113,9 @@ several results and don&#39;t need all the user information.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

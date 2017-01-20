@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1039' class='srclink' href='../../src/egg_mode/user/mod.rs.html#353-355' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn mutes_ids&lt;'a&gt;(con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a,&nbsp;<a class='struct' href='../../egg_mode/cursor/struct.IDCursor.html' title='egg_mode::cursor::IDCursor'>IDCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users that have been muted by the authenticated user, but only return their user IDs.</p>
+               </span><a id='src-463' class='srclink' href='../../src/egg_mode/user/mod.rs.html#353-355' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn mutes_ids&lt;'a&gt;(con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a, <a class='struct' href='../../egg_mode/cursor/struct.IDCursor.html' title='egg_mode::cursor::IDCursor'>IDCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users that have been muted by the authenticated user, but only return their user IDs.</p>
 
 <p>Choosing only to load the user IDs instead of the full user information results in a call that
 can return more accounts per-page, which can be useful if you anticipate having to page through
@@ -114,11 +114,9 @@ error from Twitter.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1738' class='srclink' href='../../src/egg_mode/tweet/mod.rs.html#120-130' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn lookup(ids: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</pre><div class='docblock'><p>Lookup tweet information for the given list of tweet IDs.</p>
+               </span><a id='src-799' class='srclink' href='../../src/egg_mode/tweet/mod.rs.html#120-130' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn lookup(ids: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</pre><div class='docblock'><p>Lookup tweet information for the given list of tweet IDs.</p>
 
 <p>This function differs from <code>lookup_map</code> in how it handles protected or nonexistent tweets.
 <code>lookup</code> simply returns a Vec of all the tweets it could find, leaving out any that it couldn&#39;t
@@ -109,11 +109,9 @@ find.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

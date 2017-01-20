@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1853' class='srclink' href='../../src/egg_mode/search.rs.html#1-248' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-881' class='srclink' href='../../src/egg_mode/search.rs.html#1-248' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Structs and methods for searching for tweets.</p>
 
 <p>Since there are several optional parameters for searches, egg-mode handles it with a builder
@@ -65,7 +65,7 @@ page of results, hand your tokens to <code>call</code>.</p>
 
 <span class='kw'>for</span> <span class='ident'>tweet</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>search</span>.<span class='ident'>response</span>.<span class='ident'>statuses</span> {
     <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;(@{}) {}&quot;</span>, <span class='ident'>tweet</span>.<span class='ident'>user</span>.<span class='ident'>screen_name</span>, <span class='ident'>tweet</span>.<span class='ident'>text</span>);
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <p>Once you have your <code>SearchResult</code>, you can navigate the search results by calling <code>older</code> and
 <code>newer</code> to get the next and previous pages, respsectively. In addition, you can see your
@@ -167,11 +167,9 @@ search arguments in a separate private field.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

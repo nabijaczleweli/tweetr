@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/httparse-1.2.0/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/httparse-1.2.1/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -933,6 +933,54 @@
 <span id="889">889</span>
 <span id="890">890</span>
 <span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;std&quot;</span>),  <span class='ident'>no_std</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>deny</span>(<span class='ident'>warnings</span>))]</span>
@@ -1258,8 +1306,29 @@
         <span class='self'>self</span>.<span class='ident'>version</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='macro'>complete</span><span class='macro'>!</span>(<span class='ident'>parse_version</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>bytes</span>)));
         <span class='macro'>space</span><span class='macro'>!</span>(<span class='ident'>bytes</span> <span class='ident'>or</span> <span class='ident'>Error</span>::<span class='ident'>Version</span>);
         <span class='self'>self</span>.<span class='ident'>code</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='macro'>complete</span><span class='macro'>!</span>(<span class='ident'>parse_code</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>bytes</span>)));
-        <span class='macro'>space</span><span class='macro'>!</span>(<span class='ident'>bytes</span> <span class='ident'>or</span> <span class='ident'>Error</span>::<span class='ident'>Status</span>);
-        <span class='self'>self</span>.<span class='ident'>reason</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='macro'>complete</span><span class='macro'>!</span>(<span class='ident'>parse_reason</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>bytes</span>)));
+
+        <span class='comment'>// RFC7230 says there must be &#39;SP&#39; and then reason-phrase, but admits</span>
+        <span class='comment'>// its only for legacy reasons. With the reason-phrase completely</span>
+        <span class='comment'>// optional (and preferred to be omitted) in HTTP2, we&#39;ll just</span>
+        <span class='comment'>// handle any response that doesn&#39;t include a reason-phrase, because</span>
+        <span class='comment'>// it&#39;s more lenient, and we don&#39;t care anyways.</span>
+        <span class='comment'>//</span>
+        <span class='comment'>// So, a SP means parse a reason-phrase.</span>
+        <span class='comment'>// A newline means go to headers.</span>
+        <span class='comment'>// Anything else we&#39;ll say is a malformed status.</span>
+        <span class='kw'>match</span> <span class='macro'>next</span><span class='macro'>!</span>(<span class='ident'>bytes</span>) {
+            <span class='string'>b&#39; &#39;</span> <span class='op'>=&gt;</span> {
+                <span class='ident'>bytes</span>.<span class='ident'>slice</span>();
+                <span class='self'>self</span>.<span class='ident'>reason</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='macro'>complete</span><span class='macro'>!</span>(<span class='ident'>parse_reason</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>bytes</span>)));
+            },
+            <span class='string'>b&#39;\r&#39;</span> <span class='op'>=&gt;</span> {
+                <span class='macro'>expect</span><span class='macro'>!</span>(<span class='ident'>bytes</span>.<span class='ident'>next</span>() <span class='op'>==</span> <span class='string'>b&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Status</span>));
+                <span class='self'>self</span>.<span class='ident'>reason</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>);
+            },
+            <span class='string'>b&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>reason</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>),
+            _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Status</span>),
+        }
+
 
         <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>orig_len</span> <span class='op'>-</span> <span class='ident'>bytes</span>.<span class='ident'>len</span>();
         <span class='kw'>let</span> <span class='ident'>headers_len</span> <span class='op'>=</span> <span class='macro'>complete</span><span class='macro'>!</span>(<span class='ident'>parse_headers_iter</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>headers</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>bytes</span>));
@@ -1538,18 +1607,31 @@
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>size</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_chunk_size</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>in_ext</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>count</span> <span class='op'>=</span> <span class='number'>0</span>;
     <span class='kw'>loop</span> {
         <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='macro'>next</span><span class='macro'>!</span>(<span class='ident'>bytes</span>);
         <span class='kw'>match</span> <span class='ident'>b</span> {
             <span class='string'>b&#39;0&#39;</span>...<span class='string'>b&#39;9&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='ident'>count</span> <span class='op'>&gt;</span> <span class='number'>15</span> {
+                    <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidChunkSize</span>);
+                }
+                <span class='ident'>count</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>RADIX</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>-</span> <span class='string'>b&#39;0&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             },
             <span class='string'>b&#39;a&#39;</span>...<span class='string'>b&#39;f&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='ident'>count</span> <span class='op'>&gt;</span> <span class='number'>15</span> {
+                    <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidChunkSize</span>);
+                }
+                <span class='ident'>count</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>RADIX</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>+</span> <span class='number'>10</span> <span class='op'>-</span> <span class='string'>b&#39;a&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             }
             <span class='string'>b&#39;A&#39;</span>...<span class='string'>b&#39;F&#39;</span> <span class='kw'>if</span> <span class='ident'>in_chunk_size</span> <span class='op'>=&gt;</span> {
+                <span class='kw'>if</span> <span class='ident'>count</span> <span class='op'>&gt;</span> <span class='number'>15</span> {
+                    <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidChunkSize</span>);
+                }
+                <span class='ident'>count</span> <span class='op'>+=</span> <span class='number'>1</span>;
                 <span class='ident'>size</span> <span class='op'>*=</span> <span class='ident'>RADIX</span>;
                 <span class='ident'>size</span> <span class='op'>+=</span> (<span class='ident'>b</span> <span class='op'>+</span> <span class='number'>10</span> <span class='op'>-</span> <span class='string'>b&#39;A&#39;</span>) <span class='kw'>as</span> <span class='ident'>u64</span>;
             }
@@ -1758,6 +1840,16 @@
     }
 
     <span class='macro'>res</span><span class='macro'>!</span> {
+        <span class='ident'>test_response_reason_missing_no_space</span>,
+        <span class='string'>b&quot;HTTP/1.1 200\r\n\r\n&quot;</span>,
+        <span class='op'>|</span><span class='ident'>res</span><span class='op'>|</span> {
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>.<span class='ident'>version</span>.<span class='ident'>unwrap</span>(), <span class='number'>1</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>.<span class='ident'>code</span>.<span class='ident'>unwrap</span>(), <span class='number'>200</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>.<span class='ident'>reason</span>.<span class='ident'>unwrap</span>(), <span class='string'>&quot;&quot;</span>);
+        }
+    }
+
+    <span class='macro'>res</span><span class='macro'>!</span> {
         <span class='ident'>test_response_reason_with_space_and_tab</span>,
         <span class='string'>b&quot;HTTP/1.1 101 Switching Protocols\t\r\n\r\n&quot;</span>,
         <span class='op'>|</span><span class='ident'>res</span><span class='op'>|</span> {
@@ -1814,6 +1906,10 @@
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;567f8a\rfoo&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;567f8a\rfoo&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;567xf8a\r\n&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;ffffffffffffffff\r\n&quot;</span>), <span class='prelude-val'>Ok</span>(<span class='ident'>Status</span>::<span class='ident'>Complete</span>((<span class='number'>18</span>, ::<span class='ident'>core</span>::<span class='ident'>u64</span>::<span class='ident'>MAX</span>))));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;1ffffffffffffffff\r\n&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;Affffffffffffffff\r\n&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>parse_chunk_size</span>(<span class='string'>b&quot;fffffffffffffffff\r\n&quot;</span>), <span class='prelude-val'>Err</span>(::<span class='ident'>InvalidChunkSize</span>));
     }
 
     <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;std&quot;</span>)]</span>
@@ -1882,11 +1978,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "httparse";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

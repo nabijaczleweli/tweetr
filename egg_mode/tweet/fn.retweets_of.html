@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1719' class='srclink' href='../../src/egg_mode/tweet/mod.rs.html#82-99' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn retweets_of(id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>, count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</pre><div class='docblock'><p>Lookup the most recent 100 (or fewer) retweets of the given tweet.</p>
+               </span><a id='src-785' class='srclink' href='../../src/egg_mode/tweet/mod.rs.html#82-99' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn retweets_of(id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</pre><div class='docblock'><p>Lookup the most recent 100 (or fewer) retweets of the given tweet.</p>
 
 <p>Use the <code>count</code> parameter to indicate how many retweets you would like to retrieve. If <code>count</code>
 is 0 or greater than 100, it will be defaulted to 100 before making the call.</p>
@@ -108,11 +108,9 @@ is 0 or greater than 100, it will be defaulted to 100 before making the call.</p
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

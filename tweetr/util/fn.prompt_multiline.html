@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1036' class='srclink' href='../../src/tweetr/src/util.rs.html#323-353' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn prompt_multiline&lt;R,&nbsp;W,&nbsp;F&gt;(input: &amp;mut R, output: &amp;mut W, prompt_s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, verifier: F) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>IoResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt; <span class='where'>where R: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html' title='std::io::BufRead'>BufRead</a>, W: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>, F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></span></pre><div class='docblock'><p>Ask the user to input a multiline string, (re)prompting as necessary.</p>
+               </span><a id='src-345' class='srclink' href='../../src/tweetr/src/util.rs.html#323-353' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn prompt_multiline&lt;R, W, F&gt;(input: &amp;mut R,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output: &amp;mut W,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; prompt_s: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; verifier: F)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/std/io/error/type.Result.html' title='std::io::error::Result'>IoResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt; <span class='where'>where R: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.BufRead.html' title='std::io::BufRead'>BufRead</a>, W: <a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Write.html' title='std::io::Write'>Write</a>, F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></span></pre><div class='docblock'><p>Ask the user to input a multiline string, (re)prompting as necessary.</p>
 
 <p>Each line is separated by a <code>\</code>, but can be escaped by <code>\\</code>, e.g.</p>
 
@@ -72,7 +72,7 @@
                             <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
                             <span class='string'>&quot;Lines&quot;</span>,
                             <span class='op'>|</span>_<span class='op'>|</span> <span class='bool-val'>true</span>).<span class='ident'>unwrap</span>(),
-           <span class='string'>&quot;Line 1\nLine 2\nLine 3&quot;</span>.<span class='ident'>to_string</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+           <span class='string'>&quot;Line 1\nLine 2\nLine 3&quot;</span>.<span class='ident'>to_string</span>());</pre>
 
 <p>Escaping newline:</p>
 
@@ -81,7 +81,7 @@
                             <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
                             <span class='string'>&quot;Escaped line&quot;</span>,
                             <span class='op'>|</span>_<span class='op'>|</span> <span class='bool-val'>true</span>).<span class='ident'>unwrap</span>(),
-           <span class='string'>&quot;Line 0\\&quot;</span>.<span class='ident'>to_string</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+           <span class='string'>&quot;Line 0\\&quot;</span>.<span class='ident'>to_string</span>());</pre>
 
 <p>Accepting only two-line strings:</p>
 
@@ -90,7 +90,7 @@
                             <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
                             <span class='string'>&quot;2 lines&quot;</span>,
                             <span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>lines</span>().<span class='ident'>count</span>() <span class='op'>==</span> <span class='number'>2</span>).<span class='ident'>unwrap</span>(),
-           <span class='string'>&quot;Line 1\nLine 2&quot;</span>.<span class='ident'>to_string</span>());<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+           <span class='string'>&quot;Line 1\nLine 2&quot;</span>.<span class='ident'>to_string</span>());</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -147,11 +147,9 @@
     <script>
         window.rootPath = "../../";
         window.currentCrate = "tweetr";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

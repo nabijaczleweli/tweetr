@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1013' class='srclink' href='../../src/egg_mode/user/mod.rs.html#284-290' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn followers_of&lt;'a,&nbsp;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../egg_mode/user/enum.UserID.html' title='egg_mode::user::UserID'>UserID</a>&lt;'a&gt;&gt;&gt;(acct: T, con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a,&nbsp;<a class='struct' href='../../egg_mode/cursor/struct.UserCursor.html' title='egg_mode::cursor::UserCursor'>UserCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users that follow a given account.</p>
+               </span><a id='src-437' class='srclink' href='../../src/egg_mode/user/mod.rs.html#284-290' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn followers_of&lt;'a, T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../egg_mode/user/enum.UserID.html' title='egg_mode::user::UserID'>UserID</a>&lt;'a&gt;&gt;&gt;(acct: T,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='struct' href='../../egg_mode/cursor/struct.CursorIter.html' title='egg_mode::cursor::CursorIter'>CursorIter</a>&lt;'a, <a class='struct' href='../../egg_mode/cursor/struct.UserCursor.html' title='egg_mode::cursor::UserCursor'>UserCursor</a>&gt;</pre><div class='docblock'><p>Lookup the users that follow a given account.</p>
 
 <p>This function returns an iterator over the <code>TwitterUser</code> objects returned by Twitter. This
 method defaults to returning 20 users in a single network call; the maximum is 200.</p>
@@ -108,11 +108,9 @@ method defaults to returning 20 users in a single network call; the maximum is 2
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

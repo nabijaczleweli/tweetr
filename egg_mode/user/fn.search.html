@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-994' class='srclink' href='../../src/egg_mode/user/mod.rs.html#245-249' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn search&lt;'a&gt;(query: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='struct' href='../../egg_mode/user/struct.UserSearch.html' title='egg_mode::user::UserSearch'>UserSearch</a>&lt;'a&gt;</pre><div class='docblock'><p>Lookup users based on the given search term.</p>
+               </span><a id='src-418' class='srclink' href='../../src/egg_mode/user/mod.rs.html#245-249' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn search&lt;'a&gt;(query: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;'a <a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='struct' href='../../egg_mode/user/struct.UserSearch.html' title='egg_mode::user::UserSearch'>UserSearch</a>&lt;'a&gt;</pre><div class='docblock'><p>Lookup users based on the given search term.</p>
 
 <p>This function returns an iterator over the <code>TwitterUser</code> objects returned by Twitter. Due to a
 limitation in the API, you can only obtain the first 1000 search results. This method defaults
@@ -110,11 +110,9 @@ for details.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>

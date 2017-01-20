@@ -90,7 +90,7 @@ macros to log whatever information will be useful to downstream consumers.</p>
             }
         }
     }
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h2 id='in-executables' class='section-header'><a href='#in-executables'>In executables</a></h2>
 <p>Executables should choose a logging framework and initialize it early in the
@@ -115,7 +115,7 @@ initialized will be ignored.</p>
     <span class='macro'>info</span><span class='macro'>!</span>(<span class='string'>&quot;starting up&quot;</span>);
 
     <span class='comment'>// ...</span>
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h1 id='logger-implementations' class='section-header'><a href='#logger-implementations'>Logger implementations</a></h1>
 <p>Loggers implement the <code>Log</code> trait. Here&#39;s a very basic example that simply
@@ -139,7 +139,7 @@ logs all messages at the <code>Error</code>, <code>Warn</code> or <code>Info</co
         }
     }
 }
-<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+</pre>
 
 <p>Loggers are installed by calling the <code>set_logger</code> function. It takes a
 closure which is provided a <code>MaxLogLevel</code> token and returns a <code>Log</code> trait
@@ -157,7 +157,7 @@ logger:</p>
         <span class='ident'>max_log_level</span>.<span class='ident'>set</span>(<span class='ident'>LogLevelFilter</span>::<span class='ident'>Info</span>);
         <span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>SimpleLogger</span>)
     })
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 
 <h1 id='use-with-no_std' class='section-header'><a href='#use-with-no_std'>Use with <code>no_std</code></a></h1>
 <p>To use the <code>log</code> crate without depending on <code>libstd</code>, you need to specify
@@ -182,7 +182,7 @@ shut down the global logger before exiting:</p>
         <span class='kw'>let</span> <span class='ident'>logger</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='kw-2'>&amp;</span><span class='op'>*</span>(<span class='ident'>logger</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>SimpleLogger</span>) };
         <span class='ident'>logger</span>.<span class='ident'>flush</span>();
     })
-}<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+}</pre>
 </div><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -395,11 +395,9 @@ framework.</p>
     <script>
         window.rootPath = "../";
         window.currentCrate = "log";
-        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
-    
     <script defer src="../search-index.js"></script>
 </body>
 </html>

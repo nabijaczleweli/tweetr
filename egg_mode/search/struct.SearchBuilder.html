@@ -47,10 +47,10 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1893' class='srclink' href='../../src/egg_mode/search.rs.html#86-94' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-903' class='srclink' href='../../src/egg_mode/search.rs.html#86-94' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>#[must_use = "SearchBuilder is lazy and won't do anything unless `call`ed"]
 pub struct SearchBuilder&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Represents a tweet search query before being sent.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../../egg_mode/search/struct.SearchBuilder.html' title='egg_mode::search::SearchBuilder'>SearchBuilder</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1901' class='srclink' href='../../src/egg_mode/search.rs.html#96-177' title='goto source code'>[src]</a></span></h3>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../../egg_mode/search/struct.SearchBuilder.html' title='egg_mode::search::SearchBuilder'>SearchBuilder</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-911' class='srclink' href='../../src/egg_mode/search.rs.html#96-177' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.lang' class='method'><span id='lang.v' class='invisible'><code>fn <a href='#method.lang' class='fnname'>lang</a>(self, lang: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; Self</code></span></h4>
 <div class='docblock'><p>Restrict search results to those that have been machine-parsed as the given two-letter
 language code.</p>
@@ -66,7 +66,7 @@ results.</p>
 <div class='docblock'><p>Restricts results to users located within the given radius of the given coordinate. This is
 preferably populated from location-tagged tweets, but can be filled in from the user&#39;s
 profile as a fallback.</p>
-</div><h4 id='method.call' class='method'><span id='call.v' class='invisible'><code>fn <a href='#method.call' class='fnname'>call</a>(self, con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>, access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>) -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='../../egg_mode/search/struct.SearchResult.html' title='egg_mode::search::SearchResult'>SearchResult</a>&lt;'a&gt;&gt;</code></span></h4>
+</div><h4 id='method.call' class='method'><span id='call.v' class='invisible'><code>fn <a href='#method.call' class='fnname'>call</a>(self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='../../egg_mode/search/struct.SearchResult.html' title='egg_mode::search::SearchResult'>SearchResult</a>&lt;'a&gt;&gt;</code></span></h4>
 <div class='docblock'><p>Finalize the search terms and return the first page of responses.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -124,11 +124,9 @@ profile as a fallback.</p>
     <script>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
-        window.playgroundUrl = "";
     </script>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
-    
     <script defer src="../../search-index.js"></script>
 </body>
 </html>
