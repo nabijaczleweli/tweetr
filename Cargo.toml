@@ -5,6 +5,7 @@ documentation = "https://cdn.rawgit.com/nabijaczleweli/tweetr/doc/tweetr/index.h
 repository = "https://github.com/nabijaczleweli/tweetr"
 readme = "README.md"
 keywords = ["twitter", "tweets", "queue", "schedule", "content"]
+categories = ["command-line-utilities", "database"]
 license = "MIT"
 # Remember to also update in appveyor.yml
 version = "0.2.0"
