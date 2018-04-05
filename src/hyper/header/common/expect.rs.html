@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/expect.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/expect.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>expect.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -104,67 +116,67 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>;
 
-<span class='kw'>use</span> <span class='ident'>unicase</span>::<span class='ident'>UniCase</span>;
+<span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">UniCase</span>;
 
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HeaderFormat</span>};
 
-<span class='doccomment'>/// The `Expect` header.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// &gt; The &quot;Expect&quot; header field in a request indicates a certain set of</span>
-<span class='doccomment'>/// &gt; behaviors (expectations) that need to be supported by the server in</span>
-<span class='doccomment'>/// &gt; order to properly handle this request.  The only such expectation</span>
-<span class='doccomment'>/// &gt; defined by this specification is 100-continue.</span>
-<span class='doccomment'>/// &gt;</span>
-<span class='doccomment'>/// &gt;    Expect  = &quot;100-continue&quot;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Expect};</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(Expect::Continue);</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Expect</span> {
-    <span class='doccomment'>/// The value `100-continue`.</span>
-    <span class='ident'>Continue</span>
+<span class="doccomment">/// The `Expect` header.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; The &quot;Expect&quot; header field in a request indicates a certain set of</span>
+<span class="doccomment">/// &gt; behaviors (expectations) that need to be supported by the server in</span>
+<span class="doccomment">/// &gt; order to properly handle this request.  The only such expectation</span>
+<span class="doccomment">/// &gt; defined by this specification is 100-continue.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt;    Expect  = &quot;100-continue&quot;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Expect};</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(Expect::Continue);</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Expect</span> {
+    <span class="doccomment">/// The value `100-continue`.</span>
+    <span class="ident">Continue</span>
 }
 
-<span class='kw'>const</span> <span class='ident'>EXPECT_CONTINUE</span>: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;100-continue&quot;</span>);
+<span class="kw">const</span> <span class="ident">EXPECT_CONTINUE</span>: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;100-continue&quot;</span>);
 
-<span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>Expect</span> {
-    <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='string'>&quot;Expect&quot;</span>
+<span class="kw">impl</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">Expect</span> {
+    <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;Expect&quot;</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Expect</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>raw</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>1</span> {
-            <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
-                <span class='comment'>// safe because:</span>
-                <span class='comment'>// 1. we just checked raw.len == 1</span>
-                <span class='comment'>// 2. we don&#39;t actually care if it&#39;s utf8, we just want to</span>
-                <span class='comment'>//    compare the bytes with the &quot;case&quot; normalized. If it&#39;s not</span>
-                <span class='comment'>//    utf8, then the byte comparison will fail, and we&#39;ll return</span>
-                <span class='comment'>//    None. No big deal.</span>
-                <span class='ident'>str</span>::<span class='ident'>from_utf8_unchecked</span>(<span class='ident'>raw</span>.<span class='ident'>get_unchecked</span>(<span class='number'>0</span>))
+    <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Expect</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">raw</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+            <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+                <span class="comment">// safe because:</span>
+                <span class="comment">// 1. we just checked raw.len == 1</span>
+                <span class="comment">// 2. we don&#39;t actually care if it&#39;s utf8, we just want to</span>
+                <span class="comment">//    compare the bytes with the &quot;case&quot; normalized. If it&#39;s not</span>
+                <span class="comment">//    utf8, then the byte comparison will fail, and we&#39;ll return</span>
+                <span class="comment">//    None. No big deal.</span>
+                <span class="ident">str</span>::<span class="ident">from_utf8_unchecked</span>(<span class="ident">raw</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>))
             };
-            <span class='kw'>if</span> <span class='ident'>UniCase</span>(<span class='ident'>text</span>) <span class='op'>==</span> <span class='ident'>EXPECT_CONTINUE</span> {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>Expect</span>::<span class='ident'>Continue</span>)
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+            <span class="kw">if</span> <span class="ident">UniCase</span>(<span class="ident">text</span>) <span class="op">==</span> <span class="ident">EXPECT_CONTINUE</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">Expect</span>::<span class="ident">Continue</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
             }
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Expect</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;100-continue&quot;</span>)
+<span class="kw">impl</span> <span class="ident">HeaderFormat</span> <span class="kw">for</span> <span class="ident">Expect</span> {
+    <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;100-continue&quot;</span>)
     }
 }
 </pre>
@@ -181,18 +193,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -225,7 +241,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

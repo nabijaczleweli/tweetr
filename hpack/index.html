@@ -9,14 +9,18 @@
 
     <title>hpack - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../dark.css">
+    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
+    <script src="../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'></p><script>window.sidebarCurrent = {name: 'hpack', ty: 'mod', relpath: '../'};</script>
+        <p class='location'>Crate hpack</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li></ul></div><p class='location'></p><script>window.sidebarCurrent = {name: 'hpack', ty: 'mod', relpath: '../'};</script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,43 +54,44 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>hpack</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Crate <a class="mod" href=''>hpack</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/hpack/lib.rs.html#1-761' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../src/hpack/lib.rs.html#1-761' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>A module implementing HPACK functionality. Exposes a simple API for
 performing the encoding and decoding of header sets, according to the
 HPACK spec.</p>
-</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
-<table><tr><td><code>pub use self::<a class='mod'
-                                       href='./decoder/index.html'>decoder</a>::<a class='struct' href='../hpack/decoder/struct.Decoder.html' title='hpack::decoder::Decoder'>Decoder</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
-                                       href='./encoder/index.html'>encoder</a>::<a class='struct' href='../hpack/encoder/struct.Encoder.html' title='hpack::encoder::Encoder'>Encoder</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
+<table><tr><td><code>pub use self::decoder::<a class="struct" href="../hpack/decoder/struct.Decoder.html" title="struct hpack::decoder::Decoder">Decoder</a>;</code></td></tr><tr><td><code>pub use self::encoder::<a class="struct" href="../hpack/encoder/struct.Encoder.html" title="struct hpack::encoder::Encoder">Encoder</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='decoder/index.html'
-                                  title='hpack::decoder'>decoder</a></td>
+                           <td><a class="mod" href="decoder/index.html"
+                                  title='mod hpack::decoder'>decoder</a></td>
                            <td class='docblock-short'>
                                 <p>Exposes the struct <code>Decoder</code> that allows for HPACK-encoded header blocks to
 be decoded into a header list.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='encoder/index.html'
-                                  title='hpack::encoder'>encoder</a></td>
+                           <td><a class="mod" href="encoder/index.html"
+                                  title='mod hpack::encoder'>encoder</a></td>
                            <td class='docblock-short'>
                                 <p>Implements all functionality related to encoding header blocks using
 HPACK.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='mod' href='huffman/index.html'
-                                  title='hpack::huffman'>huffman</a></td>
+                           <td><a class="mod" href="huffman/index.html"
+                                  title='mod hpack::huffman'>huffman</a></td>
                            <td class='docblock-short'>
                                 <p>A module exposing utilities for encoding and decoding Huffman-coded octet
 strings, under the Huffman code defined by HPACK.
 (HPACK-draft-10, Appendix B)</p>
+
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -93,18 +106,22 @@ strings, under the Huffman code defined by HPACK.
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -137,7 +154,6 @@ strings, under the Huffman code defined by HPACK.
         window.rootPath = "../";
         window.currentCrate = "hpack";
     </script>
-    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>
 </body>

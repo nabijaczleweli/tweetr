@@ -9,14 +9,18 @@
 
     <title>crypto::curve25519::GePrecomp - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>curve25519</a></p><script>window.sidebarCurrent = {name: 'GePrecomp', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct GePrecomp</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.maybe_set">maybe_set</a><a href="#method.select">select</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Clone">Clone</a><a href="#impl-Copy">Copy</a><a href="#impl-Add%3CGePrecomp%3E">Add&lt;GePrecomp&gt;</a><a href="#impl-Sub%3CGePrecomp%3E">Sub&lt;GePrecomp&gt;</a></div></div><p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>curve25519</a></p><script>window.sidebarCurrent = {name: 'GePrecomp', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,22 +54,40 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>curve25519</a>::<wbr><a class='struct' href=''>GePrecomp</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>curve25519</a>::<wbr><a class="struct" href=''>GePrecomp</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-6077' class='srclink' href='../../src/crypto/curve25519.rs.html#1089-1093' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct GePrecomp { /* fields omitted */ }</pre><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2973' class='srclink' href='../../src/crypto/curve25519.rs.html#1408-1443' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.maybe_set' class='method'><span id='maybe_set.v' class='invisible'><code>fn <a href='#method.maybe_set' class='fnname'>maybe_set</a>(&amp;mut self, other: &amp;<a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a>, do_swap: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>)</code></span></h4>
-<h4 id='method.select' class='method'><span id='select.v' class='invisible'><code>fn <a href='#method.select' class='fnname'>select</a>(pos: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, b: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>) -&gt; <a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a></code></span></h4>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6081' class='srclink' href='../../src/crypto/curve25519.rs.html#1088' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a></code></span></h4>
+               </span><a class='srclink' href='../../src/crypto/curve25519.rs.html#1089-1093' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct GePrecomp { /* fields omitted */ }</pre>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1408-1443' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.maybe_set' class="method"><span id='maybe_set.v' class='invisible'><code>pub fn <a href='#method.maybe_set' class='fnname'>maybe_set</a>(&amp;mut self, other: &amp;<a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a>, do_swap: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1417-1421' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.select' class="method"><span id='select.v' class='invisible'><code>pub fn <a href='#method.select' class='fnname'>select</a>(pos: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, b: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i8.html">i8</a>) -&gt; <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1423-1442' title='goto source code'>[src]</a></span></h4>
+</div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Clone' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a></code><a href='#impl-Clone' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1088' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1088' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
-</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#112-114' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../../crypto/curve25519/struct.GePrecomp.html' title='crypto::curve25519::GePrecomp'>GePrecomp</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-6084' class='srclink' href='../../src/crypto/curve25519.rs.html#1088' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div></section>
+</div></div><h3 id='impl-Copy' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a></code><a href='#impl-Copy' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1088' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 id='impl-Add%3CGePrecomp%3E' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html" title="trait core::ops::arith::Add">Add</a>&lt;<a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a>&gt; for <a class="struct" href="../../crypto/curve25519/struct.GeP3.html" title="struct crypto::curve25519::GeP3">GeP3</a></code><a href='#impl-Add%3CGePrecomp%3E' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1340-1357' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Output' class="type"><span id='Output.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html#associatedtype.Output' class="type">Output</a> = <a class="struct" href="../../crypto/curve25519/struct.GeP1P1.html" title="struct crypto::curve25519::GeP1P1">GeP1P1</a></code></span></h4>
+<div class='docblock'><p>The resulting type after applying the <code>+</code> operator.</p>
+</div><h4 id='method.add' class="method"><span id='add.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/arith/trait.Add.html#tymethod.add' class='fnname'>add</a>(self, _rhs: <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a>) -&gt; <a class="struct" href="../../crypto/curve25519/struct.GeP1P1.html" title="struct crypto::curve25519::GeP1P1">GeP1P1</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1343-1356' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Performs the <code>+</code> operation.</p>
+</div></div><h3 id='impl-Sub%3CGePrecomp%3E' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/arith/trait.Sub.html" title="trait core::ops::arith::Sub">Sub</a>&lt;<a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a>&gt; for <a class="struct" href="../../crypto/curve25519/struct.GeP3.html" title="struct crypto::curve25519::GeP3">GeP3</a></code><a href='#impl-Sub%3CGePrecomp%3E' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1379-1396' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Output-1' class="type"><span id='Output.t-1' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/ops/arith/trait.Sub.html#associatedtype.Output' class="type">Output</a> = <a class="struct" href="../../crypto/curve25519/struct.GeP1P1.html" title="struct crypto::curve25519::GeP1P1">GeP1P1</a></code></span></h4>
+<div class='docblock'><p>The resulting type after applying the <code>-</code> operator.</p>
+</div><h4 id='method.sub' class="method"><span id='sub.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/arith/trait.Sub.html#tymethod.sub' class='fnname'>sub</a>(self, _rhs: <a class="struct" href="../../crypto/curve25519/struct.GePrecomp.html" title="struct crypto::curve25519::GePrecomp">GePrecomp</a>) -&gt; <a class="struct" href="../../crypto/curve25519/struct.GeP1P1.html" title="struct crypto::curve25519::GeP1P1">GeP1P1</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/curve25519.rs.html#1382-1395' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Performs the <code>-</code> operation.</p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -70,18 +100,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -114,7 +148,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

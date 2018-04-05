@@ -9,14 +9,18 @@
 
     <title>structs.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -599,562 +611,562 @@
 <span id="555">555</span>
 <span id="556">556</span>
 <span id="557">557</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
-<span class='kw'>use</span> <span class='ident'>rustc_serialize</span>::<span class='ident'>json</span>;
+<span class="kw">use</span> <span class="ident">rustc_serialize</span>::<span class="ident">json</span>;
 
-<span class='kw'>use</span> <span class='ident'>auth</span>;
-<span class='kw'>use</span> <span class='ident'>links</span>;
-<span class='kw'>use</span> <span class='ident'>user</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>;
-<span class='kw'>use</span> <span class='ident'>entities</span>;
-<span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
+<span class="kw">use</span> <span class="ident">auth</span>;
+<span class="kw">use</span> <span class="ident">links</span>;
+<span class="kw">use</span> <span class="ident">user</span>;
+<span class="kw">use</span> <span class="ident">error</span>;
+<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">InvalidResponse</span>;
+<span class="kw">use</span> <span class="ident">entities</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="kw-2">*</span>;
 
-<span class='doccomment'>///Represents a single status update.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///The fields present in this struct can be mainly split up based on the context they&#39;re present</span>
-<span class='doccomment'>///for.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Base Tweet Info</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This information is the basic information inherent to all tweets, regardless of context.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///* `text`</span>
-<span class='doccomment'>///* `id`</span>
-<span class='doccomment'>///* `created_at`</span>
-<span class='doccomment'>///* `user`</span>
-<span class='doccomment'>///* `source`</span>
-<span class='doccomment'>///* `favorite_count`/`retweet_count`</span>
-<span class='doccomment'>///* `lang`, though third-party clients usually don&#39;t surface this at a user-interface level.</span>
-<span class='doccomment'>///  Twitter Web uses this to create machine-translations of the tweet.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Perspective-based data</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This information depends on the authenticated user who called the data. These are left as</span>
-<span class='doccomment'>///Options because certain contexts where the information is pulled either don&#39;t have an</span>
-<span class='doccomment'>///authenticated user to compare with, or don&#39;t have to opportunity to poll the user&#39;s interactions</span>
-<span class='doccomment'>///with the tweet.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///* `favorited`</span>
-<span class='doccomment'>///* `retweeted`</span>
-<span class='doccomment'>///* `current_user_retweet`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Replies</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This information is only present when the tweet in question is marked as being a reply to</span>
-<span class='doccomment'>///another tweet, or when it&#39;s threaded into a chain from the same user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///* `in_reply_to_user_id`/`in_reply_to_screen_name`</span>
-<span class='doccomment'>///* `in_reply_to_status_id`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Retweets and Quote Tweets</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This information is only present when the tweet in question is a native retweet or is a &quot;quote</span>
-<span class='doccomment'>///tweet&quot; that references another tweet by linking to it. These fields allow you to reference the</span>
-<span class='doccomment'>///parent tweet without having to make another call to `show`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///* `retweeted_status`</span>
-<span class='doccomment'>///* `quoted_status`/`quoted_status_id`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Media</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///As a tweet can attach an image, GIF, or video, these fields allow you to access information</span>
-<span class='doccomment'>///about the attached media. Note that polls are not surfaced to the Public API at the time of this</span>
-<span class='doccomment'>///writing (2016-09-01). For more information about how to use attached media, see the</span>
-<span class='doccomment'>///documentation for [`MediaEntity`][].</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///[`MediaEntity`]: ../entities/struct.MediaEntity.html</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///* `entities` (note that this also contains information about hyperlinks, user mentions, and</span>
-<span class='doccomment'>///  hashtags in addition to a picture/thumbnail)</span>
-<span class='doccomment'>///* `extended_entities`: This field is only present for tweets with attached media, and houses</span>
-<span class='doccomment'>///  more complete media information, in the case of a photo set, video, or GIF. For videos and</span>
-<span class='doccomment'>///  GIFs, note that `entities` will only contain a thumbnail, and the actual video links will be</span>
-<span class='doccomment'>///  in this field. For tweets with more than one photo attached, `entities` will only contain the</span>
-<span class='doccomment'>///  first photo, and this field will contain all of them.</span>
-<span class='doccomment'>///* `possibly_sensitive`</span>
-<span class='doccomment'>///* `withheld_copyright`</span>
-<span class='doccomment'>///* `withheld_in_countries`</span>
-<span class='doccomment'>///* `withheld_scope`</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Tweet</span> {
-    <span class='comment'>//If the user has contributors enabled, this will show which accounts contributed to this</span>
-    <span class='comment'>//tweet.</span>
-    <span class='comment'>//pub contributors: Option&lt;Contributors&gt;,</span>
-    <span class='comment'>//The location point attached to the tweet, if present.</span>
-    <span class='comment'>//pub coordinates: Option&lt;Coordinates&gt;,</span>
-    <span class='doccomment'>///UTC timestamp showing when the tweet was posted, formatted like &quot;Wed Aug 27 13:08:45 +0000</span>
-    <span class='doccomment'>///2008&quot;.</span>
-    <span class='kw'>pub</span> <span class='ident'>created_at</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///If the authenticated user has retweeted this tweet, contains the ID of the retweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>current_user_retweet</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Link, hashtag, and user mention information extracted from the tweet text.</span>
-    <span class='kw'>pub</span> <span class='ident'>entities</span>: <span class='ident'>TweetEntities</span>,
-    <span class='doccomment'>///Extended media information attached to the tweet, if media is available.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If a tweet has a photo, set of photos, gif, or video attached to it, this field will be</span>
-    <span class='doccomment'>///present and contain the real media information. The information available in the `media`</span>
-    <span class='doccomment'>///field of `entities` will only contain the first photo of a set, or a thumbnail of a gif or</span>
-    <span class='doccomment'>///video.</span>
-    <span class='kw'>pub</span> <span class='ident'>extended_entities</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ExtendedTweetEntities</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///&quot;Approximately&quot; how many times this tweet has been liked by users.</span>
-    <span class='kw'>pub</span> <span class='ident'>favorite_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///Indicates whether the authenticated user has liked this tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>favorited</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='comment'>//Indicates the maximum `FilterLevel` parameter that can be applied to a stream and still show</span>
-    <span class='comment'>//this tweet.</span>
-    <span class='comment'>//pub filter_level: FilterLevel,</span>
-    <span class='doccomment'>///Numeric ID for this tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
-    <span class='doccomment'>///If the tweet is a reply, contains the ID of the user that was replied to.</span>
-    <span class='kw'>pub</span> <span class='ident'>in_reply_to_user_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If the tweet is a reply, contains the screen name of the user that was replied to.</span>
-    <span class='kw'>pub</span> <span class='ident'>in_reply_to_screen_name</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If the tweet is a reply, contains the ID of the tweet that was replied to.</span>
-    <span class='kw'>pub</span> <span class='ident'>in_reply_to_status_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Can contain a language ID indicating the machine-detected language of the text, or &quot;und&quot; if</span>
-    <span class='doccomment'>///no language could be detected.</span>
-    <span class='kw'>pub</span> <span class='ident'>lang</span>: <span class='ident'>String</span>,
-    <span class='comment'>//TODO: Is this the user-entered location field?</span>
-    <span class='comment'>//When present, the `Place` that this tweet is associated with (but not necessarily where it</span>
-    <span class='comment'>//originated from).</span>
-    <span class='comment'>//pub place: Option&lt;Place&gt;,</span>
-    <span class='doccomment'>///If the tweet has a link, indicates whether the link may contain content that could be</span>
-    <span class='doccomment'>///identified as sensitive.</span>
-    <span class='kw'>pub</span> <span class='ident'>possibly_sensitive</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If this tweet is quoting another by link, contains the ID of the quoted tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>quoted_status_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If this tweet is quoting another by link, contains the quoted tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>quoted_status</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span>,
-    <span class='comment'>//&quot;A set of key-value pairs indicating the intended contextual delivery of the containing</span>
-    <span class='comment'>//Tweet. Currently used by Twitter’s Promoted Products.&quot;</span>
-    <span class='comment'>//pub scopes: Option&lt;Scopes&gt;,</span>
-    <span class='doccomment'>///The number of times this tweet has been retweeted (with native retweets).</span>
-    <span class='kw'>pub</span> <span class='ident'>retweet_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///Indicates whether the authenticated user has retweeted this tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>retweeted</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If this tweet is a retweet, then this field contains the original status information.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///The separation between retweet and original is so that retweets can be recalled by deleting</span>
-    <span class='doccomment'>///the retweet, and so that liking a retweet results in an additional notification to the user</span>
-    <span class='doccomment'>///who retweeted the status, as well as the original poster.</span>
-    <span class='kw'>pub</span> <span class='ident'>retweeted_status</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>///The application used to post the tweet, as an HTML anchor tag containing the app&#39;s URL and</span>
-    <span class='doccomment'>///name.</span>
-    <span class='kw'>pub</span> <span class='ident'>source</span>: <span class='ident'>String</span>, <span class='comment'>//TODO: this is html, i want to parse this eventually</span>
-    <span class='doccomment'>///The text of the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>text</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The user who posted this tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>user</span>: <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>user</span>::<span class='ident'>TwitterUser</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If present and `true`, indicates that this tweet has been withheld due to a DMCA complaint.</span>
-    <span class='kw'>pub</span> <span class='ident'>withheld_copyright</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///If present, contains two-letter country codes indicating where this tweet is being withheld.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///The following special codes exist:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///- `XX`: Withheld in all countries</span>
-    <span class='doccomment'>///- `XY`: Withheld due to DMCA complaint.</span>
-    <span class='kw'>pub</span> <span class='ident'>withheld_in_countries</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>///If present, indicates whether the content being withheld is the `status` or the `user`.</span>
-    <span class='kw'>pub</span> <span class='ident'>withheld_scope</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Represents a single status update.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///The fields present in this struct can be mainly split up based on the context they&#39;re present</span>
+<span class="doccomment">///for.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Base Tweet Info</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This information is the basic information inherent to all tweets, regardless of context.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///* `text`</span>
+<span class="doccomment">///* `id`</span>
+<span class="doccomment">///* `created_at`</span>
+<span class="doccomment">///* `user`</span>
+<span class="doccomment">///* `source`</span>
+<span class="doccomment">///* `favorite_count`/`retweet_count`</span>
+<span class="doccomment">///* `lang`, though third-party clients usually don&#39;t surface this at a user-interface level.</span>
+<span class="doccomment">///  Twitter Web uses this to create machine-translations of the tweet.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Perspective-based data</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This information depends on the authenticated user who called the data. These are left as</span>
+<span class="doccomment">///Options because certain contexts where the information is pulled either don&#39;t have an</span>
+<span class="doccomment">///authenticated user to compare with, or don&#39;t have to opportunity to poll the user&#39;s interactions</span>
+<span class="doccomment">///with the tweet.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///* `favorited`</span>
+<span class="doccomment">///* `retweeted`</span>
+<span class="doccomment">///* `current_user_retweet`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Replies</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This information is only present when the tweet in question is marked as being a reply to</span>
+<span class="doccomment">///another tweet, or when it&#39;s threaded into a chain from the same user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///* `in_reply_to_user_id`/`in_reply_to_screen_name`</span>
+<span class="doccomment">///* `in_reply_to_status_id`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Retweets and Quote Tweets</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This information is only present when the tweet in question is a native retweet or is a &quot;quote</span>
+<span class="doccomment">///tweet&quot; that references another tweet by linking to it. These fields allow you to reference the</span>
+<span class="doccomment">///parent tweet without having to make another call to `show`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///* `retweeted_status`</span>
+<span class="doccomment">///* `quoted_status`/`quoted_status_id`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Media</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///As a tweet can attach an image, GIF, or video, these fields allow you to access information</span>
+<span class="doccomment">///about the attached media. Note that polls are not surfaced to the Public API at the time of this</span>
+<span class="doccomment">///writing (2016-09-01). For more information about how to use attached media, see the</span>
+<span class="doccomment">///documentation for [`MediaEntity`][].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///[`MediaEntity`]: ../entities/struct.MediaEntity.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///* `entities` (note that this also contains information about hyperlinks, user mentions, and</span>
+<span class="doccomment">///  hashtags in addition to a picture/thumbnail)</span>
+<span class="doccomment">///* `extended_entities`: This field is only present for tweets with attached media, and houses</span>
+<span class="doccomment">///  more complete media information, in the case of a photo set, video, or GIF. For videos and</span>
+<span class="doccomment">///  GIFs, note that `entities` will only contain a thumbnail, and the actual video links will be</span>
+<span class="doccomment">///  in this field. For tweets with more than one photo attached, `entities` will only contain the</span>
+<span class="doccomment">///  first photo, and this field will contain all of them.</span>
+<span class="doccomment">///* `possibly_sensitive`</span>
+<span class="doccomment">///* `withheld_copyright`</span>
+<span class="doccomment">///* `withheld_in_countries`</span>
+<span class="doccomment">///* `withheld_scope`</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tweet</span> {
+    <span class="comment">//If the user has contributors enabled, this will show which accounts contributed to this</span>
+    <span class="comment">//tweet.</span>
+    <span class="comment">//pub contributors: Option&lt;Contributors&gt;,</span>
+    <span class="comment">//The location point attached to the tweet, if present.</span>
+    <span class="comment">//pub coordinates: Option&lt;Coordinates&gt;,</span>
+    <span class="doccomment">///UTC timestamp showing when the tweet was posted, formatted like &quot;Wed Aug 27 13:08:45 +0000</span>
+    <span class="doccomment">///2008&quot;.</span>
+    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">String</span>,
+    <span class="doccomment">///If the authenticated user has retweeted this tweet, contains the ID of the retweet.</span>
+    <span class="kw">pub</span> <span class="ident">current_user_retweet</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Link, hashtag, and user mention information extracted from the tweet text.</span>
+    <span class="kw">pub</span> <span class="ident">entities</span>: <span class="ident">TweetEntities</span>,
+    <span class="doccomment">///Extended media information attached to the tweet, if media is available.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If a tweet has a photo, set of photos, gif, or video attached to it, this field will be</span>
+    <span class="doccomment">///present and contain the real media information. The information available in the `media`</span>
+    <span class="doccomment">///field of `entities` will only contain the first photo of a set, or a thumbnail of a gif or</span>
+    <span class="doccomment">///video.</span>
+    <span class="kw">pub</span> <span class="ident">extended_entities</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtendedTweetEntities</span><span class="op">&gt;</span>,
+    <span class="doccomment">///&quot;Approximately&quot; how many times this tweet has been liked by users.</span>
+    <span class="kw">pub</span> <span class="ident">favorite_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///Indicates whether the authenticated user has liked this tweet.</span>
+    <span class="kw">pub</span> <span class="ident">favorited</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="comment">//Indicates the maximum `FilterLevel` parameter that can be applied to a stream and still show</span>
+    <span class="comment">//this tweet.</span>
+    <span class="comment">//pub filter_level: FilterLevel,</span>
+    <span class="doccomment">///Numeric ID for this tweet.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">i64</span>,
+    <span class="doccomment">///If the tweet is a reply, contains the ID of the user that was replied to.</span>
+    <span class="kw">pub</span> <span class="ident">in_reply_to_user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If the tweet is a reply, contains the screen name of the user that was replied to.</span>
+    <span class="kw">pub</span> <span class="ident">in_reply_to_screen_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If the tweet is a reply, contains the ID of the tweet that was replied to.</span>
+    <span class="kw">pub</span> <span class="ident">in_reply_to_status_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Can contain a language ID indicating the machine-detected language of the text, or &quot;und&quot; if</span>
+    <span class="doccomment">///no language could be detected.</span>
+    <span class="kw">pub</span> <span class="ident">lang</span>: <span class="ident">String</span>,
+    <span class="comment">//TODO: Is this the user-entered location field?</span>
+    <span class="comment">//When present, the `Place` that this tweet is associated with (but not necessarily where it</span>
+    <span class="comment">//originated from).</span>
+    <span class="comment">//pub place: Option&lt;Place&gt;,</span>
+    <span class="doccomment">///If the tweet has a link, indicates whether the link may contain content that could be</span>
+    <span class="doccomment">///identified as sensitive.</span>
+    <span class="kw">pub</span> <span class="ident">possibly_sensitive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If this tweet is quoting another by link, contains the ID of the quoted tweet.</span>
+    <span class="kw">pub</span> <span class="ident">quoted_status_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If this tweet is quoting another by link, contains the quoted tweet.</span>
+    <span class="kw">pub</span> <span class="ident">quoted_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span>,
+    <span class="comment">//&quot;A set of key-value pairs indicating the intended contextual delivery of the containing</span>
+    <span class="comment">//Tweet. Currently used by Twitter’s Promoted Products.&quot;</span>
+    <span class="comment">//pub scopes: Option&lt;Scopes&gt;,</span>
+    <span class="doccomment">///The number of times this tweet has been retweeted (with native retweets).</span>
+    <span class="kw">pub</span> <span class="ident">retweet_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///Indicates whether the authenticated user has retweeted this tweet.</span>
+    <span class="kw">pub</span> <span class="ident">retweeted</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If this tweet is a retweet, then this field contains the original status information.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///The separation between retweet and original is so that retweets can be recalled by deleting</span>
+    <span class="doccomment">///the retweet, and so that liking a retweet results in an additional notification to the user</span>
+    <span class="doccomment">///who retweeted the status, as well as the original poster.</span>
+    <span class="kw">pub</span> <span class="ident">retweeted_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">///The application used to post the tweet, as an HTML anchor tag containing the app&#39;s URL and</span>
+    <span class="doccomment">///name.</span>
+    <span class="kw">pub</span> <span class="ident">source</span>: <span class="ident">String</span>, <span class="comment">//TODO: this is html, i want to parse this eventually</span>
+    <span class="doccomment">///The text of the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">text</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The user who posted this tweet.</span>
+    <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">user</span>::<span class="ident">TwitterUser</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If present and `true`, indicates that this tweet has been withheld due to a DMCA complaint.</span>
+    <span class="kw">pub</span> <span class="ident">withheld_copyright</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///If present, contains two-letter country codes indicating where this tweet is being withheld.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///The following special codes exist:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///- `XX`: Withheld in all countries</span>
+    <span class="doccomment">///- `XY`: Withheld due to DMCA complaint.</span>
+    <span class="kw">pub</span> <span class="ident">withheld_in_countries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">///If present, indicates whether the content being withheld is the `status` or the `user`.</span>
+    <span class="kw">pub</span> <span class="ident">withheld_scope</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>Tweet</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;Tweet received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">Tweet</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;Tweet received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>Tweet</span> {
-            <span class='comment'>//contributors: Option&lt;Contributors&gt;,</span>
-            <span class='comment'>//coordinates: Option&lt;Coordinates&gt;,</span>
-            <span class='ident'>created_at</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;created_at&quot;</span>)),
-            <span class='ident'>current_user_retweet</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>current_user_retweet</span>(<span class='ident'>input</span>, <span class='string'>&quot;current_user_retweet&quot;</span>)),
-            <span class='ident'>entities</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;entities&quot;</span>)),
-            <span class='ident'>extended_entities</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;extended_entities&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>favorite_count</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;favorite_count&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='number'>0</span>),
-            <span class='ident'>favorited</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;favorited&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='comment'>//filter_level: FilterLevel,</span>
-            <span class='ident'>id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;id&quot;</span>)),
-            <span class='ident'>in_reply_to_user_id</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;in_reply_to_user_id&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>in_reply_to_screen_name</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;in_reply_to_screen_name&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>in_reply_to_status_id</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;in_reply_to_status_id&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>lang</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;lang&quot;</span>)),
-            <span class='comment'>//place: Option&lt;Place&gt;,</span>
-            <span class='ident'>possibly_sensitive</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;possibly_sensitive&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>quoted_status_id</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;quoted_status_id&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>quoted_status</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;quoted_status&quot;</span>).<span class='ident'>map</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>).<span class='ident'>ok</span>(),
-            <span class='comment'>//scopes: Option&lt;Scopes&gt;,</span>
-            <span class='ident'>retweet_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;retweet_count&quot;</span>)),
-            <span class='ident'>retweeted</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;retweeted&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>retweeted_status</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;retweeted_status&quot;</span>).<span class='ident'>map</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>source</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;source&quot;</span>)),
-            <span class='ident'>text</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;text&quot;</span>)),
-            <span class='ident'>user</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;user&quot;</span>).<span class='ident'>map</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>)),
-            <span class='ident'>withheld_copyright</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;withheld_copyright&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='bool-val'>false</span>),
-            <span class='ident'>withheld_in_countries</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;withheld_in_countries&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>withheld_scope</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;withheld_scope&quot;</span>).<span class='ident'>ok</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">Tweet</span> {
+            <span class="comment">//contributors: Option&lt;Contributors&gt;,</span>
+            <span class="comment">//coordinates: Option&lt;Coordinates&gt;,</span>
+            <span class="ident">created_at</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;created_at&quot;</span>)),
+            <span class="ident">current_user_retweet</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">current_user_retweet</span>(<span class="ident">input</span>, <span class="string">&quot;current_user_retweet&quot;</span>)),
+            <span class="ident">entities</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;entities&quot;</span>)),
+            <span class="ident">extended_entities</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;extended_entities&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">favorite_count</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;favorite_count&quot;</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+            <span class="ident">favorited</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;favorited&quot;</span>).<span class="ident">ok</span>(),
+            <span class="comment">//filter_level: FilterLevel,</span>
+            <span class="ident">id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;id&quot;</span>)),
+            <span class="ident">in_reply_to_user_id</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;in_reply_to_user_id&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">in_reply_to_screen_name</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;in_reply_to_screen_name&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">in_reply_to_status_id</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;in_reply_to_status_id&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">lang</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;lang&quot;</span>)),
+            <span class="comment">//place: Option&lt;Place&gt;,</span>
+            <span class="ident">possibly_sensitive</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;possibly_sensitive&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">quoted_status_id</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;quoted_status_id&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">quoted_status</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;quoted_status&quot;</span>).<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">new</span>).<span class="ident">ok</span>(),
+            <span class="comment">//scopes: Option&lt;Scopes&gt;,</span>
+            <span class="ident">retweet_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;retweet_count&quot;</span>)),
+            <span class="ident">retweeted</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;retweeted&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">retweeted_status</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;retweeted_status&quot;</span>).<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">new</span>).<span class="ident">ok</span>(),
+            <span class="ident">source</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;source&quot;</span>)),
+            <span class="ident">text</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;text&quot;</span>)),
+            <span class="ident">user</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;user&quot;</span>).<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">new</span>)),
+            <span class="ident">withheld_copyright</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;withheld_copyright&quot;</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+            <span class="ident">withheld_in_countries</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;withheld_in_countries&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">withheld_scope</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;withheld_scope&quot;</span>).<span class="ident">ok</span>(),
         })
     }
 }
 
-<span class='kw'>fn</span> <span class='ident'>current_user_retweet</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>, <span class='ident'>field</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>obj</span>) <span class='op'>=</span> <span class='ident'>input</span>.<span class='ident'>find</span>(<span class='ident'>field</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>f</span><span class='op'>|</span> <span class='ident'>f</span>.<span class='ident'>as_object</span>()) {
-        <span class='kw'>match</span> <span class='ident'>obj</span>.<span class='ident'>get</span>(<span class='string'>&quot;id&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>o</span><span class='op'>|</span> <span class='ident'>o</span>.<span class='ident'>as_i64</span>()) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>id</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='prelude-val'>Some</span>(<span class='ident'>id</span>)),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;invalid structure inside current_user_retweet&quot;</span>, <span class='prelude-val'>None</span>)),
+<span class="kw">fn</span> <span class="ident">current_user_retweet</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">obj</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">find</span>(<span class="ident">field</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_object</span>()) {
+        <span class="kw">match</span> <span class="ident">obj</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">as_i64</span>()) {
+            <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">id</span>)),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;invalid structure inside current_user_retweet&quot;</span>, <span class="prelude-val">None</span>)),
         }
     }
-    <span class='kw'>else</span> {
-        <span class='prelude-val'>Ok</span>(<span class='prelude-val'>None</span>)
+    <span class="kw">else</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 }
 
-<span class='doccomment'>///Container for URL, hashtag, mention, and media information associated with a tweet.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///If a tweet has no hashtags, financial symbols (&quot;cashtags&quot;), links, or mentions, those respective</span>
-<span class='doccomment'>///Vecs will be empty. If there is no media attached to the tweet, that field will be `None`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Note that for media attached to a tweet, this struct will only contain the first image of a</span>
-<span class='doccomment'>///photo set, or a thumbnail of a video or GIF. Full media information is available in the tweet&#39;s</span>
-<span class='doccomment'>///`extended_entities` field.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TweetEntities</span> {
-    <span class='doccomment'>///Collection of hashtags parsed from the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>hashtags</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>HashtagEntity</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Collection of financial symbols, or &quot;cashtags&quot;, parsed from the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>symbols</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>HashtagEntity</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Collection of URLs parsed from the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>urls</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>UrlEntity</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Collection of user mentions parsed from the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>user_mentions</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>MentionEntity</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If the tweet contains any attached media, this contains a collection of media information</span>
-    <span class='doccomment'>///from the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>media</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>MediaEntity</span><span class='op'>&gt;&gt;</span>,
+<span class="doccomment">///Container for URL, hashtag, mention, and media information associated with a tweet.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///If a tweet has no hashtags, financial symbols (&quot;cashtags&quot;), links, or mentions, those respective</span>
+<span class="doccomment">///Vecs will be empty. If there is no media attached to the tweet, that field will be `None`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Note that for media attached to a tweet, this struct will only contain the first image of a</span>
+<span class="doccomment">///photo set, or a thumbnail of a video or GIF. Full media information is available in the tweet&#39;s</span>
+<span class="doccomment">///`extended_entities` field.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TweetEntities</span> {
+    <span class="doccomment">///Collection of hashtags parsed from the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">hashtags</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">HashtagEntity</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Collection of financial symbols, or &quot;cashtags&quot;, parsed from the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">symbols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">HashtagEntity</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Collection of URLs parsed from the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">urls</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">UrlEntity</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Collection of user mentions parsed from the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">user_mentions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">MentionEntity</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If the tweet contains any attached media, this contains a collection of media information</span>
+    <span class="doccomment">///from the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">media</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">MediaEntity</span><span class="op">&gt;&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>TweetEntities</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;TweetEntities received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">TweetEntities</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;TweetEntities received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>TweetEntities</span> {
-            <span class='ident'>hashtags</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;hashtags&quot;</span>)),
-            <span class='ident'>symbols</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;symbols&quot;</span>)),
-            <span class='ident'>urls</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;urls&quot;</span>)),
-            <span class='ident'>user_mentions</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;user_mentions&quot;</span>)),
-            <span class='ident'>media</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;media&quot;</span>).<span class='ident'>ok</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">TweetEntities</span> {
+            <span class="ident">hashtags</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;hashtags&quot;</span>)),
+            <span class="ident">symbols</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;symbols&quot;</span>)),
+            <span class="ident">urls</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;urls&quot;</span>)),
+            <span class="ident">user_mentions</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;user_mentions&quot;</span>)),
+            <span class="ident">media</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;media&quot;</span>).<span class="ident">ok</span>(),
         })
     }
 }
 
-<span class='doccomment'>///Container for extended media information for a tweet.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///If a tweet has a photo, set of photos, gif, or video attached to it, this field will be present</span>
-<span class='doccomment'>///and contain the real media information. The information available in the `media` field of</span>
-<span class='doccomment'>///`entities` will only contain the first photo of a set, or a thumbnail of a gif or video.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ExtendedTweetEntities</span> {
-    <span class='doccomment'>///Collection of extended media information attached to the tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>media</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>MediaEntity</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Container for extended media information for a tweet.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///If a tweet has a photo, set of photos, gif, or video attached to it, this field will be present</span>
+<span class="doccomment">///and contain the real media information. The information available in the `media` field of</span>
+<span class="doccomment">///`entities` will only contain the first photo of a set, or a thumbnail of a gif or video.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExtendedTweetEntities</span> {
+    <span class="doccomment">///Collection of extended media information attached to the tweet.</span>
+    <span class="kw">pub</span> <span class="ident">media</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">MediaEntity</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>ExtendedTweetEntities</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;ExtendedTweetEntities received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">ExtendedTweetEntities</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;ExtendedTweetEntities received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ExtendedTweetEntities</span> {
-            <span class='ident'>media</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;media&quot;</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">ExtendedTweetEntities</span> {
+            <span class="ident">media</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;media&quot;</span>)),
         })
     }
 }
 
-<span class='doccomment'>/// Helper struct to navigate collections of tweets by requesting tweets older or newer than certain</span>
-<span class='doccomment'>/// IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Using a Timeline to navigate collections of tweets (like a user&#39;s timeline, their list of likes,</span>
-<span class='doccomment'>/// etc) allows you to efficiently cursor through a collection and only load in tweets you need.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// To begin, call a method that returns a `Timeline`, optionally set the page size, and call</span>
-<span class='doccomment'>/// `start` to load the first page of results:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token)</span>
-<span class='doccomment'>///                                .with_page_size(10);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// for tweet in &amp;timeline.start().unwrap().response {</span>
-<span class='doccomment'>///     println!(&quot;&lt;@{}&gt; {}&quot;, tweet.user.screen_name, tweet.text);</span>
-<span class='doccomment'>/// }</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If you need to load the next set of tweets, call `older`, which will automatically update the</span>
-<span class='doccomment'>/// tweet IDs it tracks:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token);</span>
-<span class='doccomment'>/// # timeline.start().unwrap();</span>
-<span class='doccomment'>/// for tweet in &amp;timeline.older(None).unwrap().response {</span>
-<span class='doccomment'>///     println!(&quot;&lt;@{}&gt; {}&quot;, tweet.user.screen_name, tweet.text);</span>
-<span class='doccomment'>/// }</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ...and similarly for `newer`, which operates in a similar fashion.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If you want to start afresh and reload the newest set of tweets again, you can call `start`</span>
-<span class='doccomment'>/// again, which will clear the tracked tweet IDs before loading the newest set of tweets. However,</span>
-<span class='doccomment'>/// if you&#39;ve been storing these tweets as you go, and already know the newest tweet ID you have on</span>
-<span class='doccomment'>/// hand, you can load only those tweets you need like this:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token)</span>
-<span class='doccomment'>///                                .with_page_size(10);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// timeline.start().unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// //keep the max_id for later</span>
-<span class='doccomment'>/// let reload_id = timeline.max_id.unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// //simulate scrolling down a little bit</span>
-<span class='doccomment'>/// timeline.older(None).unwrap();</span>
-<span class='doccomment'>/// timeline.older(None).unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// //reload the timeline with only what&#39;s new</span>
-<span class='doccomment'>/// timeline.reset();</span>
-<span class='doccomment'>/// timeline.older(Some(reload_id)).unwrap();</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Here, the argument to `older` means &quot;older than what I just returned, but newer than the given</span>
-<span class='doccomment'>/// ID&quot;. Since we cleared the tracked IDs with `reset`, that turns into &quot;the newest tweets</span>
-<span class='doccomment'>/// available that were posted after the given ID&quot;. The earlier invocations of `older` with `None`</span>
-<span class='doccomment'>/// do not place a bound on the tweets it loads. `newer` operates in a similar fashion with its</span>
-<span class='doccomment'>/// argument, saying &quot;newer than what I just returned, but not newer than this given ID&quot;. When</span>
-<span class='doccomment'>/// called like this, it&#39;s possible for these methods to return nothing, which will also clear the</span>
-<span class='doccomment'>/// `Timeline`&#39;s tracked IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If you want to manually pull tweets between certain IDs, the baseline `call` function can do</span>
-<span class='doccomment'>/// that for you. Keep in mind, though, that `call` doesn&#39;t update the `min_id` or `max_id` fields,</span>
-<span class='doccomment'>/// so you&#39;ll have to set those yourself if you want to follow up with `older` or `newer`.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Timeline</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///The URL to request tweets from.</span>
-    <span class='ident'>link</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
-    <span class='doccomment'>///The consumer token to authenticate requests with.</span>
-    <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The access token to authenticate requests with.</span>
-    <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Optional set of params to include prior to adding lifetime navigation parameters.</span>
-    <span class='ident'>params_base</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ParamList</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>///The maximum number of tweets to return in a single call. Twitter doesn&#39;t guarantee returning</span>
-    <span class='doccomment'>///exactly this number, as suspended or deleted content is removed after retrieving the initial</span>
-    <span class='doccomment'>///collection of tweets.</span>
-    <span class='kw'>pub</span> <span class='ident'>count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///The largest/most recent tweet ID returned in the last call to `start`, `older`, or `newer`.</span>
-    <span class='kw'>pub</span> <span class='ident'>max_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The smallest/oldest tweet ID returned in the last call to `start`, `older`, or `newer`.</span>
-    <span class='kw'>pub</span> <span class='ident'>min_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// Helper struct to navigate collections of tweets by requesting tweets older or newer than certain</span>
+<span class="doccomment">/// IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Using a Timeline to navigate collections of tweets (like a user&#39;s timeline, their list of likes,</span>
+<span class="doccomment">/// etc) allows you to efficiently cursor through a collection and only load in tweets you need.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// To begin, call a method that returns a `Timeline`, optionally set the page size, and call</span>
+<span class="doccomment">/// `start` to load the first page of results:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token)</span>
+<span class="doccomment">///                                .with_page_size(10);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// for tweet in &amp;timeline.start().unwrap().response {</span>
+<span class="doccomment">///     println!(&quot;&lt;@{}&gt; {}&quot;, tweet.user.screen_name, tweet.text);</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If you need to load the next set of tweets, call `older`, which will automatically update the</span>
+<span class="doccomment">/// tweet IDs it tracks:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token);</span>
+<span class="doccomment">/// # timeline.start().unwrap();</span>
+<span class="doccomment">/// for tweet in &amp;timeline.older(None).unwrap().response {</span>
+<span class="doccomment">///     println!(&quot;&lt;@{}&gt; {}&quot;, tweet.user.screen_name, tweet.text);</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ...and similarly for `newer`, which operates in a similar fashion.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If you want to start afresh and reload the newest set of tweets again, you can call `start`</span>
+<span class="doccomment">/// again, which will clear the tracked tweet IDs before loading the newest set of tweets. However,</span>
+<span class="doccomment">/// if you&#39;ve been storing these tweets as you go, and already know the newest tweet ID you have on</span>
+<span class="doccomment">/// hand, you can load only those tweets you need like this:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// let mut timeline = egg_mode::tweet::home_timeline(&amp;con_token, &amp;access_token)</span>
+<span class="doccomment">///                                .with_page_size(10);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// timeline.start().unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// //keep the max_id for later</span>
+<span class="doccomment">/// let reload_id = timeline.max_id.unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// //simulate scrolling down a little bit</span>
+<span class="doccomment">/// timeline.older(None).unwrap();</span>
+<span class="doccomment">/// timeline.older(None).unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// //reload the timeline with only what&#39;s new</span>
+<span class="doccomment">/// timeline.reset();</span>
+<span class="doccomment">/// timeline.older(Some(reload_id)).unwrap();</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Here, the argument to `older` means &quot;older than what I just returned, but newer than the given</span>
+<span class="doccomment">/// ID&quot;. Since we cleared the tracked IDs with `reset`, that turns into &quot;the newest tweets</span>
+<span class="doccomment">/// available that were posted after the given ID&quot;. The earlier invocations of `older` with `None`</span>
+<span class="doccomment">/// do not place a bound on the tweets it loads. `newer` operates in a similar fashion with its</span>
+<span class="doccomment">/// argument, saying &quot;newer than what I just returned, but not newer than this given ID&quot;. When</span>
+<span class="doccomment">/// called like this, it&#39;s possible for these methods to return nothing, which will also clear the</span>
+<span class="doccomment">/// `Timeline`&#39;s tracked IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If you want to manually pull tweets between certain IDs, the baseline `call` function can do</span>
+<span class="doccomment">/// that for you. Keep in mind, though, that `call` doesn&#39;t update the `min_id` or `max_id` fields,</span>
+<span class="doccomment">/// so you&#39;ll have to set those yourself if you want to follow up with `older` or `newer`.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timeline</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///The URL to request tweets from.</span>
+    <span class="ident">link</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    <span class="doccomment">///The consumer token to authenticate requests with.</span>
+    <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The access token to authenticate requests with.</span>
+    <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Optional set of params to include prior to adding lifetime navigation parameters.</span>
+    <span class="ident">params_base</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParamList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">///The maximum number of tweets to return in a single call. Twitter doesn&#39;t guarantee returning</span>
+    <span class="doccomment">///exactly this number, as suspended or deleted content is removed after retrieving the initial</span>
+    <span class="doccomment">///collection of tweets.</span>
+    <span class="kw">pub</span> <span class="ident">count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///The largest/most recent tweet ID returned in the last call to `start`, `older`, or `newer`.</span>
+    <span class="kw">pub</span> <span class="ident">max_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The smallest/oldest tweet ID returned in the last call to `start`, `older`, or `newer`.</span>
+    <span class="kw">pub</span> <span class="ident">min_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Timeline</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Clear the saved IDs on this timeline.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reset</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>max_id</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-        <span class='self'>self</span>.<span class='ident'>min_id</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Timeline</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Clear the saved IDs on this timeline.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">max_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="self">self</span>.<span class="ident">min_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     }
 
-    <span class='doccomment'>///Clear the saved IDs on this timeline, and return the most recent set of tweets.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>start</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>reset</span>();
+    <span class="doccomment">///Clear the saved IDs on this timeline, and return the most recent set of tweets.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span> {
+        <span class="self">self</span>.<span class="ident">reset</span>();
 
-        <span class='self'>self</span>.<span class='ident'>older</span>(<span class='prelude-val'>None</span>)
+        <span class="self">self</span>.<span class="ident">older</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class='doccomment'>///Return the set of tweets older than the last set pulled, optionally placing a minimum tweet</span>
-    <span class='doccomment'>///ID to bound with.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>older</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>since_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>call</span>(<span class='ident'>since_id</span>, <span class='self'>self</span>.<span class='ident'>min_id</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>id</span><span class='op'>|</span> <span class='ident'>id</span> <span class='op'>-</span> <span class='number'>1</span>)));
+    <span class="doccomment">///Return the set of tweets older than the last set pulled, optionally placing a minimum tweet</span>
+    <span class="doccomment">///ID to bound with.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">older</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">since_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">call</span>(<span class="ident">since_id</span>, <span class="self">self</span>.<span class="ident">min_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">-</span> <span class="number">1</span>)));
 
-        <span class='self'>self</span>.<span class='ident'>map_ids</span>(<span class='kw-2'>&amp;</span><span class='ident'>resp</span>.<span class='ident'>response</span>);
+        <span class="self">self</span>.<span class="ident">map_ids</span>(<span class="kw-2">&amp;</span><span class="ident">resp</span>.<span class="ident">response</span>);
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>resp</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
     }
 
-    <span class='doccomment'>///Return the set of tweets newer than the last set pulled, optionall placing a maximum tweet</span>
-    <span class='doccomment'>///ID to bound with.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>newer</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>max_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>call</span>(<span class='self'>self</span>.<span class='ident'>max_id</span>, <span class='ident'>max_id</span>));
+    <span class="doccomment">///Return the set of tweets newer than the last set pulled, optionall placing a maximum tweet</span>
+    <span class="doccomment">///ID to bound with.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">call</span>(<span class="self">self</span>.<span class="ident">max_id</span>, <span class="ident">max_id</span>));
 
-        <span class='self'>self</span>.<span class='ident'>map_ids</span>(<span class='kw-2'>&amp;</span><span class='ident'>resp</span>.<span class='ident'>response</span>);
+        <span class="self">self</span>.<span class="ident">map_ids</span>(<span class="kw-2">&amp;</span><span class="ident">resp</span>.<span class="ident">response</span>);
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>resp</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
     }
 
-    <span class='doccomment'>///Return the set of tweets between the IDs given.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Note that the range is not fully inclusive; the tweet ID given by `since_id` will not be</span>
-    <span class='doccomment'>///returned, but the tweet ID in `max_id` will be returned.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If the range of tweets given by the IDs would return more than `self.count`, the newest set</span>
-    <span class='doccomment'>///of tweets will be returned.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>since_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>, <span class='ident'>max_id</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>params_base</span>.<span class='ident'>as_ref</span>().<span class='ident'>cloned</span>().<span class='ident'>unwrap_or_default</span>();
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;count&quot;</span>, <span class='self'>self</span>.<span class='ident'>count</span>.<span class='ident'>to_string</span>());
+    <span class="doccomment">///Return the set of tweets between the IDs given.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Note that the range is not fully inclusive; the tweet ID given by `since_id` will not be</span>
+    <span class="doccomment">///returned, but the tweet ID in `max_id` will be returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If the range of tweets given by the IDs would return more than `self.count`, the newest set</span>
+    <span class="doccomment">///of tweets will be returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">since_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>, <span class="ident">max_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params_base</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;count&quot;</span>, <span class="self">self</span>.<span class="ident">count</span>.<span class="ident">to_string</span>());
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>id</span>) <span class='op'>=</span> <span class='ident'>since_id</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;since_id&quot;</span>, <span class='ident'>id</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">since_id</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;since_id&quot;</span>, <span class="ident">id</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>id</span>) <span class='op'>=</span> <span class='ident'>max_id</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;max_id&quot;</span>, <span class='ident'>id</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">max_id</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;max_id&quot;</span>, <span class="ident">id</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='self'>self</span>.<span class='ident'>link</span>, <span class='self'>self</span>.<span class='ident'>con_token</span>, <span class='self'>self</span>.<span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">link</span>, <span class="self">self</span>.<span class="ident">con_token</span>, <span class="self">self</span>.<span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-        <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+        <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
     }
 
-    <span class='doccomment'>///Helper builder function to set the page size.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_page_size</span>(<span class='self'>self</span>, <span class='ident'>page_size</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>Timeline</span> {
-            <span class='ident'>count</span>: <span class='ident'>page_size</span>,
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Helper builder function to set the page size.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_page_size</span>(<span class="self">self</span>, <span class="ident">page_size</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Timeline</span> {
+            <span class="ident">count</span>: <span class="ident">page_size</span>,
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///With the returned slice of Tweets, set the min_id and max_id on self.</span>
-    <span class='kw'>fn</span> <span class='ident'>map_ids</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>resp</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Tweet</span>]) {
-        <span class='self'>self</span>.<span class='ident'>max_id</span> <span class='op'>=</span> <span class='ident'>resp</span>.<span class='ident'>first</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>status</span><span class='op'>|</span> <span class='ident'>status</span>.<span class='ident'>id</span>);
-        <span class='self'>self</span>.<span class='ident'>min_id</span> <span class='op'>=</span> <span class='ident'>resp</span>.<span class='ident'>last</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>status</span><span class='op'>|</span> <span class='ident'>status</span>.<span class='ident'>id</span>);
+    <span class="doccomment">///With the returned slice of Tweets, set the min_id and max_id on self.</span>
+    <span class="kw">fn</span> <span class="ident">map_ids</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">resp</span>: <span class="kw-2">&amp;</span>[<span class="ident">Tweet</span>]) {
+        <span class="self">self</span>.<span class="ident">max_id</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">status</span><span class="op">|</span> <span class="ident">status</span>.<span class="ident">id</span>);
+        <span class="self">self</span>.<span class="ident">min_id</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">status</span><span class="op">|</span> <span class="ident">status</span>.<span class="ident">id</span>);
     }
 
-    <span class='doccomment'>///Create an instance of `Timeline` with the given link and tokens.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///This is an infrastructure function, not meant to be used from client code. It&#39;s not</span>
-    <span class='doccomment'>///guaranteed to stick around between versions.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>link</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>, <span class='ident'>params_base</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ParamList</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
-               <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>Timeline</span> {
-            <span class='ident'>link</span>: <span class='ident'>link</span>,
-            <span class='ident'>con_token</span>: <span class='ident'>con_token</span>,
-            <span class='ident'>access_token</span>: <span class='ident'>access_token</span>,
-            <span class='ident'>params_base</span>: <span class='ident'>params_base</span>,
-            <span class='ident'>count</span>: <span class='number'>20</span>,
-            <span class='ident'>max_id</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>min_id</span>: <span class='prelude-val'>None</span>,
+    <span class="doccomment">///Create an instance of `Timeline` with the given link and tokens.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///This is an infrastructure function, not meant to be used from client code. It&#39;s not</span>
+    <span class="doccomment">///guaranteed to stick around between versions.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">link</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">params_base</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParamList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>,
+               <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Timeline</span> {
+            <span class="ident">link</span>: <span class="ident">link</span>,
+            <span class="ident">con_token</span>: <span class="ident">con_token</span>,
+            <span class="ident">access_token</span>: <span class="ident">access_token</span>,
+            <span class="ident">params_base</span>: <span class="ident">params_base</span>,
+            <span class="ident">count</span>: <span class="number">20</span>,
+            <span class="ident">max_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">min_id</span>: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class='doccomment'>/// Represents an in-progress tweet before it is sent.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This is your entry point to posting new tweets to Twitter. To begin, make a new `DraftTweet` by</span>
-<span class='doccomment'>/// calling `new` with your desired status text:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// use egg_mode::tweet::DraftTweet;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let draft = DraftTweet::new(&quot;This is an example status!&quot;);</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// As-is, the draft won&#39;t do anything until you call `send` to post it:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # use egg_mode::tweet::DraftTweet;</span>
-<span class='doccomment'>/// # let draft = DraftTweet::new(&quot;This is an example status!&quot;);</span>
-<span class='doccomment'>/// draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Right now, the options for adding metadata to a post are pretty sparse. See the adaptor</span>
-<span class='doccomment'>/// functions below to see what metadata can be set. For example, you can use `in_reply_to` to</span>
-<span class='doccomment'>/// create a reply-chain like this:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust,no_run</span>
-<span class='doccomment'>/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>/// use egg_mode::tweet::DraftTweet;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let draft = DraftTweet::new(&quot;I&#39;d like to start a thread here.&quot;);</span>
-<span class='doccomment'>/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let draft = DraftTweet::new(&quot;You see, I have a lot of things to say.&quot;)</span>
-<span class='doccomment'>///                        .in_reply_to(tweet.response.id);</span>
-<span class='doccomment'>/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let draft = DraftTweet::new(&quot;Thank you for your time.&quot;)</span>
-<span class='doccomment'>///                        .in_reply_to(tweet.response.id);</span>
-<span class='doccomment'>/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>DraftTweet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='ident'>in_reply_to</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span>,
-    <span class='ident'>coordinates</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>f32</span>, <span class='ident'>f32</span>)<span class='op'>&gt;</span>,
-    <span class='ident'>display_coordinates</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// Represents an in-progress tweet before it is sent.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is your entry point to posting new tweets to Twitter. To begin, make a new `DraftTweet` by</span>
+<span class="doccomment">/// calling `new` with your desired status text:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// use egg_mode::tweet::DraftTweet;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let draft = DraftTweet::new(&quot;This is an example status!&quot;);</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// As-is, the draft won&#39;t do anything until you call `send` to post it:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # use egg_mode::tweet::DraftTweet;</span>
+<span class="doccomment">/// # let draft = DraftTweet::new(&quot;This is an example status!&quot;);</span>
+<span class="doccomment">/// draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Right now, the options for adding metadata to a post are pretty sparse. See the adaptor</span>
+<span class="doccomment">/// functions below to see what metadata can be set. For example, you can use `in_reply_to` to</span>
+<span class="doccomment">/// create a reply-chain like this:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust,no_run</span>
+<span class="doccomment">/// # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">/// use egg_mode::tweet::DraftTweet;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let draft = DraftTweet::new(&quot;I&#39;d like to start a thread here.&quot;);</span>
+<span class="doccomment">/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let draft = DraftTweet::new(&quot;You see, I have a lot of things to say.&quot;)</span>
+<span class="doccomment">///                        .in_reply_to(tweet.response.id);</span>
+<span class="doccomment">/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let draft = DraftTweet::new(&quot;Thank you for your time.&quot;)</span>
+<span class="doccomment">///                        .in_reply_to(tweet.response.id);</span>
+<span class="doccomment">/// let tweet = draft.send(&amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DraftTweet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="ident">in_reply_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+    <span class="ident">coordinates</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>)<span class="op">&gt;</span>,
+    <span class="ident">display_coordinates</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>DraftTweet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Creates a new `DraftTweet` with the given status text.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>text</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>DraftTweet</span> {
-            <span class='ident'>text</span>: <span class='ident'>text</span>,
-            <span class='ident'>in_reply_to</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>coordinates</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>display_coordinates</span>: <span class='prelude-val'>None</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DraftTweet</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Creates a new `DraftTweet` with the given status text.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">DraftTweet</span> {
+            <span class="ident">text</span>: <span class="ident">text</span>,
+            <span class="ident">in_reply_to</span>: <span class="prelude-val">None</span>,
+            <span class="ident">coordinates</span>: <span class="prelude-val">None</span>,
+            <span class="ident">display_coordinates</span>: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='doccomment'>///Marks this draft tweet as replying to the given status ID.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Note that this will only properly take effect if the user who posted the given status is</span>
-    <span class='doccomment'>///@mentioned in the status text, or if the given status was posted by the authenticated user.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>in_reply_to</span>(<span class='self'>self</span>, <span class='ident'>in_reply_to</span>: <span class='ident'>i64</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>DraftTweet</span> {
-            <span class='ident'>in_reply_to</span>: <span class='prelude-val'>Some</span>(<span class='ident'>in_reply_to</span>),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Marks this draft tweet as replying to the given status ID.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Note that this will only properly take effect if the user who posted the given status is</span>
+    <span class="doccomment">///@mentioned in the status text, or if the given status was posted by the authenticated user.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">in_reply_to</span>(<span class="self">self</span>, <span class="ident">in_reply_to</span>: <span class="ident">i64</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">DraftTweet</span> {
+            <span class="ident">in_reply_to</span>: <span class="prelude-val">Some</span>(<span class="ident">in_reply_to</span>),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Attach a lat/lon coordinate to this tweet, and mark whether a pin should be placed on the</span>
-    <span class='doccomment'>///exact coordinate when the tweet is displayed.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>coordinates</span>(<span class='self'>self</span>, <span class='ident'>latitude</span>: <span class='ident'>f32</span>, <span class='ident'>longitude</span>: <span class='ident'>f32</span>, <span class='ident'>display</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>DraftTweet</span> {
-            <span class='ident'>coordinates</span>: <span class='prelude-val'>Some</span>((<span class='ident'>latitude</span>, <span class='ident'>longitude</span>)),
-            <span class='ident'>display_coordinates</span>: <span class='prelude-val'>Some</span>(<span class='ident'>display</span>),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Attach a lat/lon coordinate to this tweet, and mark whether a pin should be placed on the</span>
+    <span class="doccomment">///exact coordinate when the tweet is displayed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coordinates</span>(<span class="self">self</span>, <span class="ident">latitude</span>: <span class="ident">f32</span>, <span class="ident">longitude</span>: <span class="ident">f32</span>, <span class="ident">display</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">DraftTweet</span> {
+            <span class="ident">coordinates</span>: <span class="prelude-val">Some</span>((<span class="ident">latitude</span>, <span class="ident">longitude</span>)),
+            <span class="ident">display_coordinates</span>: <span class="prelude-val">Some</span>(<span class="ident">display</span>),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Send the assembled tweet as the authenticated user.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>send</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;status&quot;</span>, <span class='self'>self</span>.<span class='ident'>text</span>);
+    <span class="doccomment">///Send the assembled tweet as the authenticated user.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;status&quot;</span>, <span class="self">self</span>.<span class="ident">text</span>);
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>reply</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>in_reply_to</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;in_reply_to_status_id&quot;</span>, <span class='ident'>reply</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reply</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_reply_to</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;in_reply_to_status_id&quot;</span>, <span class="ident">reply</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>((<span class='ident'>lat</span>, <span class='ident'>long</span>)) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>coordinates</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;lat&quot;</span>, <span class='ident'>lat</span>.<span class='ident'>to_string</span>());
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;long&quot;</span>, <span class='ident'>long</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">lat</span>, <span class="ident">long</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">coordinates</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;lat&quot;</span>, <span class="ident">lat</span>.<span class="ident">to_string</span>());
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;long&quot;</span>, <span class="ident">long</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>display</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>display_coordinates</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;display_coordinates&quot;</span>, <span class='ident'>display</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">display</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">display_coordinates</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;display_coordinates&quot;</span>, <span class="ident">display</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>statuses</span>::<span class='ident'>UPDATE</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
-        <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">statuses</span>::<span class="ident">UPDATE</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
+        <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
     }
 }
 </pre>
@@ -1171,18 +1183,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1215,7 +1231,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

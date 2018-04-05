@@ -9,14 +9,18 @@
 
     <title>openssl::x509::extension - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../../index.html'>openssl</a>::<wbr><a href='../index.html'>x509</a></p><script>window.sidebarCurrent = {name: 'extension', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module extension</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../../index.html'>openssl</a>::<wbr><a href='../index.html'>x509</a></p><script>window.sidebarCurrent = {name: 'extension', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,45 +54,47 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>openssl</a>::<wbr><a href='../index.html'>x509</a>::<wbr><a class='mod' href=''>extension</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>openssl</a>::<wbr><a href='../index.html'>x509</a>::<wbr><a class="mod" href=''>extension</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1729' class='srclink' href='../../../src/openssl/x509/extension.rs.html#1-221' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../../src/openssl/x509/extension.rs.html#1-221' title='goto source code'>[src]</a></span></h1>
 <h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.AltNameOption.html'
-                                  title='openssl::x509::extension::AltNameOption'>AltNameOption</a></td>
+                           <td><a class="enum" href="enum.AltNameOption.html"
+                                  title='enum openssl::x509::extension::AltNameOption'>AltNameOption</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.ExtKeyUsageOption.html'
-                                  title='openssl::x509::extension::ExtKeyUsageOption'>ExtKeyUsageOption</a></td>
+                           <td><a class="enum" href="enum.ExtKeyUsageOption.html"
+                                  title='enum openssl::x509::extension::ExtKeyUsageOption'>ExtKeyUsageOption</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.Extension.html'
-                                  title='openssl::x509::extension::Extension'>Extension</a></td>
+                           <td><a class="enum" href="enum.Extension.html"
+                                  title='enum openssl::x509::extension::Extension'>Extension</a></td>
                            <td class='docblock-short'>
                                 <p>A X.509 v3 certificate extension.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.ExtensionType.html'
-                                  title='openssl::x509::extension::ExtensionType'>ExtensionType</a></td>
+                           <td><a class="enum" href="enum.ExtensionType.html"
+                                  title='enum openssl::x509::extension::ExtensionType'>ExtensionType</a></td>
                            <td class='docblock-short'>
                                 <p>Type-only version of the <code>Extension</code> enum.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.KeyUsageOption.html'
-                                  title='openssl::x509::extension::KeyUsageOption'>KeyUsageOption</a></td>
+                           <td><a class="enum" href="enum.KeyUsageOption.html"
+                                  title='enum openssl::x509::extension::KeyUsageOption'>KeyUsageOption</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
@@ -97,18 +111,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -141,7 +159,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

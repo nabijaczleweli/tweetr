@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/referrer_policy.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/referrer_policy.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>referrer_policy.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -155,119 +167,119 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ascii</span>::<span class='ident'>AsciiExt</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
 
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>, <span class='ident'>parsing</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HeaderFormat</span>, <span class="ident">parsing</span>};
 
-<span class='doccomment'>/// `Referrer-Policy` header, part of</span>
-<span class='doccomment'>/// [Referrer Policy](https://www.w3.org/TR/referrer-policy/#referrer-policy-header)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The `Referrer-Policy` HTTP header specifies the referrer</span>
-<span class='doccomment'>/// policy that the user agent applies when determining what</span>
-<span class='doccomment'>/// referrer information should be included with requests made,</span>
-<span class='doccomment'>/// and with browsing contexts created from the context of the</span>
-<span class='doccomment'>/// protected resource.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # ABNF</span>
-<span class='doccomment'>/// ```plain</span>
-<span class='doccomment'>/// Referrer-Policy: 1#policy-token</span>
-<span class='doccomment'>/// policy-token   = &quot;no-referrer&quot; / &quot;no-referrer-when-downgrade&quot;</span>
-<span class='doccomment'>///                  / &quot;same-origin&quot; / &quot;origin&quot;</span>
-<span class='doccomment'>///                  / &quot;origin-when-cross-origin&quot; / &quot;unsafe-url&quot;</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example values</span>
-<span class='doccomment'>/// * `no-referrer`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, ReferrerPolicy};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(ReferrerPolicy::NoReferrer);</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ReferrerPolicy</span> {
-    <span class='doccomment'>/// `no-referrer`</span>
-    <span class='ident'>NoReferrer</span>,
-    <span class='doccomment'>/// `no-referrer-when-downgrade`</span>
-    <span class='ident'>NoReferrerWhenDowngrade</span>,
-    <span class='doccomment'>/// `same-origin`</span>
-    <span class='ident'>SameOrigin</span>,
-    <span class='doccomment'>/// `origin`</span>
-    <span class='ident'>Origin</span>,
-    <span class='doccomment'>/// `origin-when-cross-origin`</span>
-    <span class='ident'>OriginWhenCrossOrigin</span>,
-    <span class='doccomment'>/// `unsafe-url`</span>
-    <span class='ident'>UnsafeUrl</span>,
-     <span class='doccomment'>/// `strict-origin`</span>
-    <span class='ident'>StrictOrigin</span>,
-    <span class='doccomment'>///`strict-origin-when-cross-origin`</span>
-    <span class='ident'>StrictOriginWhenCrossOrigin</span>,
+<span class="doccomment">/// `Referrer-Policy` header, part of</span>
+<span class="doccomment">/// [Referrer Policy](https://www.w3.org/TR/referrer-policy/#referrer-policy-header)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `Referrer-Policy` HTTP header specifies the referrer</span>
+<span class="doccomment">/// policy that the user agent applies when determining what</span>
+<span class="doccomment">/// referrer information should be included with requests made,</span>
+<span class="doccomment">/// and with browsing contexts created from the context of the</span>
+<span class="doccomment">/// protected resource.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # ABNF</span>
+<span class="doccomment">/// ```plain</span>
+<span class="doccomment">/// Referrer-Policy: 1#policy-token</span>
+<span class="doccomment">/// policy-token   = &quot;no-referrer&quot; / &quot;no-referrer-when-downgrade&quot;</span>
+<span class="doccomment">///                  / &quot;same-origin&quot; / &quot;origin&quot;</span>
+<span class="doccomment">///                  / &quot;origin-when-cross-origin&quot; / &quot;unsafe-url&quot;</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example values</span>
+<span class="doccomment">/// * `no-referrer`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, ReferrerPolicy};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(ReferrerPolicy::NoReferrer);</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferrerPolicy</span> {
+    <span class="doccomment">/// `no-referrer`</span>
+    <span class="ident">NoReferrer</span>,
+    <span class="doccomment">/// `no-referrer-when-downgrade`</span>
+    <span class="ident">NoReferrerWhenDowngrade</span>,
+    <span class="doccomment">/// `same-origin`</span>
+    <span class="ident">SameOrigin</span>,
+    <span class="doccomment">/// `origin`</span>
+    <span class="ident">Origin</span>,
+    <span class="doccomment">/// `origin-when-cross-origin`</span>
+    <span class="ident">OriginWhenCrossOrigin</span>,
+    <span class="doccomment">/// `unsafe-url`</span>
+    <span class="ident">UnsafeUrl</span>,
+     <span class="doccomment">/// `strict-origin`</span>
+    <span class="ident">StrictOrigin</span>,
+    <span class="doccomment">///`strict-origin-when-cross-origin`</span>
+    <span class="ident">StrictOriginWhenCrossOrigin</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>ReferrerPolicy</span> {
-    <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='kw'>static</span> <span class='ident'>NAME</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Referrer-Policy&quot;</span>;
-        <span class='ident'>NAME</span>
+<span class="kw">impl</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">ReferrerPolicy</span> {
+    <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">static</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Referrer-Policy&quot;</span>;
+        <span class="ident">NAME</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ReferrerPolicy</span><span class='op'>&gt;</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>ReferrerPolicy</span>::<span class='op'>*</span>;
-        <span class='comment'>// See https://www.w3.org/TR/referrer-policy/#determine-policy-for-token</span>
-        <span class='kw'>let</span> <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parsing</span>::<span class='ident'>from_comma_delimited</span>(<span class='ident'>raw</span>));
+    <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReferrerPolicy</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ReferrerPolicy</span>::<span class="kw-2">*</span>;
+        <span class="comment">// See https://www.w3.org/TR/referrer-policy/#determine-policy-for-token</span>
+        <span class="kw">let</span> <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">parsing</span>::<span class="ident">from_comma_delimited</span>(<span class="ident">raw</span>));
 
-        <span class='kw'>for</span> <span class='ident'>h</span> <span class='kw'>in</span> <span class='ident'>headers</span>.<span class='ident'>iter</span>().<span class='ident'>rev</span>() {
-            <span class='kw'>let</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>h</span>.<span class='ident'>to_ascii_lowercase</span>()[..];
-            <span class='kw'>match</span> <span class='ident'>slice</span> {
-                <span class='string'>&quot;no-referrer&quot;</span> <span class='op'>|</span> <span class='string'>&quot;never&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>NoReferrer</span>),
-                <span class='string'>&quot;no-referrer-when-downgrade&quot;</span> <span class='op'>|</span> <span class='string'>&quot;default&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>NoReferrerWhenDowngrade</span>),
-                <span class='string'>&quot;same-origin&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>SameOrigin</span>),
-                <span class='string'>&quot;origin&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Origin</span>),
-                <span class='string'>&quot;origin-when-cross-origin&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>OriginWhenCrossOrigin</span>),
-                <span class='string'>&quot;strict-origin&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>StrictOrigin</span>),
-                <span class='string'>&quot;strict-origin-when-cross-origin&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>StrictOriginWhenCrossOrigin</span>),
-                <span class='string'>&quot;unsafe-url&quot;</span> <span class='op'>|</span> <span class='string'>&quot;always&quot;</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>UnsafeUrl</span>),
-                _ <span class='op'>=&gt;</span> <span class='kw'>continue</span>,
+        <span class="kw">for</span> <span class="ident">h</span> <span class="kw">in</span> <span class="ident">headers</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
+            <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">h</span>.<span class="ident">to_ascii_lowercase</span>()[..];
+            <span class="kw">match</span> <span class="ident">slice</span> {
+                <span class="string">&quot;no-referrer&quot;</span> <span class="op">|</span> <span class="string">&quot;never&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">NoReferrer</span>),
+                <span class="string">&quot;no-referrer-when-downgrade&quot;</span> <span class="op">|</span> <span class="string">&quot;default&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">NoReferrerWhenDowngrade</span>),
+                <span class="string">&quot;same-origin&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">SameOrigin</span>),
+                <span class="string">&quot;origin&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Origin</span>),
+                <span class="string">&quot;origin-when-cross-origin&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">OriginWhenCrossOrigin</span>),
+                <span class="string">&quot;strict-origin&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">StrictOrigin</span>),
+                <span class="string">&quot;strict-origin-when-cross-origin&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">StrictOriginWhenCrossOrigin</span>),
+                <span class="string">&quot;unsafe-url&quot;</span> <span class="op">|</span> <span class="string">&quot;always&quot;</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">UnsafeUrl</span>),
+                _ <span class="op">=&gt;</span> <span class="kw">continue</span>,
             }
         }
 
-        <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+        <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>ReferrerPolicy</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>ReferrerPolicy</span>::<span class='op'>*</span>;
-        <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>NoReferrer</span> <span class='op'>=&gt;</span> <span class='string'>&quot;no-referrer&quot;</span>,
-            <span class='ident'>NoReferrerWhenDowngrade</span> <span class='op'>=&gt;</span> <span class='string'>&quot;no-referrer-when-downgrade&quot;</span>,
-            <span class='ident'>SameOrigin</span> <span class='op'>=&gt;</span> <span class='string'>&quot;same-origin&quot;</span>,
-            <span class='ident'>Origin</span> <span class='op'>=&gt;</span> <span class='string'>&quot;origin&quot;</span>,
-            <span class='ident'>OriginWhenCrossOrigin</span> <span class='op'>=&gt;</span> <span class='string'>&quot;origin-when-cross-origin&quot;</span>,
-            <span class='ident'>StrictOrigin</span> <span class='op'>=&gt;</span> <span class='string'>&quot;strict-origin&quot;</span>,
-            <span class='ident'>StrictOriginWhenCrossOrigin</span> <span class='op'>=&gt;</span> <span class='string'>&quot;strict-origin-when-cross-origin&quot;</span>,
-            <span class='ident'>UnsafeUrl</span> <span class='op'>=&gt;</span> <span class='string'>&quot;unsafe-url&quot;</span>,
+<span class="kw">impl</span> <span class="ident">HeaderFormat</span> <span class="kw">for</span> <span class="ident">ReferrerPolicy</span> {
+    <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ReferrerPolicy</span>::<span class="kw-2">*</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">NoReferrer</span> <span class="op">=&gt;</span> <span class="string">&quot;no-referrer&quot;</span>,
+            <span class="ident">NoReferrerWhenDowngrade</span> <span class="op">=&gt;</span> <span class="string">&quot;no-referrer-when-downgrade&quot;</span>,
+            <span class="ident">SameOrigin</span> <span class="op">=&gt;</span> <span class="string">&quot;same-origin&quot;</span>,
+            <span class="ident">Origin</span> <span class="op">=&gt;</span> <span class="string">&quot;origin&quot;</span>,
+            <span class="ident">OriginWhenCrossOrigin</span> <span class="op">=&gt;</span> <span class="string">&quot;origin-when-cross-origin&quot;</span>,
+            <span class="ident">StrictOrigin</span> <span class="op">=&gt;</span> <span class="string">&quot;strict-origin&quot;</span>,
+            <span class="ident">StrictOriginWhenCrossOrigin</span> <span class="op">=&gt;</span> <span class="string">&quot;strict-origin-when-cross-origin&quot;</span>,
+            <span class="ident">UnsafeUrl</span> <span class="op">=&gt;</span> <span class="string">&quot;unsafe-url&quot;</span>,
         })
     }
 }
 
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_parse_header</span>() {
-    <span class='kw'>let</span> <span class='ident'>a</span>: <span class='ident'>ReferrerPolicy</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>([<span class='string'>b&quot;origin&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>as_ref</span>()).<span class='ident'>unwrap</span>();
-    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>ReferrerPolicy</span>::<span class='ident'>Origin</span>;
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>b</span>);
-    <span class='kw'>let</span> <span class='ident'>e</span>: ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ReferrerPolicy</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>([<span class='string'>b&quot;foobar&quot;</span>.<span class='ident'>to_vec</span>()].<span class='ident'>as_ref</span>());
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>is_err</span>());
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">test_parse_header</span>() {
+    <span class="kw">let</span> <span class="ident">a</span>: <span class="ident">ReferrerPolicy</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>([<span class="string">b&quot;origin&quot;</span>.<span class="ident">to_vec</span>()].<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">ReferrerPolicy</span>::<span class="ident">Origin</span>;
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+    <span class="kw">let</span> <span class="ident">e</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReferrerPolicy</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>([<span class="string">b&quot;foobar&quot;</span>.<span class="ident">to_vec</span>()].<span class="ident">as_ref</span>());
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">e</span>.<span class="ident">is_err</span>());
 }
 
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>test_rightmost_header</span>() {
-    <span class='kw'>let</span> <span class='ident'>a</span>: <span class='ident'>ReferrerPolicy</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>&quot;same-origin, origin, foobar&quot;</span>.<span class='ident'>into</span>()]).<span class='ident'>unwrap</span>();
-    <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>ReferrerPolicy</span>::<span class='ident'>Origin</span>;
-    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>b</span>);
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">test_rightmost_header</span>() {
+    <span class="kw">let</span> <span class="ident">a</span>: <span class="ident">ReferrerPolicy</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;same-origin, origin, foobar&quot;</span>.<span class="ident">into</span>()]).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">ReferrerPolicy</span>::<span class="ident">Origin</span>;
+    <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
 }
 </pre>
 </section>
@@ -283,18 +295,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -327,7 +343,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

@@ -9,14 +9,18 @@
 
     <title>structs.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -752,714 +764,714 @@
 <span id="708">708</span>
 <span id="709">709</span>
 <span id="710">710</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
-<span class='kw'>use</span> <span class='ident'>rustc_serialize</span>::<span class='ident'>json</span>;
-<span class='kw'>use</span> <span class='ident'>auth</span>;
-<span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
-<span class='kw'>use</span> <span class='ident'>entities</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>InvalidResponse</span>;
-<span class='kw'>use</span> <span class='ident'>links</span>;
-<span class='kw'>use</span> <span class='ident'>tweet</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">rustc_serialize</span>::<span class="ident">json</span>;
+<span class="kw">use</span> <span class="ident">auth</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">entities</span>;
+<span class="kw">use</span> <span class="ident">error</span>;
+<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">InvalidResponse</span>;
+<span class="kw">use</span> <span class="ident">links</span>;
+<span class="kw">use</span> <span class="ident">tweet</span>;
 
-<span class='doccomment'>///Convenience enum to generalize between referring to an account by numeric ID or by screen name.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Referring via the account&#39;s numeric ID.</span>
-    <span class='ident'>ID</span>(<span class='ident'>i64</span>),
-    <span class='doccomment'>///Referring via the account&#39;s screen name.</span>
-    <span class='ident'>ScreenName</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>),
+<span class="doccomment">///Convenience enum to generalize between referring to an account by numeric ID or by screen name.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Referring via the account&#39;s numeric ID.</span>
+    <span class="ident">ID</span>(<span class="ident">i64</span>),
+    <span class="doccomment">///Referring via the account&#39;s screen name.</span>
+    <span class="ident">ScreenName</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>id</span>: <span class='ident'>i64</span>) <span class='op'>-&gt;</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='ident'>id</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">i64</span>) <span class="op">-&gt;</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="ident">id</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>i64</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>id</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>i64</span>) <span class='op'>-&gt;</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='op'>*</span><span class='ident'>id</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">i64</span>) <span class="op">-&gt;</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="kw-2">*</span><span class="ident">id</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>String</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>.<span class='ident'>as_str</span>())
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>) <span class="op">-&gt;</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>.<span class="ident">as_str</span>())
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>id</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>id</span>.<span class='ident'>clone</span>()
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">id</span>.<span class="ident">clone</span>()
     }
 }
 
-<span class='doccomment'>/// Represents a Twitter user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Field-level documentation is mostly ripped wholesale from [Twitter&#39;s user</span>
-<span class='doccomment'>/// documentation][api-user].</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// [api-user]: https://dev.twitter.com/overview/api/users</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The fields present in this struct can be divided up into a few sections: Profile Information and</span>
-<span class='doccomment'>/// Settings.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ## Profile Information</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Information here can be considered part of the user&#39;s profile. These fields are the &quot;obvious&quot;</span>
-<span class='doccomment'>/// visible portion of a profile view.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// * `id`</span>
-<span class='doccomment'>/// * `screen_name`</span>
-<span class='doccomment'>/// * `name`</span>
-<span class='doccomment'>/// * `verified`</span>
-<span class='doccomment'>/// * `protected`</span>
-<span class='doccomment'>/// * `description`</span>
-<span class='doccomment'>/// * `location`</span>
-<span class='doccomment'>/// * `url`</span>
-<span class='doccomment'>/// * `statuses_count`</span>
-<span class='doccomment'>/// * `friends_count`</span>
-<span class='doccomment'>/// * `followers_count`</span>
-<span class='doccomment'>/// * `favourites_count`</span>
-<span class='doccomment'>/// * `listed_count`</span>
-<span class='doccomment'>/// * `profile_image_url`/`profile_image_url_https`</span>
-<span class='doccomment'>/// * `profile_banner_url`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ## Settings Information</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Information here can be used to alter the UI around this user, or to provide further metadata</span>
-<span class='doccomment'>/// that may not necessarily be user-facing.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// * `contributors_enabled`</span>
-<span class='doccomment'>/// * `created_at`</span>
-<span class='doccomment'>/// * `default_profile_image`</span>
-<span class='doccomment'>/// * `follow_request_sent`</span>
-<span class='doccomment'>/// * `default_profile`, `profile_background_color`, `profile_background_image_url`,</span>
-<span class='doccomment'>///   `profile_background_image_url_https`, `profile_background_tile`, `profile_link_color`,</span>
-<span class='doccomment'>///   `profile_sidebar_border_color`, `profile_sidebar_fill_color`, `profile_text_color`,</span>
-<span class='doccomment'>///   `profile_use_background_image`: These fields can be used to theme a user&#39;s profile page to</span>
-<span class='doccomment'>///   look like the settings they&#39;ve set on the Twitter website.</span>
-<span class='doccomment'>/// * `geo_enabled`</span>
-<span class='doccomment'>/// * `is_translator`</span>
-<span class='doccomment'>/// * `lang`</span>
-<span class='doccomment'>/// * `show_all_inline_media`</span>
-<span class='doccomment'>/// * `time_zone`/`utc_offset`</span>
-<span class='doccomment'>/// * `withheld_in_countries`/`withheld_scope`</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>TwitterUser</span> {
-    <span class='doccomment'>///Indicates this user has an account with &quot;contributor mode&quot; enabled, allowing</span>
-    <span class='doccomment'>///for Tweets issued by the user to be co-authored by another account. Rarely `true`.</span>
-    <span class='kw'>pub</span> <span class='ident'>contributors_enabled</span>: <span class='ident'>bool</span>,
-    <span class='comment'>//TODO: parse as date?</span>
-    <span class='doccomment'>///The UTC datetime that this user account was created on Twitter, formatted like &quot;Tue Jan</span>
-    <span class='doccomment'>///13 23:37:34 +0000 2015&quot;.</span>
-    <span class='kw'>pub</span> <span class='ident'>created_at</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///When true, indicates that this user has not altered the theme or background of</span>
-    <span class='doccomment'>///their user profile.</span>
-    <span class='kw'>pub</span> <span class='ident'>default_profile</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///When true, indicates that the user has not uploaded their own avatar and a default</span>
-    <span class='doccomment'>///egg avatar is used instead.</span>
-    <span class='kw'>pub</span> <span class='ident'>default_profile_image</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///The user-defined string describing their account.</span>
-    <span class='kw'>pub</span> <span class='ident'>description</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Link information that has been parsed out of the `url` or `description` fields given by the</span>
-    <span class='doccomment'>///user.</span>
-    <span class='kw'>pub</span> <span class='ident'>entities</span>: <span class='ident'>UserEntities</span>,
-    <span class='doccomment'>///The number of tweets this user has favorited or liked in the account&#39;s lifetime.</span>
-    <span class='doccomment'>///The term &quot;favourites&quot; and its British spelling are used for historical reasons.</span>
-    <span class='kw'>pub</span> <span class='ident'>favourites_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///When true, indicates that the authenticating user has issued a follow request to</span>
-    <span class='doccomment'>///this protected account.</span>
-    <span class='kw'>pub</span> <span class='ident'>follow_request_sent</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether the authenticating user is following this account. Deprecated</span>
-    <span class='doccomment'>///(and thus hidden) due to increasing error conditions where this returns None.</span>
-    <span class='ident'>following</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The number of followers this account has.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///In certain server-stress conditions, this may temporarily mistakenly return 0.</span>
-    <span class='kw'>pub</span> <span class='ident'>followers_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///The number of users this account follows, aka its &quot;followings&quot;.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///In certain server-stress conditions, this may temporarily mistakenly return 0.</span>
-    <span class='kw'>pub</span> <span class='ident'>friends_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///Indicates whether this user as enabled their tweets to be geotagged.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If this is set for the current user, then they can attach geographic data when</span>
-    <span class='doccomment'>///posting a new Tweet.</span>
-    <span class='kw'>pub</span> <span class='ident'>geo_enabled</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Unique identifier for this user.</span>
-    <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
-    <span class='doccomment'>///Indicates whether the user participates in Twitter&#39;s translator community.</span>
-    <span class='kw'>pub</span> <span class='ident'>is_translator</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Language code for the user&#39;s self-declared interface language.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Codes are formatted as a language tag from [BCP 47][]. Only indicates the user&#39;s</span>
-    <span class='doccomment'>///interface language, not necessarily the content of their Tweets.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[BCP 47]: https://tools.ietf.org/html/bcp47</span>
-    <span class='kw'>pub</span> <span class='ident'>lang</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The number of public lists the user is a member of.</span>
-    <span class='kw'>pub</span> <span class='ident'>listed_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///The user-entered location field from their profile. Not necessarily parseable</span>
-    <span class='doccomment'>///or even a location.</span>
-    <span class='kw'>pub</span> <span class='ident'>location</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The user-entered display name.</span>
-    <span class='kw'>pub</span> <span class='ident'>name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///Indicates whether the authenticated user has chosen to received this user&#39;s tweets</span>
-    <span class='doccomment'>///via SMS. Deprecated (and thus hidden) due to bugs where this incorrectly returns</span>
-    <span class='doccomment'>///false.</span>
-    <span class='ident'>notifications</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The hex color chosen by the user for their profile background.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_background_color</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///A URL pointing to the background image chosen by the user for their profile. Uses</span>
-    <span class='doccomment'>///HTTP as the protocol.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_background_image_url</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///A URL pointing to the background image chosen by the user for their profile. Uses</span>
-    <span class='doccomment'>///HTTPS as the protocol.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_background_image_url_https</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether the user&#39;s `profile_background_image_url` should be tiled when</span>
-    <span class='doccomment'>///displayed.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_background_tile</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///A URL pointing to the banner image chosen by the user. Uses HTTPS as the protocol.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///This is a base URL that a size specifier can be appended onto to get variously</span>
-    <span class='doccomment'>///sized images, with size specifiers according to [Profile Images and Banners][profile-img].</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_banner_url</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///A URL pointing to the user&#39;s avatar image. Uses HTTP as the protocol. Size</span>
-    <span class='doccomment'>///specifiers can be used according to [Profile Images and Banners][profile-img].</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_image_url</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///A URL pointing to the user&#39;s avatar image. Uses HTTPS as the protocol. Size</span>
-    <span class='doccomment'>///specifiers can be used according to [Profile Images and Banners][profile-img].</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_image_url_https</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The hex color chosen by the user to display links in the Twitter UI.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_link_color</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The hex color chosen by the user to display sidebar borders in the Twitter UI.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_sidebar_border_color</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The hex color chosen by the user to display sidebar backgrounds in the Twitter UI.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_sidebar_fill_color</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The hex color chosen by the user to display text in the Twitter UI.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_text_color</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///Indicates whether the user wants their uploaded background image to be used.</span>
-    <span class='kw'>pub</span> <span class='ident'>profile_use_background_image</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Indicates whether the user is a [protected][] account.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[protected]: https://support.twitter.com/articles/14016</span>
-    <span class='kw'>pub</span> <span class='ident'>protected</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///The screen name or handle identifying this user.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Screen names are unique per-user but can be changed. Use `id` for an immutable identifier</span>
-    <span class='doccomment'>///for an account.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Typically a maximum of 15 characters long, but older accounts may exist with longer screen</span>
-    <span class='doccomment'>///names.</span>
-    <span class='kw'>pub</span> <span class='ident'>screen_name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///Indicates that the user would like to see media inline. &quot;Somewhat disused.&quot;</span>
-    <span class='kw'>pub</span> <span class='ident'>show_all_inline_media</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///If possible, the most recent tweet or retweet from this user.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///&quot;In some circumstances, this data cannot be provided and this field will be omitted, null,</span>
-    <span class='doccomment'>///or empty.&quot; Do not depend on this field being filled. Also note that this is actually their</span>
-    <span class='doccomment'>///most-recent tweet, not the status pinned to their profile.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///&quot;Perspectival&quot; items within this tweet that depend on the authenticating user</span>
-    <span class='doccomment'>///[may not be completely reliable][stale-embed] in this embed.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[stale-embed]: https://dev.twitter.com/docs/faq/basics/why-are-embedded-objects-stale-or-inaccurate</span>
-    <span class='kw'>pub</span> <span class='ident'>status</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>tweet</span>::<span class='ident'>Tweet</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>///The number of tweets (including retweets) posted by this user.</span>
-    <span class='kw'>pub</span> <span class='ident'>statuses_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///The full name of the time zone the user has set their UI preference to.</span>
-    <span class='kw'>pub</span> <span class='ident'>time_zone</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The website link given by this user in their profile.</span>
-    <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The UTC offset of `time_zone` in minutes.</span>
-    <span class='kw'>pub</span> <span class='ident'>utc_offset</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether this user is a verified account.</span>
-    <span class='kw'>pub</span> <span class='ident'>verified</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///When present, lists the countries this user has been withheld from.</span>
-    <span class='kw'>pub</span> <span class='ident'>withheld_in_countries</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>///When present, indicates whether the content being withheld is a &quot;status&quot; or &quot;user&quot;.</span>
-    <span class='kw'>pub</span> <span class='ident'>withheld_scope</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// Represents a Twitter user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Field-level documentation is mostly ripped wholesale from [Twitter&#39;s user</span>
+<span class="doccomment">/// documentation][api-user].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [api-user]: https://dev.twitter.com/overview/api/users</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The fields present in this struct can be divided up into a few sections: Profile Information and</span>
+<span class="doccomment">/// Settings.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Profile Information</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Information here can be considered part of the user&#39;s profile. These fields are the &quot;obvious&quot;</span>
+<span class="doccomment">/// visible portion of a profile view.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * `id`</span>
+<span class="doccomment">/// * `screen_name`</span>
+<span class="doccomment">/// * `name`</span>
+<span class="doccomment">/// * `verified`</span>
+<span class="doccomment">/// * `protected`</span>
+<span class="doccomment">/// * `description`</span>
+<span class="doccomment">/// * `location`</span>
+<span class="doccomment">/// * `url`</span>
+<span class="doccomment">/// * `statuses_count`</span>
+<span class="doccomment">/// * `friends_count`</span>
+<span class="doccomment">/// * `followers_count`</span>
+<span class="doccomment">/// * `favourites_count`</span>
+<span class="doccomment">/// * `listed_count`</span>
+<span class="doccomment">/// * `profile_image_url`/`profile_image_url_https`</span>
+<span class="doccomment">/// * `profile_banner_url`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Settings Information</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Information here can be used to alter the UI around this user, or to provide further metadata</span>
+<span class="doccomment">/// that may not necessarily be user-facing.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * `contributors_enabled`</span>
+<span class="doccomment">/// * `created_at`</span>
+<span class="doccomment">/// * `default_profile_image`</span>
+<span class="doccomment">/// * `follow_request_sent`</span>
+<span class="doccomment">/// * `default_profile`, `profile_background_color`, `profile_background_image_url`,</span>
+<span class="doccomment">///   `profile_background_image_url_https`, `profile_background_tile`, `profile_link_color`,</span>
+<span class="doccomment">///   `profile_sidebar_border_color`, `profile_sidebar_fill_color`, `profile_text_color`,</span>
+<span class="doccomment">///   `profile_use_background_image`: These fields can be used to theme a user&#39;s profile page to</span>
+<span class="doccomment">///   look like the settings they&#39;ve set on the Twitter website.</span>
+<span class="doccomment">/// * `geo_enabled`</span>
+<span class="doccomment">/// * `is_translator`</span>
+<span class="doccomment">/// * `lang`</span>
+<span class="doccomment">/// * `show_all_inline_media`</span>
+<span class="doccomment">/// * `time_zone`/`utc_offset`</span>
+<span class="doccomment">/// * `withheld_in_countries`/`withheld_scope`</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TwitterUser</span> {
+    <span class="doccomment">///Indicates this user has an account with &quot;contributor mode&quot; enabled, allowing</span>
+    <span class="doccomment">///for Tweets issued by the user to be co-authored by another account. Rarely `true`.</span>
+    <span class="kw">pub</span> <span class="ident">contributors_enabled</span>: <span class="ident">bool</span>,
+    <span class="comment">//TODO: parse as date?</span>
+    <span class="doccomment">///The UTC datetime that this user account was created on Twitter, formatted like &quot;Tue Jan</span>
+    <span class="doccomment">///13 23:37:34 +0000 2015&quot;.</span>
+    <span class="kw">pub</span> <span class="ident">created_at</span>: <span class="ident">String</span>,
+    <span class="doccomment">///When true, indicates that this user has not altered the theme or background of</span>
+    <span class="doccomment">///their user profile.</span>
+    <span class="kw">pub</span> <span class="ident">default_profile</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///When true, indicates that the user has not uploaded their own avatar and a default</span>
+    <span class="doccomment">///egg avatar is used instead.</span>
+    <span class="kw">pub</span> <span class="ident">default_profile_image</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///The user-defined string describing their account.</span>
+    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Link information that has been parsed out of the `url` or `description` fields given by the</span>
+    <span class="doccomment">///user.</span>
+    <span class="kw">pub</span> <span class="ident">entities</span>: <span class="ident">UserEntities</span>,
+    <span class="doccomment">///The number of tweets this user has favorited or liked in the account&#39;s lifetime.</span>
+    <span class="doccomment">///The term &quot;favourites&quot; and its British spelling are used for historical reasons.</span>
+    <span class="kw">pub</span> <span class="ident">favourites_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///When true, indicates that the authenticating user has issued a follow request to</span>
+    <span class="doccomment">///this protected account.</span>
+    <span class="kw">pub</span> <span class="ident">follow_request_sent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether the authenticating user is following this account. Deprecated</span>
+    <span class="doccomment">///(and thus hidden) due to increasing error conditions where this returns None.</span>
+    <span class="ident">following</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The number of followers this account has.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///In certain server-stress conditions, this may temporarily mistakenly return 0.</span>
+    <span class="kw">pub</span> <span class="ident">followers_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///The number of users this account follows, aka its &quot;followings&quot;.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///In certain server-stress conditions, this may temporarily mistakenly return 0.</span>
+    <span class="kw">pub</span> <span class="ident">friends_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///Indicates whether this user as enabled their tweets to be geotagged.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If this is set for the current user, then they can attach geographic data when</span>
+    <span class="doccomment">///posting a new Tweet.</span>
+    <span class="kw">pub</span> <span class="ident">geo_enabled</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Unique identifier for this user.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">i64</span>,
+    <span class="doccomment">///Indicates whether the user participates in Twitter&#39;s translator community.</span>
+    <span class="kw">pub</span> <span class="ident">is_translator</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Language code for the user&#39;s self-declared interface language.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Codes are formatted as a language tag from [BCP 47][]. Only indicates the user&#39;s</span>
+    <span class="doccomment">///interface language, not necessarily the content of their Tweets.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[BCP 47]: https://tools.ietf.org/html/bcp47</span>
+    <span class="kw">pub</span> <span class="ident">lang</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The number of public lists the user is a member of.</span>
+    <span class="kw">pub</span> <span class="ident">listed_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///The user-entered location field from their profile. Not necessarily parseable</span>
+    <span class="doccomment">///or even a location.</span>
+    <span class="kw">pub</span> <span class="ident">location</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The user-entered display name.</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///Indicates whether the authenticated user has chosen to received this user&#39;s tweets</span>
+    <span class="doccomment">///via SMS. Deprecated (and thus hidden) due to bugs where this incorrectly returns</span>
+    <span class="doccomment">///false.</span>
+    <span class="ident">notifications</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The hex color chosen by the user for their profile background.</span>
+    <span class="kw">pub</span> <span class="ident">profile_background_color</span>: <span class="ident">String</span>,
+    <span class="doccomment">///A URL pointing to the background image chosen by the user for their profile. Uses</span>
+    <span class="doccomment">///HTTP as the protocol.</span>
+    <span class="kw">pub</span> <span class="ident">profile_background_image_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///A URL pointing to the background image chosen by the user for their profile. Uses</span>
+    <span class="doccomment">///HTTPS as the protocol.</span>
+    <span class="kw">pub</span> <span class="ident">profile_background_image_url_https</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether the user&#39;s `profile_background_image_url` should be tiled when</span>
+    <span class="doccomment">///displayed.</span>
+    <span class="kw">pub</span> <span class="ident">profile_background_tile</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///A URL pointing to the banner image chosen by the user. Uses HTTPS as the protocol.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///This is a base URL that a size specifier can be appended onto to get variously</span>
+    <span class="doccomment">///sized images, with size specifiers according to [Profile Images and Banners][profile-img].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
+    <span class="kw">pub</span> <span class="ident">profile_banner_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///A URL pointing to the user&#39;s avatar image. Uses HTTP as the protocol. Size</span>
+    <span class="doccomment">///specifiers can be used according to [Profile Images and Banners][profile-img].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
+    <span class="kw">pub</span> <span class="ident">profile_image_url</span>: <span class="ident">String</span>,
+    <span class="doccomment">///A URL pointing to the user&#39;s avatar image. Uses HTTPS as the protocol. Size</span>
+    <span class="doccomment">///specifiers can be used according to [Profile Images and Banners][profile-img].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[profile-img]: https://dev.twitter.com/overview/general/user-profile-images-and-banners</span>
+    <span class="kw">pub</span> <span class="ident">profile_image_url_https</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The hex color chosen by the user to display links in the Twitter UI.</span>
+    <span class="kw">pub</span> <span class="ident">profile_link_color</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The hex color chosen by the user to display sidebar borders in the Twitter UI.</span>
+    <span class="kw">pub</span> <span class="ident">profile_sidebar_border_color</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The hex color chosen by the user to display sidebar backgrounds in the Twitter UI.</span>
+    <span class="kw">pub</span> <span class="ident">profile_sidebar_fill_color</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The hex color chosen by the user to display text in the Twitter UI.</span>
+    <span class="kw">pub</span> <span class="ident">profile_text_color</span>: <span class="ident">String</span>,
+    <span class="doccomment">///Indicates whether the user wants their uploaded background image to be used.</span>
+    <span class="kw">pub</span> <span class="ident">profile_use_background_image</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Indicates whether the user is a [protected][] account.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[protected]: https://support.twitter.com/articles/14016</span>
+    <span class="kw">pub</span> <span class="ident">protected</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///The screen name or handle identifying this user.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Screen names are unique per-user but can be changed. Use `id` for an immutable identifier</span>
+    <span class="doccomment">///for an account.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Typically a maximum of 15 characters long, but older accounts may exist with longer screen</span>
+    <span class="doccomment">///names.</span>
+    <span class="kw">pub</span> <span class="ident">screen_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///Indicates that the user would like to see media inline. &quot;Somewhat disused.&quot;</span>
+    <span class="kw">pub</span> <span class="ident">show_all_inline_media</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///If possible, the most recent tweet or retweet from this user.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///&quot;In some circumstances, this data cannot be provided and this field will be omitted, null,</span>
+    <span class="doccomment">///or empty.&quot; Do not depend on this field being filled. Also note that this is actually their</span>
+    <span class="doccomment">///most-recent tweet, not the status pinned to their profile.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///&quot;Perspectival&quot; items within this tweet that depend on the authenticating user</span>
+    <span class="doccomment">///[may not be completely reliable][stale-embed] in this embed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[stale-embed]: https://dev.twitter.com/docs/faq/basics/why-are-embedded-objects-stale-or-inaccurate</span>
+    <span class="kw">pub</span> <span class="ident">status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">tweet</span>::<span class="ident">Tweet</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">///The number of tweets (including retweets) posted by this user.</span>
+    <span class="kw">pub</span> <span class="ident">statuses_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///The full name of the time zone the user has set their UI preference to.</span>
+    <span class="kw">pub</span> <span class="ident">time_zone</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The website link given by this user in their profile.</span>
+    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The UTC offset of `time_zone` in minutes.</span>
+    <span class="kw">pub</span> <span class="ident">utc_offset</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether this user is a verified account.</span>
+    <span class="kw">pub</span> <span class="ident">verified</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///When present, lists the countries this user has been withheld from.</span>
+    <span class="kw">pub</span> <span class="ident">withheld_in_countries</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">///When present, indicates whether the content being withheld is a &quot;status&quot; or &quot;user&quot;.</span>
+    <span class="kw">pub</span> <span class="ident">withheld_scope</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
-<span class='doccomment'>///Container for URL entity information that may be paired with a user&#39;s profile.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>UserEntities</span> {
-    <span class='doccomment'>///URL information that has been parsed out of the user&#39;s `description`. If no URLs were</span>
-    <span class='doccomment'>///detected, then the contained Vec will be empty.</span>
-    <span class='kw'>pub</span> <span class='ident'>description</span>: <span class='ident'>UserEntityDetail</span>,
-    <span class='doccomment'>///Link information for the user&#39;s `url`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If `url` is present on the user&#39;s profile, so will this field. Twitter validates the URL</span>
-    <span class='doccomment'>///entered to a user&#39;s profile when they save it, so this can be reasonably assumed to have URL</span>
-    <span class='doccomment'>///information if it&#39;s present.</span>
-    <span class='kw'>pub</span> <span class='ident'>url</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>UserEntityDetail</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Container for URL entity information that may be paired with a user&#39;s profile.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserEntities</span> {
+    <span class="doccomment">///URL information that has been parsed out of the user&#39;s `description`. If no URLs were</span>
+    <span class="doccomment">///detected, then the contained Vec will be empty.</span>
+    <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">UserEntityDetail</span>,
+    <span class="doccomment">///Link information for the user&#39;s `url`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If `url` is present on the user&#39;s profile, so will this field. Twitter validates the URL</span>
+    <span class="doccomment">///entered to a user&#39;s profile when they save it, so this can be reasonably assumed to have URL</span>
+    <span class="doccomment">///information if it&#39;s present.</span>
+    <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserEntityDetail</span><span class="op">&gt;</span>,
 }
 
-<span class='doccomment'>///Represents a collection of URL entity information paired with a specific user profile field.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>UserEntityDetail</span> {
-    <span class='doccomment'>///Collection of URL entity information.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///There should be one of these per URL in the paired field. In the case of the user&#39;s</span>
-    <span class='doccomment'>///`description`, if no URLs are present, this field will still be present, but empty.</span>
-    <span class='kw'>pub</span> <span class='ident'>urls</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>entities</span>::<span class='ident'>UrlEntity</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Represents a collection of URL entity information paired with a specific user profile field.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserEntityDetail</span> {
+    <span class="doccomment">///Collection of URL entity information.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///There should be one of these per URL in the paired field. In the case of the user&#39;s</span>
+    <span class="doccomment">///`description`, if no URLs are present, this field will still be present, but empty.</span>
+    <span class="kw">pub</span> <span class="ident">urls</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">entities</span>::<span class="ident">UrlEntity</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>TwitterUser</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;TwitterUser received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">TwitterUser</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;TwitterUser received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>TwitterUser</span> {
-            <span class='ident'>contributors_enabled</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;contributors_enabled&quot;</span>).<span class='ident'>unwrap_or</span>(<span class='bool-val'>false</span>),
-            <span class='ident'>created_at</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;created_at&quot;</span>)),
-            <span class='ident'>default_profile</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;default_profile&quot;</span>)),
-            <span class='ident'>default_profile_image</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;default_profile_image&quot;</span>)),
-            <span class='ident'>description</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;description&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>entities</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;entities&quot;</span>)),
-            <span class='ident'>favourites_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;favourites_count&quot;</span>)),
-            <span class='ident'>follow_request_sent</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;follow_request_sent&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>following</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;following&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>followers_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;followers_count&quot;</span>)),
-            <span class='ident'>friends_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;friends_count&quot;</span>)),
-            <span class='ident'>geo_enabled</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;geo_enabled&quot;</span>)),
-            <span class='ident'>id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;id&quot;</span>)),
-            <span class='ident'>is_translator</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;is_translator&quot;</span>)),
-            <span class='ident'>lang</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;lang&quot;</span>)),
-            <span class='ident'>listed_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;listed_count&quot;</span>)),
-            <span class='ident'>location</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;location&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;name&quot;</span>)),
-            <span class='ident'>notifications</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;notifications&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>profile_background_color</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_background_color&quot;</span>)),
-            <span class='ident'>profile_background_image_url</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_background_image_url&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>profile_background_image_url_https</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_background_image_url_https&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>profile_background_tile</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_background_tile&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>profile_banner_url</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_banner_url&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>profile_image_url</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_image_url&quot;</span>)),
-            <span class='ident'>profile_image_url_https</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_image_url_https&quot;</span>)),
-            <span class='ident'>profile_link_color</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_link_color&quot;</span>)),
-            <span class='ident'>profile_sidebar_border_color</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_sidebar_border_color&quot;</span>)),
-            <span class='ident'>profile_sidebar_fill_color</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_sidebar_fill_color&quot;</span>)),
-            <span class='ident'>profile_text_color</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_text_color&quot;</span>)),
-            <span class='ident'>profile_use_background_image</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;profile_use_background_image&quot;</span>)),
-            <span class='ident'>protected</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;protected&quot;</span>)),
-            <span class='ident'>screen_name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;screen_name&quot;</span>)),
-            <span class='ident'>show_all_inline_media</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;show_all_inline_media&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>status</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;status&quot;</span>).<span class='ident'>map</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>statuses_count</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;statuses_count&quot;</span>)),
-            <span class='ident'>time_zone</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;time_zone&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>url</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;url&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>utc_offset</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;utc_offset&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>verified</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;verified&quot;</span>)),
-            <span class='ident'>withheld_in_countries</span>: <span class='ident'>input</span>.<span class='ident'>find</span>(<span class='string'>&quot;withheld_in_countries&quot;</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>f</span><span class='op'>|</span> <span class='ident'>f</span>.<span class='ident'>as_array</span>())
-                                        .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>arr</span><span class='op'>|</span> <span class='ident'>arr</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>as_string</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>to_string</span>()))
-                                                           .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>()),
-            <span class='ident'>withheld_scope</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;withheld_scope&quot;</span>).<span class='ident'>ok</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">TwitterUser</span> {
+            <span class="ident">contributors_enabled</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;contributors_enabled&quot;</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+            <span class="ident">created_at</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;created_at&quot;</span>)),
+            <span class="ident">default_profile</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;default_profile&quot;</span>)),
+            <span class="ident">default_profile_image</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;default_profile_image&quot;</span>)),
+            <span class="ident">description</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;description&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">entities</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;entities&quot;</span>)),
+            <span class="ident">favourites_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;favourites_count&quot;</span>)),
+            <span class="ident">follow_request_sent</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;follow_request_sent&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">following</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;following&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">followers_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;followers_count&quot;</span>)),
+            <span class="ident">friends_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;friends_count&quot;</span>)),
+            <span class="ident">geo_enabled</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;geo_enabled&quot;</span>)),
+            <span class="ident">id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;id&quot;</span>)),
+            <span class="ident">is_translator</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;is_translator&quot;</span>)),
+            <span class="ident">lang</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;lang&quot;</span>)),
+            <span class="ident">listed_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;listed_count&quot;</span>)),
+            <span class="ident">location</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;location&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;name&quot;</span>)),
+            <span class="ident">notifications</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;notifications&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">profile_background_color</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_background_color&quot;</span>)),
+            <span class="ident">profile_background_image_url</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_background_image_url&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">profile_background_image_url_https</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_background_image_url_https&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">profile_background_tile</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_background_tile&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">profile_banner_url</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_banner_url&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">profile_image_url</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_image_url&quot;</span>)),
+            <span class="ident">profile_image_url_https</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_image_url_https&quot;</span>)),
+            <span class="ident">profile_link_color</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_link_color&quot;</span>)),
+            <span class="ident">profile_sidebar_border_color</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_sidebar_border_color&quot;</span>)),
+            <span class="ident">profile_sidebar_fill_color</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_sidebar_fill_color&quot;</span>)),
+            <span class="ident">profile_text_color</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_text_color&quot;</span>)),
+            <span class="ident">profile_use_background_image</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;profile_use_background_image&quot;</span>)),
+            <span class="ident">protected</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;protected&quot;</span>)),
+            <span class="ident">screen_name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;screen_name&quot;</span>)),
+            <span class="ident">show_all_inline_media</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;show_all_inline_media&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">status</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;status&quot;</span>).<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">new</span>).<span class="ident">ok</span>(),
+            <span class="ident">statuses_count</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;statuses_count&quot;</span>)),
+            <span class="ident">time_zone</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;time_zone&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">url</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;url&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">utc_offset</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;utc_offset&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">verified</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;verified&quot;</span>)),
+            <span class="ident">withheld_in_countries</span>: <span class="ident">input</span>.<span class="ident">find</span>(<span class="string">&quot;withheld_in_countries&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_array</span>())
+                                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arr</span><span class="op">|</span> <span class="ident">arr</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_string</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()))
+                                                           .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>()),
+            <span class="ident">withheld_scope</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;withheld_scope&quot;</span>).<span class="ident">ok</span>(),
         })
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>UserEntities</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;UserEntities received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">UserEntities</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;UserEntities received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>UserEntities</span> {
-            <span class='ident'>description</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;description&quot;</span>)),
-            <span class='ident'>url</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;url&quot;</span>).<span class='ident'>ok</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">UserEntities</span> {
+            <span class="ident">description</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;description&quot;</span>)),
+            <span class="ident">url</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;url&quot;</span>).<span class="ident">ok</span>(),
         })
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>UserEntityDetail</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;UserEntityDetail received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">UserEntityDetail</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;UserEntityDetail received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>UserEntityDetail</span> {
-            <span class='ident'>urls</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;urls&quot;</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">UserEntityDetail</span> {
+            <span class="ident">urls</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;urls&quot;</span>)),
         })
     }
 }
 
-<span class='doccomment'>///Represents an active user search.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This struct is returned by [`search`][] and is meant to be used as an iterator. This means that</span>
-<span class='doccomment'>///all the standard iterator adaptors can be used to work with the results:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///[`search`]: fn.search.html</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///for name in egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token)</span>
-<span class='doccomment'>///                                  .map(|u| u.unwrap().response.screen_name).take(10) {</span>
-<span class='doccomment'>///    println!(&quot;{}&quot;, name);</span>
-<span class='doccomment'>///}</span>
-<span class='doccomment'>///```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///You can even collect the results, letting you get one set of rate-limit information for the</span>
-<span class='doccomment'>///entire search setup:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///use egg_mode::Response;</span>
-<span class='doccomment'>///use egg_mode::user::TwitterUser;</span>
-<span class='doccomment'>///use egg_mode::error::Error;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///let names: Result&lt;Response&lt;Vec&lt;TwitterUser&gt;&gt;, Error&gt; =</span>
-<span class='doccomment'>///    egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token).take(10).collect();</span>
-<span class='doccomment'>///```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///`UserSearch` has a couple adaptors of its own that you can use before consuming it.</span>
-<span class='doccomment'>///`with_page_size` will let you set how many users are pulled in with a single network call, and</span>
-<span class='doccomment'>///`start_at_page` lets you start your search at a specific page. Calling either of these after</span>
-<span class='doccomment'>///starting iteration will clear any current results.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///The type returned by the iterator is `Result&lt;Response&lt;TwitterUser&gt;, Error&gt;`, so network errors,</span>
-<span class='doccomment'>///rate-limit errors and other issues are passed directly through to `next()`. This also means that</span>
-<span class='doccomment'>///getting an error while iterating doesn&#39;t mean you&#39;re at the end of the list; you can wait for</span>
-<span class='doccomment'>///the network connection to return or for the rate limit to refresh before trying again.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Manual paging</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///The iterator works by lazily loading a page of results at a time (with size set by</span>
-<span class='doccomment'>///`with_page_size` or by directly assigning `page_size`) in the background whenever you ask for</span>
-<span class='doccomment'>///the next result. This can be nice, but it also means that you can lose track of when your loop</span>
-<span class='doccomment'>///will block for the next page of results. This is where the extra fields and methods on</span>
-<span class='doccomment'>///`UserSearch` come in. By using the raw `call()` function and changing `page_num` as necessary,</span>
-<span class='doccomment'>///you can have full control over when the network calls happen:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///let mut search = egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token).with_page_size(20);</span>
-<span class='doccomment'>///let resp = search.call().unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///for user in resp.response {</span>
-<span class='doccomment'>///    println!(&quot;{} (@{})&quot;, user.name, user.screen_name);</span>
-<span class='doccomment'>///}</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///search.page_num += 1;</span>
-<span class='doccomment'>///let resp = search.call().unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///for user in resp.response {</span>
-<span class='doccomment'>///    println!(&quot;{} (@{})&quot;, user.name, user.screen_name);</span>
-<span class='doccomment'>///}</span>
-<span class='doccomment'>///```</span>
-<span class='attribute'>#[<span class='ident'>must_use</span> <span class='op'>=</span> <span class='string'>&quot;search iterators are lazy and do nothing unless consumed&quot;</span>]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>UserSearch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='ident'>query</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='doccomment'>///The current page of results being returned, starting at 1.</span>
-    <span class='kw'>pub</span> <span class='ident'>page_num</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>///The number of user records per page of results. Defaults to 10, maximum of 20.</span>
-    <span class='kw'>pub</span> <span class='ident'>page_size</span>: <span class='ident'>i32</span>,
-    <span class='ident'>current_results</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ResponseIter</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;&gt;</span>,
+<span class="doccomment">///Represents an active user search.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This struct is returned by [`search`][] and is meant to be used as an iterator. This means that</span>
+<span class="doccomment">///all the standard iterator adaptors can be used to work with the results:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///[`search`]: fn.search.html</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///for name in egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token)</span>
+<span class="doccomment">///                                  .map(|u| u.unwrap().response.screen_name).take(10) {</span>
+<span class="doccomment">///    println!(&quot;{}&quot;, name);</span>
+<span class="doccomment">///}</span>
+<span class="doccomment">///```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///You can even collect the results, letting you get one set of rate-limit information for the</span>
+<span class="doccomment">///entire search setup:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///use egg_mode::Response;</span>
+<span class="doccomment">///use egg_mode::user::TwitterUser;</span>
+<span class="doccomment">///use egg_mode::error::Error;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///let names: Result&lt;Response&lt;Vec&lt;TwitterUser&gt;&gt;, Error&gt; =</span>
+<span class="doccomment">///    egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token).take(10).collect();</span>
+<span class="doccomment">///```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///`UserSearch` has a couple adaptors of its own that you can use before consuming it.</span>
+<span class="doccomment">///`with_page_size` will let you set how many users are pulled in with a single network call, and</span>
+<span class="doccomment">///`start_at_page` lets you start your search at a specific page. Calling either of these after</span>
+<span class="doccomment">///starting iteration will clear any current results.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///The type returned by the iterator is `Result&lt;Response&lt;TwitterUser&gt;, Error&gt;`, so network errors,</span>
+<span class="doccomment">///rate-limit errors and other issues are passed directly through to `next()`. This also means that</span>
+<span class="doccomment">///getting an error while iterating doesn&#39;t mean you&#39;re at the end of the list; you can wait for</span>
+<span class="doccomment">///the network connection to return or for the rate limit to refresh before trying again.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Manual paging</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///The iterator works by lazily loading a page of results at a time (with size set by</span>
+<span class="doccomment">///`with_page_size` or by directly assigning `page_size`) in the background whenever you ask for</span>
+<span class="doccomment">///the next result. This can be nice, but it also means that you can lose track of when your loop</span>
+<span class="doccomment">///will block for the next page of results. This is where the extra fields and methods on</span>
+<span class="doccomment">///`UserSearch` come in. By using the raw `call()` function and changing `page_num` as necessary,</span>
+<span class="doccomment">///you can have full control over when the network calls happen:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///let mut search = egg_mode::user::search(&quot;rustlang&quot;, &amp;con_token, &amp;access_token).with_page_size(20);</span>
+<span class="doccomment">///let resp = search.call().unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///for user in resp.response {</span>
+<span class="doccomment">///    println!(&quot;{} (@{})&quot;, user.name, user.screen_name);</span>
+<span class="doccomment">///}</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///search.page_num += 1;</span>
+<span class="doccomment">///let resp = search.call().unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///for user in resp.response {</span>
+<span class="doccomment">///    println!(&quot;{} (@{})&quot;, user.name, user.screen_name);</span>
+<span class="doccomment">///}</span>
+<span class="doccomment">///```</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;search iterators are lazy and do nothing unless consumed&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="doccomment">///The current page of results being returned, starting at 1.</span>
+    <span class="kw">pub</span> <span class="ident">page_num</span>: <span class="ident">i32</span>,
+    <span class="doccomment">///The number of user records per page of results. Defaults to 10, maximum of 20.</span>
+    <span class="kw">pub</span> <span class="ident">page_size</span>: <span class="ident">i32</span>,
+    <span class="ident">current_results</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResponseIter</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>UserSearch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Sets the page size used for the search query.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Calling this will invalidate any current search results, making the next call to `next()`</span>
-    <span class='doccomment'>///perform a network call.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_page_size</span>(<span class='self'>self</span>, <span class='ident'>page_size</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>UserSearch</span> {
-            <span class='ident'>page_size</span>: <span class='ident'>page_size</span>,
-            <span class='ident'>current_results</span>: <span class='prelude-val'>None</span>,
-            ..<span class='self'>self</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UserSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Sets the page size used for the search query.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Calling this will invalidate any current search results, making the next call to `next()`</span>
+    <span class="doccomment">///perform a network call.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_page_size</span>(<span class="self">self</span>, <span class="ident">page_size</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">UserSearch</span> {
+            <span class="ident">page_size</span>: <span class="ident">page_size</span>,
+            <span class="ident">current_results</span>: <span class="prelude-val">None</span>,
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Sets the starting page number for the search query.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Calling this will invalidate any current search results, making the next call to `next()`</span>
-    <span class='doccomment'>///perform a network call.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>start_at_page</span>(<span class='self'>self</span>, <span class='ident'>page_num</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>UserSearch</span> {
-            <span class='ident'>page_num</span>: <span class='ident'>page_num</span>,
-            <span class='ident'>current_results</span>: <span class='prelude-val'>None</span>,
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Sets the starting page number for the search query.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Calling this will invalidate any current search results, making the next call to `next()`</span>
+    <span class="doccomment">///perform a network call.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_at_page</span>(<span class="self">self</span>, <span class="ident">page_num</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">UserSearch</span> {
+            <span class="ident">page_num</span>: <span class="ident">page_num</span>,
+            <span class="ident">current_results</span>: <span class="prelude-val">None</span>,
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Performs the search for the current page of results.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///This will automatically be called if you use the `UserSearch` as an iterator. This method is</span>
-    <span class='doccomment'>///made public for convenience if you want to manage the pagination yourself. Remember to</span>
-    <span class='doccomment'>///change `page_num` between calls.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;q&quot;</span>, <span class='self'>self</span>.<span class='ident'>query</span>);
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;page&quot;</span>, <span class='self'>self</span>.<span class='ident'>page_num</span>.<span class='ident'>to_string</span>());
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;count&quot;</span>, <span class='self'>self</span>.<span class='ident'>page_size</span>.<span class='ident'>to_string</span>());
+    <span class="doccomment">///Performs the search for the current page of results.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///This will automatically be called if you use the `UserSearch` as an iterator. This method is</span>
+    <span class="doccomment">///made public for convenience if you want to manage the pagination yourself. Remember to</span>
+    <span class="doccomment">///change `page_num` between calls.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;q&quot;</span>, <span class="self">self</span>.<span class="ident">query</span>);
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;page&quot;</span>, <span class="self">self</span>.<span class="ident">page_num</span>.<span class="ident">to_string</span>());
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;count&quot;</span>, <span class="self">self</span>.<span class="ident">page_size</span>.<span class="ident">to_string</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>SEARCH</span>, <span class='self'>self</span>.<span class='ident'>con_token</span>, <span class='self'>self</span>.<span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">SEARCH</span>, <span class="self">self</span>.<span class="ident">con_token</span>, <span class="self">self</span>.<span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-        <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+        <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
     }
 
-    <span class='doccomment'>///Returns a new UserSearch with the given query and tokens, with the default page size of 10.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>query</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>UserSearch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>UserSearch</span> {
-            <span class='ident'>con_token</span>: <span class='ident'>con_token</span>,
-            <span class='ident'>access_token</span>: <span class='ident'>access_token</span>,
-            <span class='ident'>query</span>: <span class='ident'>query</span>,
-            <span class='ident'>page_num</span>: <span class='number'>1</span>,
-            <span class='ident'>page_size</span>: <span class='number'>10</span>,
-            <span class='ident'>current_results</span>: <span class='prelude-val'>None</span>,
+    <span class="doccomment">///Returns a new UserSearch with the given query and tokens, with the default page size of 10.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">UserSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">UserSearch</span> {
+            <span class="ident">con_token</span>: <span class="ident">con_token</span>,
+            <span class="ident">access_token</span>: <span class="ident">access_token</span>,
+            <span class="ident">query</span>: <span class="ident">query</span>,
+            <span class="ident">page_num</span>: <span class="number">1</span>,
+            <span class="ident">page_size</span>: <span class="number">10</span>,
+            <span class="ident">current_results</span>: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>UserSearch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">UserSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Item</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>results</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>current_results</span> {
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>user</span>) <span class='op'>=</span> <span class='ident'>results</span>.<span class='ident'>next</span>() {
-                <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='prelude-val'>Ok</span>(<span class='ident'>user</span>));
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">results</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_results</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="ident">results</span>.<span class="ident">next</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">user</span>));
             }
-            <span class='kw'>else</span> <span class='kw'>if</span> (<span class='ident'>results</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>) <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>page_size</span> {
-                <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+            <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">results</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span>) <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">page_size</span> {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class='kw'>else</span> {
-                <span class='self'>self</span>.<span class='ident'>page_num</span> <span class='op'>+=</span> <span class='number'>1</span>;
+            <span class="kw">else</span> {
+                <span class="self">self</span>.<span class="ident">page_num</span> <span class="op">+=</span> <span class="number">1</span>;
             }
         }
 
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>call</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>resp</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>iter</span> <span class='op'>=</span> <span class='ident'>resp</span>.<span class='ident'>into_iter</span>();
-                <span class='kw'>let</span> <span class='ident'>first</span> <span class='op'>=</span> <span class='ident'>iter</span>.<span class='ident'>next</span>();
-                <span class='self'>self</span>.<span class='ident'>current_results</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>iter</span>);
-                <span class='kw'>match</span> <span class='ident'>first</span> {
-                    <span class='prelude-val'>Some</span>(<span class='ident'>user</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='prelude-val'>Ok</span>(<span class='ident'>user</span>)),
-                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">call</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">resp</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">into_iter</span>();
+                <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
+                <span class="self">self</span>.<span class="ident">current_results</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">iter</span>);
+                <span class="kw">match</span> <span class="ident">first</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">user</span>)),
+                    <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                 }
             },
-            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
-                <span class='comment'>//Invalidate current results so we don&#39;t increment the page number again</span>
-                <span class='self'>self</span>.<span class='ident'>current_results</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-                <span class='prelude-val'>Some</span>(<span class='prelude-val'>Err</span>(<span class='ident'>err</span>))
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> {
+                <span class="comment">//Invalidate current results so we don&#39;t increment the page number again</span>
+                <span class="self">self</span>.<span class="ident">current_results</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))
             },
         }
     }
 }
 
-<span class='doccomment'>///Represents relationship settings between two Twitter accounts.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Relationship</span> {
-    <span class='doccomment'>///Contains settings from the perspective of the target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>target</span>: <span class='ident'>RelationTarget</span>,
-    <span class='doccomment'>///Contains settings from the perspective of the source account.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///This contains more information than `target` if the source account is the same as the</span>
-    <span class='doccomment'>///authenticated user. See the [`RelationSource`][] page for details.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///[`RelationSource`]: struct.RelationSource.html</span>
-    <span class='kw'>pub</span> <span class='ident'>source</span>: <span class='ident'>RelationSource</span>,
+<span class="doccomment">///Represents relationship settings between two Twitter accounts.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Relationship</span> {
+    <span class="doccomment">///Contains settings from the perspective of the target account.</span>
+    <span class="kw">pub</span> <span class="ident">target</span>: <span class="ident">RelationTarget</span>,
+    <span class="doccomment">///Contains settings from the perspective of the source account.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///This contains more information than `target` if the source account is the same as the</span>
+    <span class="doccomment">///authenticated user. See the [`RelationSource`][] page for details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///[`RelationSource`]: struct.RelationSource.html</span>
+    <span class="kw">pub</span> <span class="ident">source</span>: <span class="ident">RelationSource</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>Relationship</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;Relationship received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">Relationship</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;Relationship received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>relation</span>) <span class='op'>=</span> <span class='ident'>input</span>.<span class='ident'>find</span>(<span class='string'>&quot;relationship&quot;</span>) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>Relationship</span> {
-                <span class='ident'>target</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>relation</span>, <span class='string'>&quot;target&quot;</span>)),
-                <span class='ident'>source</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>relation</span>, <span class='string'>&quot;source&quot;</span>)),
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">find</span>(<span class="string">&quot;relationship&quot;</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">Relationship</span> {
+                <span class="ident">target</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">relation</span>, <span class="string">&quot;target&quot;</span>)),
+                <span class="ident">source</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">relation</span>, <span class="string">&quot;source&quot;</span>)),
             })
         }
-        <span class='kw'>else</span> {
-            <span class='prelude-val'>Err</span>(<span class='ident'>error</span>::<span class='ident'>Error</span>::<span class='ident'>MissingValue</span>(<span class='string'>&quot;relationship&quot;</span>))
+        <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">error</span>::<span class="ident">Error</span>::<span class="ident">MissingValue</span>(<span class="string">&quot;relationship&quot;</span>))
         }
     }
 }
 
-<span class='doccomment'>///Represents relationship settings between two Twitter accounts, from the perspective of the</span>
-<span class='doccomment'>///target user.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RelationTarget</span> {
-    <span class='doccomment'>///Numeric ID for this account.</span>
-    <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
-    <span class='doccomment'>///Screen name for this account.</span>
-    <span class='kw'>pub</span> <span class='ident'>screen_name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///Indicates whether the source account follows this target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>followed_by</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Indicates whether this target account follows the source account.</span>
-    <span class='kw'>pub</span> <span class='ident'>following</span>: <span class='ident'>bool</span>,
+<span class="doccomment">///Represents relationship settings between two Twitter accounts, from the perspective of the</span>
+<span class="doccomment">///target user.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationTarget</span> {
+    <span class="doccomment">///Numeric ID for this account.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">i64</span>,
+    <span class="doccomment">///Screen name for this account.</span>
+    <span class="kw">pub</span> <span class="ident">screen_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///Indicates whether the source account follows this target account.</span>
+    <span class="kw">pub</span> <span class="ident">followed_by</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Indicates whether this target account follows the source account.</span>
+    <span class="kw">pub</span> <span class="ident">following</span>: <span class="ident">bool</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>RelationTarget</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;RelationTarget received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">RelationTarget</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;RelationTarget received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>RelationTarget</span> {
-            <span class='ident'>id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;id&quot;</span>)),
-            <span class='ident'>screen_name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;screen_name&quot;</span>)),
-            <span class='ident'>followed_by</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;followed_by&quot;</span>)),
-            <span class='ident'>following</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;following&quot;</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">RelationTarget</span> {
+            <span class="ident">id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;id&quot;</span>)),
+            <span class="ident">screen_name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;screen_name&quot;</span>)),
+            <span class="ident">followed_by</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;followed_by&quot;</span>)),
+            <span class="ident">following</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;following&quot;</span>)),
         })
     }
 }
 
-<span class='doccomment'>///Represents relationship settings between two Twitter accounts, from the perspective of the</span>
-<span class='doccomment'>///source user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This struct holds more information than the `RelationTarget` struct, mainly attributes only</span>
-<span class='doccomment'>///visible to the user that set them. While you can see relationships between any two arbitrary</span>
-<span class='doccomment'>///users, if the &quot;source&quot; account is the same one whose access token you&#39;re using, you can see</span>
-<span class='doccomment'>///extra information about this relationship.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RelationSource</span> {
-    <span class='doccomment'>///Numeric ID for this account.</span>
-    <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
-    <span class='doccomment'>///Screen name for this account.</span>
-    <span class='kw'>pub</span> <span class='ident'>screen_name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///Indicates whether this source account follows the target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>following</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Indicates whether the target account follows this source account.</span>
-    <span class='kw'>pub</span> <span class='ident'>followed_by</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Indicates whether this source account can send a direct message to the target account.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If `followed_by` is false but this is true, that could indicate that the target account has</span>
-    <span class='doccomment'>///allowed anyone to direct-message them.</span>
-    <span class='kw'>pub</span> <span class='ident'>can_dm</span>: <span class='ident'>bool</span>,
-    <span class='doccomment'>///Indicates whether this source account is blocking the target account. If the source account</span>
-    <span class='doccomment'>///is not the authenticated user, holds `None` instead.</span>
-    <span class='kw'>pub</span> <span class='ident'>blocking</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether this source account has reported the target account for spam. If the source</span>
-    <span class='doccomment'>///account is not the authenticated user, holds `None` instead.</span>
-    <span class='kw'>pub</span> <span class='ident'>marked_spam</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether this source account has decided to receive all replies from the target</span>
-    <span class='doccomment'>///account. If the source account is not the authenticated user, holds `None` instead.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///Note that there is no mechanism with which to toggle this setting, at least none that this</span>
-    <span class='doccomment'>///author could find, either through the API or through the official site.</span>
-    <span class='ident'>all_replies</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether this source account has decided to show retweets from the target account.</span>
-    <span class='doccomment'>///If the source account is not the authenticated user, holds `None` instead.</span>
-    <span class='kw'>pub</span> <span class='ident'>want_retweets</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///Indicates whether this source account has decided to receive mobile notifications for the</span>
-    <span class='doccomment'>///target account. If the source account is not the authenticated user, holds `None` instead.</span>
-    <span class='kw'>pub</span> <span class='ident'>notifications_enabled</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Represents relationship settings between two Twitter accounts, from the perspective of the</span>
+<span class="doccomment">///source user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This struct holds more information than the `RelationTarget` struct, mainly attributes only</span>
+<span class="doccomment">///visible to the user that set them. While you can see relationships between any two arbitrary</span>
+<span class="doccomment">///users, if the &quot;source&quot; account is the same one whose access token you&#39;re using, you can see</span>
+<span class="doccomment">///extra information about this relationship.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationSource</span> {
+    <span class="doccomment">///Numeric ID for this account.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">i64</span>,
+    <span class="doccomment">///Screen name for this account.</span>
+    <span class="kw">pub</span> <span class="ident">screen_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///Indicates whether this source account follows the target account.</span>
+    <span class="kw">pub</span> <span class="ident">following</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Indicates whether the target account follows this source account.</span>
+    <span class="kw">pub</span> <span class="ident">followed_by</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Indicates whether this source account can send a direct message to the target account.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If `followed_by` is false but this is true, that could indicate that the target account has</span>
+    <span class="doccomment">///allowed anyone to direct-message them.</span>
+    <span class="kw">pub</span> <span class="ident">can_dm</span>: <span class="ident">bool</span>,
+    <span class="doccomment">///Indicates whether this source account is blocking the target account. If the source account</span>
+    <span class="doccomment">///is not the authenticated user, holds `None` instead.</span>
+    <span class="kw">pub</span> <span class="ident">blocking</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether this source account has reported the target account for spam. If the source</span>
+    <span class="doccomment">///account is not the authenticated user, holds `None` instead.</span>
+    <span class="kw">pub</span> <span class="ident">marked_spam</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether this source account has decided to receive all replies from the target</span>
+    <span class="doccomment">///account. If the source account is not the authenticated user, holds `None` instead.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///Note that there is no mechanism with which to toggle this setting, at least none that this</span>
+    <span class="doccomment">///author could find, either through the API or through the official site.</span>
+    <span class="ident">all_replies</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether this source account has decided to show retweets from the target account.</span>
+    <span class="doccomment">///If the source account is not the authenticated user, holds `None` instead.</span>
+    <span class="kw">pub</span> <span class="ident">want_retweets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///Indicates whether this source account has decided to receive mobile notifications for the</span>
+    <span class="doccomment">///target account. If the source account is not the authenticated user, holds `None` instead.</span>
+    <span class="kw">pub</span> <span class="ident">notifications_enabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>RelationSource</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;RelationSource received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">RelationSource</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;RelationSource received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>RelationSource</span> {
-            <span class='ident'>id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;id&quot;</span>)),
-            <span class='ident'>screen_name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;screen_name&quot;</span>)),
-            <span class='ident'>following</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;following&quot;</span>)),
-            <span class='ident'>followed_by</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;followed_by&quot;</span>)),
-            <span class='ident'>can_dm</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;can_dm&quot;</span>)),
-            <span class='ident'>blocking</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;blocking&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>marked_spam</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;marked_spam&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>all_replies</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;all_replies&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>want_retweets</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;want_retweets&quot;</span>).<span class='ident'>ok</span>(),
-            <span class='ident'>notifications_enabled</span>: <span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;notifications_enabled&quot;</span>).<span class='ident'>ok</span>(),
+        <span class="prelude-val">Ok</span>(<span class="ident">RelationSource</span> {
+            <span class="ident">id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;id&quot;</span>)),
+            <span class="ident">screen_name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;screen_name&quot;</span>)),
+            <span class="ident">following</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;following&quot;</span>)),
+            <span class="ident">followed_by</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;followed_by&quot;</span>)),
+            <span class="ident">can_dm</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;can_dm&quot;</span>)),
+            <span class="ident">blocking</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;blocking&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">marked_spam</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;marked_spam&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">all_replies</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;all_replies&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">want_retweets</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;want_retweets&quot;</span>).<span class="ident">ok</span>(),
+            <span class="ident">notifications_enabled</span>: <span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;notifications_enabled&quot;</span>).<span class="ident">ok</span>(),
         })
     }
 }
 
-<span class='doccomment'>///Represents the relation the authenticated user has to a given account.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This is returned by `relation_lookup`, as opposed to `Relationship`, which is returned by</span>
-<span class='doccomment'>///`relation`.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RelationLookup</span> {
-    <span class='doccomment'>///The display name of the target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The screen name of the target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>screen_name</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>///The numeric ID of the target account.</span>
-    <span class='kw'>pub</span> <span class='ident'>id</span>: <span class='ident'>i64</span>,
-    <span class='doccomment'>///The ways the target account is connected to the authenticated user.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///If the target account has no relation to the authenticated user, this will not be empty; its</span>
-    <span class='doccomment'>///only element will be `None`.</span>
-    <span class='kw'>pub</span> <span class='ident'>connections</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Connection</span><span class='op'>&gt;</span>,
+<span class="doccomment">///Represents the relation the authenticated user has to a given account.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This is returned by `relation_lookup`, as opposed to `Relationship`, which is returned by</span>
+<span class="doccomment">///`relation`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationLookup</span> {
+    <span class="doccomment">///The display name of the target account.</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The screen name of the target account.</span>
+    <span class="kw">pub</span> <span class="ident">screen_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">///The numeric ID of the target account.</span>
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">i64</span>,
+    <span class="doccomment">///The ways the target account is connected to the authenticated user.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///If the target account has no relation to the authenticated user, this will not be empty; its</span>
+    <span class="doccomment">///only element will be `None`.</span>
+    <span class="kw">pub</span> <span class="ident">connections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>RelationLookup</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;RelationLookup received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">RelationLookup</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;RelationLookup received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>RelationLookup</span> {
-            <span class='ident'>name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;name&quot;</span>)),
-            <span class='ident'>screen_name</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;screen_name&quot;</span>)),
-            <span class='ident'>id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;id&quot;</span>)),
-            <span class='ident'>connections</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;connections&quot;</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">RelationLookup</span> {
+            <span class="ident">name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;name&quot;</span>)),
+            <span class="ident">screen_name</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;screen_name&quot;</span>)),
+            <span class="ident">id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;id&quot;</span>)),
+            <span class="ident">connections</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;connections&quot;</span>)),
         })
     }
 }
 
-<span class='doccomment'>///Represents the ways a target account can be connected to another account.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Connection</span> {
-    <span class='doccomment'>///The target account has no relation.</span>
-    <span class='prelude-val'>None</span>,
-    <span class='doccomment'>///The authenticated user has requested to follow the target account.</span>
-    <span class='ident'>FollowingRequested</span>,
-    <span class='doccomment'>///The target account has requested to follow the authenticated user.</span>
-    <span class='ident'>FollowingReceived</span>,
-    <span class='doccomment'>///The target account follows the authenticated user.</span>
-    <span class='ident'>FollowedBy</span>,
-    <span class='doccomment'>///The authenticated user follows the target account.</span>
-    <span class='ident'>Following</span>,
-    <span class='doccomment'>///The authenticated user has blocked the target account.</span>
-    <span class='ident'>Blocking</span>,
-    <span class='doccomment'>///The authenticated user has muted the target account.</span>
-    <span class='ident'>Muting</span>,
+<span class="doccomment">///Represents the ways a target account can be connected to another account.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Connection</span> {
+    <span class="doccomment">///The target account has no relation.</span>
+    <span class="prelude-val">None</span>,
+    <span class="doccomment">///The authenticated user has requested to follow the target account.</span>
+    <span class="ident">FollowingRequested</span>,
+    <span class="doccomment">///The target account has requested to follow the authenticated user.</span>
+    <span class="ident">FollowingReceived</span>,
+    <span class="doccomment">///The target account follows the authenticated user.</span>
+    <span class="ident">FollowedBy</span>,
+    <span class="doccomment">///The authenticated user follows the target account.</span>
+    <span class="ident">Following</span>,
+    <span class="doccomment">///The authenticated user has blocked the target account.</span>
+    <span class="ident">Blocking</span>,
+    <span class="doccomment">///The authenticated user has muted the target account.</span>
+    <span class="ident">Muting</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>Connection</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>text</span>) <span class='op'>=</span> <span class='ident'>input</span>.<span class='ident'>as_string</span>() {
-            <span class='kw'>match</span> <span class='ident'>text</span> {
-                <span class='string'>&quot;none&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='prelude-val'>None</span>),
-                <span class='string'>&quot;following_requested&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>FollowingRequested</span>),
-                <span class='string'>&quot;following_received&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>FollowingReceived</span>),
-                <span class='string'>&quot;followed_by&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>FollowedBy</span>),
-                <span class='string'>&quot;following&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>Following</span>),
-                <span class='string'>&quot;blocking&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>Blocking</span>),
-                <span class='string'>&quot;muting&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Connection</span>::<span class='ident'>Muting</span>),
-                _ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;unexpected string for Connection&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>text</span>.<span class='ident'>to_string</span>()))),
+<span class="kw">impl</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">Connection</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">text</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_string</span>() {
+            <span class="kw">match</span> <span class="ident">text</span> {
+                <span class="string">&quot;none&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="prelude-val">None</span>),
+                <span class="string">&quot;following_requested&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">FollowingRequested</span>),
+                <span class="string">&quot;following_received&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">FollowingReceived</span>),
+                <span class="string">&quot;followed_by&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">FollowedBy</span>),
+                <span class="string">&quot;following&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">Following</span>),
+                <span class="string">&quot;blocking&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">Blocking</span>),
+                <span class="string">&quot;muting&quot;</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Connection</span>::<span class="ident">Muting</span>),
+                _ <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;unexpected string for Connection&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">text</span>.<span class="ident">to_string</span>()))),
             }
         }
-        <span class='kw'>else</span> {
-            <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;Connection received json that wasn&#39;t a string&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())))
+        <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;Connection received json that wasn&#39;t a string&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())))
         }
     }
 }
@@ -1477,18 +1489,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1521,7 +1537,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

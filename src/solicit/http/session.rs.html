@@ -9,14 +9,18 @@
 
     <title>session.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -542,504 +554,504 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Defines the interface for the session-level management of HTTP/2</span>
-<span class='doccomment'>//! communication. This is effectively an API that allows hooking into an</span>
-<span class='doccomment'>//! HTTP/2 connection in order to handle events arising on the connection.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The module also provides a default implementation for some of the traits.</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Read</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Cursor</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>FromIterator</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>StreamId</span>, <span class='ident'>Header</span>};
+</pre><pre class="rust ">
+<span class="doccomment">//! Defines the interface for the session-level management of HTTP/2</span>
+<span class="doccomment">//! communication. This is effectively an API that allows hooking into an</span>
+<span class="doccomment">//! HTTP/2 connection in order to handle events arising on the connection.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The module also provides a default implementation for some of the traits.</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Read</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Cursor</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">FromIterator</span>;
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">StreamId</span>, <span class="ident">Header</span>};
 
-<span class='doccomment'>/// A trait that defines the interface between an `HttpConnection` and the higher-levels that use</span>
-<span class='doccomment'>/// it. Essentially, it allows the `HttpConnection` to pass information onto those higher levels</span>
-<span class='doccomment'>/// through a well-defined interface.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// These methods are effectively a set of callbacks that the `HttpConnection` invokes when the</span>
-<span class='doccomment'>/// corresponding events arise on the HTTP/2 connection (i.e. frame stream).</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// TODO Allow the session to influence the `HttpConnection` state and raise</span>
-<span class='doccomment'>///      errors (i.e. make the return type -&gt; HttpResult&lt;()&gt;).</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Session</span> {
-    <span class='doccomment'>/// Notifies the `Session` that a new data chunk has arrived on the</span>
-    <span class='doccomment'>/// connection for a particular stream. Only the raw data is passed</span>
-    <span class='doccomment'>/// to the callback (all padding is already discarded by the connection).</span>
-    <span class='kw'>fn</span> <span class='ident'>new_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]);
-    <span class='doccomment'>/// Notifies the `Session` that headers have arrived for a particular</span>
-    <span class='doccomment'>/// stream. The given list of headers is already decoded by the connection.</span>
-    <span class='kw'>fn</span> <span class='ident'>new_headers</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>, <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>);
-    <span class='doccomment'>/// Notifies the `Session` that a particular stream got closed by the peer.</span>
-    <span class='kw'>fn</span> <span class='ident'>end_of_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>);
+<span class="doccomment">/// A trait that defines the interface between an `HttpConnection` and the higher-levels that use</span>
+<span class="doccomment">/// it. Essentially, it allows the `HttpConnection` to pass information onto those higher levels</span>
+<span class="doccomment">/// through a well-defined interface.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// These methods are effectively a set of callbacks that the `HttpConnection` invokes when the</span>
+<span class="doccomment">/// corresponding events arise on the HTTP/2 connection (i.e. frame stream).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// TODO Allow the session to influence the `HttpConnection` state and raise</span>
+<span class="doccomment">///      errors (i.e. make the return type -&gt; HttpResult&lt;()&gt;).</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Session</span> {
+    <span class="doccomment">/// Notifies the `Session` that a new data chunk has arrived on the</span>
+    <span class="doccomment">/// connection for a particular stream. Only the raw data is passed</span>
+    <span class="doccomment">/// to the callback (all padding is already discarded by the connection).</span>
+    <span class="kw">fn</span> <span class="ident">new_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]);
+    <span class="doccomment">/// Notifies the `Session` that headers have arrived for a particular</span>
+    <span class="doccomment">/// stream. The given list of headers is already decoded by the connection.</span>
+    <span class="kw">fn</span> <span class="ident">new_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Notifies the `Session` that a particular stream got closed by the peer.</span>
+    <span class="kw">fn</span> <span class="ident">end_of_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>);
 }
 
-<span class='doccomment'>/// A newtype for an iterator over `Stream`s saved in a `SessionState`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Allows `SessionState` implementations to return iterators over its session without being forced</span>
-<span class='doccomment'>/// to declare them as associated types.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>StreamIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>S</span>: <span class='ident'>Stream</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>Item</span><span class='op'>=</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>S</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>);
+<span class="doccomment">/// A newtype for an iterator over `Stream`s saved in a `SessionState`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Allows `SessionState` implementations to return iterators over its session without being forced</span>
+<span class="doccomment">/// to declare them as associated types.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>StreamIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Stream</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span> {
-    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>S</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">StreamIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span>;
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>S</span><span class='op'>&gt;</span> { <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>next</span>() }
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>() }
 }
 
-<span class='doccomment'>/// A trait defining a set of methods for accessing and influencing an HTTP/2 session&#39;s state.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This trait is tightly coupled to a `Stream`-based session layer implementation. Particular</span>
-<span class='doccomment'>/// implementations are additionally tightly coupled to one particular `Stream` implementation.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Note</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Clients built on top of the raw `HttpConnection` + `Session` can still exist without using</span>
-<span class='doccomment'>/// this trait; however, it is included for convenience, as most session implementations *will*</span>
-<span class='doccomment'>/// want to keep track of similar things in the session&#39;s state.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SessionState</span> {
-    <span class='doccomment'>/// The type of the `Stream` that the `SessionState` manages.</span>
-    <span class='kw'>type</span> <span class='ident'>Stream</span>: <span class='ident'>Stream</span>;
+<span class="doccomment">/// A trait defining a set of methods for accessing and influencing an HTTP/2 session&#39;s state.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This trait is tightly coupled to a `Stream`-based session layer implementation. Particular</span>
+<span class="doccomment">/// implementations are additionally tightly coupled to one particular `Stream` implementation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Note</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Clients built on top of the raw `HttpConnection` + `Session` can still exist without using</span>
+<span class="doccomment">/// this trait; however, it is included for convenience, as most session implementations *will*</span>
+<span class="doccomment">/// want to keep track of similar things in the session&#39;s state.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SessionState</span> {
+    <span class="doccomment">/// The type of the `Stream` that the `SessionState` manages.</span>
+    <span class="kw">type</span> <span class="ident">Stream</span>: <span class="ident">Stream</span>;
 
-    <span class='doccomment'>/// Inserts the given `Stream` into the session&#39;s state, starting to track it.</span>
-    <span class='kw'>fn</span> <span class='ident'>insert_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream</span>: <span class='self'>Self</span>::<span class='ident'>Stream</span>);
-    <span class='doccomment'>/// Returns a reference to a `Stream` with the given `StreamId`, if it is found in the current</span>
-    <span class='doccomment'>/// session.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span>;
-    <span class='doccomment'>/// Returns a mutable reference to a `Stream` with the given `StreamId`, if it is found in the</span>
-    <span class='doccomment'>/// current session.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span>;
-    <span class='doccomment'>/// Removes the stream with the given `StreamId` from the session. If the stream was found in</span>
-    <span class='doccomment'>/// the session, it is returned in the result.</span>
-    <span class='kw'>fn</span> <span class='ident'>remove_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span>;
+    <span class="doccomment">/// Inserts the given `Stream` into the session&#39;s state, starting to track it.</span>
+    <span class="kw">fn</span> <span class="ident">insert_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="self">Self</span>::<span class="ident">Stream</span>);
+    <span class="doccomment">/// Returns a reference to a `Stream` with the given `StreamId`, if it is found in the current</span>
+    <span class="doccomment">/// session.</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a mutable reference to a `Stream` with the given `StreamId`, if it is found in the</span>
+    <span class="doccomment">/// current session.</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Removes the stream with the given `StreamId` from the session. If the stream was found in</span>
+    <span class="doccomment">/// the session, it is returned in the result.</span>
+    <span class="kw">fn</span> <span class="ident">remove_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span>;
 
-    <span class='doccomment'>/// Returns an iterator over the streams currently found in the session.</span>
-    <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamIter</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span>;
+    <span class="doccomment">/// Returns an iterator over the streams currently found in the session.</span>
+    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamIter</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span>;
 
-    <span class='doccomment'>/// Returns all streams that are closed and tracked by the session state.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The streams are moved out of the session state.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The default implementations relies on the `iter` implementation to find the closed streams</span>
-    <span class='doccomment'>/// first and then calls `remove_stream` on all of them.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_closed</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>ids</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter</span>()
-                              .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> {
-                                  <span class='kw'>if</span> <span class='ident'>s</span>.<span class='ident'>is_closed</span>() { <span class='prelude-val'>Some</span>(<span class='ident'>s</span>.<span class='ident'>id</span>()) } <span class='kw'>else</span> { <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Returns all streams that are closed and tracked by the session state.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The streams are moved out of the session state.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The default implementations relies on the `iter` implementation to find the closed streams</span>
+    <span class="doccomment">/// first and then calls `remove_stream` on all of them.</span>
+    <span class="kw">fn</span> <span class="ident">get_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>()
+                              .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
+                                  <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">is_closed</span>() { <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">id</span>()) } <span class="kw">else</span> { <span class="prelude-val">None</span> }
                               })
-                              .<span class='ident'>collect</span>();
-        <span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>ids</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>remove_stream</span>(<span class='ident'>i</span>).<span class='ident'>unwrap</span>()))
+                              .<span class="ident">collect</span>();
+        <span class="ident">FromIterator</span>::<span class="ident">from_iter</span>(<span class="ident">ids</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">remove_stream</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>()))
     }
 }
 
-<span class='doccomment'>/// An implementation of the `SessionState` trait that tracks the active streams in a `HashMap`,</span>
-<span class='doccomment'>/// mapping the stream ID to the concrete `Stream` instance.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Stream</span> {
-    <span class='doccomment'>/// All streams that the session state is currently aware of.</span>
-    <span class='ident'>streams</span>: <span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='ident'>StreamId</span>, <span class='ident'>S</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// An implementation of the `SessionState` trait that tracks the active streams in a `HashMap`,</span>
+<span class="doccomment">/// mapping the stream ID to the concrete `Stream` instance.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Stream</span> {
+    <span class="doccomment">/// All streams that the session state is currently aware of.</span>
+    <span class="ident">streams</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">S</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Stream</span> {
-    <span class='doccomment'>/// Creates a new `DefaultSessionState` with no known streams.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-        <span class='ident'>DefaultSessionState</span> {
-            <span class='ident'>streams</span>: <span class='ident'>HashMap</span>::<span class='ident'>new</span>(),
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Stream</span> {
+    <span class="doccomment">/// Creates a new `DefaultSessionState` with no known streams.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+        <span class="ident">DefaultSessionState</span> {
+            <span class="ident">streams</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>SessionState</span> <span class='kw'>for</span> <span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Stream</span> {
-    <span class='kw'>type</span> <span class='ident'>Stream</span> <span class='op'>=</span> <span class='ident'>S</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">SessionState</span> <span class="kw">for</span> <span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Stream</span> {
+    <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">S</span>;
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>insert_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream</span>: <span class='self'>Self</span>::<span class='ident'>Stream</span>) {
-        <span class='self'>self</span>.<span class='ident'>streams</span>.<span class='ident'>insert</span>(<span class='ident'>stream</span>.<span class='ident'>id</span>(), <span class='ident'>stream</span>);
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">insert_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="self">Self</span>::<span class="ident">Stream</span>) {
+        <span class="self">self</span>.<span class="ident">streams</span>.<span class="ident">insert</span>(<span class="ident">stream</span>.<span class="ident">id</span>(), <span class="ident">stream</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>streams</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>stream_id</span>)
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">streams</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">stream_id</span>)
     }
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>streams</span>.<span class='ident'>get_mut</span>(<span class='kw-2'>&amp;</span><span class='ident'>stream_id</span>)
-    }
-
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>remove_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span>::<span class='ident'>Stream</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>streams</span>.<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>stream_id</span>)
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">streams</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">stream_id</span>)
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamIter</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-        <span class='ident'>StreamIter</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>streams</span>.<span class='ident'>iter_mut</span>().<span class='ident'>map</span>(<span class='op'>|</span>(_, <span class='ident'>s</span>)<span class='op'>|</span> <span class='ident'>s</span>)))
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">remove_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Stream</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">streams</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">stream_id</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamIter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+        <span class="ident">StreamIter</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">streams</span>.<span class="ident">iter_mut</span>().<span class="ident">map</span>(<span class="op">|</span>(_, <span class="ident">s</span>)<span class="op">|</span> <span class="ident">s</span>)))
     }
 }
 
-<span class='doccomment'>/// The enum represents all the states that an HTTP/2 stream can be found in.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Corresponds to [section 5.1.](http://http2.github.io/http2-spec/#rfc.section.5.1) of the spec.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StreamState</span> {
-    <span class='ident'>Idle</span>,
-    <span class='ident'>ReservedLocal</span>,
-    <span class='ident'>ReservedRemote</span>,
-    <span class='ident'>Open</span>,
-    <span class='ident'>HalfClosedRemote</span>,
-    <span class='ident'>HalfClosedLocal</span>,
-    <span class='ident'>Closed</span>,
+<span class="doccomment">/// The enum represents all the states that an HTTP/2 stream can be found in.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Corresponds to [section 5.1.](http://http2.github.io/http2-spec/#rfc.section.5.1) of the spec.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StreamState</span> {
+    <span class="ident">Idle</span>,
+    <span class="ident">ReservedLocal</span>,
+    <span class="ident">ReservedRemote</span>,
+    <span class="ident">Open</span>,
+    <span class="ident">HalfClosedRemote</span>,
+    <span class="ident">HalfClosedLocal</span>,
+    <span class="ident">Closed</span>,
 }
 
-<span class='doccomment'>/// The enum represents errors that can be returned from the `Stream::get_data_chunk` method.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StreamDataError</span> {
-    <span class='doccomment'>/// Indicates that the stream cannot provide any data, since it is closed for further writes</span>
-    <span class='doccomment'>/// from the peer&#39;s side.</span>
-    <span class='ident'>Closed</span>,
-    <span class='doccomment'>/// A different error while trying to obtain the data chunk. Wraps a boxed `Error` impl.</span>
-    <span class='ident'>Other</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Error</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span><span class='op'>&gt;</span>),
+<span class="doccomment">/// The enum represents errors that can be returned from the `Stream::get_data_chunk` method.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StreamDataError</span> {
+    <span class="doccomment">/// Indicates that the stream cannot provide any data, since it is closed for further writes</span>
+    <span class="doccomment">/// from the peer&#39;s side.</span>
+    <span class="ident">Closed</span>,
+    <span class="doccomment">/// A different error while trying to obtain the data chunk. Wraps a boxed `Error` impl.</span>
+    <span class="ident">Other</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>E</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>StreamDataError</span> <span class='kw'>where</span> <span class='ident'>E</span>: <span class='ident'>Error</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>err</span>: <span class='ident'>E</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamDataError</span> { <span class='ident'>StreamDataError</span>::<span class='ident'>Other</span>(<span class='ident'>Box</span>::<span class='ident'>new</span>(<span class='ident'>err</span>)) }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StreamDataError</span> <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">E</span>) <span class="op">-&gt;</span> <span class="ident">StreamDataError</span> { <span class="ident">StreamDataError</span>::<span class="ident">Other</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">err</span>)) }
 }
 
-<span class='doccomment'>/// The enum represents the successful completion of the `Stream::get_data_chunk` method.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StreamDataChunk</span> {
-    <span class='doccomment'>/// A data chunk of the given size, after which more chunks can follow.</span>
-    <span class='ident'>Chunk</span>(<span class='ident'>usize</span>),
-    <span class='doccomment'>/// The chunk was the last one that the stream will ever write.</span>
-    <span class='ident'>Last</span>(<span class='ident'>usize</span>),
-    <span class='doccomment'>/// No data currently available, but the stream isn&#39;t closed yet</span>
-    <span class='ident'>Unavailable</span>,
+<span class="doccomment">/// The enum represents the successful completion of the `Stream::get_data_chunk` method.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StreamDataChunk</span> {
+    <span class="doccomment">/// A data chunk of the given size, after which more chunks can follow.</span>
+    <span class="ident">Chunk</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// The chunk was the last one that the stream will ever write.</span>
+    <span class="ident">Last</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// No data currently available, but the stream isn&#39;t closed yet</span>
+    <span class="ident">Unavailable</span>,
 }
 
-<span class='doccomment'>/// A trait representing a single HTTP/2 stream. An HTTP/2 connection multiplexes a number of</span>
-<span class='doccomment'>/// streams.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The trait defines which operations need to be implemented by a type that should</span>
-<span class='doccomment'>/// be usable as an HTTP/2 stream. By implementing this trait, clients can implement only</span>
-<span class='doccomment'>/// stream-level logic, such as how the received data should be handled, or which data should be</span>
-<span class='doccomment'>/// sent to the peer, without having to worry about the lower-level details of session and</span>
-<span class='doccomment'>/// connection management (e.g. handling raw frames or tracking stream status).</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Stream</span> {
-    <span class='doccomment'>/// Create a new stream with the given ID</span>
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>;
-    <span class='doccomment'>/// Handle a new data chunk that has arrived for the stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>new_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]);
-    <span class='doccomment'>/// Set headers for a stream. A stream is only allowed to have one set of</span>
-    <span class='doccomment'>/// headers.</span>
-    <span class='kw'>fn</span> <span class='ident'>set_headers</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>);
-    <span class='doccomment'>/// Sets the stream state to the newly provided state.</span>
-    <span class='kw'>fn</span> <span class='ident'>set_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>state</span>: <span class='ident'>StreamState</span>);
+<span class="doccomment">/// A trait representing a single HTTP/2 stream. An HTTP/2 connection multiplexes a number of</span>
+<span class="doccomment">/// streams.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The trait defines which operations need to be implemented by a type that should</span>
+<span class="doccomment">/// be usable as an HTTP/2 stream. By implementing this trait, clients can implement only</span>
+<span class="doccomment">/// stream-level logic, such as how the received data should be handled, or which data should be</span>
+<span class="doccomment">/// sent to the peer, without having to worry about the lower-level details of session and</span>
+<span class="doccomment">/// connection management (e.g. handling raw frames or tracking stream status).</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Stream</span> {
+    <span class="doccomment">/// Create a new stream with the given ID</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="doccomment">/// Handle a new data chunk that has arrived for the stream.</span>
+    <span class="kw">fn</span> <span class="ident">new_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]);
+    <span class="doccomment">/// Set headers for a stream. A stream is only allowed to have one set of</span>
+    <span class="doccomment">/// headers.</span>
+    <span class="kw">fn</span> <span class="ident">set_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Sets the stream state to the newly provided state.</span>
+    <span class="kw">fn</span> <span class="ident">set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">StreamState</span>);
 
-    <span class='doccomment'>/// Places the next data chunk that should be written onto the stream into the given buffer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The returned variant of the `StreamDataChunk` enum can indicate that the returned chunk is</span>
-    <span class='doccomment'>/// the last one that the stream can write (the `StreamDataChunk::Last` variant).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// It can also indicate that the stream currently does not have any data that could be</span>
-    <span class='doccomment'>/// written, but it isn&#39;t closed yet, implying that at a later time some data might become</span>
-    <span class='doccomment'>/// available for writing (the `StreamDataChunk::Unavailable` variant).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `StreamDataChunk::Chunk` indicates that the chunk of the given length has been placed</span>
-    <span class='doccomment'>/// into the buffer and that more data might follow on the stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>StreamDataChunk</span>, <span class='ident'>StreamDataError</span><span class='op'>&gt;</span>;
+    <span class="doccomment">/// Places the next data chunk that should be written onto the stream into the given buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned variant of the `StreamDataChunk` enum can indicate that the returned chunk is</span>
+    <span class="doccomment">/// the last one that the stream can write (the `StreamDataChunk::Last` variant).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It can also indicate that the stream currently does not have any data that could be</span>
+    <span class="doccomment">/// written, but it isn&#39;t closed yet, implying that at a later time some data might become</span>
+    <span class="doccomment">/// available for writing (the `StreamDataChunk::Unavailable` variant).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `StreamDataChunk::Chunk` indicates that the chunk of the given length has been placed</span>
+    <span class="doccomment">/// into the buffer and that more data might follow on the stream.</span>
+    <span class="kw">fn</span> <span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamDataChunk</span>, <span class="ident">StreamDataError</span><span class="op">&gt;</span>;
 
-    <span class='doccomment'>/// Returns the ID of the stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span>;
-    <span class='doccomment'>/// Returns the current state of the stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>state</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamState</span>;
+    <span class="doccomment">/// Returns the ID of the stream.</span>
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span>;
+    <span class="doccomment">/// Returns the current state of the stream.</span>
+    <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamState</span>;
 
-    <span class='doccomment'>/// Transitions the stream state to closed. After this, the stream is considered to be closed</span>
-    <span class='doccomment'>/// for any further reads or writes.</span>
-    <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) { <span class='self'>self</span>.<span class='ident'>set_state</span>(<span class='ident'>StreamState</span>::<span class='ident'>Closed</span>); }
-    <span class='doccomment'>/// Updates the `Stream` status to indicate that it is closed locally.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the stream is closed on the remote end, then it is fully closed after this call.</span>
-    <span class='kw'>fn</span> <span class='ident'>close_local</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='ident'>next</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>() {
-            <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedRemote</span> <span class='op'>=&gt;</span> <span class='ident'>StreamState</span>::<span class='ident'>Closed</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedLocal</span>,
+    <span class="doccomment">/// Transitions the stream state to closed. After this, the stream is considered to be closed</span>
+    <span class="doccomment">/// for any further reads or writes.</span>
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) { <span class="self">self</span>.<span class="ident">set_state</span>(<span class="ident">StreamState</span>::<span class="ident">Closed</span>); }
+    <span class="doccomment">/// Updates the `Stream` status to indicate that it is closed locally.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the stream is closed on the remote end, then it is fully closed after this call.</span>
+    <span class="kw">fn</span> <span class="ident">close_local</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>() {
+            <span class="ident">StreamState</span>::<span class="ident">HalfClosedRemote</span> <span class="op">=&gt;</span> <span class="ident">StreamState</span>::<span class="ident">Closed</span>,
+            _ <span class="op">=&gt;</span> <span class="ident">StreamState</span>::<span class="ident">HalfClosedLocal</span>,
         };
-        <span class='self'>self</span>.<span class='ident'>set_state</span>(<span class='ident'>next</span>);
+        <span class="self">self</span>.<span class="ident">set_state</span>(<span class="ident">next</span>);
     }
-    <span class='doccomment'>/// Updates the `Stream` status to indicate that it is closed on the remote peer&#39;s side.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the stream is also locally closed, then it is fully closed after this call.</span>
-    <span class='kw'>fn</span> <span class='ident'>close_remote</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='ident'>next</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>() {
-            <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedLocal</span> <span class='op'>=&gt;</span> <span class='ident'>StreamState</span>::<span class='ident'>Closed</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedRemote</span>,
+    <span class="doccomment">/// Updates the `Stream` status to indicate that it is closed on the remote peer&#39;s side.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the stream is also locally closed, then it is fully closed after this call.</span>
+    <span class="kw">fn</span> <span class="ident">close_remote</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>() {
+            <span class="ident">StreamState</span>::<span class="ident">HalfClosedLocal</span> <span class="op">=&gt;</span> <span class="ident">StreamState</span>::<span class="ident">Closed</span>,
+            _ <span class="op">=&gt;</span> <span class="ident">StreamState</span>::<span class="ident">HalfClosedRemote</span>,
         };
-        <span class='self'>self</span>.<span class='ident'>set_state</span>(<span class='ident'>next</span>);
+        <span class="self">self</span>.<span class="ident">set_state</span>(<span class="ident">next</span>);
     }
-    <span class='doccomment'>/// Returns whether the stream is closed.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A stream is considered to be closed iff its state is set to `Closed`.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_closed</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> { <span class='self'>self</span>.<span class='ident'>state</span>() <span class='op'>==</span> <span class='ident'>StreamState</span>::<span class='ident'>Closed</span> }
-    <span class='doccomment'>/// Returns whether the stream is closed locally.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_closed_local</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>() {
-            <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedLocal</span> <span class='op'>|</span> <span class='ident'>StreamState</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+    <span class="doccomment">/// Returns whether the stream is closed.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A stream is considered to be closed iff its state is set to `Closed`.</span>
+    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> { <span class="self">self</span>.<span class="ident">state</span>() <span class="op">==</span> <span class="ident">StreamState</span>::<span class="ident">Closed</span> }
+    <span class="doccomment">/// Returns whether the stream is closed locally.</span>
+    <span class="kw">fn</span> <span class="ident">is_closed_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>() {
+            <span class="ident">StreamState</span>::<span class="ident">HalfClosedLocal</span> <span class="op">|</span> <span class="ident">StreamState</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
-    <span class='doccomment'>/// Returns whether the remote peer has closed the stream. This includes a fully closed stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_closed_remote</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>() {
-            <span class='ident'>StreamState</span>::<span class='ident'>HalfClosedRemote</span> <span class='op'>|</span> <span class='ident'>StreamState</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+    <span class="doccomment">/// Returns whether the remote peer has closed the stream. This includes a fully closed stream.</span>
+    <span class="kw">fn</span> <span class="ident">is_closed_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>() {
+            <span class="ident">StreamState</span>::<span class="ident">HalfClosedRemote</span> <span class="op">|</span> <span class="ident">StreamState</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class='doccomment'>/// An implementation of the `Stream` trait that saves all headers and data</span>
-<span class='doccomment'>/// in memory.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Stores its outgoing data as a `Vec&lt;u8&gt;`.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>DefaultStream</span> {
-    <span class='doccomment'>/// The ID of the stream</span>
-    <span class='kw'>pub</span> <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>,
-    <span class='doccomment'>/// The headers associated with the stream (i.e. the response headers)</span>
-    <span class='kw'>pub</span> <span class='ident'>headers</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>/// The body of the stream (i.e. the response body)</span>
-    <span class='kw'>pub</span> <span class='ident'>body</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The current stream state.</span>
-    <span class='kw'>pub</span> <span class='ident'>state</span>: <span class='ident'>StreamState</span>,
-    <span class='doccomment'>/// The outgoing data associated to the stream. The `Cursor` points into the `Vec` at the</span>
-    <span class='doccomment'>/// position where the data has been sent out.</span>
-    <span class='ident'>data</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cursor</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// An implementation of the `Stream` trait that saves all headers and data</span>
+<span class="doccomment">/// in memory.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Stores its outgoing data as a `Vec&lt;u8&gt;`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultStream</span> {
+    <span class="doccomment">/// The ID of the stream</span>
+    <span class="kw">pub</span> <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// The headers associated with the stream (i.e. the response headers)</span>
+    <span class="kw">pub</span> <span class="ident">headers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">/// The body of the stream (i.e. the response body)</span>
+    <span class="kw">pub</span> <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The current stream state.</span>
+    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">StreamState</span>,
+    <span class="doccomment">/// The outgoing data associated to the stream. The `Cursor` points into the `Vec` at the</span>
+    <span class="doccomment">/// position where the data has been sent out.</span>
+    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>DefaultStream</span> {
-    <span class='doccomment'>/// Create a new `DefaultStream` with the given ID.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='ident'>DefaultStream</span> {
-        <span class='ident'>DefaultStream</span> {
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>headers</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>body</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-            <span class='ident'>state</span>: <span class='ident'>StreamState</span>::<span class='ident'>Open</span>,
-            <span class='ident'>data</span>: <span class='prelude-val'>None</span>,
+<span class="kw">impl</span> <span class="ident">DefaultStream</span> {
+    <span class="doccomment">/// Create a new `DefaultStream` with the given ID.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="ident">DefaultStream</span> {
+        <span class="ident">DefaultStream</span> {
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">headers</span>: <span class="prelude-val">None</span>,
+            <span class="ident">body</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">state</span>: <span class="ident">StreamState</span>::<span class="ident">Open</span>,
+            <span class="ident">data</span>: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='doccomment'>/// Sets the outgoing data of the stream to the given `Vec`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any previously associated (and perhaps unwritten) data is discarded.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_full_data</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
-        <span class='self'>self</span>.<span class='ident'>data</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Cursor</span>::<span class='ident'>new</span>(<span class='ident'>data</span>));
+    <span class="doccomment">/// Sets the outgoing data of the stream to the given `Vec`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any previously associated (and perhaps unwritten) data is discarded.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_full_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Cursor</span>::<span class="ident">new</span>(<span class="ident">data</span>));
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Stream</span> <span class='kw'>for</span> <span class='ident'>DefaultStream</span> {
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='ident'>DefaultStream</span> {
-        <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='ident'>stream_id</span>)
+<span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">DefaultStream</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="ident">DefaultStream</span> {
+        <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="ident">stream_id</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>new_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='self'>self</span>.<span class='ident'>body</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="kw">fn</span> <span class="ident">new_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
     }
 
-    <span class='kw'>fn</span> <span class='ident'>set_headers</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>) {
-        <span class='self'>self</span>.<span class='ident'>headers</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>headers</span>);
+    <span class="kw">fn</span> <span class="ident">set_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) {
+        <span class="self">self</span>.<span class="ident">headers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">headers</span>);
     }
-    <span class='kw'>fn</span> <span class='ident'>set_state</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>state</span>: <span class='ident'>StreamState</span>) { <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>state</span>; }
+    <span class="kw">fn</span> <span class="ident">set_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">state</span>: <span class="ident">StreamState</span>) { <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>; }
 
-    <span class='kw'>fn</span> <span class='ident'>id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span> {
-        <span class='self'>self</span>.<span class='ident'>stream_id</span>
+    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span> {
+        <span class="self">self</span>.<span class="ident">stream_id</span>
     }
-    <span class='kw'>fn</span> <span class='ident'>state</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamState</span> { <span class='self'>self</span>.<span class='ident'>state</span> }
+    <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamState</span> { <span class="self">self</span>.<span class="ident">state</span> }
 
-    <span class='kw'>fn</span> <span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>StreamDataChunk</span>, <span class='ident'>StreamDataError</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_closed_local</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>StreamDataError</span>::<span class='ident'>Closed</span>);
+    <span class="kw">fn</span> <span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StreamDataChunk</span>, <span class="ident">StreamDataError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closed_local</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">StreamDataError</span>::<span class="ident">Closed</span>);
         }
-        <span class='kw'>let</span> <span class='ident'>chunk</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_mut</span>() {
-            <span class='comment'>// No data associated to the stream, but it&#39;s open =&gt; nothing available for writing</span>
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>StreamDataChunk</span>::<span class='ident'>Unavailable</span>,
-            <span class='prelude-val'>Some</span>(<span class='ident'>d</span>) <span class='op'>=&gt;</span>  {
-                <span class='comment'>// For the `Vec`-backed reader, this should never fail, so unwrapping is</span>
-                <span class='comment'>// fine.</span>
-                <span class='kw'>let</span> <span class='ident'>read</span> <span class='op'>=</span> <span class='ident'>d</span>.<span class='ident'>read</span>(<span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
-                <span class='kw'>if</span> (<span class='ident'>d</span>.<span class='ident'>position</span>() <span class='kw'>as</span> <span class='ident'>usize</span>) <span class='op'>==</span> <span class='ident'>d</span>.<span class='ident'>get_ref</span>().<span class='ident'>len</span>() {
-                    <span class='ident'>StreamDataChunk</span>::<span class='ident'>Last</span>(<span class='ident'>read</span>)
-                } <span class='kw'>else</span> {
-                    <span class='ident'>StreamDataChunk</span>::<span class='ident'>Chunk</span>(<span class='ident'>read</span>)
+        <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_mut</span>() {
+            <span class="comment">// No data associated to the stream, but it&#39;s open =&gt; nothing available for writing</span>
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">StreamDataChunk</span>::<span class="ident">Unavailable</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=&gt;</span>  {
+                <span class="comment">// For the `Vec`-backed reader, this should never fail, so unwrapping is</span>
+                <span class="comment">// fine.</span>
+                <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">read</span>(<span class="ident">buf</span>).<span class="ident">unwrap</span>();
+                <span class="kw">if</span> (<span class="ident">d</span>.<span class="ident">position</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">==</span> <span class="ident">d</span>.<span class="ident">get_ref</span>().<span class="ident">len</span>() {
+                    <span class="ident">StreamDataChunk</span>::<span class="ident">Last</span>(<span class="ident">read</span>)
+                } <span class="kw">else</span> {
+                    <span class="ident">StreamDataChunk</span>::<span class="ident">Chunk</span>(<span class="ident">read</span>)
                 }
             }
         };
-        <span class='comment'>// Transition the stream state to locally closed if we&#39;ve extracted the final data chunk.</span>
-        <span class='kw'>match</span> <span class='ident'>chunk</span> {
-            <span class='ident'>StreamDataChunk</span>::<span class='ident'>Last</span>(_) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>close_local</span>(),
-            _ <span class='op'>=&gt;</span> {},
+        <span class="comment">// Transition the stream state to locally closed if we&#39;ve extracted the final data chunk.</span>
+        <span class="kw">match</span> <span class="ident">chunk</span> {
+            <span class="ident">StreamDataChunk</span>::<span class="ident">Last</span>(_) <span class="op">=&gt;</span> <span class="self">self</span>.<span class="ident">close_local</span>(),
+            _ <span class="op">=&gt;</span> {},
         };
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>chunk</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">chunk</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{
-        <span class='ident'>Stream</span>,
-        <span class='ident'>DefaultSessionState</span>,
-        <span class='ident'>DefaultStream</span>,
-        <span class='ident'>StreamDataChunk</span>, <span class='ident'>StreamDataError</span>,
-        <span class='ident'>SessionState</span>,
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{
+        <span class="ident">Stream</span>,
+        <span class="ident">DefaultSessionState</span>,
+        <span class="ident">DefaultStream</span>,
+        <span class="ident">StreamDataChunk</span>, <span class="ident">StreamDataError</span>,
+        <span class="ident">SessionState</span>,
     };
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>tests</span>::<span class='ident'>common</span>::<span class='ident'>TestStream</span>;
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">tests</span>::<span class="ident">common</span>::<span class="ident">TestStream</span>;
 
-    <span class='doccomment'>/// Tests for the `DefaultSessionState` implementation of the `SessionState` trait.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_default_session_state</span>() {
-        <span class='kw'>fn</span> <span class='ident'>new_mock_state</span>() <span class='op'>-&gt;</span> <span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>TestStream</span><span class='op'>&gt;</span> { <span class='ident'>DefaultSessionState</span>::<span class='ident'>new</span>() }
+    <span class="doccomment">/// Tests for the `DefaultSessionState` implementation of the `SessionState` trait.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_default_session_state</span>() {
+        <span class="kw">fn</span> <span class="ident">new_mock_state</span>() <span class="op">-&gt;</span> <span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">TestStream</span><span class="op">&gt;</span> { <span class="ident">DefaultSessionState</span>::<span class="ident">new</span>() }
 
         {
-            <span class='comment'>// Test insert</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>1</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>id</span>(), <span class='number'>1</span>);
+            <span class="comment">// Test insert</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">id</span>(), <span class="number">1</span>);
         }
         {
-            <span class='comment'>// Test remove</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>101</span>));
+            <span class="comment">// Test remove</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">101</span>));
 
-            <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>state</span>.<span class='ident'>remove_stream</span>(<span class='number'>101</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">remove_stream</span>(<span class="number">101</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>101</span>, <span class='ident'>stream</span>.<span class='ident'>id</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">101</span>, <span class="ident">stream</span>.<span class="ident">id</span>());
         }
         {
-            <span class='comment'>// Test get stream -- unknown ID</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>1</span>));
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>3</span>).<span class='ident'>is_none</span>());
+            <span class="comment">// Test get stream -- unknown ID</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">1</span>));
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">3</span>).<span class="ident">is_none</span>());
         }
         {
-            <span class='comment'>// Test iterate</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>1</span>));
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>7</span>));
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>3</span>));
+            <span class="comment">// Test iterate</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">1</span>));
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">7</span>));
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">3</span>));
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>streams</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>state</span>.<span class='ident'>iter</span>().<span class='ident'>collect</span>();
-            <span class='ident'>streams</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>s1</span>, <span class='ident'>s2</span><span class='op'>|</span> <span class='ident'>s1</span>.<span class='ident'>id</span>().<span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='ident'>s2</span>.<span class='ident'>id</span>()));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">streams</span>: <span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
+            <span class="ident">streams</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">s1</span>, <span class="ident">s2</span><span class="op">|</span> <span class="ident">s1</span>.<span class="ident">id</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>.<span class="ident">id</span>()));
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>3</span>, <span class='number'>7</span>], <span class='ident'>streams</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>id</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">7</span>], <span class="ident">streams</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>());
         }
         {
-            <span class='comment'>// Test iterate on an empty state</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
+            <span class="comment">// Test iterate on an empty state</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>iter</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>().<span class='ident'>len</span>(), <span class='number'>0</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>().<span class="ident">len</span>(), <span class="number">0</span>);
         }
         {
-            <span class='comment'>// Test `get_closed`</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>new_mock_state</span>();
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>1</span>));
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>7</span>));
-            <span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='number'>3</span>));
-            <span class='comment'>// Close some streams now</span>
-            <span class='ident'>state</span>.<span class='ident'>get_stream_mut</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>close</span>();
-            <span class='ident'>state</span>.<span class='ident'>get_stream_mut</span>(<span class='number'>7</span>).<span class='ident'>unwrap</span>().<span class='ident'>close</span>();
+            <span class="comment">// Test `get_closed`</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">new_mock_state</span>();
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">1</span>));
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">7</span>));
+            <span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">Stream</span>::<span class="ident">new</span>(<span class="number">3</span>));
+            <span class="comment">// Close some streams now</span>
+            <span class="ident">state</span>.<span class="ident">get_stream_mut</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">close</span>();
+            <span class="ident">state</span>.<span class="ident">get_stream_mut</span>(<span class="number">7</span>).<span class="ident">unwrap</span>().<span class="ident">close</span>();
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>closed</span> <span class='op'>=</span> <span class='ident'>state</span>.<span class='ident'>get_closed</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">closed</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">get_closed</span>();
 
-            <span class='comment'>// Only one stream left</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>streams</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
-            <span class='comment'>// Both of the closed streams extracted into the `closed` Vec.</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>closed</span>.<span class='ident'>len</span>(), <span class='number'>2</span>);
-            <span class='ident'>closed</span>.<span class='ident'>sort_by</span>(<span class='op'>|</span><span class='ident'>s1</span>, <span class='ident'>s2</span><span class='op'>|</span> <span class='ident'>s1</span>.<span class='ident'>id</span>().<span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='ident'>s2</span>.<span class='ident'>id</span>()));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>7</span>], <span class='ident'>closed</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>id</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
+            <span class="comment">// Only one stream left</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">streams</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+            <span class="comment">// Both of the closed streams extracted into the `closed` Vec.</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">closed</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+            <span class="ident">closed</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">s1</span>, <span class="ident">s2</span><span class="op">|</span> <span class="ident">s1</span>.<span class="ident">id</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">s2</span>.<span class="ident">id</span>()));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">7</span>], <span class="ident">closed</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>());
         }
     }
 
-    <span class='doccomment'>/// Tests that the `DefaultStream` provides the correct data when its `get_data_chunk` method</span>
-    <span class='doccomment'>/// is called.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_default_stream_get_data</span>() {
-        <span class='comment'>// The buffer that will be used in upcoming tests</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>);
-        <span class='kw'>unsafe</span> { <span class='ident'>buf</span>.<span class='ident'>set_len</span>(<span class='number'>2</span>); }
+    <span class="doccomment">/// Tests that the `DefaultStream` provides the correct data when its `get_data_chunk` method</span>
+    <span class="doccomment">/// is called.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_default_stream_get_data</span>() {
+        <span class="comment">// The buffer that will be used in upcoming tests</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">2</span>);
+        <span class="kw">unsafe</span> { <span class="ident">buf</span>.<span class="ident">set_len</span>(<span class="number">2</span>); }
 
         {
-            <span class='comment'>// A newly open stream has no available data.</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Unavailable</span>);
+            <span class="comment">// A newly open stream has no available data.</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Unavailable</span>);
         }
         {
-            <span class='comment'>// A closed stream returns an error</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='ident'>stream</span>.<span class='ident'>close</span>();
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>err</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw'>match</span> <span class='ident'>res</span> {
-                <span class='ident'>StreamDataError</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-                _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            <span class="comment">// A closed stream returns an error</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="ident">stream</span>.<span class="ident">close</span>();
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">match</span> <span class="ident">res</span> {
+                <span class="ident">StreamDataError</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+                _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             });
         }
         {
-            <span class='comment'>// A locally closed stream returns an error</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='ident'>stream</span>.<span class='ident'>close_local</span>();
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>err</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw'>match</span> <span class='ident'>res</span> {
-                <span class='ident'>StreamDataError</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-                _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            <span class="comment">// A locally closed stream returns an error</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="ident">stream</span>.<span class="ident">close_local</span>();
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">match</span> <span class="ident">res</span> {
+                <span class="ident">StreamDataError</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+                _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             });
         }
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='ident'>stream</span>.<span class='ident'>set_full_data</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="ident">stream</span>.<span class="ident">set_full_data</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
 
-            <span class='comment'>// A stream with data returns the first full chunk</span>
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Chunk</span>(<span class='number'>2</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>]);
+            <span class="comment">// A stream with data returns the first full chunk</span>
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Chunk</span>(<span class="number">2</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>]);
 
-            <span class='comment'>// Now it returns the last chunk with the correct indicator</span>
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Last</span>(<span class='number'>2</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>3</span>, <span class='number'>4</span>]);
+            <span class="comment">// Now it returns the last chunk with the correct indicator</span>
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Last</span>(<span class="number">2</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">3</span>, <span class="number">4</span>]);
 
-            <span class='comment'>// Further calls indicate that the stream is now closed locally</span>
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>err</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw'>match</span> <span class='ident'>res</span> {
-                <span class='ident'>StreamDataError</span>::<span class='ident'>Closed</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-                _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            <span class="comment">// Further calls indicate that the stream is now closed locally</span>
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">err</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">match</span> <span class="ident">res</span> {
+                <span class="ident">StreamDataError</span>::<span class="ident">Closed</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+                _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
             });
         }
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='ident'>stream</span>.<span class='ident'>set_full_data</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="ident">stream</span>.<span class="ident">set_full_data</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]);
 
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Chunk</span>(<span class='number'>2</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>]);
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Chunk</span>(<span class="number">2</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>]);
 
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Chunk</span>(<span class='number'>2</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>3</span>, <span class='number'>4</span>]);
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Chunk</span>(<span class="number">2</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">3</span>, <span class="number">4</span>]);
 
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Last</span>(<span class='number'>1</span>));
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>[..<span class='number'>1</span>], <span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>5</span>][..]);
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Last</span>(<span class="number">1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="number">1</span>], <span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="number">5</span>][..]);
         }
         {
-            <span class='comment'>// Empty data</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='number'>1</span>);
-            <span class='ident'>stream</span>.<span class='ident'>set_full_data</span>(<span class='macro'>vec</span><span class='macro'>!</span>[]);
+            <span class="comment">// Empty data</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="number">1</span>);
+            <span class="ident">stream</span>.<span class="ident">set_full_data</span>(<span class="macro">vec</span><span class="macro">!</span>[]);
 
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>get_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>StreamDataChunk</span>::<span class='ident'>Last</span>(<span class='number'>0</span>));
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">get_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">StreamDataChunk</span>::<span class="ident">Last</span>(<span class="number">0</span>));
         }
     }
 }
@@ -1057,18 +1069,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1101,7 +1117,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

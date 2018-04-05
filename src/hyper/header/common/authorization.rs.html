@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/authorization.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/authorization.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>authorization.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -335,300 +347,300 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::<span class='ident'>Any</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::{<span class='ident'>FromStr</span>, <span class='ident'>from_utf8</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
-<span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>base64</span>::{<span class='ident'>ToBase64</span>, <span class='ident'>FromBase64</span>, <span class='ident'>Standard</span>, <span class='ident'>Config</span>, <span class='ident'>Newline</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::{<span class="ident">FromStr</span>, <span class="ident">from_utf8</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+<span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">base64</span>::{<span class="ident">ToBase64</span>, <span class="ident">FromBase64</span>, <span class="ident">Standard</span>, <span class="ident">Config</span>, <span class="ident">Newline</span>};
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HeaderFormat</span>};
 
-<span class='doccomment'>/// `Authorization` header, defined in [RFC7235](https://tools.ietf.org/html/rfc7235#section-4.2)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The `Authorization` header field allows a user agent to authenticate</span>
-<span class='doccomment'>/// itself with an origin server -- usually, but not necessarily, after</span>
-<span class='doccomment'>/// receiving a 401 (Unauthorized) response.  Its value consists of</span>
-<span class='doccomment'>/// credentials containing the authentication information of the user</span>
-<span class='doccomment'>/// agent for the realm of the resource being requested.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # ABNF</span>
-<span class='doccomment'>/// ```plain</span>
-<span class='doccomment'>/// Authorization = credentials</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example values</span>
-<span class='doccomment'>/// * `Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==`</span>
-<span class='doccomment'>/// * `Bearer fpKL54jvWmEGVoRdCNjG`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Authorization};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(Authorization(&quot;let me in&quot;.to_owned()));</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Authorization, Basic};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///    Authorization(</span>
-<span class='doccomment'>///        Basic {</span>
-<span class='doccomment'>///            username: &quot;Aladdin&quot;.to_owned(),</span>
-<span class='doccomment'>///            password: Some(&quot;open sesame&quot;.to_owned())</span>
-<span class='doccomment'>///        }</span>
-<span class='doccomment'>///    )</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Authorization, Bearer};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///    Authorization(</span>
-<span class='doccomment'>///        Bearer {</span>
-<span class='doccomment'>///            token: &quot;QWxhZGRpbjpvcGVuIHNlc2FtZQ&quot;.to_owned()</span>
-<span class='doccomment'>///        }</span>
-<span class='doccomment'>///    )</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span><span class='op'>&gt;</span>(<span class='kw'>pub</span> <span class='ident'>S</span>);
+<span class="doccomment">/// `Authorization` header, defined in [RFC7235](https://tools.ietf.org/html/rfc7235#section-4.2)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `Authorization` header field allows a user agent to authenticate</span>
+<span class="doccomment">/// itself with an origin server -- usually, but not necessarily, after</span>
+<span class="doccomment">/// receiving a 401 (Unauthorized) response.  Its value consists of</span>
+<span class="doccomment">/// credentials containing the authentication information of the user</span>
+<span class="doccomment">/// agent for the realm of the resource being requested.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # ABNF</span>
+<span class="doccomment">/// ```plain</span>
+<span class="doccomment">/// Authorization = credentials</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example values</span>
+<span class="doccomment">/// * `Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==`</span>
+<span class="doccomment">/// * `Bearer fpKL54jvWmEGVoRdCNjG`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Authorization};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(Authorization(&quot;let me in&quot;.to_owned()));</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Authorization, Basic};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///    Authorization(</span>
+<span class="doccomment">///        Basic {</span>
+<span class="doccomment">///            username: &quot;Aladdin&quot;.to_owned(),</span>
+<span class="doccomment">///            password: Some(&quot;open sesame&quot;.to_owned())</span>
+<span class="doccomment">///        }</span>
+<span class="doccomment">///    )</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Authorization, Bearer};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///    Authorization(</span>
+<span class="doccomment">///        Bearer {</span>
+<span class="doccomment">///            token: &quot;QWxhZGRpbjpvcGVuIHNlc2FtZQ&quot;.to_owned()</span>
+<span class="doccomment">///        }</span>
+<span class="doccomment">///    )</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Scheme</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">S</span>);
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span><span class='op'>&gt;</span> <span class='ident'>Deref</span> <span class='kw'>for</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='kw'>type</span> <span class='ident'>Target</span> <span class='op'>=</span> <span class='ident'>S</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Scheme</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">S</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>deref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>S</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>
+    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">S</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span><span class='op'>&gt;</span> <span class='ident'>DerefMut</span> <span class='kw'>for</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>deref_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>S</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='number'>0</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Scheme</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span> <span class='op'>+</span> <span class='ident'>Any</span><span class='op'>&gt;</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span>: <span class='lifetime'>&#39;static</span> {
-    <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='string'>&quot;Authorization&quot;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Scheme</span> <span class="op">+</span> <span class="ident">Any</span><span class="op">&gt;</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span>: <span class="lifetime">&#39;static</span> {
+    <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;Authorization&quot;</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>raw</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='number'>1</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>);
+    <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">if</span> <span class="ident">raw</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">1</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>);
         }
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>from_utf8</span>(<span class='kw'>unsafe</span> { <span class='kw-2'>&amp;</span><span class='ident'>raw</span>.<span class='ident'>get_unchecked</span>(<span class='number'>0</span>)[..] }));
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>scheme</span>) <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>Scheme</span><span class='op'>&gt;</span>::<span class='ident'>scheme</span>() {
-            <span class='kw'>if</span> <span class='ident'>header</span>.<span class='ident'>starts_with</span>(<span class='ident'>scheme</span>) <span class='op'>&amp;&amp;</span> <span class='ident'>header</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span> {
-                <span class='kw'>match</span> <span class='ident'>header</span>[<span class='ident'>scheme</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='number'>1</span>..].<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
-                    <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>),
-                    <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">from_utf8</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">raw</span>.<span class="ident">get_unchecked</span>(<span class="number">0</span>)[..] }));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">scheme</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">Scheme</span><span class="op">&gt;</span>::<span class="ident">scheme</span>() {
+            <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">starts_with</span>(<span class="ident">scheme</span>) <span class="op">&amp;&amp;</span> <span class="ident">header</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">scheme</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> {
+                <span class="kw">match</span> <span class="ident">header</span>[<span class="ident">scheme</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>..].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">Authorization</span>) {
+                    <span class="prelude-val">Ok</span>(<span class="ident">h</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">h</span>),
+                    <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
                 }
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
             }
-        } <span class='kw'>else</span> {
-            <span class='kw'>match</span> <span class='ident'>header</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>().<span class='ident'>map</span>(<span class='ident'>Authorization</span>) {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>h</span>),
-                <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+        } <span class="kw">else</span> {
+            <span class="kw">match</span> <span class="ident">header</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">Authorization</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">h</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">h</span>),
+                <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
             }
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Scheme</span> <span class='op'>+</span> <span class='ident'>Any</span><span class='op'>&gt;</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span>: <span class='lifetime'>&#39;static</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>scheme</span>) <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>Scheme</span><span class='op'>&gt;</span>::<span class='ident'>scheme</span>() {
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} &quot;</span>, <span class='ident'>scheme</span>))
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Scheme</span> <span class="op">+</span> <span class="ident">Any</span><span class="op">&gt;</span> <span class="ident">HeaderFormat</span> <span class="kw">for</span> <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span>: <span class="lifetime">&#39;static</span> {
+    <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">scheme</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">Scheme</span><span class="op">&gt;</span>::<span class="ident">scheme</span>() {
+            <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{} &quot;</span>, <span class="ident">scheme</span>))
         };
-        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>fmt_scheme</span>(<span class='ident'>f</span>)
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt_scheme</span>(<span class="ident">f</span>)
     }
 }
 
-<span class='doccomment'>/// An Authorization scheme to be used in the header.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Scheme</span>: <span class='ident'>FromStr</span> <span class='op'>+</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='op'>+</span> <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='ident'>Sync</span> {
-    <span class='doccomment'>/// An optional Scheme name.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Will be replaced with an associated constant once available.</span>
-    <span class='kw'>fn</span> <span class='ident'>scheme</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span>;
-    <span class='doccomment'>/// Format the Scheme data into a header value.</span>
-    <span class='kw'>fn</span> <span class='ident'>fmt_scheme</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span>;
+<span class="doccomment">/// An Authorization scheme to be used in the header.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Scheme</span>: <span class="ident">FromStr</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
+    <span class="doccomment">/// An optional Scheme name.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will be replaced with an associated constant once available.</span>
+    <span class="kw">fn</span> <span class="ident">scheme</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Format the Scheme data into a header value.</span>
+    <span class="kw">fn</span> <span class="ident">fmt_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span>;
 }
 
-<span class='kw'>impl</span> <span class='ident'>Scheme</span> <span class='kw'>for</span> <span class='ident'>String</span> {
-    <span class='kw'>fn</span> <span class='ident'>scheme</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='prelude-val'>None</span>
+<span class="kw">impl</span> <span class="ident">Scheme</span> <span class="kw">for</span> <span class="ident">String</span> {
+    <span class="kw">fn</span> <span class="ident">scheme</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>fmt_scheme</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='self'>self</span>, <span class='ident'>f</span>)
+    <span class="kw">fn</span> <span class="ident">fmt_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
 }
 
-<span class='doccomment'>/// Credential holder for Basic Authentication</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Basic</span> {
-    <span class='doccomment'>/// The username as a possibly empty string</span>
-    <span class='kw'>pub</span> <span class='ident'>username</span>: <span class='ident'>String</span>,
-    <span class='doccomment'>/// The password. `None` if the `:` delimiter character was not</span>
-    <span class='doccomment'>/// part of the parsed input.</span>
-    <span class='kw'>pub</span> <span class='ident'>password</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
+<span class="doccomment">/// Credential holder for Basic Authentication</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Basic</span> {
+    <span class="doccomment">/// The username as a possibly empty string</span>
+    <span class="kw">pub</span> <span class="ident">username</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The password. `None` if the `:` delimiter character was not</span>
+    <span class="doccomment">/// part of the parsed input.</span>
+    <span class="kw">pub</span> <span class="ident">password</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>
 }
 
-<span class='kw'>impl</span> <span class='ident'>Scheme</span> <span class='kw'>for</span> <span class='ident'>Basic</span> {
-    <span class='kw'>fn</span> <span class='ident'>scheme</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='prelude-val'>Some</span>(<span class='string'>&quot;Basic&quot;</span>)
+<span class="kw">impl</span> <span class="ident">Scheme</span> <span class="kw">for</span> <span class="ident">Basic</span> {
+    <span class="kw">fn</span> <span class="ident">scheme</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Basic&quot;</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>fmt_scheme</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='comment'>//FIXME: serialize::base64 could use some Debug implementation, so</span>
-        <span class='comment'>//that we don&#39;t have to allocate a new string here just to write it</span>
-        <span class='comment'>//to the formatter.</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>username</span>.<span class='ident'>clone</span>();
-        <span class='ident'>text</span>.<span class='ident'>push</span>(<span class='string'>&#39;:&#39;</span>);
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>pass</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>password</span> {
-            <span class='ident'>text</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>pass</span>[..]);
+    <span class="kw">fn</span> <span class="ident">fmt_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="comment">//FIXME: serialize::base64 could use some Debug implementation, so</span>
+        <span class="comment">//that we don&#39;t have to allocate a new string here just to write it</span>
+        <span class="comment">//to the formatter.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">text</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">username</span>.<span class="ident">clone</span>();
+        <span class="ident">text</span>.<span class="ident">push</span>(<span class="string">&#39;:&#39;</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">pass</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">password</span> {
+            <span class="ident">text</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">pass</span>[..]);
         }
-        <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>text</span>.<span class='ident'>as_bytes</span>().<span class='ident'>to_base64</span>(<span class='ident'>Config</span> {
-            <span class='ident'>char_set</span>: <span class='ident'>Standard</span>,
-            <span class='ident'>newline</span>: <span class='ident'>Newline</span>::<span class='ident'>CRLF</span>,
-            <span class='ident'>pad</span>: <span class='bool-val'>true</span>,
-            <span class='ident'>line_length</span>: <span class='prelude-val'>None</span>
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>.<span class="ident">as_bytes</span>().<span class="ident">to_base64</span>(<span class="ident">Config</span> {
+            <span class="ident">char_set</span>: <span class="ident">Standard</span>,
+            <span class="ident">newline</span>: <span class="ident">Newline</span>::<span class="ident">CRLF</span>,
+            <span class="ident">pad</span>: <span class="bool-val">true</span>,
+            <span class="ident">line_length</span>: <span class="prelude-val">None</span>
         })[..])
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Basic</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> ::<span class='ident'>Error</span>;
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='ident'>s</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>decoded</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>decoded</span>) {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>text</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>parts</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>text</span>.<span class='ident'>split</span>(<span class='string'>&#39;:&#39;</span>);
-                    <span class='kw'>let</span> <span class='ident'>user</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>parts</span>.<span class='ident'>next</span>() {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>part</span>) <span class='op'>=&gt;</span> <span class='ident'>part</span>.<span class='ident'>to_owned</span>(),
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Basic</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ::<span class="ident">Error</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">decoded</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">decoded</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">text</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">text</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>);
+                    <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">part</span>) <span class="op">=&gt;</span> <span class="ident">part</span>.<span class="ident">to_owned</span>(),
+                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
                     };
-                    <span class='kw'>let</span> <span class='ident'>password</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>parts</span>.<span class='ident'>next</span>() {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>part</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>part</span>.<span class='ident'>to_owned</span>()),
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+                    <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">next</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">part</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">part</span>.<span class="ident">to_owned</span>()),
+                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>
                     };
-                    <span class='prelude-val'>Ok</span>(<span class='ident'>Basic</span> {
-                        <span class='ident'>username</span>: <span class='ident'>user</span>,
-                        <span class='ident'>password</span>: <span class='ident'>password</span>
+                    <span class="prelude-val">Ok</span>(<span class="ident">Basic</span> {
+                        <span class="ident">username</span>: <span class="ident">user</span>,
+                        <span class="ident">password</span>: <span class="ident">password</span>
                     })
                 },
-                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
-                    <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Basic::from_utf8 error={:?}&quot;</span>, <span class='ident'>e</span>);
-                    <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+                    <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Basic::from_utf8 error={:?}&quot;</span>, <span class="ident">e</span>);
+                    <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
                 }
             },
-            <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Basic::from_base64 error={:?}&quot;</span>, <span class='ident'>e</span>);
-                <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Basic::from_base64 error={:?}&quot;</span>, <span class="ident">e</span>);
+                <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
             }
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='doccomment'>///Token holder for Bearer Authentication, most often seen with oauth</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Bearer</span> {
-	<span class='doccomment'>///Actual bearer token as a string</span>
-	<span class='kw'>pub</span> <span class='ident'>token</span>: <span class='ident'>String</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="doccomment">///Token holder for Bearer Authentication, most often seen with oauth</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bearer</span> {
+	<span class="doccomment">///Actual bearer token as a string</span>
+	<span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>
 }
 
-<span class='kw'>impl</span> <span class='ident'>Scheme</span> <span class='kw'>for</span> <span class='ident'>Bearer</span> {
-	<span class='kw'>fn</span> <span class='ident'>scheme</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-		<span class='prelude-val'>Some</span>(<span class='string'>&quot;Bearer&quot;</span>)
+<span class="kw">impl</span> <span class="ident">Scheme</span> <span class="kw">for</span> <span class="ident">Bearer</span> {
+	<span class="kw">fn</span> <span class="ident">scheme</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Some</span>(<span class="string">&quot;Bearer&quot;</span>)
 	}
 
-	<span class='kw'>fn</span> <span class='ident'>fmt_scheme</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>token</span>)
-	}
-}
-
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Bearer</span> {
-	<span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> ::<span class='ident'>Error</span>;
-	<span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Bearer</span><span class='op'>&gt;</span> {
-		<span class='prelude-val'>Ok</span>(<span class='ident'>Bearer</span> { <span class='ident'>token</span>: <span class='ident'>s</span>.<span class='ident'>to_owned</span>()})
+	<span class="kw">fn</span> <span class="ident">fmt_scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+		<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">token</span>)
 	}
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Authorization</span>, <span class='ident'>Basic</span>, <span class='ident'>Bearer</span>};
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='kw'>super</span>::<span class='kw'>super</span>::{<span class='ident'>Headers</span>, <span class='ident'>Header</span>};
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Bearer</span> {
+	<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ::<span class="ident">Error</span>;
+	<span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Bearer</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Ok</span>(<span class="ident">Bearer</span> { <span class="ident">token</span>: <span class="ident">s</span>.<span class="ident">to_owned</span>()})
+	}
+}
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_auth</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
-        <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>Authorization</span>(<span class='string'>&quot;foo bar baz&quot;</span>.<span class='ident'>to_owned</span>()));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>headers</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;Authorization: foo bar baz\r\n&quot;</span>.<span class='ident'>to_owned</span>());
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Authorization</span>, <span class="ident">Basic</span>, <span class="ident">Bearer</span>};
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">Headers</span>, <span class="ident">Header</span>};
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_auth</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
+        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Authorization</span>(<span class="string">&quot;foo bar baz&quot;</span>.<span class="ident">to_owned</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">to_string</span>(), <span class="string">&quot;Authorization: foo bar baz\r\n&quot;</span>.<span class="ident">to_owned</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_auth_parse</span>() {
-        <span class='kw'>let</span> <span class='ident'>header</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;foo bar baz&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>header</span>.<span class='number'>0</span>, <span class='string'>&quot;foo bar baz&quot;</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_auth_parse</span>() {
+        <span class="kw">let</span> <span class="ident">header</span>: <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(
+            <span class="kw-2">&amp;</span>[<span class="string">b&quot;foo bar baz&quot;</span>.<span class="ident">to_vec</span>()]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">header</span>.<span class="number">0</span>, <span class="string">&quot;foo bar baz&quot;</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_basic_auth</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
-        <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>Authorization</span>(
-            <span class='ident'>Basic</span> { <span class='ident'>username</span>: <span class='string'>&quot;Aladdin&quot;</span>.<span class='ident'>to_owned</span>(), <span class='ident'>password</span>: <span class='prelude-val'>Some</span>(<span class='string'>&quot;open sesame&quot;</span>.<span class='ident'>to_owned</span>()) }));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(
-            <span class='ident'>headers</span>.<span class='ident'>to_string</span>(),
-            <span class='string'>&quot;Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\r\n&quot;</span>.<span class='ident'>to_owned</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_basic_auth</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
+        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Authorization</span>(
+            <span class="ident">Basic</span> { <span class="ident">username</span>: <span class="string">&quot;Aladdin&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">password</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;open sesame&quot;</span>.<span class="ident">to_owned</span>()) }));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">headers</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==\r\n&quot;</span>.<span class="ident">to_owned</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_basic_auth_no_password</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
-        <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>Authorization</span>(<span class='ident'>Basic</span> { <span class='ident'>username</span>: <span class='string'>&quot;Aladdin&quot;</span>.<span class='ident'>to_owned</span>(), <span class='ident'>password</span>: <span class='prelude-val'>None</span> }));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>headers</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;Authorization: Basic QWxhZGRpbjo=\r\n&quot;</span>.<span class='ident'>to_owned</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_basic_auth_no_password</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
+        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Authorization</span>(<span class="ident">Basic</span> { <span class="ident">username</span>: <span class="string">&quot;Aladdin&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">password</span>: <span class="prelude-val">None</span> }));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">headers</span>.<span class="ident">to_string</span>(), <span class="string">&quot;Authorization: Basic QWxhZGRpbjo=\r\n&quot;</span>.<span class="ident">to_owned</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_basic_auth_parse</span>() {
-        <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>username</span>, <span class='string'>&quot;Aladdin&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>password</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;open sesame&quot;</span>.<span class='ident'>to_owned</span>()));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_basic_auth_parse</span>() {
+        <span class="kw">let</span> <span class="ident">auth</span>: <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(
+            <span class="kw-2">&amp;</span>[<span class="string">b&quot;Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==&quot;</span>.<span class="ident">to_vec</span>()]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">auth</span>.<span class="number">0</span>.<span class="ident">username</span>, <span class="string">&quot;Aladdin&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">auth</span>.<span class="number">0</span>.<span class="ident">password</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;open sesame&quot;</span>.<span class="ident">to_owned</span>()));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_basic_auth_parse_no_password</span>() {
-        <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Basic QWxhZGRpbjo=&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>username</span>, <span class='string'>&quot;Aladdin&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>password</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>()));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_basic_auth_parse_no_password</span>() {
+        <span class="kw">let</span> <span class="ident">auth</span>: <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(
+            <span class="kw-2">&amp;</span>[<span class="string">b&quot;Basic QWxhZGRpbjo=&quot;</span>.<span class="ident">to_vec</span>()]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">auth</span>.<span class="number">0</span>.<span class="ident">username</span>, <span class="string">&quot;Aladdin&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">auth</span>.<span class="number">0</span>.<span class="ident">password</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>()));
     }
 
-	<span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_bearer_auth</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>Headers</span>::<span class='ident'>new</span>();
-        <span class='ident'>headers</span>.<span class='ident'>set</span>(<span class='ident'>Authorization</span>(
-            <span class='ident'>Bearer</span> { <span class='ident'>token</span>: <span class='string'>&quot;fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class='ident'>to_owned</span>() }));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(
-            <span class='ident'>headers</span>.<span class='ident'>to_string</span>(),
-            <span class='string'>&quot;Authorization: Bearer fpKL54jvWmEGVoRdCNjG\r\n&quot;</span>.<span class='ident'>to_owned</span>());
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_bearer_auth</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">Headers</span>::<span class="ident">new</span>();
+        <span class="ident">headers</span>.<span class="ident">set</span>(<span class="ident">Authorization</span>(
+            <span class="ident">Bearer</span> { <span class="ident">token</span>: <span class="string">&quot;fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class="ident">to_owned</span>() }));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">headers</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;Authorization: Bearer fpKL54jvWmEGVoRdCNjG\r\n&quot;</span>.<span class="ident">to_owned</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_bearer_auth_parse</span>() {
-        <span class='kw'>let</span> <span class='ident'>auth</span>: <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Bearer</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(
-            <span class='kw-2'>&amp;</span>[<span class='string'>b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class='ident'>to_vec</span>()]).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>auth</span>.<span class='number'>0</span>.<span class='ident'>token</span>, <span class='string'>&quot;fpKL54jvWmEGVoRdCNjG&quot;</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_bearer_auth_parse</span>() {
+        <span class="kw">let</span> <span class="ident">auth</span>: <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">Bearer</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(
+            <span class="kw-2">&amp;</span>[<span class="string">b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class="ident">to_vec</span>()]).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">auth</span>.<span class="number">0</span>.<span class="ident">token</span>, <span class="string">&quot;fpKL54jvWmEGVoRdCNjG&quot;</span>);
     }
 }
 
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>raw</span>, <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;foo bar baz&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>basic</span>, <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Basic</span><span class='op'>&gt;</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;Basic QWxhZGRpbjpuIHNlc2FtZQ==&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>bearer</span>, <span class='ident'>Authorization</span><span class='op'>&lt;</span><span class='ident'>Bearer</span><span class='op'>&gt;</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class='ident'>to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">raw</span>, <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;foo bar baz&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">basic</span>, <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">Basic</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Basic QWxhZGRpbjpuIHNlc2FtZQ==&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">bearer</span>, <span class="ident">Authorization</span><span class="op">&lt;</span><span class="ident">Bearer</span><span class="op">&gt;</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;Bearer fpKL54jvWmEGVoRdCNjG&quot;</span>.<span class="ident">to_vec</span>()] });
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -643,18 +655,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -687,7 +703,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

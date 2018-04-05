@@ -9,14 +9,18 @@
 
     <title>openssl::ssl::Ssl - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a></p><script>window.sidebarCurrent = {name: 'Ssl', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct Ssl</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.new">new</a><a href="#method.set_verify">set_verify</a><a href="#method.set_verify_callback">set_verify_callback</a><a href="#method.get_current_cipher">get_current_cipher</a><a href="#method.state_string">state_string</a><a href="#method.state_string_long">state_string_long</a><a href="#method.set_hostname">set_hostname</a><a href="#method.peer_certificate">peer_certificate</a><a href="#method.version">version</a><a href="#method.pending">pending</a><a href="#method.compression">compression</a><a href="#method.get_ssl_method">get_ssl_method</a><a href="#method.get_servername">get_servername</a><a href="#method.set_ssl_context">set_ssl_context</a><a href="#method.get_ssl_context">get_ssl_context</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Send">Send</a><a href="#impl-Sync">Sync</a><a href="#impl-Debug">Debug</a><a href="#impl-Drop">Drop</a><a href="#impl-Clone">Clone</a><a href="#impl-IntoSsl">IntoSsl</a></div></div><p class='location'><a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a></p><script>window.sidebarCurrent = {name: 'Ssl', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,67 +54,70 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a>::<wbr><a class='struct' href=''>Ssl</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a>::<wbr><a class="struct" href=''>Ssl</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1406' class='srclink' href='../../src/openssl/ssl/mod.rs.html#917-919' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct Ssl { /* fields omitted */ }</pre><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1420' class='srclink' href='../../src/openssl/ssl/mod.rs.html#947-1191' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(ctx: &amp;<a class='struct' href='../../openssl/ssl/struct.SslContext.html' title='openssl::ssl::SslContext'>SslContext</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a>, <a class='enum' href='../../openssl/ssl/error/enum.SslError.html' title='openssl::ssl::error::SslError'>SslError</a>&gt;</code></span></h4>
-<h4 id='method.set_verify' class='method'><span id='set_verify.v' class='invisible'><code>fn <a href='#method.set_verify' class='fnname'>set_verify</a>(&amp;mut self, mode: <a class='struct' href='../../openssl/ssl/struct.SslVerifyMode.html' title='openssl::ssl::SslVerifyMode'>SslVerifyMode</a>)</code></span></h4>
+               </span><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#917-919' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Ssl { /* fields omitted */ }</pre>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#947-1191' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>pub fn <a href='#method.new' class='fnname'>new</a>(ctx: &amp;<a class="struct" href="../../openssl/ssl/struct.SslContext.html" title="struct openssl::ssl::SslContext">SslContext</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a>, <a class="enum" href="../../openssl/ssl/error/enum.SslError.html" title="enum openssl::ssl::error::SslError">SslError</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#948-952' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.set_verify' class="method"><span id='set_verify.v' class='invisible'><code>pub fn <a href='#method.set_verify' class='fnname'>set_verify</a>(&amp;mut self, mode: <a class="struct" href="../../openssl/ssl/struct.SslVerifyMode.html" title="struct openssl::ssl::SslVerifyMode">SslVerifyMode</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#987-989' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Sets the verification mode to be used during the handshake process.</p>
-
 <p>Use <code>set_verify_callback</code> to additionally add a callback.</p>
-</div><h4 id='method.set_verify_callback' class='method'><span id='set_verify_callback.v' class='invisible'><code>fn <a href='#method.set_verify_callback' class='fnname'>set_verify_callback</a>&lt;F&gt;(&amp;mut self, mode: <a class='struct' href='../../openssl/ssl/struct.SslVerifyMode.html' title='openssl::ssl::SslVerifyMode'>SslVerifyMode</a>, verify: F) <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>, &amp;<a class='struct' href='../../openssl/x509/struct.X509StoreContext.html' title='openssl::x509::X509StoreContext'>X509StoreContext</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/any/trait.Any.html' title='core::any::Any'>Any</a> + 'static + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html' title='core::marker::Sync'>Sync</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a></span></code></span></h4>
+</div><h4 id='method.set_verify_callback' class="method"><span id='set_verify_callback.v' class='invisible'><code>pub fn <a href='#method.set_verify_callback' class='fnname'>set_verify_callback</a>&lt;F&gt;(&amp;mut self, mode: <a class="struct" href="../../openssl/ssl/struct.SslVerifyMode.html" title="struct openssl::ssl::SslVerifyMode">SslVerifyMode</a>, verify: F) <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.Fn.html" title="trait core::ops::function::Fn">Fn</a>(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, &amp;<a class="struct" href="../../openssl/x509/struct.X509StoreContext.html" title="struct openssl::x509::X509StoreContext">X509StoreContext</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a> + 'static + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>,&nbsp;</span></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#998-1008' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Sets the certificate verification callback to be used during the
 handshake process.</p>
-
 <p>The callback is provided with a boolean indicating if the
 preveification process was successful, and an object providing access
 to the certificate chain. It should return <code>true</code> if the certificate
 chain is valid and <code>false</code> otherwise.</p>
-</div><h4 id='method.get_current_cipher' class='method'><span id='get_current_cipher.v' class='invisible'><code>fn <a href='#method.get_current_cipher' class='fnname'>get_current_cipher</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../openssl/ssl/struct.SslCipher.html' title='openssl::ssl::SslCipher'>SslCipher</a>&lt;'a&gt;&gt;</code></span></h4>
-<h4 id='method.state_string' class='method'><span id='state_string.v' class='invisible'><code>fn <a href='#method.state_string' class='fnname'>state_string</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
-<h4 id='method.state_string_long' class='method'><span id='state_string_long.v' class='invisible'><code>fn <a href='#method.state_string_long' class='fnname'>state_string_long</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
-<h4 id='method.set_hostname' class='method'><span id='set_hostname.v' class='invisible'><code>fn <a href='#method.set_hostname' class='fnname'>set_hostname</a>(&amp;self, hostname: &amp;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='enum' href='../../openssl/ssl/error/enum.SslError.html' title='openssl::ssl::error::SslError'>SslError</a>&gt;</code></span></h4>
+</div><h4 id='method.get_current_cipher' class="method"><span id='get_current_cipher.v' class='invisible'><code>pub fn <a href='#method.get_current_cipher' class='fnname'>get_current_cipher</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../openssl/ssl/struct.SslCipher.html" title="struct openssl::ssl::SslCipher">SslCipher</a>&lt;'a&gt;&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1010-1023' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.state_string' class="method"><span id='state_string.v' class='invisible'><code>pub fn <a href='#method.state_string' class='fnname'>state_string</a>(&amp;self) -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1025-1032' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.state_string_long' class="method"><span id='state_string_long.v' class='invisible'><code>pub fn <a href='#method.state_string_long' class='fnname'>state_string_long</a>(&amp;self) -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1034-1041' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.set_hostname' class="method"><span id='set_hostname.v' class='invisible'><code>pub fn <a href='#method.set_hostname' class='fnname'>set_hostname</a>(&amp;self, hostname: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="enum" href="../../openssl/ssl/error/enum.SslError.html" title="enum openssl::ssl::error::SslError">SslError</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1044-1056' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Sets the host name to be used with SNI (Server Name Indication).</p>
-</div><h4 id='method.peer_certificate' class='method'><span id='peer_certificate.v' class='invisible'><code>fn <a href='#method.peer_certificate' class='fnname'>peer_certificate</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../openssl/x509/struct.X509.html' title='openssl::x509::X509'>X509</a>&gt;</code></span></h4>
+</div><h4 id='method.peer_certificate' class="method"><span id='peer_certificate.v' class='invisible'><code>pub fn <a href='#method.peer_certificate' class='fnname'>peer_certificate</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../openssl/x509/struct.X509.html" title="struct openssl::x509::X509">X509</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1059-1068' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the certificate of the peer, if present.</p>
-</div><h4 id='method.version' class='method'><span id='version.v' class='invisible'><code>fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
+</div><h4 id='method.version' class="method"><span id='version.v' class='invisible'><code>pub fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1071-1078' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the name of the protocol used for the connection, e.g. &quot;TLSv1.2&quot;, &quot;SSLv3&quot;, etc.</p>
-</div><h4 id='method.pending' class='method'><span id='pending.v' class='invisible'><code>fn <a href='#method.pending' class='fnname'>pending</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h4>
+</div><h4 id='method.pending' class="method"><span id='pending.v' class='invisible'><code>pub fn <a href='#method.pending' class='fnname'>pending</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1128-1130' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the number of bytes remaining in the currently processed TLS
 record.</p>
-</div><h4 id='method.compression' class='method'><span id='compression.v' class='invisible'><code>fn <a href='#method.compression' class='fnname'>compression</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
+</div><h4 id='method.compression' class="method"><span id='compression.v' class='invisible'><code>pub fn <a href='#method.compression' class='fnname'>compression</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1136-1148' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the compression currently in use.</p>
-
 <p>The result will be either None, indicating no compression is in use, or
 a string with the compression name.</p>
-</div><h4 id='method.get_ssl_method' class='method'><span id='get_ssl_method.v' class='invisible'><code>fn <a href='#method.get_ssl_method' class='fnname'>get_ssl_method</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../openssl/ssl/enum.SslMethod.html' title='openssl::ssl::SslMethod'>SslMethod</a>&gt;</code></span></h4>
-<h4 id='method.get_servername' class='method'><span id='get_servername.v' class='invisible'><code>fn <a href='#method.get_servername' class='fnname'>get_servername</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
-<div class='docblock'><p>Returns the server&#39;s name for the current connection</p>
-</div><h4 id='method.set_ssl_context' class='method'><span id='set_ssl_context.v' class='invisible'><code>fn <a href='#method.set_ssl_context' class='fnname'>set_ssl_context</a>(&amp;self, ctx: &amp;<a class='struct' href='../../openssl/ssl/struct.SslContext.html' title='openssl::ssl::SslContext'>SslContext</a>) -&gt; <a class='struct' href='../../openssl/ssl/struct.SslContext.html' title='openssl::ssl::SslContext'>SslContext</a></code></span></h4>
+</div><h4 id='method.get_ssl_method' class="method"><span id='get_ssl_method.v' class='invisible'><code>pub fn <a href='#method.get_ssl_method' class='fnname'>get_ssl_method</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="enum" href="../../openssl/ssl/enum.SslMethod.html" title="enum openssl::ssl::SslMethod">SslMethod</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1150-1155' title='goto source code'>[src]</a></span></h4>
+<h4 id='method.get_servername' class="method"><span id='get_servername.v' class='invisible'><code>pub fn <a href='#method.get_servername' class='fnname'>get_servername</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1158-1165' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Returns the server's name for the current connection</p>
+</div><h4 id='method.set_ssl_context' class="method"><span id='set_ssl_context.v' class='invisible'><code>pub fn <a href='#method.set_ssl_context' class='fnname'>set_ssl_context</a>(&amp;self, ctx: &amp;<a class="struct" href="../../openssl/ssl/struct.SslContext.html" title="struct openssl::ssl::SslContext">SslContext</a>) -&gt; <a class="struct" href="../../openssl/ssl/struct.SslContext.html" title="struct openssl::ssl::SslContext">SslContext</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1170-1182' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>change the context corresponding to the current connection</p>
-
 <p>Returns a clone of the SslContext @ctx (ie: the new context). The old context is freed.</p>
-</div><h4 id='method.get_ssl_context' class='method'><span id='get_ssl_context.v' class='invisible'><code>fn <a href='#method.get_ssl_context' class='fnname'>get_ssl_context</a>(&amp;self) -&gt; <a class='struct' href='../../openssl/ssl/struct.SslContext.html' title='openssl::ssl::SslContext'>SslContext</a></code></span></h4>
+</div><h4 id='method.get_ssl_context' class="method"><span id='get_ssl_context.v' class='invisible'><code>pub fn <a href='#method.get_ssl_context' class='fnname'>get_ssl_context</a>(&amp;self) -&gt; <a class="struct" href="../../openssl/ssl/struct.SslContext.html" title="struct openssl::ssl::SslContext">SslContext</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1185-1190' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>obtain the context corresponding to the current connection</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1408' class='srclink' href='../../src/openssl/ssl/mod.rs.html#921' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html' title='core::marker::Sync'>Sync</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1409' class='srclink' href='../../src/openssl/ssl/mod.rs.html#922' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1410' class='srclink' href='../../src/openssl/ssl/mod.rs.html#924-930' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, fmt: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
-<div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1414' class='srclink' href='../../src/openssl/ssl/mod.rs.html#932-936' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.drop' class='method'><span id='drop.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></span></h4>
-<div class='docblock'><p>A method called when the value goes out of scope. <a href="https://doc.rust-lang.org/nightly/core/ops/trait.Drop.html#tymethod.drop">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1417' class='srclink' href='../../src/openssl/ssl/mod.rs.html#938-945' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span></h4>
-<div class='docblock'>
-<h1 id='deprecated' class='section-header'><a href='#deprecated'>Deprecated</a></h1></div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div></div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Send' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-Send' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#921' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 id='impl-Sync' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-Sync' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#922' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#924-930' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, fmt: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#925-929' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
+</div></div><h3 id='impl-Drop' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html" title="trait core::ops::drop::Drop">Drop</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-Drop' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#932-936' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.drop' class="method"><span id='drop.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html#tymethod.drop' class='fnname'>drop</a>(&amp;mut self)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#933-935' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Executes the destructor for this type. <a href="https://doc.rust-lang.org/nightly/core/ops/drop/trait.Drop.html#tymethod.drop">Read more</a></p>
+</div></div><h3 id='impl-Clone' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-Clone' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#938-945' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#940-944' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><h1 id="deprecated" class="section-header"><a href="#deprecated">Deprecated</a></h1></div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#112-114' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='../../openssl/ssl/trait.IntoSsl.html' title='openssl::ssl::IntoSsl'>IntoSsl</a> for <a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1614' class='srclink' href='../../src/openssl/ssl/mod.rs.html#1512-1516' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.into_ssl' class='method'><span id='into_ssl.v' class='invisible'><code>fn <a href='../../openssl/ssl/trait.IntoSsl.html#tymethod.into_ssl' class='fnname'>into_ssl</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../openssl/ssl/struct.Ssl.html' title='openssl::ssl::Ssl'>Ssl</a>, <a class='enum' href='../../openssl/ssl/error/enum.SslError.html' title='openssl::ssl::error::SslError'>SslError</a>&gt;</code></span></h4>
+</div></div><h3 id='impl-IntoSsl' class='impl'><span class='in-band'><code>impl <a class="trait" href="../../openssl/ssl/trait.IntoSsl.html" title="trait openssl::ssl::IntoSsl">IntoSsl</a> for <a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a></code><a href='#impl-IntoSsl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1512-1516' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.into_ssl' class="method"><span id='into_ssl.v' class='invisible'><code>fn <a href='../../openssl/ssl/trait.IntoSsl.html#tymethod.into_ssl' class='fnname'>into_ssl</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../../openssl/ssl/struct.Ssl.html" title="struct openssl::ssl::Ssl">Ssl</a>, <a class="enum" href="../../openssl/ssl/error/enum.SslError.html" title="enum openssl::ssl::error::SslError">SslError</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#1513-1515' title='goto source code'>[src]</a></span></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -116,18 +131,22 @@ a string with the compression name.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -160,7 +179,6 @@ a string with the compression name.</p>
         window.rootPath = "../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

@@ -9,14 +9,18 @@
 
     <title>simple.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -308,271 +320,271 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains an implementation of a simple HTTP/2 client.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains an implementation of a simple HTTP/2 client.</span>
 
-<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>StreamId</span>, <span class='ident'>HttpResult</span>, <span class='ident'>HttpError</span>, <span class='ident'>Response</span>, <span class='ident'>Header</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>transport</span>::<span class='ident'>TransportStream</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>connection</span>::{<span class='ident'>HttpConnection</span>, <span class='ident'>SendStatus</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>session</span>::{<span class='ident'>SessionState</span>, <span class='ident'>DefaultSessionState</span>, <span class='ident'>DefaultStream</span>, <span class='ident'>Stream</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>client</span>::{<span class='ident'>ClientConnection</span>, <span class='ident'>HttpConnect</span>, <span class='ident'>RequestStream</span>};
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">StreamId</span>, <span class="ident">HttpResult</span>, <span class="ident">HttpError</span>, <span class="ident">Response</span>, <span class="ident">Header</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">transport</span>::<span class="ident">TransportStream</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">connection</span>::{<span class="ident">HttpConnection</span>, <span class="ident">SendStatus</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">session</span>::{<span class="ident">SessionState</span>, <span class="ident">DefaultSessionState</span>, <span class="ident">DefaultStream</span>, <span class="ident">Stream</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">client</span>::{<span class="ident">ClientConnection</span>, <span class="ident">HttpConnect</span>, <span class="ident">RequestStream</span>};
 
-<span class='doccomment'>/// A struct implementing a simple HTTP/2 client.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This client works as an HTTP/1.1 client with a Keep-Alive connection and</span>
-<span class='doccomment'>/// pipelining might work.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Multiple requests can be queued up (and sent to the server) by calling</span>
-<span class='doccomment'>/// `request` multiple times, before any `get_response`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Once a `get_response` is issued, the client blocks until it receives the</span>
-<span class='doccomment'>/// response for the particular request that was referenced in the `get_response`</span>
-<span class='doccomment'>/// call.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Therefore, by doing `request` -&gt; `get_response` we can use the HTTP/2</span>
-<span class='doccomment'>/// connection as a `Keep-Alive` HTTP/1.1 connection and a pipelined flow by</span>
-<span class='doccomment'>/// queuing up a sequence of requests and then &quot;joining&quot; over them by calling</span>
-<span class='doccomment'>/// `get_response` for each of them.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The responses that are returned by the client are very raw representations</span>
-<span class='doccomment'>/// of the response.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Issue a simple GET request using the helper `get` method. Premade connection</span>
-<span class='doccomment'>/// passed to the client.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```no_run</span>
-<span class='doccomment'>/// use std::net::TcpStream;</span>
-<span class='doccomment'>/// use solicit::http::HttpScheme;</span>
-<span class='doccomment'>/// use solicit::http::connection::HttpConnection;</span>
-<span class='doccomment'>/// use solicit::http::client::write_preface;</span>
-<span class='doccomment'>/// use solicit::client::SimpleClient;</span>
-<span class='doccomment'>/// use std::str;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Prepare a stream manually... We must write the preface ourselves in this case.</span>
-<span class='doccomment'>/// // This is a more advanced way to use the client and the `HttpConnect` implementations</span>
-<span class='doccomment'>/// // should usually be preferred for their convenience.</span>
-<span class='doccomment'>/// let mut stream = TcpStream::connect(&amp;(&quot;http2bin.org&quot;, 80)).unwrap();</span>
-<span class='doccomment'>/// write_preface(&amp;mut stream);</span>
-<span class='doccomment'>/// // Connect to an HTTP/2 aware server</span>
-<span class='doccomment'>/// let conn = HttpConnection::&lt;TcpStream, TcpStream&gt;::with_stream(</span>
-<span class='doccomment'>///                                stream,</span>
-<span class='doccomment'>///                                HttpScheme::Http);</span>
-<span class='doccomment'>/// let mut client = SimpleClient::with_connection(conn, &quot;http2bin.org&quot;.into()).unwrap();</span>
-<span class='doccomment'>/// let response = client.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
-<span class='doccomment'>/// assert_eq!(response.stream_id, 1);</span>
-<span class='doccomment'>/// assert_eq!(response.status_code().unwrap(), 200);</span>
-<span class='doccomment'>/// // Dump the headers and the response body to stdout.</span>
-<span class='doccomment'>/// // They are returned as raw bytes for the user to do as they please.</span>
-<span class='doccomment'>/// // (Note: in general directly decoding assuming a utf8 encoding might not</span>
-<span class='doccomment'>/// // always work -- this is meant as a simple example that shows that the</span>
-<span class='doccomment'>/// // response is well formed.)</span>
-<span class='doccomment'>/// for header in response.headers.iter() {</span>
-<span class='doccomment'>///     println!(&quot;{}: {}&quot;,</span>
-<span class='doccomment'>///         str::from_utf8(&amp;header.0).unwrap(),</span>
-<span class='doccomment'>///         str::from_utf8(&amp;header.1).unwrap());</span>
-<span class='doccomment'>/// }</span>
-<span class='doccomment'>/// println!(&quot;{}&quot;, str::from_utf8(&amp;response.body).unwrap());</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Issue a simple GET request using the helper `get` method. Pass a connector</span>
-<span class='doccomment'>/// to establish a new connection.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```no_run</span>
-<span class='doccomment'>/// use solicit::http::client::CleartextConnector;</span>
-<span class='doccomment'>/// use solicit::client::SimpleClient;</span>
-<span class='doccomment'>/// use std::str;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Connect to an HTTP/2 aware server</span>
-<span class='doccomment'>/// let connector = CleartextConnector::new(&quot;http2bin.org&quot;);</span>
-<span class='doccomment'>/// let mut client = SimpleClient::with_connector(connector).unwrap();</span>
-<span class='doccomment'>/// let response = client.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
-<span class='doccomment'>/// assert_eq!(response.stream_id, 1);</span>
-<span class='doccomment'>/// assert_eq!(response.status_code().unwrap(), 200);</span>
-<span class='doccomment'>/// // Dump the headers and the response body to stdout.</span>
-<span class='doccomment'>/// // They are returned as raw bytes for the user to do as they please.</span>
-<span class='doccomment'>/// // (Note: in general directly decoding assuming a utf8 encoding might not</span>
-<span class='doccomment'>/// // always work -- this is meant as a simple example that shows that the</span>
-<span class='doccomment'>/// // response is well formed.)</span>
-<span class='doccomment'>/// for header in response.headers.iter() {</span>
-<span class='doccomment'>///     println!(&quot;{}: {}&quot;,</span>
-<span class='doccomment'>///         str::from_utf8(&amp;header.0).unwrap(),</span>
-<span class='doccomment'>///         str::from_utf8(&amp;header.1).unwrap());</span>
-<span class='doccomment'>/// }</span>
-<span class='doccomment'>/// println!(&quot;{}&quot;, str::from_utf8(&amp;response.body).unwrap());</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SimpleClient</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>TransportStream</span> {
-    <span class='doccomment'>/// The underlying `ClientConnection` that the client uses</span>
-    <span class='ident'>conn</span>: <span class='ident'>ClientConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>S</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Holds the ID that can be assigned to the next stream to be opened by the</span>
-    <span class='doccomment'>/// client.</span>
-    <span class='ident'>next_stream_id</span>: <span class='ident'>u32</span>,
-    <span class='doccomment'>/// The name of the host to which the client is connected to.</span>
-    <span class='ident'>host</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A struct implementing a simple HTTP/2 client.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This client works as an HTTP/1.1 client with a Keep-Alive connection and</span>
+<span class="doccomment">/// pipelining might work.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Multiple requests can be queued up (and sent to the server) by calling</span>
+<span class="doccomment">/// `request` multiple times, before any `get_response`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Once a `get_response` is issued, the client blocks until it receives the</span>
+<span class="doccomment">/// response for the particular request that was referenced in the `get_response`</span>
+<span class="doccomment">/// call.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Therefore, by doing `request` -&gt; `get_response` we can use the HTTP/2</span>
+<span class="doccomment">/// connection as a `Keep-Alive` HTTP/1.1 connection and a pipelined flow by</span>
+<span class="doccomment">/// queuing up a sequence of requests and then &quot;joining&quot; over them by calling</span>
+<span class="doccomment">/// `get_response` for each of them.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The responses that are returned by the client are very raw representations</span>
+<span class="doccomment">/// of the response.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Issue a simple GET request using the helper `get` method. Premade connection</span>
+<span class="doccomment">/// passed to the client.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// use std::net::TcpStream;</span>
+<span class="doccomment">/// use solicit::http::HttpScheme;</span>
+<span class="doccomment">/// use solicit::http::connection::HttpConnection;</span>
+<span class="doccomment">/// use solicit::http::client::write_preface;</span>
+<span class="doccomment">/// use solicit::client::SimpleClient;</span>
+<span class="doccomment">/// use std::str;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Prepare a stream manually... We must write the preface ourselves in this case.</span>
+<span class="doccomment">/// // This is a more advanced way to use the client and the `HttpConnect` implementations</span>
+<span class="doccomment">/// // should usually be preferred for their convenience.</span>
+<span class="doccomment">/// let mut stream = TcpStream::connect(&amp;(&quot;http2bin.org&quot;, 80)).unwrap();</span>
+<span class="doccomment">/// write_preface(&amp;mut stream);</span>
+<span class="doccomment">/// // Connect to an HTTP/2 aware server</span>
+<span class="doccomment">/// let conn = HttpConnection::&lt;TcpStream, TcpStream&gt;::with_stream(</span>
+<span class="doccomment">///                                stream,</span>
+<span class="doccomment">///                                HttpScheme::Http);</span>
+<span class="doccomment">/// let mut client = SimpleClient::with_connection(conn, &quot;http2bin.org&quot;.into()).unwrap();</span>
+<span class="doccomment">/// let response = client.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
+<span class="doccomment">/// assert_eq!(response.stream_id, 1);</span>
+<span class="doccomment">/// assert_eq!(response.status_code().unwrap(), 200);</span>
+<span class="doccomment">/// // Dump the headers and the response body to stdout.</span>
+<span class="doccomment">/// // They are returned as raw bytes for the user to do as they please.</span>
+<span class="doccomment">/// // (Note: in general directly decoding assuming a utf8 encoding might not</span>
+<span class="doccomment">/// // always work -- this is meant as a simple example that shows that the</span>
+<span class="doccomment">/// // response is well formed.)</span>
+<span class="doccomment">/// for header in response.headers.iter() {</span>
+<span class="doccomment">///     println!(&quot;{}: {}&quot;,</span>
+<span class="doccomment">///         str::from_utf8(&amp;header.0).unwrap(),</span>
+<span class="doccomment">///         str::from_utf8(&amp;header.1).unwrap());</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// println!(&quot;{}&quot;, str::from_utf8(&amp;response.body).unwrap());</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Issue a simple GET request using the helper `get` method. Pass a connector</span>
+<span class="doccomment">/// to establish a new connection.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// use solicit::http::client::CleartextConnector;</span>
+<span class="doccomment">/// use solicit::client::SimpleClient;</span>
+<span class="doccomment">/// use std::str;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Connect to an HTTP/2 aware server</span>
+<span class="doccomment">/// let connector = CleartextConnector::new(&quot;http2bin.org&quot;);</span>
+<span class="doccomment">/// let mut client = SimpleClient::with_connector(connector).unwrap();</span>
+<span class="doccomment">/// let response = client.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
+<span class="doccomment">/// assert_eq!(response.stream_id, 1);</span>
+<span class="doccomment">/// assert_eq!(response.status_code().unwrap(), 200);</span>
+<span class="doccomment">/// // Dump the headers and the response body to stdout.</span>
+<span class="doccomment">/// // They are returned as raw bytes for the user to do as they please.</span>
+<span class="doccomment">/// // (Note: in general directly decoding assuming a utf8 encoding might not</span>
+<span class="doccomment">/// // always work -- this is meant as a simple example that shows that the</span>
+<span class="doccomment">/// // response is well formed.)</span>
+<span class="doccomment">/// for header in response.headers.iter() {</span>
+<span class="doccomment">///     println!(&quot;{}: {}&quot;,</span>
+<span class="doccomment">///         str::from_utf8(&amp;header.0).unwrap(),</span>
+<span class="doccomment">///         str::from_utf8(&amp;header.1).unwrap());</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// println!(&quot;{}&quot;, str::from_utf8(&amp;response.body).unwrap());</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimpleClient</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">TransportStream</span> {
+    <span class="doccomment">/// The underlying `ClientConnection` that the client uses</span>
+    <span class="ident">conn</span>: <span class="ident">ClientConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Holds the ID that can be assigned to the next stream to be opened by the</span>
+    <span class="doccomment">/// client.</span>
+    <span class="ident">next_stream_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The name of the host to which the client is connected to.</span>
+    <span class="ident">host</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>SimpleClient</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>TransportStream</span> {
-    <span class='doccomment'>/// Create a new `SimpleClient` instance that will use the given `HttpConnection`</span>
-    <span class='doccomment'>/// to communicate to the server.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// It assumes that the connection stream is initialized and will *not* automatically write the</span>
-    <span class='doccomment'>/// client preface.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_connection</span>(<span class='ident'>conn</span>: <span class='ident'>HttpConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>S</span><span class='op'>&gt;</span>, <span class='ident'>host</span>: <span class='ident'>String</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>SimpleClient</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>client</span> <span class='op'>=</span> <span class='ident'>SimpleClient</span> {
-            <span class='ident'>conn</span>: <span class='ident'>ClientConnection</span>::<span class='ident'>with_connection</span>(<span class='ident'>conn</span>, <span class='ident'>DefaultSessionState</span>::<span class='ident'>new</span>()),
-            <span class='ident'>next_stream_id</span>: <span class='number'>1</span>,
-            <span class='ident'>host</span>: <span class='ident'>host</span>.<span class='ident'>as_bytes</span>().<span class='ident'>to_vec</span>(),
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">SimpleClient</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">TransportStream</span> {
+    <span class="doccomment">/// Create a new `SimpleClient` instance that will use the given `HttpConnection`</span>
+    <span class="doccomment">/// to communicate to the server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It assumes that the connection stream is initialized and will *not* automatically write the</span>
+    <span class="doccomment">/// client preface.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_connection</span>(<span class="ident">conn</span>: <span class="ident">HttpConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">host</span>: <span class="ident">String</span>)
+            <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">SimpleClient</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">SimpleClient</span> {
+            <span class="ident">conn</span>: <span class="ident">ClientConnection</span>::<span class="ident">with_connection</span>(<span class="ident">conn</span>, <span class="ident">DefaultSessionState</span>::<span class="ident">new</span>()),
+            <span class="ident">next_stream_id</span>: <span class="number">1</span>,
+            <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
         };
 
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>client</span>.<span class='ident'>init</span>());
+        <span class="macro">try</span><span class="macro">!</span>(<span class="ident">client</span>.<span class="ident">init</span>());
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>client</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">client</span>)
     }
 
-    <span class='doccomment'>/// A convenience constructor that first tries to establish an HTTP/2</span>
-    <span class='doccomment'>/// connection by using the given connector instance (an implementation of</span>
-    <span class='doccomment'>/// the `HttpConnect` trait).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Currently, it panics if the connector returns an error.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_connector</span><span class='op'>&lt;</span><span class='ident'>C</span><span class='op'>&gt;</span>(<span class='ident'>connector</span>: <span class='ident'>C</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>SimpleClient</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>C</span>: <span class='ident'>HttpConnect</span><span class='op'>&lt;</span><span class='ident'>Stream</span><span class='op'>=</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>connector</span>.<span class='ident'>connect</span>());
-        <span class='kw'>let</span> <span class='ident'>conn</span> <span class='op'>=</span> <span class='ident'>HttpConnection</span>::<span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>S</span><span class='op'>&gt;</span>::<span class='ident'>with_stream</span>(<span class='ident'>stream</span>.<span class='number'>0</span>, <span class='ident'>stream</span>.<span class='number'>1</span>);
-        <span class='ident'>SimpleClient</span>::<span class='ident'>with_connection</span>(<span class='ident'>conn</span>, <span class='ident'>stream</span>.<span class='number'>2</span>)
+    <span class="doccomment">/// A convenience constructor that first tries to establish an HTTP/2</span>
+    <span class="doccomment">/// connection by using the given connector instance (an implementation of</span>
+    <span class="doccomment">/// the `HttpConnect` trait).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Currently, it panics if the connector returns an error.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_connector</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">C</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">SimpleClient</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;&gt;</span>
+            <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">HttpConnect</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">=</span><span class="ident">S</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">connector</span>.<span class="ident">connect</span>());
+        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">HttpConnection</span>::<span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">S</span><span class="op">&gt;</span>::<span class="ident">with_stream</span>(<span class="ident">stream</span>.<span class="number">0</span>, <span class="ident">stream</span>.<span class="number">1</span>);
+        <span class="ident">SimpleClient</span>::<span class="ident">with_connection</span>(<span class="ident">conn</span>, <span class="ident">stream</span>.<span class="number">2</span>)
     }
 
-    <span class='doccomment'>/// Internal helper method that performs the initialization of the client&#39;s</span>
-    <span class='doccomment'>/// connection.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>init</span>()
+    <span class="doccomment">/// Internal helper method that performs the initialization of the client&#39;s</span>
+    <span class="doccomment">/// connection.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">init</span>()
     }
 
-    <span class='doccomment'>/// Send a request to the server. Blocks until the entire request has been</span>
-    <span class='doccomment'>/// sent.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The request is described by the method, the path on which it should be</span>
-    <span class='doccomment'>/// invoked and the &quot;real&quot; headers that should be included. Clients should</span>
-    <span class='doccomment'>/// never put pseudo-headers in the `headers` parameter, as those are</span>
-    <span class='doccomment'>/// automatically included based on metadata.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the full request is successfully sent, returns the ID of the stream</span>
-    <span class='doccomment'>/// on which the request was sent. Clients can use this ID to refer to the</span>
-    <span class='doccomment'>/// response.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any IO errors are propagated.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>method</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>extras</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>], <span class='ident'>body</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>StreamId</span><span class='op'>&gt;</span> {
-        <span class='comment'>// Prepares the request stream</span>
-        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>new_stream</span>(<span class='ident'>method</span>, <span class='ident'>path</span>, <span class='ident'>extras</span>, <span class='ident'>body</span>);
-        <span class='comment'>// Remember the stream&#39;s ID before passing on the ownership to the connection</span>
-        <span class='kw'>let</span> <span class='ident'>stream_id</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>stream</span>.<span class='ident'>id</span>();
-        <span class='comment'>// Starts the request (i.e. sends out the headers)</span>
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>start_request</span>(<span class='ident'>stream</span>));
+    <span class="doccomment">/// Send a request to the server. Blocks until the entire request has been</span>
+    <span class="doccomment">/// sent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The request is described by the method, the path on which it should be</span>
+    <span class="doccomment">/// invoked and the &quot;real&quot; headers that should be included. Clients should</span>
+    <span class="doccomment">/// never put pseudo-headers in the `headers` parameter, as those are</span>
+    <span class="doccomment">/// automatically included based on metadata.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the full request is successfully sent, returns the ID of the stream</span>
+    <span class="doccomment">/// on which the request was sent. Clients can use this ID to refer to the</span>
+    <span class="doccomment">/// response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any IO errors are propagated.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">extras</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>], <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>)
+            <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">StreamId</span><span class="op">&gt;</span> {
+        <span class="comment">// Prepares the request stream</span>
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">new_stream</span>(<span class="ident">method</span>, <span class="ident">path</span>, <span class="ident">extras</span>, <span class="ident">body</span>);
+        <span class="comment">// Remember the stream&#39;s ID before passing on the ownership to the connection</span>
+        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">stream</span>.<span class="ident">id</span>();
+        <span class="comment">// Starts the request (i.e. sends out the headers)</span>
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">start_request</span>(<span class="ident">stream</span>));
 
-        <span class='comment'>// And now makes sure the data is sent out...</span>
-        <span class='comment'>// Note: Since for now there is no flow control, sending data will always continue</span>
-        <span class='comment'>//       progressing, but it might violate flow control windows, causing the peer to shut</span>
-        <span class='comment'>//       down the connection.</span>
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Trying to send the body&quot;</span>);
-        <span class='kw'>while</span> <span class='kw'>let</span> <span class='ident'>SendStatus</span>::<span class='ident'>Sent</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>send_next_data</span>()) {
-            <span class='comment'>// We iterate until the data is sent, as the contract of this call is that it blocks</span>
-            <span class='comment'>// until such a time.</span>
+        <span class="comment">// And now makes sure the data is sent out...</span>
+        <span class="comment">// Note: Since for now there is no flow control, sending data will always continue</span>
+        <span class="comment">//       progressing, but it might violate flow control windows, causing the peer to shut</span>
+        <span class="comment">//       down the connection.</span>
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Trying to send the body&quot;</span>);
+        <span class="kw">while</span> <span class="kw">let</span> <span class="ident">SendStatus</span>::<span class="ident">Sent</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">send_next_data</span>()) {
+            <span class="comment">// We iterate until the data is sent, as the contract of this call is that it blocks</span>
+            <span class="comment">// until such a time.</span>
         }
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>stream_id</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">stream_id</span>)
     }
 
-    <span class='doccomment'>/// Gets the response for the stream with the given ID. If a valid stream ID</span>
-    <span class='doccomment'>/// is given, it blocks until a response is received.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `Response` if the response can be successfully read.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any underlying IO errors are propagated. Errors in the HTTP/2 protocol</span>
-    <span class='doccomment'>/// also stop processing and are returned to the client.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='ident'>stream_id</span>) {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>HttpError</span>::<span class='ident'>UnknownStreamId</span>),
-            <span class='prelude-val'>Some</span>(_) <span class='op'>=&gt;</span> {},
+    <span class="doccomment">/// Gets the response for the stream with the given ID. If a valid stream ID</span>
+    <span class="doccomment">/// is given, it blocks until a response is received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `Response` if the response can be successfully read.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any underlying IO errors are propagated. Errors in the HTTP/2 protocol</span>
+    <span class="doccomment">/// also stop processing and are returned to the client.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="ident">stream_id</span>) {
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HttpError</span>::<span class="ident">UnknownStreamId</span>),
+            <span class="prelude-val">Some</span>(_) <span class="op">=&gt;</span> {},
         };
-        <span class='kw'>loop</span> {
-            <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>stream</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='ident'>stream_id</span>) {
-                <span class='kw'>if</span> <span class='ident'>stream</span>.<span class='ident'>is_closed</span>() {
-                    <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Response</span> {
-                        <span class='ident'>stream_id</span>: <span class='ident'>stream</span>.<span class='ident'>id</span>(),
-                        <span class='ident'>headers</span>: <span class='ident'>stream</span>.<span class='ident'>headers</span>.<span class='ident'>clone</span>().<span class='ident'>unwrap</span>(),
-                        <span class='ident'>body</span>: <span class='ident'>stream</span>.<span class='ident'>body</span>.<span class='ident'>clone</span>(),
+        <span class="kw">loop</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="ident">stream_id</span>) {
+                <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_closed</span>() {
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Response</span> {
+                        <span class="ident">stream_id</span>: <span class="ident">stream</span>.<span class="ident">id</span>(),
+                        <span class="ident">headers</span>: <span class="ident">stream</span>.<span class="ident">headers</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>(),
+                        <span class="ident">body</span>: <span class="ident">stream</span>.<span class="ident">body</span>.<span class="ident">clone</span>(),
                     });
                 }
             }
-            <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>handle_next_frame</span>());
+            <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">handle_next_frame</span>());
         }
     }
 
-    <span class='doccomment'>/// Performs a GET request on the given path. This is a shortcut method for</span>
-    <span class='doccomment'>/// calling `request` followed by `get_response` for the returned stream ID.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>extra_headers</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>])
-            <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>stream_id</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>request</span>(<span class='string'>b&quot;GET&quot;</span>, <span class='ident'>path</span>, <span class='ident'>extra_headers</span>, <span class='prelude-val'>None</span>));
-        <span class='self'>self</span>.<span class='ident'>get_response</span>(<span class='ident'>stream_id</span>)
+    <span class="doccomment">/// Performs a GET request on the given path. This is a shortcut method for</span>
+    <span class="doccomment">/// calling `request` followed by `get_response` for the returned stream ID.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">extra_headers</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>])
+            <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">request</span>(<span class="string">b&quot;GET&quot;</span>, <span class="ident">path</span>, <span class="ident">extra_headers</span>, <span class="prelude-val">None</span>));
+        <span class="self">self</span>.<span class="ident">get_response</span>(<span class="ident">stream_id</span>)
     }
 
-    <span class='doccomment'>/// Performs a POST request on the given path.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>post</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>extra_headers</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>], <span class='ident'>body</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>stream_id</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>request</span>(<span class='string'>b&quot;POST&quot;</span>, <span class='ident'>path</span>, <span class='ident'>extra_headers</span>, <span class='prelude-val'>Some</span>(<span class='ident'>body</span>)));
-        <span class='self'>self</span>.<span class='ident'>get_response</span>(<span class='ident'>stream_id</span>)
+    <span class="doccomment">/// Performs a POST request on the given path.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">extra_headers</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>], <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)
+            <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">request</span>(<span class="string">b&quot;POST&quot;</span>, <span class="ident">path</span>, <span class="ident">extra_headers</span>, <span class="prelude-val">Some</span>(<span class="ident">body</span>)));
+        <span class="self">self</span>.<span class="ident">get_response</span>(<span class="ident">stream_id</span>)
     }
 
-    <span class='doccomment'>/// Internal helper method that prepares a new `RequestStream` instance based on the given</span>
-    <span class='doccomment'>/// request parameters.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `RequestStream` is then ready to be passed on to the connection instance in order to</span>
-    <span class='doccomment'>/// start the request.</span>
-    <span class='kw'>fn</span> <span class='ident'>new_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>method</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>extras</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>], <span class='ident'>body</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>RequestStream</span><span class='op'>&lt;</span><span class='ident'>DefaultStream</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>stream_id</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_next_stream_id</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='ident'>stream_id</span>);
-        <span class='kw'>match</span> <span class='ident'>body</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>body</span>) <span class='op'>=&gt;</span> <span class='ident'>stream</span>.<span class='ident'>set_full_data</span>(<span class='ident'>body</span>),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>stream</span>.<span class='ident'>close_local</span>(),
+    <span class="doccomment">/// Internal helper method that prepares a new `RequestStream` instance based on the given</span>
+    <span class="doccomment">/// request parameters.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `RequestStream` is then ready to be passed on to the connection instance in order to</span>
+    <span class="doccomment">/// start the request.</span>
+    <span class="kw">fn</span> <span class="ident">new_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">extras</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>], <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>)
+            <span class="op">-&gt;</span> <span class="ident">RequestStream</span><span class="op">&lt;</span><span class="ident">DefaultStream</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_next_stream_id</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="ident">stream_id</span>);
+        <span class="kw">match</span> <span class="ident">body</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">body</span>) <span class="op">=&gt;</span> <span class="ident">stream</span>.<span class="ident">set_full_data</span>(<span class="ident">body</span>),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">stream</span>.<span class="ident">close_local</span>(),
         };
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='ident'>method</span>.<span class='ident'>to_vec</span>()),
-            (<span class='string'>b&quot;:path&quot;</span>.<span class='ident'>to_vec</span>(), <span class='ident'>path</span>.<span class='ident'>to_vec</span>()),
-            (<span class='string'>b&quot;:authority&quot;</span>.<span class='ident'>to_vec</span>(), <span class='self'>self</span>.<span class='ident'>host</span>.<span class='ident'>clone</span>()),
-            (<span class='string'>b&quot;:scheme&quot;</span>.<span class='ident'>to_vec</span>(), <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>scheme</span>().<span class='ident'>as_bytes</span>().<span class='ident'>to_vec</span>()),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="ident">method</span>.<span class="ident">to_vec</span>()),
+            (<span class="string">b&quot;:path&quot;</span>.<span class="ident">to_vec</span>(), <span class="ident">path</span>.<span class="ident">to_vec</span>()),
+            (<span class="string">b&quot;:authority&quot;</span>.<span class="ident">to_vec</span>(), <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>()),
+            (<span class="string">b&quot;:scheme&quot;</span>.<span class="ident">to_vec</span>(), <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">scheme</span>().<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>()),
         ];
-        <span class='ident'>headers</span>.<span class='ident'>extend</span>(<span class='ident'>extras</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+        <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="ident">extras</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-        <span class='ident'>RequestStream</span> {
-            <span class='ident'>headers</span>: <span class='ident'>headers</span>,
-            <span class='ident'>stream</span>: <span class='ident'>stream</span>,
+        <span class="ident">RequestStream</span> {
+            <span class="ident">headers</span>: <span class="ident">headers</span>,
+            <span class="ident">stream</span>: <span class="ident">stream</span>,
         }
     }
 
-    <span class='doccomment'>/// Internal helper method that gets the next valid stream ID number.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_next_stream_id</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span> {
-        <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>next_stream_id</span>;
-        <span class='self'>self</span>.<span class='ident'>next_stream_id</span> <span class='op'>+=</span> <span class='number'>2</span>;
+    <span class="doccomment">/// Internal helper method that gets the next valid stream ID number.</span>
+    <span class="kw">fn</span> <span class="ident">get_next_stream_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span> {
+        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_stream_id</span>;
+        <span class="self">self</span>.<span class="ident">next_stream_id</span> <span class="op">+=</span> <span class="number">2</span>;
 
-        <span class='ident'>ret</span>
+        <span class="ident">ret</span>
     }
 
-    <span class='doccomment'>/// Internal helper method that triggers the client to handle the next</span>
-    <span class='doccomment'>/// frame off the HTTP/2 connection.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>handle_next_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>handle_next_frame</span>()
+    <span class="doccomment">/// Internal helper method that triggers the client to handle the next</span>
+    <span class="doccomment">/// frame off the HTTP/2 connection.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">handle_next_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">handle_next_frame</span>()
     }
 }
 </pre>
@@ -589,18 +601,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -633,7 +649,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

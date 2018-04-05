@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/connection.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/connection.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>connection.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -185,148 +197,148 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='self'>self</span>, <span class='ident'>Display</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>unicase</span>::<span class='ident'>UniCase</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">UniCase</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>ConnectionOption</span>::{<span class='ident'>KeepAlive</span>, <span class='ident'>Close</span>, <span class='ident'>ConnectionHeader</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ConnectionOption</span>::{<span class="ident">KeepAlive</span>, <span class="ident">Close</span>, <span class="ident">ConnectionHeader</span>};
 
-<span class='kw'>const</span> <span class='ident'>KEEP_ALIVE</span>: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;keep-alive&quot;</span>);
-<span class='kw'>const</span> <span class='ident'>CLOSE</span>: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;close&quot;</span>);
+<span class="kw">const</span> <span class="ident">KEEP_ALIVE</span>: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;keep-alive&quot;</span>);
+<span class="kw">const</span> <span class="ident">CLOSE</span>: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;close&quot;</span>);
 
-<span class='doccomment'>/// Values that can be in the `Connection` header.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ConnectionOption</span> {
-    <span class='doccomment'>/// The `keep-alive` connection value.</span>
-    <span class='ident'>KeepAlive</span>,
-    <span class='doccomment'>/// The `close` connection value.</span>
-    <span class='ident'>Close</span>,
-    <span class='doccomment'>/// Values in the Connection header that are supposed to be names of other Headers.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// &gt; When a header field aside from Connection is used to supply control</span>
-    <span class='doccomment'>/// &gt; information for or about the current connection, the sender MUST list</span>
-    <span class='doccomment'>/// &gt; the corresponding field-name within the Connection header field.</span>
-    <span class='comment'>// TODO: it would be nice if these &quot;Strings&quot; could be stronger types, since</span>
-    <span class='comment'>// they are supposed to relate to other Header fields (which we have strong</span>
-    <span class='comment'>// types for).</span>
-    <span class='ident'>ConnectionHeader</span>(<span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>),
+<span class="doccomment">/// Values that can be in the `Connection` header.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionOption</span> {
+    <span class="doccomment">/// The `keep-alive` connection value.</span>
+    <span class="ident">KeepAlive</span>,
+    <span class="doccomment">/// The `close` connection value.</span>
+    <span class="ident">Close</span>,
+    <span class="doccomment">/// Values in the Connection header that are supposed to be names of other Headers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &gt; When a header field aside from Connection is used to supply control</span>
+    <span class="doccomment">/// &gt; information for or about the current connection, the sender MUST list</span>
+    <span class="doccomment">/// &gt; the corresponding field-name within the Connection header field.</span>
+    <span class="comment">// TODO: it would be nice if these &quot;Strings&quot; could be stronger types, since</span>
+    <span class="comment">// they are supposed to relate to other Header fields (which we have strong</span>
+    <span class="comment">// types for).</span>
+    <span class="ident">ConnectionHeader</span>(<span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>ConnectionOption</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> ();
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>ConnectionOption</span>, ()<span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>UniCase</span>(<span class='ident'>s</span>) <span class='op'>==</span> <span class='ident'>KEEP_ALIVE</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>KeepAlive</span>)
-        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>UniCase</span>(<span class='ident'>s</span>) <span class='op'>==</span> <span class='ident'>CLOSE</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>Close</span>)
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>ConnectionHeader</span>(<span class='ident'>UniCase</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>())))
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ConnectionOption</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ();
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ConnectionOption</span>, ()<span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">UniCase</span>(<span class="ident">s</span>) <span class="op">==</span> <span class="ident">KEEP_ALIVE</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">KeepAlive</span>)
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">UniCase</span>(<span class="ident">s</span>) <span class="op">==</span> <span class="ident">CLOSE</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">Close</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">ConnectionHeader</span>(<span class="ident">UniCase</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())))
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>ConnectionOption</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>KeepAlive</span> <span class='op'>=&gt;</span> <span class='string'>&quot;keep-alive&quot;</span>,
-            <span class='ident'>Close</span> <span class='op'>=&gt;</span> <span class='string'>&quot;close&quot;</span>,
-            <span class='ident'>ConnectionHeader</span>(<span class='ident'>UniCase</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>)) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>as_ref</span>()
+<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConnectionOption</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">KeepAlive</span> <span class="op">=&gt;</span> <span class="string">&quot;keep-alive&quot;</span>,
+            <span class="ident">Close</span> <span class="op">=&gt;</span> <span class="string">&quot;close&quot;</span>,
+            <span class="ident">ConnectionHeader</span>(<span class="ident">UniCase</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">as_ref</span>()
         })
     }
 }
 
-<span class='macro'>header</span><span class='macro'>!</span> {
-    <span class='doccomment'>/// `Connection` header, defined in</span>
-    <span class='doccomment'>/// [RFC7230](http://tools.ietf.org/html/rfc7230#section-6.1)</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `Connection` header field allows the sender to indicate desired</span>
-    <span class='doccomment'>/// control options for the current connection.  In order to avoid</span>
-    <span class='doccomment'>/// confusing downstream recipients, a proxy or gateway MUST remove or</span>
-    <span class='doccomment'>/// replace any received connection options before forwarding the</span>
-    <span class='doccomment'>/// message.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # ABNF</span>
-    <span class='doccomment'>/// ```plain</span>
-    <span class='doccomment'>/// Connection        = 1#connection-option</span>
-    <span class='doccomment'>/// connection-option = token</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Example values</span>
-    <span class='doccomment'>/// * `close`</span>
-    <span class='doccomment'>/// * `keep-alive`</span>
-    <span class='doccomment'>/// * `upgrade`</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, Connection};</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// headers.set(Connection::keep_alive());</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate hyper;</span>
-    <span class='doccomment'>/// # extern crate unicase;</span>
-    <span class='doccomment'>/// # fn main() {</span>
-    <span class='doccomment'>/// // extern crate unicase;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, Connection, ConnectionOption};</span>
-    <span class='doccomment'>/// use unicase::UniCase;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     Connection(vec![</span>
-    <span class='doccomment'>///         ConnectionOption::ConnectionHeader(UniCase(&quot;upgrade&quot;.to_owned())),</span>
-    <span class='doccomment'>///     ])</span>
-    <span class='doccomment'>/// );</span>
-    <span class='doccomment'>/// # }</span>
-    <span class='doccomment'>/// ```</span>
-    (<span class='ident'>Connection</span>, <span class='string'>&quot;Connection&quot;</span>) <span class='op'>=&gt;</span> (<span class='ident'>ConnectionOption</span>)<span class='op'>+</span>
+<span class="macro">header</span><span class="macro">!</span> {
+    <span class="doccomment">/// `Connection` header, defined in</span>
+    <span class="doccomment">/// [RFC7230](http://tools.ietf.org/html/rfc7230#section-6.1)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `Connection` header field allows the sender to indicate desired</span>
+    <span class="doccomment">/// control options for the current connection.  In order to avoid</span>
+    <span class="doccomment">/// confusing downstream recipients, a proxy or gateway MUST remove or</span>
+    <span class="doccomment">/// replace any received connection options before forwarding the</span>
+    <span class="doccomment">/// message.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # ABNF</span>
+    <span class="doccomment">/// ```plain</span>
+    <span class="doccomment">/// Connection        = 1#connection-option</span>
+    <span class="doccomment">/// connection-option = token</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example values</span>
+    <span class="doccomment">/// * `close`</span>
+    <span class="doccomment">/// * `keep-alive`</span>
+    <span class="doccomment">/// * `upgrade`</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use hyper::header::{Headers, Connection};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// headers.set(Connection::keep_alive());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # extern crate unicase;</span>
+    <span class="doccomment">/// # fn main() {</span>
+    <span class="doccomment">/// // extern crate unicase;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// use hyper::header::{Headers, Connection, ConnectionOption};</span>
+    <span class="doccomment">/// use unicase::UniCase;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// headers.set(</span>
+    <span class="doccomment">///     Connection(vec![</span>
+    <span class="doccomment">///         ConnectionOption::ConnectionHeader(UniCase(&quot;upgrade&quot;.to_owned())),</span>
+    <span class="doccomment">///     ])</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    (<span class="ident">Connection</span>, <span class="string">&quot;Connection&quot;</span>) <span class="op">=&gt;</span> (<span class="ident">ConnectionOption</span>)<span class="op">+</span>
 
-    <span class='ident'>test_connection</span> {
-        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>test1</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;close&quot;</span>]);
-        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>test2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;keep-alive&quot;</span>]);
-        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>test3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;upgrade&quot;</span>]);
+    <span class="ident">test_connection</span> {
+        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">test1</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;close&quot;</span>]);
+        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">test2</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;keep-alive&quot;</span>]);
+        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">test3</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;upgrade&quot;</span>]);
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Connection</span> {
-    <span class='doccomment'>/// A constructor to easily create a `Connection: close` header.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>close</span>() <span class='op'>-&gt;</span> <span class='ident'>Connection</span> {
-        <span class='ident'>Connection</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>ConnectionOption</span>::<span class='ident'>Close</span>])
+<span class="kw">impl</span> <span class="ident">Connection</span> {
+    <span class="doccomment">/// A constructor to easily create a `Connection: close` header.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>() <span class="op">-&gt;</span> <span class="ident">Connection</span> {
+        <span class="ident">Connection</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ConnectionOption</span>::<span class="ident">Close</span>])
     }
 
-    <span class='doccomment'>/// A constructor to easily create a `Connection: keep-alive` header.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>keep_alive</span>() <span class='op'>-&gt;</span> <span class='ident'>Connection</span> {
-        <span class='ident'>Connection</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>ConnectionOption</span>::<span class='ident'>KeepAlive</span>])
+    <span class="doccomment">/// A constructor to easily create a `Connection: keep-alive` header.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive</span>() <span class="op">-&gt;</span> <span class="ident">Connection</span> {
+        <span class="ident">Connection</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ConnectionOption</span>::<span class="ident">KeepAlive</span>])
     }
 }
 
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>close</span>, <span class='ident'>Connection</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;close&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>keep_alive</span>, <span class='ident'>Connection</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;keep-alive&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>header</span>, <span class='ident'>Connection</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;authorization&quot;</span>.<span class='ident'>to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">close</span>, <span class="ident">Connection</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;close&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">keep_alive</span>, <span class="ident">Connection</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;keep-alive&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">header</span>, <span class="ident">Connection</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;authorization&quot;</span>.<span class="ident">to_vec</span>()] });
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Connection</span>,<span class='ident'>ConnectionHeader</span>};
-    <span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Header</span>;
-    <span class='kw'>use</span> <span class='ident'>unicase</span>::<span class='ident'>UniCase</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Connection</span>,<span class="ident">ConnectionHeader</span>};
+    <span class="kw">use</span> <span class="ident">header</span>::<span class="ident">Header</span>;
+    <span class="kw">use</span> <span class="ident">unicase</span>::<span class="ident">UniCase</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>parse_option</span>(<span class='ident'>header</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Connection</span> {
-        <span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>header</span>];
-        <span class='kw'>let</span> <span class='ident'>connection</span>: <span class='ident'>Connection</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>val</span>[..]).<span class='ident'>unwrap</span>();
-        <span class='ident'>connection</span>
+    <span class="kw">fn</span> <span class="ident">parse_option</span>(<span class="ident">header</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Connection</span> {
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">header</span>];
+        <span class="kw">let</span> <span class="ident">connection</span>: <span class="ident">Connection</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>[..]).<span class="ident">unwrap</span>();
+        <span class="ident">connection</span>
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Connection</span>::<span class='ident'>close</span>(),<span class='ident'>parse_option</span>(<span class='string'>b&quot;close&quot;</span>.<span class='ident'>to_vec</span>()));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Connection</span>::<span class='ident'>keep_alive</span>(),<span class='ident'>parse_option</span>(<span class='string'>b&quot;keep-alive&quot;</span>.<span class='ident'>to_vec</span>()));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Connection</span>::<span class='ident'>keep_alive</span>(),<span class='ident'>parse_option</span>(<span class='string'>b&quot;Keep-Alive&quot;</span>.<span class='ident'>to_vec</span>()));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Connection</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>ConnectionHeader</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;upgrade&quot;</span>.<span class='ident'>to_owned</span>()))]),
-            <span class='ident'>parse_option</span>(<span class='string'>b&quot;upgrade&quot;</span>.<span class='ident'>to_vec</span>()));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Connection</span>::<span class="ident">close</span>(),<span class="ident">parse_option</span>(<span class="string">b&quot;close&quot;</span>.<span class="ident">to_vec</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Connection</span>::<span class="ident">keep_alive</span>(),<span class="ident">parse_option</span>(<span class="string">b&quot;keep-alive&quot;</span>.<span class="ident">to_vec</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Connection</span>::<span class="ident">keep_alive</span>(),<span class="ident">parse_option</span>(<span class="string">b&quot;Keep-Alive&quot;</span>.<span class="ident">to_vec</span>()));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Connection</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">ConnectionHeader</span>(<span class="ident">UniCase</span>(<span class="string">&quot;upgrade&quot;</span>.<span class="ident">to_owned</span>()))]),
+            <span class="ident">parse_option</span>(<span class="string">b&quot;upgrade&quot;</span>.<span class="ident">to_vec</span>()));
     }
 }
 </pre>
@@ -343,18 +355,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -387,7 +403,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

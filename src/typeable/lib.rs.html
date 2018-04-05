@@ -9,14 +9,18 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -60,24 +72,24 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-</pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>warnings</span>)]</span>
+</pre><pre class="rust ">
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
 
-<span class='doccomment'>//! Exposes `Typeable`, which exposes the `get_type` method, which gives</span>
-<span class='doccomment'>//! the `TypeId` of any &#39;static type.</span>
+<span class="doccomment">//! Exposes `Typeable`, which exposes the `get_type` method, which gives</span>
+<span class="doccomment">//! the `TypeId` of any &#39;static type.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>any</span>::{<span class='ident'>Any</span>, <span class='ident'>TypeId</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">any</span>::{<span class="ident">Any</span>, <span class="ident">TypeId</span>};
 
-<span class='doccomment'>/// Universal mixin trait for adding a `get_type` method.</span>
-<span class='doccomment'>///</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Typeable</span>: <span class='ident'>Any</span> {
-    <span class='doccomment'>/// Get the `TypeId` of this object.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
-    <span class='kw'>fn</span> <span class='ident'>get_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>TypeId</span> { <span class='ident'>TypeId</span>::<span class='ident'>of</span>::<span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span>() }
+<span class="doccomment">/// Universal mixin trait for adding a `get_type` method.</span>
+<span class="doccomment">///</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Typeable</span>: <span class="ident">Any</span> {
+    <span class="doccomment">/// Get the `TypeId` of this object.</span>
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">TypeId</span> { <span class="ident">TypeId</span>::<span class="ident">of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Any</span><span class='op'>&gt;</span> <span class='ident'>Typeable</span> <span class='kw'>for</span> <span class='ident'>T</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Any</span><span class="op">&gt;</span> <span class="ident">Typeable</span> <span class="kw">for</span> <span class="ident">T</span> {}
 
 </pre>
 </section>
@@ -93,18 +105,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -137,7 +153,6 @@
         window.rootPath = "../../";
         window.currentCrate = "typeable";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

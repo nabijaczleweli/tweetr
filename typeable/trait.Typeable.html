@@ -9,14 +9,18 @@
 
     <title>typeable::Typeable - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../dark.css">
+    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
+    <script src="../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='index.html'>typeable</a></p><script>window.sidebarCurrent = {name: 'Typeable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Trait Typeable</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#provided-methods">Provided Methods</a><div class="sidebar-links"><a href="#method.get_type">get_type</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='index.html'>typeable</a></p><script>window.sidebarCurrent = {name: 'Typeable', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,23 +54,27 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>typeable</a>::<wbr><a class='trait' href=''>Typeable</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='index.html'>typeable</a>::<wbr><a class="trait" href=''>Typeable</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-5' class='srclink' href='../src/typeable/lib.rs.html#11-15' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait Typeable: <a class='trait' href='https://doc.rust-lang.org/nightly/core/any/trait.Any.html' title='core::any::Any'>Any</a> {
-    fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/core/any/struct.TypeId.html' title='core::any::TypeId'>TypeId</a> { ... }
+               </span><a class='srclink' href='../src/typeable/lib.rs.html#11-15' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Typeable: <a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a> {
+    fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/any/struct.TypeId.html" title="struct core::any::TypeId">TypeId</a> { ... }
 }</pre><div class='docblock'><p>Universal mixin trait for adding a <code>get_type</code> method.</p>
 </div>
-            <h2 id='provided-methods'>Provided Methods</h2>
+            <h2 id='provided-methods' class='small-section-header'>
+              Provided Methods<a href='#provided-methods' class='anchor'></a>
+            </h2>
             <div class='methods'>
-        <h3 id='method.get_type' class='method stab '><span id='get_type.v' class='invisible'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/core/any/struct.TypeId.html' title='core::any::TypeId'>TypeId</a></code></span></h3><div class='docblock'><p>Get the <code>TypeId</code> of this object.</p>
+        <h3 id='method.get_type' class='method'><span id='get_type.v' class='invisible'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/core/any/struct.TypeId.html" title="struct core::any::TypeId">TypeId</a></code></span></h3><div class='docblock'><p>Get the <code>TypeId</code> of this object.</p>
 </div></div>
-        <h2 id='implementors'>Implementors</h2>
+        <h2 id='implementors' class='small-section-header'>
+          Implementors<a href='#implementors' class='anchor'></a>
+        </h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/any/trait.Any.html' title='core::any::Any'>Any</a>&gt; Typeable for T</code></li>
+    <li><div class='out-of-band'><a class='srclink' href='../src/typeable/lib.rs.html#17' title='goto source code'>[src]</a></div><code>impl&lt;T:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/any/trait.Any.html" title="trait core::any::Any">Any</a>&gt; Typeable for T</code></li>
 </ul><script type="text/javascript" async
                          src="../implementors/typeable/trait.Typeable.js">
                  </script></section>
@@ -74,18 +90,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -118,7 +138,6 @@
         window.rootPath = "../";
         window.currentCrate = "typeable";
     </script>
-    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>
 </body>

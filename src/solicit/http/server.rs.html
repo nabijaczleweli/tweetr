@@ -9,14 +9,18 @@
 
     <title>server.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -266,229 +278,229 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains a number of reusable components for implementing the server side of an</span>
-<span class='doccomment'>//! HTTP/2 connection.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains a number of reusable components for implementing the server side of an</span>
+<span class="doccomment">//! HTTP/2 connection.</span>
 
-<span class='kw'>use</span> <span class='ident'>http</span>::{
-    <span class='ident'>StreamId</span>,
-    <span class='ident'>Header</span>,
-    <span class='ident'>HttpResult</span>,
-    <span class='ident'>HttpScheme</span>,
+<span class="kw">use</span> <span class="ident">http</span>::{
+    <span class="ident">StreamId</span>,
+    <span class="ident">Header</span>,
+    <span class="ident">HttpResult</span>,
+    <span class="ident">HttpScheme</span>,
 };
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::<span class='ident'>SettingsFrame</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>connection</span>::{
-    <span class='ident'>SendFrame</span>, <span class='ident'>ReceiveFrame</span>,
-    <span class='ident'>HttpConnection</span>, <span class='ident'>EndStream</span>,
-    <span class='ident'>SendStatus</span>,
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::<span class="ident">SettingsFrame</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">connection</span>::{
+    <span class="ident">SendFrame</span>, <span class="ident">ReceiveFrame</span>,
+    <span class="ident">HttpConnection</span>, <span class="ident">EndStream</span>,
+    <span class="ident">SendStatus</span>,
 };
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>session</span>::{
-    <span class='ident'>Session</span>,
-    <span class='ident'>SessionState</span>,
-    <span class='ident'>Stream</span>,
-    <span class='ident'>DefaultStream</span>,
-    <span class='ident'>DefaultSessionState</span>,
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">session</span>::{
+    <span class="ident">Session</span>,
+    <span class="ident">SessionState</span>,
+    <span class="ident">Stream</span>,
+    <span class="ident">DefaultStream</span>,
+    <span class="ident">DefaultSessionState</span>,
 };
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>priority</span>::<span class='ident'>SimplePrioritizer</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">priority</span>::<span class="ident">SimplePrioritizer</span>;
 
-<span class='doccomment'>/// An implementation of the `Session` trait for a server-side HTTP/2 connection.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ServerSession</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>State</span>: <span class='ident'>SessionState</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span> {
-    <span class='ident'>state</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>State</span>,
+<span class="doccomment">/// An implementation of the `Session` trait for a server-side HTTP/2 connection.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerSession</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">State</span>: <span class="ident">SessionState</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='ident'>ServerSession</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>State</span>: <span class='ident'>SessionState</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>state</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>State</span>) <span class='op'>-&gt;</span> <span class='ident'>ServerSession</span><span class='op'>&lt;</span><span class='ident'>State</span><span class='op'>&gt;</span> {
-        <span class='ident'>ServerSession</span> {
-            <span class='ident'>state</span>: <span class='ident'>state</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">ServerSession</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">State</span>: <span class="ident">SessionState</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>) <span class="op">-&gt;</span> <span class="ident">ServerSession</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
+        <span class="ident">ServerSession</span> {
+            <span class="ident">state</span>: <span class="ident">state</span>,
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='ident'>Session</span> <span class='kw'>for</span> <span class='ident'>ServerSession</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>State</span>: <span class='ident'>SessionState</span> <span class='op'>+</span> <span class='lifetime'>&#39;a</span> {
-    <span class='kw'>fn</span> <span class='ident'>new_data_chunk</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Data chunk for stream {}&quot;</span>, <span class='ident'>stream_id</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>get_stream_mut</span>(<span class='ident'>stream_id</span>) {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Received a frame for an unknown stream!&quot;</span>);
-                <span class='kw'>return</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Session</span> <span class="kw">for</span> <span class="ident">ServerSession</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">State</span>: <span class="ident">SessionState</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
+    <span class="kw">fn</span> <span class="ident">new_data_chunk</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Data chunk for stream {}&quot;</span>, <span class="ident">stream_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_stream_mut</span>(<span class="ident">stream_id</span>) {
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Received a frame for an unknown stream!&quot;</span>);
+                <span class="kw">return</span>;
             },
-            <span class='prelude-val'>Some</span>(<span class='ident'>stream</span>) <span class='op'>=&gt;</span> <span class='ident'>stream</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=&gt;</span> <span class="ident">stream</span>,
         };
-        <span class='comment'>// Now let the stream handle the data chunk</span>
-        <span class='ident'>stream</span>.<span class='ident'>new_data_chunk</span>(<span class='ident'>data</span>);
+        <span class="comment">// Now let the stream handle the data chunk</span>
+        <span class="ident">stream</span>.<span class="ident">new_data_chunk</span>(<span class="ident">data</span>);
     }
-    <span class='kw'>fn</span> <span class='ident'>new_headers</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>, <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>) {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Headers for stream {}&quot;</span>, <span class='ident'>stream_id</span>);
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>get_stream_mut</span>(<span class='ident'>stream_id</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>stream</span>) <span class='op'>=&gt;</span> {
-                <span class='comment'>// This&#39;d correspond to having received trailers...</span>
-                <span class='ident'>stream</span>.<span class='ident'>set_headers</span>(<span class='ident'>headers</span>);
-                <span class='kw'>return</span>;
+    <span class="kw">fn</span> <span class="ident">new_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) {
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Headers for stream {}&quot;</span>, <span class="ident">stream_id</span>);
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_stream_mut</span>(<span class="ident">stream_id</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=&gt;</span> {
+                <span class="comment">// This&#39;d correspond to having received trailers...</span>
+                <span class="ident">stream</span>.<span class="ident">set_headers</span>(<span class="ident">headers</span>);
+                <span class="kw">return</span>;
             },
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {},
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> {},
         };
-        <span class='comment'>// New stream initiated by the client</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span>: <span class='ident'>State</span>::<span class='ident'>Stream</span> <span class='op'>=</span> <span class='ident'>Stream</span>::<span class='ident'>new</span>(<span class='ident'>stream_id</span>);
-        <span class='ident'>stream</span>.<span class='ident'>set_headers</span>(<span class='ident'>headers</span>);
-        <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>insert_stream</span>(<span class='ident'>stream</span>);
+        <span class="comment">// New stream initiated by the client</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span>: <span class="ident">State</span>::<span class="ident">Stream</span> <span class="op">=</span> <span class="ident">Stream</span>::<span class="ident">new</span>(<span class="ident">stream_id</span>);
+        <span class="ident">stream</span>.<span class="ident">set_headers</span>(<span class="ident">headers</span>);
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">insert_stream</span>(<span class="ident">stream</span>);
     }
 
-    <span class='kw'>fn</span> <span class='ident'>end_of_stream</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;End of stream {}&quot;</span>, <span class='ident'>stream_id</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span>.<span class='ident'>get_stream_mut</span>(<span class='ident'>stream_id</span>) {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Received a frame for an unknown stream!&quot;</span>);
-                <span class='kw'>return</span>;
+    <span class="kw">fn</span> <span class="ident">end_of_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) {
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;End of stream {}&quot;</span>, <span class="ident">stream_id</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_stream_mut</span>(<span class="ident">stream_id</span>) {
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Received a frame for an unknown stream!&quot;</span>);
+                <span class="kw">return</span>;
             },
-            <span class='prelude-val'>Some</span>(<span class='ident'>stream</span>) <span class='op'>=&gt;</span> <span class='ident'>stream</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=&gt;</span> <span class="ident">stream</span>,
         };
-        <span class='ident'>stream</span>.<span class='ident'>close_remote</span>()
+        <span class="ident">stream</span>.<span class="ident">close_remote</span>()
     }
 }
 
-<span class='doccomment'>/// The struct provides a more convenient API for server-related functionality of an HTTP/2</span>
-<span class='doccomment'>/// connection, such as sending a response back to the client.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ServerConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span>, <span class='ident'>State</span><span class='op'>=</span><span class='ident'>DefaultSessionState</span><span class='op'>&lt;</span><span class='ident'>DefaultStream</span><span class='op'>&gt;&gt;</span>
-        <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>SendFrame</span>, <span class='ident'>R</span>: <span class='ident'>ReceiveFrame</span>, <span class='ident'>State</span>: <span class='ident'>SessionState</span> {
-    <span class='doccomment'>/// The underlying `HttpConnection` that will be used for any HTTP/2</span>
-    <span class='doccomment'>/// communication.</span>
-    <span class='ident'>conn</span>: <span class='ident'>HttpConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The state of the session associated to this client connection. Maintains the status of the</span>
-    <span class='doccomment'>/// connection streams.</span>
-    <span class='kw'>pub</span> <span class='ident'>state</span>: <span class='ident'>State</span>,
+<span class="doccomment">/// The struct provides a more convenient API for server-related functionality of an HTTP/2</span>
+<span class="doccomment">/// connection, such as sending a response back to the client.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span>, <span class="ident">State</span><span class="op">=</span><span class="ident">DefaultSessionState</span><span class="op">&lt;</span><span class="ident">DefaultStream</span><span class="op">&gt;&gt;</span>
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">SendFrame</span>, <span class="ident">R</span>: <span class="ident">ReceiveFrame</span>, <span class="ident">State</span>: <span class="ident">SessionState</span> {
+    <span class="doccomment">/// The underlying `HttpConnection` that will be used for any HTTP/2</span>
+    <span class="doccomment">/// communication.</span>
+    <span class="ident">conn</span>: <span class="ident">HttpConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The state of the session associated to this client connection. Maintains the status of the</span>
+    <span class="doccomment">/// connection streams.</span>
+    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">State</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span>, <span class='ident'>State</span><span class='op'>&gt;</span> <span class='ident'>ServerConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span>, <span class='ident'>State</span><span class='op'>&gt;</span>
-        <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>SendFrame</span>, <span class='ident'>R</span>: <span class='ident'>ReceiveFrame</span>, <span class='ident'>State</span>: <span class='ident'>SessionState</span> {
-    <span class='doccomment'>/// Creates a new `ServerConnection` that will use the given `HttpConnection` for its</span>
-    <span class='doccomment'>/// underlying HTTP/2 communication.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_connection</span>(<span class='ident'>conn</span>: <span class='ident'>HttpConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span><span class='op'>&gt;</span>, <span class='ident'>state</span>: <span class='ident'>State</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>ServerConnection</span><span class='op'>&lt;</span><span class='ident'>S</span>, <span class='ident'>R</span>, <span class='ident'>State</span><span class='op'>&gt;</span> {
-        <span class='ident'>ServerConnection</span> {
-            <span class='ident'>conn</span>: <span class='ident'>conn</span>,
-            <span class='ident'>state</span>: <span class='ident'>state</span>,
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">ServerConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span>, <span class="ident">State</span><span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">SendFrame</span>, <span class="ident">R</span>: <span class="ident">ReceiveFrame</span>, <span class="ident">State</span>: <span class="ident">SessionState</span> {
+    <span class="doccomment">/// Creates a new `ServerConnection` that will use the given `HttpConnection` for its</span>
+    <span class="doccomment">/// underlying HTTP/2 communication.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_connection</span>(<span class="ident">conn</span>: <span class="ident">HttpConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="ident">State</span>)
+            <span class="op">-&gt;</span> <span class="ident">ServerConnection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span>, <span class="ident">State</span><span class="op">&gt;</span> {
+        <span class="ident">ServerConnection</span> {
+            <span class="ident">conn</span>: <span class="ident">conn</span>,
+            <span class="ident">state</span>: <span class="ident">state</span>,
         }
     }
 
-    <span class='doccomment'>/// Returns the scheme of the underlying `HttpConnection`.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>scheme</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpScheme</span> {
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>scheme</span>
+    <span class="doccomment">/// Returns the scheme of the underlying `HttpConnection`.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scheme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpScheme</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">scheme</span>
     }
 
-    <span class='doccomment'>/// Initializes the `ServerConnection` by sending the server&#39;s settings and processing the</span>
-    <span class='doccomment'>/// client&#39;s.</span>
-    <span class='doccomment'>/// If the client does not provide a settings frame, returns an error.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// TODO This method should eventually be split into two.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='comment'>// TODO: `HttpConnection` should provide a better API for sending settings.</span>
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>sender</span>.<span class='ident'>send_frame</span>(<span class='ident'>SettingsFrame</span>::<span class='ident'>new</span>()));
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>read_preface</span>());
-        <span class='prelude-val'>Ok</span>(())
+    <span class="doccomment">/// Initializes the `ServerConnection` by sending the server&#39;s settings and processing the</span>
+    <span class="doccomment">/// client&#39;s.</span>
+    <span class="doccomment">/// If the client does not provide a settings frame, returns an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// TODO This method should eventually be split into two.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="comment">// TODO: `HttpConnection` should provide a better API for sending settings.</span>
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">sender</span>.<span class="ident">send_frame</span>(<span class="ident">SettingsFrame</span>::<span class="ident">new</span>()));
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">read_preface</span>());
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class='doccomment'>/// Reads and handles the settings frame of the client preface. If the settings frame is not</span>
-    <span class='doccomment'>/// the next frame received on the underlying connection, returns an error.</span>
-    <span class='kw'>fn</span> <span class='ident'>read_preface</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>state</span>);
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>expect_settings</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>session</span>)
+    <span class="doccomment">/// Reads and handles the settings frame of the client preface. If the settings frame is not</span>
+    <span class="doccomment">/// the next frame received on the underlying connection, returns an error.</span>
+    <span class="kw">fn</span> <span class="ident">read_preface</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">expect_settings</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">session</span>)
     }
 
-    <span class='doccomment'>/// Fully handles the next incoming frame. Events are passed on to the internal `session`</span>
-    <span class='doccomment'>/// instance.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>handle_next_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>state</span>);
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>handle_next_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>session</span>)
+    <span class="doccomment">/// Fully handles the next incoming frame. Events are passed on to the internal `session`</span>
+    <span class="doccomment">/// instance.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_next_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>);
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">handle_next_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">session</span>)
     }
 
-    <span class='doccomment'>/// Starts a response on the stream with the given ID by sending the given headers.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The body of the response is assumed to be provided by the `Stream` instance stored within</span>
-    <span class='doccomment'>/// the connection&#39;s state. (The body does not have to be ready when this method is called, as</span>
-    <span class='doccomment'>/// long as the `Stream` instance knows how to provide it to the connection later on.)</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>start_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
-                          <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>,
-                          <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>,
-                          <span class='ident'>end_stream</span>: <span class='ident'>EndStream</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>send_headers</span>(<span class='ident'>headers</span>, <span class='ident'>stream_id</span>, <span class='ident'>end_stream</span>)
+    <span class="doccomment">/// Starts a response on the stream with the given ID by sending the given headers.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The body of the response is assumed to be provided by the `Stream` instance stored within</span>
+    <span class="doccomment">/// the connection&#39;s state. (The body does not have to be ready when this method is called, as</span>
+    <span class="doccomment">/// long as the `Stream` instance knows how to provide it to the connection later on.)</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                          <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>,
+                          <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+                          <span class="ident">end_stream</span>: <span class="ident">EndStream</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">send_headers</span>(<span class="ident">headers</span>, <span class="ident">stream_id</span>, <span class="ident">end_stream</span>)
     }
 
-    <span class='doccomment'>/// Queues a new DATA frame onto the underlying `SendFrame`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Currently, no prioritization of streams is taken into account and which stream&#39;s data is</span>
-    <span class='doccomment'>/// queued cannot be relied on.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>send_next_data</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>SendStatus</span><span class='op'>&gt;</span> {
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Sending next data...&quot;</span>);
-        <span class='comment'>// A default &quot;maximum&quot; chunk size of 8 KiB is set on all data frames.</span>
-        <span class='kw'>const</span> <span class='ident'>MAX_CHUNK_SIZE</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>8</span> <span class='op'>*</span> <span class='number'>1024</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>; <span class='ident'>MAX_CHUNK_SIZE</span>];
+    <span class="doccomment">/// Queues a new DATA frame onto the underlying `SendFrame`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Currently, no prioritization of streams is taken into account and which stream&#39;s data is</span>
+    <span class="doccomment">/// queued cannot be relied on.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_next_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">SendStatus</span><span class="op">&gt;</span> {
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Sending next data...&quot;</span>);
+        <span class="comment">// A default &quot;maximum&quot; chunk size of 8 KiB is set on all data frames.</span>
+        <span class="kw">const</span> <span class="ident">MAX_CHUNK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="number">1024</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MAX_CHUNK_SIZE</span>];
 
-        <span class='comment'>// TODO: Additionally account for the flow control windows.</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>prioritizer</span> <span class='op'>=</span> <span class='ident'>SimplePrioritizer</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>state</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>);
+        <span class="comment">// TODO: Additionally account for the flow control windows.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prioritizer</span> <span class="op">=</span> <span class="ident">SimplePrioritizer</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
 
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>send_next_data</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>prioritizer</span>)
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">send_next_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">prioritizer</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>ServerSession</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ServerSession</span>;
 
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>tests</span>::<span class='ident'>common</span>::<span class='ident'>TestStream</span>;
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">tests</span>::<span class="ident">common</span>::<span class="ident">TestStream</span>;
 
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>session</span>::{<span class='ident'>DefaultSessionState</span>, <span class='ident'>SessionState</span>, <span class='ident'>Stream</span>, <span class='ident'>Session</span>};
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">session</span>::{<span class="ident">DefaultSessionState</span>, <span class="ident">SessionState</span>, <span class="ident">Stream</span>, <span class="ident">Session</span>};
 
-    <span class='doccomment'>/// Tests that the `ServerSession` correctly manages the stream state.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_server_session</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>DefaultSessionState</span>::<span class='op'>&lt;</span><span class='ident'>TestStream</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
+    <span class="doccomment">/// Tests that the `ServerSession` correctly manages the stream state.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_server_session</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">DefaultSessionState</span>::<span class="op">&lt;</span><span class="ident">TestStream</span><span class="op">&gt;</span>::<span class="ident">new</span>();
 
-        <span class='comment'>// Receiving new headers results in a new stream being created</span>
-        <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;GET&quot;</span>.<span class='ident'>to_vec</span>())];
+        <span class="comment">// Receiving new headers results in a new stream being created</span>
+        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;GET&quot;</span>.<span class="ident">to_vec</span>())];
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>state</span>);
-            <span class='ident'>session</span>.<span class='ident'>new_headers</span>(<span class='number'>1</span>, <span class='ident'>headers</span>.<span class='ident'>clone</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="ident">session</span>.<span class="ident">new_headers</span>(<span class="number">1</span>, <span class="ident">headers</span>.<span class="ident">clone</span>());
         }
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>is_some</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>headers</span>.<span class='ident'>clone</span>().<span class='ident'>unwrap</span>(),
-                   <span class='ident'>headers</span>);
-        <span class='comment'>// Now some data arrives on the stream...</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">headers</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>(),
+                   <span class="ident">headers</span>);
+        <span class="comment">// Now some data arrives on the stream...</span>
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>state</span>);
-            <span class='ident'>session</span>.<span class='ident'>new_data_chunk</span>(<span class='number'>1</span>, <span class='kw-2'>&amp;</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="ident">session</span>.<span class="ident">new_data_chunk</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
         }
-        <span class='comment'>// ...works.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>body</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>]);
-        <span class='comment'>// Some more data...</span>
+        <span class="comment">// ...works.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">body</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+        <span class="comment">// Some more data...</span>
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>state</span>);
-            <span class='ident'>session</span>.<span class='ident'>new_data_chunk</span>(<span class='number'>1</span>, <span class='kw-2'>&amp;</span>[<span class='number'>4</span>]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="ident">session</span>.<span class="ident">new_data_chunk</span>(<span class="number">1</span>, <span class="kw-2">&amp;</span>[<span class="number">4</span>]);
         }
-        <span class='comment'>// ...all good.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>body</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>]);
-        <span class='comment'>// Add another stream in the mix</span>
+        <span class="comment">// ...all good.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">body</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
+        <span class="comment">// Add another stream in the mix</span>
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>state</span>);
-            <span class='ident'>session</span>.<span class='ident'>new_headers</span>(<span class='number'>3</span>, <span class='ident'>headers</span>.<span class='ident'>clone</span>());
-            <span class='ident'>session</span>.<span class='ident'>new_data_chunk</span>(<span class='number'>3</span>, <span class='kw-2'>&amp;</span>[<span class='number'>100</span>]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="ident">session</span>.<span class="ident">new_headers</span>(<span class="number">3</span>, <span class="ident">headers</span>.<span class="ident">clone</span>());
+            <span class="ident">session</span>.<span class="ident">new_data_chunk</span>(<span class="number">3</span>, <span class="kw-2">&amp;</span>[<span class="number">100</span>]);
         }
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>3</span>).<span class='ident'>is_some</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>3</span>).<span class='ident'>unwrap</span>().<span class='ident'>headers</span>.<span class='ident'>clone</span>().<span class='ident'>unwrap</span>(),
-                   <span class='ident'>headers</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>3</span>).<span class='ident'>unwrap</span>().<span class='ident'>body</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>100</span>]);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">3</span>).<span class="ident">is_some</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">3</span>).<span class="ident">unwrap</span>().<span class="ident">headers</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>(),
+                   <span class="ident">headers</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">3</span>).<span class="ident">unwrap</span>().<span class="ident">body</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="number">100</span>]);
         {
-            <span class='comment'>// Finally, the stream 1 ends...</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>session</span> <span class='op'>=</span> <span class='ident'>ServerSession</span>::<span class='ident'>new</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>state</span>);
-            <span class='ident'>session</span>.<span class='ident'>end_of_stream</span>(<span class='number'>1</span>);
+            <span class="comment">// Finally, the stream 1 ends...</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">ServerSession</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>);
+            <span class="ident">session</span>.<span class="ident">end_of_stream</span>(<span class="number">1</span>);
         }
-        <span class='comment'>// ...and gets closed.</span>
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>1</span>).<span class='ident'>unwrap</span>().<span class='ident'>is_closed_remote</span>());
-        <span class='comment'>// but not the other one.</span>
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>state</span>.<span class='ident'>get_stream_ref</span>(<span class='number'>3</span>).<span class='ident'>unwrap</span>().<span class='ident'>is_closed_remote</span>());
+        <span class="comment">// ...and gets closed.</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">is_closed_remote</span>());
+        <span class="comment">// but not the other one.</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">state</span>.<span class="ident">get_stream_ref</span>(<span class="number">3</span>).<span class="ident">unwrap</span>().<span class="ident">is_closed_remote</span>());
     }
 }
 </pre>
@@ -505,18 +517,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -549,7 +565,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

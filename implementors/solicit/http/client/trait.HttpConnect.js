@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["solicit"] = [];implementors["hyper"] = [];
+implementors["solicit"] = [];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

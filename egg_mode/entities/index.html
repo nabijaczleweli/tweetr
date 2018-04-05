@@ -9,14 +9,18 @@
 
     <title>egg_mode::entities - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'entities', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module entities</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'entities', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,35 +54,29 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>egg_mode</a>::<wbr><a class='mod' href=''>entities</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>egg_mode</a>::<wbr><a class="mod" href=''>entities</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-544' class='srclink' href='../../src/egg_mode/entities.rs.html#1-362' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/egg_mode/entities.rs.html#1-362' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Data structures containing extracted URL, mention, tag, and media information.</p>
-
 <p>These structures are meant to be received in an API call to describe the data they accompany.
 For example, a <code>UrlEntity</code> describes a hyperlink in a tweet or user description text, and a
 <code>HashtagEntity</code> describes a hashtag or stock symbol extracted from a tweet.</p>
-
-<p>For more information on the data in these structures, see Twitter&#39;s documentation for
+<p>For more information on the data in these structures, see Twitter's documentation for
 <a href="https://dev.twitter.com/overview/api/entities">Entities</a> and <a href="https://dev.twitter.com/overview/api/entities-in-twitter-objects">Entities in Objects</a>.</p>
-
-<h2 id='using-indices-and-urls' class='section-header'><a href='#using-indices-and-urls'>Using indices and URLs</a></h2>
+<h2 id="using-indices-and-urls" class="section-header"><a href="#using-indices-and-urls">Using indices and URLs</a></h2>
 <p>When displaying text with accompanied entities, be wary about how you use the accompanied
 indices. The indices given by Twitter reference the <em>graphemes</em> in the tweet, so something like
 <code>char_indices</code> will fall flat when faced with text that uses combining characters. The
 <a href="https://crates.io/crates/unicode-segmentation">unicode-segmentation</a> crate provides a means to iterate over the graphemes of a string,
 allowing you to make sure you hyperlink the right range of characters in the text.</p>
-
 <p>Alternately, when substituting URLs for display, <code>str::replace</code> works just fine.</p>
-
-<h3 id='shortened-display-and-expanded-urls' class='section-header'><a href='#shortened-display-and-expanded-urls'>Shortened, Display, and Expanded URLs</a></h3>
+<h3 id="shortened-display-and-expanded-urls" class="section-header"><a href="#shortened-display-and-expanded-urls">Shortened, Display, and Expanded URLs</a></h3>
 <p>URL and Media entities contain references to a URL within their parent text. However, due to
 the nature of how Twitter handles URLs in tweets and user bios, each entity struct has three
 URLs within it:</p>
-
 <ul>
 <li><code>url</code>: This is the <code>t.co</code> shortened URL as returned directly from twitter. This is what
 contributes to character count in tweets and user bios.</li>
@@ -84,74 +90,84 @@ potentially filling up a lot of space with the fullly expanded URL.</li>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.HashtagEntity.html'
-                                  title='egg_mode::entities::HashtagEntity'>HashtagEntity</a></td>
+                           <td><a class="struct" href="struct.HashtagEntity.html"
+                                  title='struct egg_mode::entities::HashtagEntity'>HashtagEntity</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a hashtag or symbol extracted from another piece of text.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.MediaEntity.html'
-                                  title='egg_mode::entities::MediaEntity'>MediaEntity</a></td>
+                           <td><a class="struct" href="struct.MediaEntity.html"
+                                  title='struct egg_mode::entities::MediaEntity'>MediaEntity</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a piece of media attached to a tweet.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.MediaSize.html'
-                                  title='egg_mode::entities::MediaSize'>MediaSize</a></td>
+                           <td><a class="struct" href="struct.MediaSize.html"
+                                  title='struct egg_mode::entities::MediaSize'>MediaSize</a></td>
                            <td class='docblock-short'>
                                 <p>Represents the dimensions of a media file.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.MediaSizes.html'
-                                  title='egg_mode::entities::MediaSizes'>MediaSizes</a></td>
+                           <td><a class="struct" href="struct.MediaSizes.html"
+                                  title='struct egg_mode::entities::MediaSizes'>MediaSizes</a></td>
                            <td class='docblock-short'>
                                 <p>Represents the available sizes for a media file.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.MentionEntity.html'
-                                  title='egg_mode::entities::MentionEntity'>MentionEntity</a></td>
+                           <td><a class="struct" href="struct.MentionEntity.html"
+                                  title='struct egg_mode::entities::MentionEntity'>MentionEntity</a></td>
                            <td class='docblock-short'>
                                 <p>Represnts a user mention extracted from another piece of text.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.UrlEntity.html'
-                                  title='egg_mode::entities::UrlEntity'>UrlEntity</a></td>
+                           <td><a class="struct" href="struct.UrlEntity.html"
+                                  title='struct egg_mode::entities::UrlEntity'>UrlEntity</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a link extracted from another piece of text.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.VideoInfo.html'
-                                  title='egg_mode::entities::VideoInfo'>VideoInfo</a></td>
+                           <td><a class="struct" href="struct.VideoInfo.html"
+                                  title='struct egg_mode::entities::VideoInfo'>VideoInfo</a></td>
                            <td class='docblock-short'>
                                 <p>Represents metadata specific to videos.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.VideoVariant.html'
-                                  title='egg_mode::entities::VideoVariant'>VideoVariant</a></td>
+                           <td><a class="struct" href="struct.VideoVariant.html"
+                                  title='struct egg_mode::entities::VideoVariant'>VideoVariant</a></td>
                            <td class='docblock-short'>
                                 <p>Represents information about a specific encoding of a video.</p>
+
                            </td>
                        </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.MediaType.html'
-                                  title='egg_mode::entities::MediaType'>MediaType</a></td>
+                           <td><a class="enum" href="enum.MediaType.html"
+                                  title='enum egg_mode::entities::MediaType'>MediaType</a></td>
                            <td class='docblock-short'>
                                 <p>Represents the types of media that can be attached to a tweet.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='enum' href='enum.ResizeMode.html'
-                                  title='egg_mode::entities::ResizeMode'>ResizeMode</a></td>
+                           <td><a class="enum" href="enum.ResizeMode.html"
+                                  title='enum egg_mode::entities::ResizeMode'>ResizeMode</a></td>
                            <td class='docblock-short'>
                                 <p>Represents how an image has been resized for a given size variant.</p>
+
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -166,18 +182,22 @@ potentially filling up a lot of space with the fullly expanded URL.</li>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -210,7 +230,6 @@ potentially filling up a lot of space with the fullly expanded URL.</li>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

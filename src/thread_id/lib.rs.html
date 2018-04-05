@@ -9,14 +9,18 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -109,73 +121,73 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
-</pre><pre class='rust '>
-<span class='comment'>// Thread-ID -- Get a unique thread ID</span>
-<span class='comment'>// Copyright 2016 Ruud van Asseldonk</span>
-<span class='comment'>//</span>
-<span class='comment'>// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class='comment'>// you may not use this file except in compliance with the License.</span>
-<span class='comment'>// A copy of the License has been included in the root of the repository.</span>
+</pre><pre class="rust ">
+<span class="comment">// Thread-ID -- Get a unique thread ID</span>
+<span class="comment">// Copyright 2016 Ruud van Asseldonk</span>
+<span class="comment">//</span>
+<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="comment">// you may not use this file except in compliance with the License.</span>
+<span class="comment">// A copy of the License has been included in the root of the repository.</span>
 
-<span class='doccomment'>//! Thread-ID: get a unique ID for the current thread.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! For diagnostics and debugging it can often be useful to get an ID that is</span>
-<span class='doccomment'>//! different for every thread. This crate provides that functionality.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Example</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! use std::thread;</span>
-<span class='doccomment'>//! use thread_id;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! thread::spawn(move || {</span>
-<span class='doccomment'>//!     println!(&quot;spawned thread has id {}&quot;, thread_id::get());</span>
-<span class='doccomment'>//! });</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! println!(&quot;main thread has id {}&quot;, thread_id::get());</span>
-<span class='doccomment'>//! ```</span>
+<span class="doccomment">//! Thread-ID: get a unique ID for the current thread.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For diagnostics and debugging it can often be useful to get an ID that is</span>
+<span class="doccomment">//! different for every thread. This crate provides that functionality.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use std::thread;</span>
+<span class="doccomment">//! use thread_id;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! thread::spawn(move || {</span>
+<span class="doccomment">//!     println!(&quot;spawned thread has id {}&quot;, thread_id::get());</span>
+<span class="doccomment">//! });</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! println!(&quot;main thread has id {}&quot;, thread_id::get());</span>
+<span class="doccomment">//! ```</span>
 
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>unix</span>)]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>windows</span>)]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>kernel32</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">kernel32</span>;
 
-<span class='doccomment'>/// Returns a number that is unique to the calling thread.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Calling this function twice from the same thread will return the same</span>
-<span class='doccomment'>/// number. Calling this function from a different thread will return a</span>
-<span class='doccomment'>/// different number.</span>
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span>() <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-    <span class='ident'>get_internal</span>()
+<span class="doccomment">/// Returns a number that is unique to the calling thread.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Calling this function twice from the same thread will return the same</span>
+<span class="doccomment">/// number. Calling this function from a different thread will return a</span>
+<span class="doccomment">/// different number.</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="ident">get_internal</span>()
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>unix</span>)]</span>
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>get_internal</span>() <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-    <span class='kw'>unsafe</span> { <span class='ident'>libc</span>::<span class='ident'>pthread_self</span>() <span class='kw'>as</span> <span class='ident'>usize</span> }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">get_internal</span>() <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">unsafe</span> { <span class="ident">libc</span>::<span class="ident">pthread_self</span>() <span class="kw">as</span> <span class="ident">usize</span> }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>windows</span>)]</span>
-<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>get_internal</span>() <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-    <span class='kw'>unsafe</span> { <span class='ident'>kernel32</span>::<span class='ident'>GetCurrentThreadId</span>() <span class='kw'>as</span> <span class='ident'>usize</span> }
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">fn</span> <span class="ident">get_internal</span>() <span class="op">-&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">unsafe</span> { <span class="ident">kernel32</span>::<span class="ident">GetCurrentThreadId</span>() <span class="kw">as</span> <span class="ident">usize</span> }
 }
 
-<span class='attribute'>#[<span class='ident'>test</span>]</span>
-<span class='kw'>fn</span> <span class='ident'>distinct_threads_have_distinct_ids</span>() {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">distinct_threads_have_distinct_ids</span>() {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
 
-    <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
-    <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> <span class='ident'>tx</span>.<span class='ident'>send</span>(::<span class='ident'>get</span>()).<span class='ident'>unwrap</span>()).<span class='ident'>join</span>().<span class='ident'>unwrap</span>();
+    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>();
+    <span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">||</span> <span class="ident">tx</span>.<span class="ident">send</span>(::<span class="ident">get</span>()).<span class="ident">unwrap</span>()).<span class="ident">join</span>().<span class="ident">unwrap</span>();
 
-    <span class='kw'>let</span> <span class='ident'>main_tid</span> <span class='op'>=</span> ::<span class='ident'>get</span>();
-    <span class='kw'>let</span> <span class='ident'>other_tid</span> <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>recv</span>().<span class='ident'>unwrap</span>();
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>main_tid</span> <span class='op'>!=</span> <span class='ident'>other_tid</span>);
+    <span class="kw">let</span> <span class="ident">main_tid</span> <span class="op">=</span> ::<span class="ident">get</span>();
+    <span class="kw">let</span> <span class="ident">other_tid</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">main_tid</span> <span class="op">!=</span> <span class="ident">other_tid</span>);
 }
 </pre>
 </section>
@@ -191,18 +203,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -235,7 +251,6 @@
         window.rootPath = "../../";
         window.currentCrate = "thread_id";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

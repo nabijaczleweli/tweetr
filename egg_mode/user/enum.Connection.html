@@ -9,14 +9,18 @@
 
     <title>egg_mode::user::Connection - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc enum">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>user</a></p><script>window.sidebarCurrent = {name: 'Connection', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Enum Connection</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#variants">Variants</a><div class="sidebar-links"><a href="#variant.None">None</a><a href="#variant.FollowingRequested">FollowingRequested</a><a href="#variant.FollowingReceived">FollowingReceived</a><a href="#variant.FollowedBy">FollowedBy</a><a href="#variant.Following">Following</a><a href="#variant.Blocking">Blocking</a><a href="#variant.Muting">Muting</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Debug">Debug</a></div></div><p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>user</a></p><script>window.sidebarCurrent = {name: 'Connection', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,12 +54,12 @@
         </form>
     </nav>
 
-    <section id='main' class="content enum">
-<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>user</a>::<wbr><a class='enum' href=''>Connection</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>user</a>::<wbr><a class="enum" href=''>Connection</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1710' class='srclink' href='../../src/egg_mode/user/structs.rs.html#675-690' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/egg_mode/user/structs.rs.html#675-690' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum Connection {
     None,
     FollowingRequested,
@@ -57,17 +69,22 @@
     Blocking,
     Muting,
 }</pre><div class='docblock'><p>Represents the ways a target account can be connected to another account.</p>
-</div><h2 class='variants'>Variants</h2>
-<span id='variant.None' class='variant'><span id='None.v' class='invisible'><code>None</code></span></span><div class='docblock'><p>The target account has no relation.</p>
-</div><span id='variant.FollowingRequested' class='variant'><span id='FollowingRequested.v' class='invisible'><code>FollowingRequested</code></span></span><div class='docblock'><p>The authenticated user has requested to follow the target account.</p>
-</div><span id='variant.FollowingReceived' class='variant'><span id='FollowingReceived.v' class='invisible'><code>FollowingReceived</code></span></span><div class='docblock'><p>The target account has requested to follow the authenticated user.</p>
-</div><span id='variant.FollowedBy' class='variant'><span id='FollowedBy.v' class='invisible'><code>FollowedBy</code></span></span><div class='docblock'><p>The target account follows the authenticated user.</p>
-</div><span id='variant.Following' class='variant'><span id='Following.v' class='invisible'><code>Following</code></span></span><div class='docblock'><p>The authenticated user follows the target account.</p>
-</div><span id='variant.Blocking' class='variant'><span id='Blocking.v' class='invisible'><code>Blocking</code></span></span><div class='docblock'><p>The authenticated user has blocked the target account.</p>
-</div><span id='variant.Muting' class='variant'><span id='Muting.v' class='invisible'><code>Muting</code></span></span><div class='docblock'><p>The authenticated user has muted the target account.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../egg_mode/user/enum.Connection.html' title='egg_mode::user::Connection'>Connection</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1718' class='srclink' href='../../src/egg_mode/user/structs.rs.html#674' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
-<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div><h2 id='variants' class='variants small-section-header'>
+                   Variants<a href='#variants' class='anchor'></a></h2>
+<span id="variant.None" class="variant small-section-header"><a href="#variant.None" class="anchor field"></a><span id='None.v' class='invisible'><code>None</code></span></span><div class='docblock'><p>The target account has no relation.</p>
+</div><span id="variant.FollowingRequested" class="variant small-section-header"><a href="#variant.FollowingRequested" class="anchor field"></a><span id='FollowingRequested.v' class='invisible'><code>FollowingRequested</code></span></span><div class='docblock'><p>The authenticated user has requested to follow the target account.</p>
+</div><span id="variant.FollowingReceived" class="variant small-section-header"><a href="#variant.FollowingReceived" class="anchor field"></a><span id='FollowingReceived.v' class='invisible'><code>FollowingReceived</code></span></span><div class='docblock'><p>The target account has requested to follow the authenticated user.</p>
+</div><span id="variant.FollowedBy" class="variant small-section-header"><a href="#variant.FollowedBy" class="anchor field"></a><span id='FollowedBy.v' class='invisible'><code>FollowedBy</code></span></span><div class='docblock'><p>The target account follows the authenticated user.</p>
+</div><span id="variant.Following" class="variant small-section-header"><a href="#variant.Following" class="anchor field"></a><span id='Following.v' class='invisible'><code>Following</code></span></span><div class='docblock'><p>The authenticated user follows the target account.</p>
+</div><span id="variant.Blocking" class="variant small-section-header"><a href="#variant.Blocking" class="anchor field"></a><span id='Blocking.v' class='invisible'><code>Blocking</code></span></span><div class='docblock'><p>The authenticated user has blocked the target account.</p>
+</div><span id="variant.Muting" class="variant small-section-header"><a href="#variant.Muting" class="anchor field"></a><span id='Muting.v' class='invisible'><code>Muting</code></span></span><div class='docblock'><p>The authenticated user has muted the target account.</p>
+</div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../../egg_mode/user/enum.Connection.html" title="enum egg_mode::user::Connection">Connection</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/user/structs.rs.html#674' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/user/structs.rs.html#674' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -81,18 +98,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -125,7 +146,6 @@
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

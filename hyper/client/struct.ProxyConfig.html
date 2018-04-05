@@ -9,14 +9,18 @@
 
     <title>hyper::client::ProxyConfig - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'ProxyConfig', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct ProxyConfig</p><div class="sidebar-elems"><p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>client</a></p><script>window.sidebarCurrent = {name: 'ProxyConfig', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,13 +54,13 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>client</a>::<wbr><a class='struct' href=''>ProxyConfig</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>client</a>::<wbr><a class="struct" href=''>ProxyConfig</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-417' class='srclink' href='../../src/hyper/client/mod.rs.html#88-90' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct ProxyConfig&lt;H, S&gt;(pub H, pub <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a>, pub S) <span class='where'>where H: <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='https://doc.rust-lang.org/nightly/collections/borrow/enum.Cow.html' title='collections::borrow::Cow'>Cow</a>&lt;'static, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;&gt;, S: <a class='trait' href='../../hyper/net/trait.SslClient.html' title='hyper::net::SslClient'>SslClient</a>&lt;<a class='struct' href='../../hyper/net/struct.HttpConnector.html' title='hyper::net::HttpConnector'>HttpConnector</a>::Stream&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Send.html' title='core::marker::Send'>Send</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html' title='core::marker::Sync'>Sync</a> + 'static</span>;</pre><div class='docblock'><p>Proxy server configuration with a custom TLS wrapper.</p>
+               </span><a class='srclink' href='../../src/hyper/client/mod.rs.html#88-90' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ProxyConfig&lt;H, S&gt;(pub H, pub <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>, pub S)<br> <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;H: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/alloc/borrow/enum.Cow.html" title="enum alloc::borrow::Cow">Cow</a>&lt;'static, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href="../../hyper/net/trait.SslClient.html" title="trait hyper::net::SslClient">SslClient</a>&lt;&lt;<a class="struct" href="../../hyper/net/struct.HttpConnector.html" title="struct hyper::net::HttpConnector">HttpConnector</a> as <a class="trait" href="../../hyper/net/trait.NetworkConnector.html" title="trait hyper::net::NetworkConnector">NetworkConnector</a>&gt;::<a class="type" href="../../hyper/net/trait.NetworkConnector.html#associatedtype.Stream" title="type hyper::net::NetworkConnector::Stream">Stream</a>&gt; + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static</span>;</pre><div class='docblock'><p>Proxy server configuration with a custom TLS wrapper.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -62,18 +74,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -106,7 +122,6 @@
         window.rootPath = "../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

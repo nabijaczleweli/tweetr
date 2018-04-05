@@ -9,14 +9,18 @@
 
     <title>solicit::http::frame::settings::SettingsFrame - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../../../index.html'>solicit</a>::<wbr><a href='../../index.html'>http</a>::<wbr><a href='../index.html'>frame</a>::<wbr><a href='index.html'>settings</a></p><script>window.sidebarCurrent = {name: 'SettingsFrame', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct SettingsFrame</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#fields">Fields</a><div class="sidebar-links"><a href="#structfield.settings">settings</a></div><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.new">new</a><a href="#method.new_ack">new_ack</a><a href="#method.add_setting">add_setting</a><a href="#method.set_ack">set_ack</a><a href="#method.is_ack">is_ack</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-PartialEq">PartialEq</a><a href="#impl-Debug">Debug</a><a href="#impl-Clone">Clone</a><a href="#impl-Frame">Frame</a></div></div><p class='location'><a href='../../../index.html'>solicit</a>::<wbr><a href='../../index.html'>http</a>::<wbr><a href='../index.html'>frame</a>::<wbr><a href='index.html'>settings</a></p><script>window.sidebarCurrent = {name: 'SettingsFrame', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,92 +54,97 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../../../index.html'>solicit</a>::<wbr><a href='../../index.html'>http</a>::<wbr><a href='../index.html'>frame</a>::<wbr><a href='index.html'>settings</a>::<wbr><a class='struct' href=''>SettingsFrame</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../../index.html'>solicit</a>::<wbr><a href='../../index.html'>http</a>::<wbr><a href='../index.html'>frame</a>::<wbr><a href='index.html'>settings</a>::<wbr><a class="struct" href=''>SettingsFrame</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1446' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#142-150' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#142-150' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct SettingsFrame {
-    pub settings: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../../../solicit/http/frame/settings/enum.HttpSetting.html' title='solicit::http::frame::settings::HttpSetting'>HttpSetting</a>&gt;,
+    pub settings: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="../../../../solicit/http/frame/settings/enum.HttpSetting.html" title="enum solicit::http::frame::settings::HttpSetting">HttpSetting</a>&gt;,
     // some fields omitted
 }</pre><div class='docblock'><p>A struct representing the SETTINGS frames of HTTP/2, as defined in the
 HTTP/2 spec, section 6.5.</p>
-
 <p>The struct does not try to prevent the client from creating malformed
 SETTINGS frames, such as ones that have the ACK flag set along with some
 settings values. The users are responsible to follow the prescribed rules
 before sending the frame to the peer.</p>
-
 <p>On parsing received frames, it treats the following as errors:</p>
-
 <ul>
 <li>ACK flag and a number of settings both set</li>
 <li>Payload length not a multiple of 6</li>
 <li>Stream ID not zero (SETTINGS frames MUST be associated to stream 0)</li>
 </ul>
-
 <p>What is <em>not</em> treated as an error (for now) are settings values out of
-allowed bounds such as a EnablePush being set to something other than 0 or
-1.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.settings' class='structfield'>
-                           <span id='settings.v' class='invisible'>
-                           <code>settings: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='enum' href='../../../../solicit/http/frame/settings/enum.HttpSetting.html' title='solicit::http::frame::settings::HttpSetting'>HttpSetting</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Contains all the settings that are currently set in the frame. It is
+allowed bounds such as a EnablePush being set to something other than 0 or</p>
+<ol>
+<li></li>
+</ol>
+</div><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.settings" class="structfield small-section-header">
+                           <a href="#structfield.settings" class="anchor field"></a>
+                           <span id="settings.v" class='invisible'>
+                           <code>settings: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="../../../../solicit/http/frame/settings/enum.HttpSetting.html" title="enum solicit::http::frame::settings::HttpSetting">HttpSetting</a>&gt;</code>
+                           </span></span><div class='docblock'><p>Contains all the settings that are currently set in the frame. It is
 safe to access this field (to read, add, or remove settings), even
 though a helper method <code>add_setting</code> exists.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-171' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#152-215' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new' class='method'><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span></h4>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#152-215' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>pub fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#154-160' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Creates a new <code>SettingsFrame</code></p>
-</div><h4 id='method.new_ack' class='method'><span id='new_ack.v' class='invisible'><code>fn <a href='#method.new_ack' class='fnname'>new_ack</a>() -&gt; <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span></h4>
+</div><h4 id='method.new_ack' class="method"><span id='new_ack.v' class='invisible'><code>pub fn <a href='#method.new_ack' class='fnname'>new_ack</a>() -&gt; <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#164-169' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>A convenience constructor that returns a <code>SettingsFrame</code> with the ACK
 flag already set and no settings.</p>
-</div><h4 id='method.add_setting' class='method'><span id='add_setting.v' class='invisible'><code>fn <a href='#method.add_setting' class='fnname'>add_setting</a>(&amp;mut self, setting: <a class='enum' href='../../../../solicit/http/frame/settings/enum.HttpSetting.html' title='solicit::http::frame::settings::HttpSetting'>HttpSetting</a>)</code></span></h4>
+</div><h4 id='method.add_setting' class="method"><span id='add_setting.v' class='invisible'><code>pub fn <a href='#method.add_setting' class='fnname'>add_setting</a>(&amp;mut self, setting: <a class="enum" href="../../../../solicit/http/frame/settings/enum.HttpSetting.html" title="enum solicit::http::frame::settings::HttpSetting">HttpSetting</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#172-174' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Adds the given setting to the frame.</p>
-</div><h4 id='method.set_ack' class='method'><span id='set_ack.v' class='invisible'><code>fn <a href='#method.set_ack' class='fnname'>set_ack</a>(&amp;mut self)</code></span></h4>
+</div><h4 id='method.set_ack' class="method"><span id='set_ack.v' class='invisible'><code>pub fn <a href='#method.set_ack' class='fnname'>set_ack</a>(&amp;mut self)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#178-180' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Sets the ACK flag for the frame. This method is just a convenience
 method for calling <code>frame.set_flag(SettingsFlag::Ack)</code>.</p>
-</div><h4 id='method.is_ack' class='method'><span id='is_ack.v' class='invisible'><code>fn <a href='#method.is_ack' class='fnname'>is_ack</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+</div><h4 id='method.is_ack' class="method"><span id='is_ack.v' class='invisible'><code>pub fn <a href='#method.is_ack' class='fnname'>is_ack</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#183-185' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Checks whether the <code>SettingsFrame</code> has an ACK attached to it.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1449' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#139' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.eq' class='method'><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+</div></div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-PartialEq' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code><a href='#impl-PartialEq' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#139' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#139' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
-</div><h4 id='method.ne' class='method'><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#139' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>This method tests for <code>!=</code>.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1464' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#140' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
-<div class='docblock'><p>Formats the value using the given formatter.</p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1471' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#141' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span></h4>
+</div></div><h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#140' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#140' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
+</div></div><h3 id='impl-Clone' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code><a href='#impl-Clone' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#141' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#141' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
-</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#112-114' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
-</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='../../../../solicit/http/frame/trait.Frame.html' title='solicit::http::frame::Frame'>Frame</a> for <a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-187' class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#217-308' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='associatedtype.FlagType' class='type'><span id='FlagType.t' class='invisible'><code>type <a href='../../../../solicit/http/frame/trait.Frame.html#associatedtype.FlagType' class='type'>FlagType</a> = <a class='enum' href='../../../../solicit/http/frame/settings/enum.SettingsFlag.html' title='solicit::http::frame::settings::SettingsFlag'>SettingsFlag</a></code></span></h4>
+</div></div><h3 id='impl-Frame' class='impl'><span class='in-band'><code>impl <a class="trait" href="../../../../solicit/http/frame/trait.Frame.html" title="trait solicit::http::frame::Frame">Frame</a> for <a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a></code><a href='#impl-Frame' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#217-308' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.FlagType' class="type"><span id='FlagType.t' class='invisible'><code>type <a href='../../../../solicit/http/frame/trait.Frame.html#associatedtype.FlagType' class="type">FlagType</a> = <a class="enum" href="../../../../solicit/http/frame/settings/enum.SettingsFlag.html" title="enum solicit::http::frame::settings::SettingsFlag">SettingsFlag</a></code></span></h4>
 <div class='docblock'><p>The type that represents the flags that the particular <code>Frame</code> can take.
 This makes sure that only valid <code>Flag</code>s are used with each <code>Frame</code>.</p>
-</div><h4 id='method.from_raw' class='method'><span id='from_raw.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.from_raw' class='fnname'>from_raw</a>(raw_frame: <a class='struct' href='../../../../solicit/http/frame/struct.RawFrame.html' title='solicit::http::frame::RawFrame'>RawFrame</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../../solicit/http/frame/settings/struct.SettingsFrame.html' title='solicit::http::frame::settings::SettingsFrame'>SettingsFrame</a>&gt;</code></span></h4>
+</div><h4 id='method.from_raw' class="method"><span id='from_raw.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.from_raw' class='fnname'>from_raw</a>(raw_frame: <a class="struct" href="../../../../solicit/http/frame/struct.RawFrame.html" title="struct solicit::http::frame::RawFrame">RawFrame</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../../../solicit/http/frame/settings/struct.SettingsFrame.html" title="struct solicit::http::frame::settings::SettingsFrame">SettingsFrame</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#233-272' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Creates a new <code>SettingsFrame</code> with the given <code>RawFrame</code> (i.e. header and
 payload), if possible.</p>
-
-<h1 id='returns' class='section-header'><a href='#returns'>Returns</a></h1>
+<h1 id="returns" class="section-header"><a href="#returns">Returns</a></h1>
 <p><code>None</code> if a valid <code>SettingsFrame</code> cannot be constructed from the given
 <code>RawFrame</code>. The stream ID <em>must</em> be 0 in order for the frame to be
 valid. If the <code>ACK</code> flag is set, there MUST not be a payload. The
 total payload length must be multiple of 6.</p>
-
 <p>Otherwise, returns a newly constructed <code>SettingsFrame</code>.</p>
-</div><h4 id='method.is_set' class='method'><span id='is_set.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.is_set' class='fnname'>is_set</a>(&amp;self, flag: <a class='enum' href='../../../../solicit/http/frame/settings/enum.SettingsFlag.html' title='solicit::http::frame::settings::SettingsFlag'>SettingsFlag</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h4>
+</div><h4 id='method.is_set' class="method"><span id='is_set.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.is_set' class='fnname'>is_set</a>(&amp;self, flag: <a class="enum" href="../../../../solicit/http/frame/settings/enum.SettingsFlag.html" title="enum solicit::http::frame::settings::SettingsFlag">SettingsFlag</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#275-277' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Tests if the given flag is set for the frame.</p>
-</div><h4 id='method.get_stream_id' class='method'><span id='get_stream_id.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.get_stream_id' class='fnname'>get_stream_id</a>(&amp;self) -&gt; <a class='type' href='../../../../solicit/http/type.StreamId.html' title='solicit::http::StreamId'>StreamId</a></code></span></h4>
+</div><h4 id='method.get_stream_id' class="method"><span id='get_stream_id.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.get_stream_id' class='fnname'>get_stream_id</a>(&amp;self) -&gt; <a class="type" href="../../../../solicit/http/type.StreamId.html" title="type solicit::http::StreamId">StreamId</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#282-284' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the <code>StreamId</code> of the stream to which the frame is associated.</p>
-
 <p>A <code>SettingsFrame</code> always has to be associated to stream <code>0</code>.</p>
-</div><h4 id='method.get_header' class='method'><span id='get_header.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.get_header' class='fnname'>get_header</a>(&amp;self) -&gt; <a class='type' href='../../../../solicit/http/frame/type.FrameHeader.html' title='solicit::http::frame::FrameHeader'>FrameHeader</a></code></span></h4>
+</div><h4 id='method.get_header' class="method"><span id='get_header.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.get_header' class='fnname'>get_header</a>(&amp;self) -&gt; <a class="type" href="../../../../solicit/http/frame/type.FrameHeader.html" title="type solicit::http::frame::FrameHeader">FrameHeader</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#287-289' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a <code>FrameHeader</code> based on the current state of the <code>Frame</code>.</p>
-</div><h4 id='method.set_flag' class='method'><span id='set_flag.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.set_flag' class='fnname'>set_flag</a>(&amp;mut self, flag: <a class='enum' href='../../../../solicit/http/frame/settings/enum.SettingsFlag.html' title='solicit::http::frame::settings::SettingsFlag'>SettingsFlag</a>)</code></span></h4>
+</div><h4 id='method.set_flag' class="method"><span id='set_flag.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.set_flag' class='fnname'>set_flag</a>(&amp;mut self, flag: <a class="enum" href="../../../../solicit/http/frame/settings/enum.SettingsFlag.html" title="enum solicit::http::frame::settings::SettingsFlag">SettingsFlag</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#292-294' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Sets the given flag for the frame.</p>
-</div><h4 id='method.serialize' class='method'><span id='serialize.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.serialize' class='fnname'>serialize</a>(&amp;self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a>&gt;</code></span></h4>
+</div><h4 id='method.serialize' class="method"><span id='serialize.v' class='invisible'><code>fn <a href='../../../../solicit/http/frame/trait.Frame.html#tymethod.serialize' class='fnname'>serialize</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/solicit/http/frame/settings.rs.html#297-307' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a <code>Vec</code> with the serialized representation of the frame.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -142,18 +159,22 @@ total payload length must be multiple of 6.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -186,7 +207,6 @@ total payload length must be multiple of 6.</p>
         window.rootPath = "../../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

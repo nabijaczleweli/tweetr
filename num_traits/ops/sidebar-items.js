@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["checked",""],["saturating",""]]});
+initSidebarItems({"mod":[["checked",""],["inv",""],["saturating",""],["wrapping",""]]});

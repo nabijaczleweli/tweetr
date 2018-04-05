@@ -9,14 +9,18 @@
 
     <title>crypto::curve25519 - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>crypto</a></p><script>window.sidebarCurrent = {name: 'curve25519', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module curve25519</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>crypto</a></p><script>window.sidebarCurrent = {name: 'curve25519', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,88 +54,88 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>crypto</a>::<wbr><a class='mod' href=''>curve25519</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>crypto</a>::<wbr><a class="mod" href=''>curve25519</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2128' class='srclink' href='../../src/crypto/curve25519.rs.html#1-3642' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/crypto/curve25519.rs.html#1-3642' title='goto source code'>[src]</a></span></h1>
 <h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.Fe.html'
-                                  title='crypto::curve25519::Fe'>Fe</a></td>
+                           <td><a class="struct" href="struct.Fe.html"
+                                  title='struct crypto::curve25519::Fe'>Fe</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.GeCached.html'
-                                  title='crypto::curve25519::GeCached'>GeCached</a></td>
+                           <td><a class="struct" href="struct.GeCached.html"
+                                  title='struct crypto::curve25519::GeCached'>GeCached</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.GeP1P1.html'
-                                  title='crypto::curve25519::GeP1P1'>GeP1P1</a></td>
+                           <td><a class="struct" href="struct.GeP2.html"
+                                  title='struct crypto::curve25519::GeP2'>GeP2</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.GeP2.html'
-                                  title='crypto::curve25519::GeP2'>GeP2</a></td>
+                           <td><a class="struct" href="struct.GeP3.html"
+                                  title='struct crypto::curve25519::GeP3'>GeP3</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.GeP3.html'
-                                  title='crypto::curve25519::GeP3'>GeP3</a></td>
+                           <td><a class="struct" href="struct.GeP1P1.html"
+                                  title='struct crypto::curve25519::GeP1P1'>GeP1P1</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.GePrecomp.html'
-                                  title='crypto::curve25519::GePrecomp'>GePrecomp</a></td>
+                           <td><a class="struct" href="struct.GePrecomp.html"
+                                  title='struct crypto::curve25519::GePrecomp'>GePrecomp</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.curve25519.html'
-                                  title='crypto::curve25519::curve25519'>curve25519</a></td>
+                           <td><a class="fn" href="fn.curve25519.html"
+                                  title='fn crypto::curve25519::curve25519'>curve25519</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.curve25519_base.html'
-                                  title='crypto::curve25519::curve25519_base'>curve25519_base</a></td>
+                           <td><a class="fn" href="fn.curve25519_base.html"
+                                  title='fn crypto::curve25519::curve25519_base'>curve25519_base</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.ge_scalarmult_base.html'
-                                  title='crypto::curve25519::ge_scalarmult_base'>ge_scalarmult_base</a></td>
+                           <td><a class="fn" href="fn.ge_scalarmult_base.html"
+                                  title='fn crypto::curve25519::ge_scalarmult_base'>ge_scalarmult_base</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.sc_muladd.html'
-                                  title='crypto::curve25519::sc_muladd'>sc_muladd</a></td>
+                           <td><a class="fn" href="fn.sc_muladd.html"
+                                  title='fn crypto::curve25519::sc_muladd'>sc_muladd</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.sc_reduce.html'
-                                  title='crypto::curve25519::sc_reduce'>sc_reduce</a></td>
+                           <td><a class="fn" href="fn.sc_reduce.html"
+                                  title='fn crypto::curve25519::sc_reduce'>sc_reduce</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
@@ -140,18 +152,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -184,7 +200,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

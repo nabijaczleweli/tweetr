@@ -9,14 +9,18 @@
 
     <title>hyper::http::h1::parse_response - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc fn">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         <p class='location'><a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>h1</a></p><script>window.sidebarCurrent = {name: 'parse_response', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,13 +54,13 @@
         </form>
     </nav>
 
-    <section id='main' class="content fn">
-<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>h1</a>::<wbr><a class='fn' href=''>parse_response</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>hyper</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>h1</a>::<wbr><a class="fn" href=''>parse_response</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2546' class='srclink' href='../../../src/hyper/http/h1.rs.html#865-867' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn parse_response&lt;R:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/std/io/trait.Read.html' title='std::io::Read'>Read</a>&gt;(buf: &amp;mut BufReader&lt;R&gt;)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../../hyper/error/type.Result.html' title='hyper::error::Result'>Result</a>&lt;<a class='struct' href='../../../hyper/http/h1/struct.Incoming.html' title='hyper::http::h1::Incoming'>Incoming</a>&lt;<a class='struct' href='../../../hyper/http/struct.RawStatus.html' title='hyper::http::RawStatus'>RawStatus</a>&gt;&gt;</pre><div class='docblock'><p>Parses a response into an Incoming message head.</p>
+               </span><a class='srclink' href='../../../src/hyper/http/h1.rs.html#865-867' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn parse_response&lt;R:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/std/io/trait.Read.html" title="trait std::io::Read">Read</a>&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;buf: &amp;mut BufReader&lt;R&gt;<br>) -&gt; <a class="type" href="../../../hyper/error/type.Result.html" title="type hyper::error::Result">Result</a>&lt;<a class="struct" href="../../../hyper/http/h1/struct.Incoming.html" title="struct hyper::http::h1::Incoming">Incoming</a>&lt;<a class="struct" href="../../../hyper/http/struct.RawStatus.html" title="struct hyper::http::RawStatus">RawStatus</a>&gt;&gt;</pre><div class='docblock'><p>Parses a response into an Incoming message head.</p>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -62,18 +74,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -106,7 +122,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

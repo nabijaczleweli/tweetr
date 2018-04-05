@@ -9,14 +9,18 @@
 
     <title>async.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -759,722 +771,722 @@
 <span id="715">715</span>
 <span id="716">716</span>
 <span id="717">717</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Contains an implementation of an asynchronous client.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! It allows users to make requests to the same underlying connection from</span>
-<span class='doccomment'>//! different threads concurrently, as well as to receive the response</span>
-<span class='doccomment'>//! asynchronously.</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
+</pre><pre class="rust ">
+<span class="doccomment">//! Contains an implementation of an asynchronous client.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! It allows users to make requests to the same underlying connection from</span>
+<span class="doccomment">//! different threads concurrently, as well as to receive the response</span>
+<span class="doccomment">//! asynchronously.</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>::{<span class='ident'>Sender</span>, <span class='ident'>Receiver</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>mpsc</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::{<span class="ident">Sender</span>, <span class="ident">Receiver</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
 
-<span class='kw'>use</span> <span class='ident'>http</span>::{<span class='ident'>StreamId</span>, <span class='ident'>HttpError</span>, <span class='ident'>Response</span>, <span class='ident'>Header</span>, <span class='ident'>HttpResult</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::<span class='ident'>RawFrame</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>transport</span>::<span class='ident'>TransportStream</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>connection</span>::{<span class='ident'>SendFrame</span>, <span class='ident'>ReceiveFrame</span>, <span class='ident'>HttpFrame</span>, <span class='ident'>HttpConnection</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>session</span>::{<span class='ident'>SessionState</span>, <span class='ident'>DefaultSessionState</span>, <span class='ident'>DefaultStream</span>, <span class='ident'>Stream</span>};
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>client</span>::{<span class='ident'>ClientConnection</span>, <span class='ident'>HttpConnect</span>, <span class='ident'>ClientStream</span>, <span class='ident'>RequestStream</span>};
+<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">StreamId</span>, <span class="ident">HttpError</span>, <span class="ident">Response</span>, <span class="ident">Header</span>, <span class="ident">HttpResult</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::<span class="ident">RawFrame</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">transport</span>::<span class="ident">TransportStream</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">connection</span>::{<span class="ident">SendFrame</span>, <span class="ident">ReceiveFrame</span>, <span class="ident">HttpFrame</span>, <span class="ident">HttpConnection</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">session</span>::{<span class="ident">SessionState</span>, <span class="ident">DefaultSessionState</span>, <span class="ident">DefaultStream</span>, <span class="ident">Stream</span>};
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">client</span>::{<span class="ident">ClientConnection</span>, <span class="ident">HttpConnect</span>, <span class="ident">ClientStream</span>, <span class="ident">RequestStream</span>};
 
-<span class='doccomment'>/// A struct representing an asynchronously dispatched request. It is used</span>
-<span class='doccomment'>/// internally be the `ClientService` and `Client` structs.</span>
-<span class='kw'>struct</span> <span class='ident'>AsyncRequest</span> {
-    <span class='doccomment'>/// The method of the request</span>
-    <span class='kw'>pub</span> <span class='ident'>method</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The path being requested</span>
-    <span class='kw'>pub</span> <span class='ident'>path</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Extra headers that should be included in the request. Does *not*</span>
-    <span class='doccomment'>/// include meta-headers.</span>
-    <span class='kw'>pub</span> <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The body of the request, if any.</span>
-    <span class='kw'>pub</span> <span class='ident'>body</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>/// The sender side of a channel where the response to this request should</span>
-    <span class='doccomment'>/// be delivered.</span>
-    <span class='ident'>tx</span>: <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A struct representing an asynchronously dispatched request. It is used</span>
+<span class="doccomment">/// internally be the `ClientService` and `Client` structs.</span>
+<span class="kw">struct</span> <span class="ident">AsyncRequest</span> {
+    <span class="doccomment">/// The method of the request</span>
+    <span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The path being requested</span>
+    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Extra headers that should be included in the request. Does *not*</span>
+    <span class="doccomment">/// include meta-headers.</span>
+    <span class="kw">pub</span> <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The body of the request, if any.</span>
+    <span class="kw">pub</span> <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">/// The sender side of a channel where the response to this request should</span>
+    <span class="doccomment">/// be delivered.</span>
+    <span class="ident">tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>,
 }
 
-<span class='doccomment'>/// A struct that buffers `RawFrame`s in an internal `mpsc` channel and sends them using the</span>
-<span class='doccomment'>/// wrapped `SendFrame` instance when the `send_next` method is called.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Additionally, it provides a `ChannelFrameSenderHandle` instance that implements the `SendFrame`</span>
-<span class='doccomment'>/// trait and as such can be passed to the `HttpConnection`. This handler simply queues the frame</span>
-<span class='doccomment'>/// into the internal channel, without ever blocking.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// As such, this is a convenience struct that makes it possible to provide non-blocking writes</span>
-<span class='doccomment'>/// from within `HttpConnection`s, while handling the actual writes using a `SendFrame`</span>
-<span class='doccomment'>/// implementation that will block until the frame is sent on a separate thread.</span>
-<span class='kw'>struct</span> <span class='ident'>ChannelFrameSender</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>SendFrame</span> {
-    <span class='doccomment'>/// The receiving end of the channel. Buffers the frames that are to be sent.</span>
-    <span class='ident'>rx</span>: <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>RawFrame</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The `SendFrame` instance that will perform the actual writes from within the `send_next`</span>
-    <span class='doccomment'>/// method.</span>
-    <span class='ident'>inner</span>: <span class='ident'>S</span>,
+<span class="doccomment">/// A struct that buffers `RawFrame`s in an internal `mpsc` channel and sends them using the</span>
+<span class="doccomment">/// wrapped `SendFrame` instance when the `send_next` method is called.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Additionally, it provides a `ChannelFrameSenderHandle` instance that implements the `SendFrame`</span>
+<span class="doccomment">/// trait and as such can be passed to the `HttpConnection`. This handler simply queues the frame</span>
+<span class="doccomment">/// into the internal channel, without ever blocking.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// As such, this is a convenience struct that makes it possible to provide non-blocking writes</span>
+<span class="doccomment">/// from within `HttpConnection`s, while handling the actual writes using a `SendFrame`</span>
+<span class="doccomment">/// implementation that will block until the frame is sent on a separate thread.</span>
+<span class="kw">struct</span> <span class="ident">ChannelFrameSender</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">SendFrame</span> {
+    <span class="doccomment">/// The receiving end of the channel. Buffers the frames that are to be sent.</span>
+    <span class="ident">rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">RawFrame</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `SendFrame` instance that will perform the actual writes from within the `send_next`</span>
+    <span class="doccomment">/// method.</span>
+    <span class="ident">inner</span>: <span class="ident">S</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>ChannelFrameSender</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>SendFrame</span> {
-    <span class='doccomment'>/// Creates a new `ChannelFrameSender` that will use the provided `SendFrame` instance within</span>
-    <span class='doccomment'>/// the `send_next` method in order to perform the final send to the remote peer.</span>
-    <span class='doccomment'>/// The `ChannelFrameSenderHandle` that is returned can be used to queue frames for sending</span>
-    <span class='doccomment'>/// from within `HttpConnection`s, as it implements the `SendFrame` trait.</span>
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>inner</span>: <span class='ident'>S</span>) <span class='op'>-&gt;</span> (<span class='ident'>ChannelFrameSender</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>, <span class='ident'>ChannelFrameSenderHandle</span>) {
-        <span class='kw'>let</span> (<span class='ident'>send</span>, <span class='ident'>recv</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">ChannelFrameSender</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">SendFrame</span> {
+    <span class="doccomment">/// Creates a new `ChannelFrameSender` that will use the provided `SendFrame` instance within</span>
+    <span class="doccomment">/// the `send_next` method in order to perform the final send to the remote peer.</span>
+    <span class="doccomment">/// The `ChannelFrameSenderHandle` that is returned can be used to queue frames for sending</span>
+    <span class="doccomment">/// from within `HttpConnection`s, as it implements the `SendFrame` trait.</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">S</span>) <span class="op">-&gt;</span> (<span class="ident">ChannelFrameSender</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">ChannelFrameSenderHandle</span>) {
+        <span class="kw">let</span> (<span class="ident">send</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>();
 
-        <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>ChannelFrameSenderHandle</span> { <span class='ident'>tx</span>: <span class='ident'>send</span> };
-        <span class='kw'>let</span> <span class='ident'>sender</span> <span class='op'>=</span> <span class='ident'>ChannelFrameSender</span> {
-            <span class='ident'>rx</span>: <span class='ident'>recv</span>,
-            <span class='ident'>inner</span>: <span class='ident'>inner</span>,
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">ChannelFrameSenderHandle</span> { <span class="ident">tx</span>: <span class="ident">send</span> };
+        <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ChannelFrameSender</span> {
+            <span class="ident">rx</span>: <span class="ident">recv</span>,
+            <span class="ident">inner</span>: <span class="ident">inner</span>,
         };
-        (<span class='ident'>sender</span>, <span class='ident'>handle</span>)
+        (<span class="ident">sender</span>, <span class="ident">handle</span>)
     }
 
-    <span class='doccomment'>/// Performs the send of the next frame that is buffered in the internal channel of the struct.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If there is no frame in the channel, it will block until there is one there.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the channel becomes disconnected from all senders, indicating that all handles to the</span>
-    <span class='doccomment'>/// sender have been dropped, the mehod will return an error.</span>
-    <span class='kw'>fn</span> <span class='ident'>send_next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(
-            <span class='self'>self</span>.<span class='ident'>rx</span>.<span class='ident'>recv</span>()
-                   .<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
-                       <span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;Unable to send frame&quot;</span>)
+    <span class="doccomment">/// Performs the send of the next frame that is buffered in the internal channel of the struct.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there is no frame in the channel, it will block until there is one there.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the channel becomes disconnected from all senders, indicating that all handles to the</span>
+    <span class="doccomment">/// sender have been dropped, the mehod will return an error.</span>
+    <span class="kw">fn</span> <span class="ident">send_next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(
+            <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">recv</span>()
+                   .<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                       <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Unable to send frame&quot;</span>)
                    })
         );
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Performing the actual send frame IO&quot;</span>);
-        <span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>send_raw_frame</span>(<span class='ident'>frame</span>)
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Performing the actual send frame IO&quot;</span>);
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">send_raw_frame</span>(<span class="ident">frame</span>)
     }
 }
 
-<span class='doccomment'>/// A handle to the `ChannelFrameSender` and an implementation of the `SendFrame` trait. It simply</span>
-<span class='doccomment'>/// queues the given frames into the send queue of the `ChannelFrameSender` without ever blocking.</span>
-<span class='doccomment'>/// (Except possibly to allocate some memory, as per the `mpsc::channel` specification.)</span>
-<span class='kw'>struct</span> <span class='ident'>ChannelFrameSenderHandle</span> {
-    <span class='doccomment'>/// The sender side of the channel that buffers the frames to be written. Allows the handle to</span>
-    <span class='doccomment'>/// queue the frame for future writing without blocking on the IO.</span>
-    <span class='ident'>tx</span>: <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>RawFrame</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A handle to the `ChannelFrameSender` and an implementation of the `SendFrame` trait. It simply</span>
+<span class="doccomment">/// queues the given frames into the send queue of the `ChannelFrameSender` without ever blocking.</span>
+<span class="doccomment">/// (Except possibly to allocate some memory, as per the `mpsc::channel` specification.)</span>
+<span class="kw">struct</span> <span class="ident">ChannelFrameSenderHandle</span> {
+    <span class="doccomment">/// The sender side of the channel that buffers the frames to be written. Allows the handle to</span>
+    <span class="doccomment">/// queue the frame for future writing without blocking on the IO.</span>
+    <span class="ident">tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">RawFrame</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>SendFrame</span> <span class='kw'>for</span> <span class='ident'>ChannelFrameSenderHandle</span> {
-    <span class='kw'>fn</span> <span class='ident'>send_raw_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>frame</span>: <span class='ident'>RawFrame</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>frame</span>)
-                    .<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
-                        <span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;Unable to send frame&quot;</span>)
+<span class="kw">impl</span> <span class="ident">SendFrame</span> <span class="kw">for</span> <span class="ident">ChannelFrameSenderHandle</span> {
+    <span class="kw">fn</span> <span class="ident">send_raw_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">RawFrame</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="ident">frame</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Unable to send frame&quot;</span>)
                     }));
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Queued the frame for sending...&quot;</span>);
-        <span class='prelude-val'>Ok</span>(())
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Queued the frame for sending...&quot;</span>);
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class='doccomment'>/// A struct that buffers `HttpFrame`s read by the wrapped `ReceiveFrame` instance in an internal</span>
-<span class='doccomment'>/// `mpsc` channel. The reads from the wrapped `ReceiveFrame` instance are triggered by calls to</span>
-<span class='doccomment'>/// the `read_next` method.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Additionally, it provides a `ChannelFrameReceiverHandle` instance that implements the</span>
-<span class='doccomment'>/// `ReceiveFrame` trait, such that it pops the next available frame from the internal channel.</span>
-<span class='doccomment'>/// If there are no available frames, it will block, so care must be taken to trigger the</span>
-<span class='doccomment'>/// connection&#39;s frame handling only when there are buffered frames, if it is not to block.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// As such, this is a convenience struct that makes it possible to provide non-blocking reads</span>
-<span class='doccomment'>/// from within `HttpConnection`s, while handling the actual reads using a `ReceiveFrame`</span>
-<span class='doccomment'>/// implementation that can block. (Predicated on triggering a single frame handle operation on</span>
-<span class='doccomment'>/// the connection for each successfully executed `read_next`.)</span>
-<span class='kw'>struct</span> <span class='ident'>ChannelFrameReceiver</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>R</span>: <span class='ident'>ReceiveFrame</span> {
-    <span class='doccomment'>/// The sender side of the channel. Buffers the frames read by the wrapped `ReceiveFrame`</span>
-    <span class='doccomment'>/// instance for future consumation by the associated `ChannelFrameReceiverHandle`.</span>
-    <span class='ident'>tx</span>: <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>HttpFrame</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The `ReceiveFrame` instance that performs the actual reading of the frame, used from within</span>
-    <span class='doccomment'>/// the `read_next` method.</span>
-    <span class='ident'>inner</span>: <span class='ident'>R</span>,
+<span class="doccomment">/// A struct that buffers `HttpFrame`s read by the wrapped `ReceiveFrame` instance in an internal</span>
+<span class="doccomment">/// `mpsc` channel. The reads from the wrapped `ReceiveFrame` instance are triggered by calls to</span>
+<span class="doccomment">/// the `read_next` method.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Additionally, it provides a `ChannelFrameReceiverHandle` instance that implements the</span>
+<span class="doccomment">/// `ReceiveFrame` trait, such that it pops the next available frame from the internal channel.</span>
+<span class="doccomment">/// If there are no available frames, it will block, so care must be taken to trigger the</span>
+<span class="doccomment">/// connection&#39;s frame handling only when there are buffered frames, if it is not to block.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// As such, this is a convenience struct that makes it possible to provide non-blocking reads</span>
+<span class="doccomment">/// from within `HttpConnection`s, while handling the actual reads using a `ReceiveFrame`</span>
+<span class="doccomment">/// implementation that can block. (Predicated on triggering a single frame handle operation on</span>
+<span class="doccomment">/// the connection for each successfully executed `read_next`.)</span>
+<span class="kw">struct</span> <span class="ident">ChannelFrameReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">ReceiveFrame</span> {
+    <span class="doccomment">/// The sender side of the channel. Buffers the frames read by the wrapped `ReceiveFrame`</span>
+    <span class="doccomment">/// instance for future consumation by the associated `ChannelFrameReceiverHandle`.</span>
+    <span class="ident">tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">HttpFrame</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `ReceiveFrame` instance that performs the actual reading of the frame, used from within</span>
+    <span class="doccomment">/// the `read_next` method.</span>
+    <span class="ident">inner</span>: <span class="ident">R</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span> <span class='ident'>ChannelFrameReceiver</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>R</span>: <span class='ident'>ReceiveFrame</span> {
-    <span class='doccomment'>/// Creates a new `ChannelFrameReceiver`, as well as the associated</span>
-    <span class='doccomment'>/// `ChannelFrameReceiverHandle`.</span>
-    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>inner</span>: <span class='ident'>R</span>) <span class='op'>-&gt;</span> (<span class='ident'>ChannelFrameReceiver</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span>, <span class='ident'>ChannelFrameReceiverHandle</span>) {
-        <span class='kw'>let</span> (<span class='ident'>send</span>, <span class='ident'>recv</span>) <span class='op'>=</span> <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">ChannelFrameReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">ReceiveFrame</span> {
+    <span class="doccomment">/// Creates a new `ChannelFrameReceiver`, as well as the associated</span>
+    <span class="doccomment">/// `ChannelFrameReceiverHandle`.</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">R</span>) <span class="op">-&gt;</span> (<span class="ident">ChannelFrameReceiver</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">ChannelFrameReceiverHandle</span>) {
+        <span class="kw">let</span> (<span class="ident">send</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">mpsc</span>::<span class="ident">channel</span>();
 
-        <span class='kw'>let</span> <span class='ident'>handle</span> <span class='op'>=</span> <span class='ident'>ChannelFrameReceiverHandle</span> { <span class='ident'>rx</span>: <span class='ident'>recv</span> };
-        <span class='kw'>let</span> <span class='ident'>receiver</span> <span class='op'>=</span> <span class='ident'>ChannelFrameReceiver</span> {
-            <span class='ident'>tx</span>: <span class='ident'>send</span>,
-            <span class='ident'>inner</span>: <span class='ident'>inner</span>,
+        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">ChannelFrameReceiverHandle</span> { <span class="ident">rx</span>: <span class="ident">recv</span> };
+        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">ChannelFrameReceiver</span> {
+            <span class="ident">tx</span>: <span class="ident">send</span>,
+            <span class="ident">inner</span>: <span class="ident">inner</span>,
         };
-        (<span class='ident'>receiver</span>, <span class='ident'>handle</span>)
+        (<span class="ident">receiver</span>, <span class="ident">handle</span>)
     }
 
-    <span class='doccomment'>/// Performs a `recv_frame` operation on the wrapped `ReceiveFrame` instance, possibly blocking</span>
-    <span class='doccomment'>/// the thread in the process, depending on the implementation of the trait. Once a frame is</span>
-    <span class='doccomment'>/// returned, it will buffer it within the internal channel.</span>
-    <span class='kw'>fn</span> <span class='ident'>read_next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>inner</span>.<span class='ident'>recv_frame</span>());
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>frame</span>)
-                    .<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
-                        <span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;Unable to read frame&quot;</span>)
+    <span class="doccomment">/// Performs a `recv_frame` operation on the wrapped `ReceiveFrame` instance, possibly blocking</span>
+    <span class="doccomment">/// the thread in the process, depending on the implementation of the trait. Once a frame is</span>
+    <span class="doccomment">/// returned, it will buffer it within the internal channel.</span>
+    <span class="kw">fn</span> <span class="ident">read_next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">recv_frame</span>());
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="ident">frame</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                        <span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Unable to read frame&quot;</span>)
                     }));
-        <span class='prelude-val'>Ok</span>(())
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class='doccomment'>/// A handle to the `ChannelFrameReceiver` and an implementation of the `ReceiveFrame` trait.</span>
-<span class='doccomment'>/// It simply pops the next frame from the internal channel that buffers the frames read by the</span>
-<span class='doccomment'>/// `ReceiveFrame` instance wrapped by the associated `ChannelFrameReceiver`. If there are no</span>
-<span class='doccomment'>/// frames currently buffered, it blocks until there is one. Therefore, the `handle_next_frame`</span>
-<span class='doccomment'>/// method of the `HttpConnection` that relies on the IO provided by this `ReceiveFrame`</span>
-<span class='doccomment'>/// implementation should be triggered only when sure that there are buffered frames, if blocking</span>
-<span class='doccomment'>/// handles are to be avoided.</span>
-<span class='kw'>struct</span> <span class='ident'>ChannelFrameReceiverHandle</span> {
-    <span class='doccomment'>/// The receiver end of the channel that buffers the received frames.</span>
-    <span class='ident'>rx</span>: <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>HttpFrame</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A handle to the `ChannelFrameReceiver` and an implementation of the `ReceiveFrame` trait.</span>
+<span class="doccomment">/// It simply pops the next frame from the internal channel that buffers the frames read by the</span>
+<span class="doccomment">/// `ReceiveFrame` instance wrapped by the associated `ChannelFrameReceiver`. If there are no</span>
+<span class="doccomment">/// frames currently buffered, it blocks until there is one. Therefore, the `handle_next_frame`</span>
+<span class="doccomment">/// method of the `HttpConnection` that relies on the IO provided by this `ReceiveFrame`</span>
+<span class="doccomment">/// implementation should be triggered only when sure that there are buffered frames, if blocking</span>
+<span class="doccomment">/// handles are to be avoided.</span>
+<span class="kw">struct</span> <span class="ident">ChannelFrameReceiverHandle</span> {
+    <span class="doccomment">/// The receiver end of the channel that buffers the received frames.</span>
+    <span class="ident">rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">HttpFrame</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>ReceiveFrame</span> <span class='kw'>for</span> <span class='ident'>ChannelFrameReceiverHandle</span> {
-    <span class='kw'>fn</span> <span class='ident'>recv_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HttpResult</span><span class='op'>&lt;</span><span class='ident'>HttpFrame</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>rx</span>.<span class='ident'>recv</span>()
-            .<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
-                <span class='ident'>HttpError</span>::<span class='ident'>from</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>, <span class='string'>&quot;Unable to read frame&quot;</span>))
+<span class="kw">impl</span> <span class="ident">ReceiveFrame</span> <span class="kw">for</span> <span class="ident">ChannelFrameReceiverHandle</span> {
+    <span class="kw">fn</span> <span class="ident">recv_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HttpResult</span><span class="op">&lt;</span><span class="ident">HttpFrame</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">recv</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span>_<span class="op">|</span> {
+                <span class="ident">HttpError</span>::<span class="ident">from</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>, <span class="string">&quot;Unable to read frame&quot;</span>))
             })
     }
 }
 
-<span class='doccomment'>/// An enum that represents errors that can be raised by the operation of a</span>
-<span class='doccomment'>/// `ClientService`.</span>
-<span class='kw'>enum</span> <span class='ident'>ClientServiceErr</span> {
-    <span class='doccomment'>/// Corresponds to the case where the service has finished its operation.</span>
-    <span class='ident'>Done</span>,
-    <span class='doccomment'>/// Corresponds to the case where the service is unable to continue due to</span>
-    <span class='doccomment'>/// an error that occurred on the underlying HTTP/2 connection.</span>
-    <span class='ident'>Http</span>(<span class='ident'>HttpError</span>),
+<span class="doccomment">/// An enum that represents errors that can be raised by the operation of a</span>
+<span class="doccomment">/// `ClientService`.</span>
+<span class="kw">enum</span> <span class="ident">ClientServiceErr</span> {
+    <span class="doccomment">/// Corresponds to the case where the service has finished its operation.</span>
+    <span class="ident">Done</span>,
+    <span class="doccomment">/// Corresponds to the case where the service is unable to continue due to</span>
+    <span class="doccomment">/// an error that occurred on the underlying HTTP/2 connection.</span>
+    <span class="ident">Http</span>(<span class="ident">HttpError</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>HttpError</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>ClientServiceErr</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>err</span>: <span class='ident'>HttpError</span>) <span class='op'>-&gt;</span> <span class='ident'>ClientServiceErr</span> { <span class='ident'>ClientServiceErr</span>::<span class='ident'>Http</span>(<span class='ident'>err</span>) }
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientServiceErr</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HttpError</span>) <span class="op">-&gt;</span> <span class="ident">ClientServiceErr</span> { <span class="ident">ClientServiceErr</span>::<span class="ident">Http</span>(<span class="ident">err</span>) }
 }
 
-<span class='doccomment'>/// An enum representing the types of work that the `ClientService` can perform from within its</span>
-<span class='doccomment'>/// `run_once` method.</span>
-<span class='kw'>enum</span> <span class='ident'>WorkItem</span> {
-    <span class='doccomment'>/// Queue a new request to the HTTP/2 connection.</span>
-    <span class='ident'>Request</span>(<span class='ident'>AsyncRequest</span>),
-    <span class='doccomment'>/// Trigger a new `handle_next_frame`. The work item should be queued only when there is a</span>
-    <span class='doccomment'>/// frame to be handled to avoid blocking the `run_once` call.</span>
-    <span class='ident'>HandleFrame</span>,
-    <span class='doccomment'>/// Trigger a new `send_next_data` operation.</span>
-    <span class='ident'>SendData</span>,
-    <span class='doccomment'>/// Signals to the service that a new client is connected. Helps it keep track of whether there</span>
-    <span class='doccomment'>/// are clients that would expect a response.</span>
-    <span class='ident'>NewClient</span>,
-    <span class='doccomment'>/// Signals to the service that a client has disconnected. Helps it keep track of whether there</span>
-    <span class='doccomment'>/// are clients that would expect a response.</span>
-    <span class='ident'>ClientLeft</span>,
+<span class="doccomment">/// An enum representing the types of work that the `ClientService` can perform from within its</span>
+<span class="doccomment">/// `run_once` method.</span>
+<span class="kw">enum</span> <span class="ident">WorkItem</span> {
+    <span class="doccomment">/// Queue a new request to the HTTP/2 connection.</span>
+    <span class="ident">Request</span>(<span class="ident">AsyncRequest</span>),
+    <span class="doccomment">/// Trigger a new `handle_next_frame`. The work item should be queued only when there is a</span>
+    <span class="doccomment">/// frame to be handled to avoid blocking the `run_once` call.</span>
+    <span class="ident">HandleFrame</span>,
+    <span class="doccomment">/// Trigger a new `send_next_data` operation.</span>
+    <span class="ident">SendData</span>,
+    <span class="doccomment">/// Signals to the service that a new client is connected. Helps it keep track of whether there</span>
+    <span class="doccomment">/// are clients that would expect a response.</span>
+    <span class="ident">NewClient</span>,
+    <span class="doccomment">/// Signals to the service that a client has disconnected. Helps it keep track of whether there</span>
+    <span class="doccomment">/// are clients that would expect a response.</span>
+    <span class="ident">ClientLeft</span>,
 }
 
-<span class='doccomment'>/// An internal struct encapsulating a service that lets multiple clients</span>
-<span class='doccomment'>/// issue concurrent requests to the same HTTP/2 connection.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The service maintains an internal queue of `WorkItem`s that indicate what the operations that</span>
-<span class='doccomment'>/// it should perform. The next operation from the queue is performed on each `run_once` method</span>
-<span class='doccomment'>/// call.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// It handles issuing new requests (corresponding to `WorkItem::Request` work item), handling the</span>
-<span class='doccomment'>/// next received frame (when indicated by the `WorkItem::HandleFrame`), and tracks the number of</span>
-<span class='doccomment'>/// connected clients (`run_once` returns an error once there are no more clients connected to the</span>
-<span class='doccomment'>/// service).</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If there is no work in the queue, the `run_once` method blocks.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Essentially, this represents a simplified event loop that handles events queued on the work</span>
-<span class='doccomment'>/// queue (blocking to wait for new work when none is available; does not spin). Therefore, the</span>
-<span class='doccomment'>/// user of the `ClientService` needs to provide a dedicated thread in which to run the `run_once`</span>
-<span class='doccomment'>/// event loop handler.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Additionally, the client needs to make sure to perform the actual socket IO (which is fully</span>
-<span class='doccomment'>/// blocking, without even timeout support currently in Rust) in threads dedicated for that, by</span>
-<span class='doccomment'>/// calling the `send_next` or `read_next` methods of the `ChannelFrameSender` or</span>
-<span class='doccomment'>/// `ChannelFrameReceiver`, which are returned from the `ClientService` constructor.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// TODO: Technically, the `run_once` method could take a `WorkItem`, so a single event loop could</span>
-<span class='doccomment'>///       dispatch work items to a corresponding service, removing the need for the</span>
-<span class='doccomment'>///       thread-per-service requirement. However, at that point we&#39;re nearing a reimplementation</span>
-<span class='doccomment'>///       of a real event loop, which is slightly out of scope of the `solicit` library, as</span>
-<span class='doccomment'>///       imagined; the async client is (for now) supposed to be a proof-of-concept</span>
-<span class='doccomment'>///       implementation of a high-level async/concurrent HTTP/2 client.</span>
-<span class='kw'>struct</span> <span class='ident'>ClientService</span> {
-    <span class='doccomment'>/// The ID that will be assigned to the next client-initiated stream.</span>
-    <span class='ident'>next_stream_id</span>: <span class='ident'>StreamId</span>,
-    <span class='doccomment'>/// The number of requests that have been sent, but are yet unanswered.</span>
-    <span class='ident'>outstanding_reqs</span>: <span class='ident'>u32</span>,
-    <span class='doccomment'>/// The limit to the number of requests that can be pending (unanswered,</span>
-    <span class='doccomment'>/// but sent).</span>
-    <span class='ident'>limit</span>: <span class='ident'>u32</span>,
-    <span class='doccomment'>/// The connection that is used for underlying HTTP/2 communication.</span>
-    <span class='ident'>conn</span>: <span class='ident'>ClientConnection</span><span class='op'>&lt;</span><span class='ident'>ChannelFrameSenderHandle</span>, <span class='ident'>ChannelFrameReceiverHandle</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// A mapping of stream IDs to the sender side of a channel that is</span>
-    <span class='doccomment'>/// expecting a response to the request that is to arrive on that stream.</span>
-    <span class='ident'>chans</span>: <span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='ident'>StreamId</span>, <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;&gt;</span>,
-    <span class='doccomment'>/// The receiver end of a channel to which work items for the service are</span>
-    <span class='doccomment'>/// queued. Work items include the variants of the `WorkItem` enum.</span>
-    <span class='ident'>work_queue</span>: <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>WorkItem</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The queue of `AsyncRequest`s that haven&#39;t yet been sent to the server.</span>
-    <span class='ident'>request_queue</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>AsyncRequest</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Tracks the number of currently connected clients -- once it reaches 0, the `run_once`</span>
-    <span class='doccomment'>/// method returns an error.</span>
-    <span class='ident'>client_count</span>: <span class='ident'>i32</span>,
-    <span class='doccomment'>/// The name of the host the connection is established to.</span>
-    <span class='ident'>host</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Whether the connection has already been initialized.</span>
-    <span class='ident'>initialized</span>: <span class='ident'>bool</span>,
+<span class="doccomment">/// An internal struct encapsulating a service that lets multiple clients</span>
+<span class="doccomment">/// issue concurrent requests to the same HTTP/2 connection.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The service maintains an internal queue of `WorkItem`s that indicate what the operations that</span>
+<span class="doccomment">/// it should perform. The next operation from the queue is performed on each `run_once` method</span>
+<span class="doccomment">/// call.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It handles issuing new requests (corresponding to `WorkItem::Request` work item), handling the</span>
+<span class="doccomment">/// next received frame (when indicated by the `WorkItem::HandleFrame`), and tracks the number of</span>
+<span class="doccomment">/// connected clients (`run_once` returns an error once there are no more clients connected to the</span>
+<span class="doccomment">/// service).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If there is no work in the queue, the `run_once` method blocks.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Essentially, this represents a simplified event loop that handles events queued on the work</span>
+<span class="doccomment">/// queue (blocking to wait for new work when none is available; does not spin). Therefore, the</span>
+<span class="doccomment">/// user of the `ClientService` needs to provide a dedicated thread in which to run the `run_once`</span>
+<span class="doccomment">/// event loop handler.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Additionally, the client needs to make sure to perform the actual socket IO (which is fully</span>
+<span class="doccomment">/// blocking, without even timeout support currently in Rust) in threads dedicated for that, by</span>
+<span class="doccomment">/// calling the `send_next` or `read_next` methods of the `ChannelFrameSender` or</span>
+<span class="doccomment">/// `ChannelFrameReceiver`, which are returned from the `ClientService` constructor.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// TODO: Technically, the `run_once` method could take a `WorkItem`, so a single event loop could</span>
+<span class="doccomment">///       dispatch work items to a corresponding service, removing the need for the</span>
+<span class="doccomment">///       thread-per-service requirement. However, at that point we&#39;re nearing a reimplementation</span>
+<span class="doccomment">///       of a real event loop, which is slightly out of scope of the `solicit` library, as</span>
+<span class="doccomment">///       imagined; the async client is (for now) supposed to be a proof-of-concept</span>
+<span class="doccomment">///       implementation of a high-level async/concurrent HTTP/2 client.</span>
+<span class="kw">struct</span> <span class="ident">ClientService</span> {
+    <span class="doccomment">/// The ID that will be assigned to the next client-initiated stream.</span>
+    <span class="ident">next_stream_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// The number of requests that have been sent, but are yet unanswered.</span>
+    <span class="ident">outstanding_reqs</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The limit to the number of requests that can be pending (unanswered,</span>
+    <span class="doccomment">/// but sent).</span>
+    <span class="ident">limit</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The connection that is used for underlying HTTP/2 communication.</span>
+    <span class="ident">conn</span>: <span class="ident">ClientConnection</span><span class="op">&lt;</span><span class="ident">ChannelFrameSenderHandle</span>, <span class="ident">ChannelFrameReceiverHandle</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A mapping of stream IDs to the sender side of a channel that is</span>
+    <span class="doccomment">/// expecting a response to the request that is to arrive on that stream.</span>
+    <span class="ident">chans</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;&gt;</span>,
+    <span class="doccomment">/// The receiver end of a channel to which work items for the service are</span>
+    <span class="doccomment">/// queued. Work items include the variants of the `WorkItem` enum.</span>
+    <span class="ident">work_queue</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">WorkItem</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The queue of `AsyncRequest`s that haven&#39;t yet been sent to the server.</span>
+    <span class="ident">request_queue</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AsyncRequest</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Tracks the number of currently connected clients -- once it reaches 0, the `run_once`</span>
+    <span class="doccomment">/// method returns an error.</span>
+    <span class="ident">client_count</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// The name of the host the connection is established to.</span>
+    <span class="ident">host</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the connection has already been initialized.</span>
+    <span class="ident">initialized</span>: <span class="ident">bool</span>,
 }
 
-<span class='doccomment'>/// A helper wrapper around the components of the `ClientService` that are returned from its</span>
-<span class='doccomment'>/// constructor.</span>
-<span class='kw'>struct</span> <span class='ident'>Service</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(
-    <span class='ident'>ClientService</span>,
-    <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>WorkItem</span><span class='op'>&gt;</span>,
-    <span class='ident'>ChannelFrameReceiver</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>,
-    <span class='ident'>ChannelFrameSender</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>) <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>TransportStream</span>;
+<span class="doccomment">/// A helper wrapper around the components of the `ClientService` that are returned from its</span>
+<span class="doccomment">/// constructor.</span>
+<span class="kw">struct</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">ClientService</span>,
+    <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">WorkItem</span><span class="op">&gt;</span>,
+    <span class="ident">ChannelFrameReceiver</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="ident">ChannelFrameSender</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">TransportStream</span>;
 
-<span class='kw'>impl</span> <span class='ident'>ClientService</span> {
-    <span class='doccomment'>/// Creates a new `ClientService` that will use the provided `ClientStream` for its underlying</span>
-    <span class='doccomment'>/// network communication. A handle is returned for both the read, as well as the write end of</span>
-    <span class='doccomment'>/// the socket that allows the client that creates the `ClientService` to perform the blocking</span>
-    <span class='doccomment'>/// IO without influencing the `ClientService` (i.e. without having its `run_once` method</span>
-    <span class='doccomment'>/// block).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns all the relevant components of the newly created `ClientService`:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// - The `ClientService` itself -- processes events (`WorkItem`s) on each `run_once` call.</span>
-    <span class='doccomment'>/// - The sender-side of the work queue -- allows `WorkItem`s to be queued into the</span>
-    <span class='doccomment'>///   `ClientService`&#39;s simplified event loop.</span>
-    <span class='doccomment'>/// - The `ChannelFrameReceiver` -- the instance that wraps the actual socket that performs</span>
-    <span class='doccomment'>///   the blocking read IO. Allows the caller to block on the IO in a customized manner (e.g.</span>
-    <span class='doccomment'>///   in a separate dedicated thread).</span>
-    <span class='doccomment'>/// - The `ChannelFrameSender` -- the instance that wraps the actual socket that performs the</span>
-    <span class='doccomment'>///   blocking write IO. Allows the caller to block on the IO in a customized manner (e.g. in</span>
-    <span class='doccomment'>///   a separate thread).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If no HTTP/2 connection can be established to the given host on the</span>
-    <span class='doccomment'>/// given port, returns `None`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(<span class='ident'>client_stream</span>: <span class='ident'>ClientStream</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Service</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>TransportStream</span> {
-        <span class='kw'>let</span> (<span class='ident'>tx</span>, <span class='ident'>rx</span>): (<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>WorkItem</span><span class='op'>&gt;</span>, <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>WorkItem</span><span class='op'>&gt;</span>) <span class='op'>=</span>
-                <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
-        <span class='kw'>let</span> <span class='ident'>ClientStream</span>(<span class='ident'>stream</span>, <span class='ident'>scheme</span>, <span class='ident'>host</span>) <span class='op'>=</span> <span class='ident'>client_stream</span>;
+<span class="kw">impl</span> <span class="ident">ClientService</span> {
+    <span class="doccomment">/// Creates a new `ClientService` that will use the provided `ClientStream` for its underlying</span>
+    <span class="doccomment">/// network communication. A handle is returned for both the read, as well as the write end of</span>
+    <span class="doccomment">/// the socket that allows the client that creates the `ClientService` to perform the blocking</span>
+    <span class="doccomment">/// IO without influencing the `ClientService` (i.e. without having its `run_once` method</span>
+    <span class="doccomment">/// block).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns all the relevant components of the newly created `ClientService`:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - The `ClientService` itself -- processes events (`WorkItem`s) on each `run_once` call.</span>
+    <span class="doccomment">/// - The sender-side of the work queue -- allows `WorkItem`s to be queued into the</span>
+    <span class="doccomment">///   `ClientService`&#39;s simplified event loop.</span>
+    <span class="doccomment">/// - The `ChannelFrameReceiver` -- the instance that wraps the actual socket that performs</span>
+    <span class="doccomment">///   the blocking read IO. Allows the caller to block on the IO in a customized manner (e.g.</span>
+    <span class="doccomment">///   in a separate dedicated thread).</span>
+    <span class="doccomment">/// - The `ChannelFrameSender` -- the instance that wraps the actual socket that performs the</span>
+    <span class="doccomment">///   blocking write IO. Allows the caller to block on the IO in a customized manner (e.g. in</span>
+    <span class="doccomment">///   a separate thread).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If no HTTP/2 connection can be established to the given host on the</span>
+    <span class="doccomment">/// given port, returns `None`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">client_stream</span>: <span class="ident">ClientStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;&gt;</span>
+            <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">TransportStream</span> {
+        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>): (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">WorkItem</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">WorkItem</span><span class="op">&gt;</span>) <span class="op">=</span>
+                <span class="ident">mpsc</span>::<span class="ident">channel</span>();
+        <span class="kw">let</span> <span class="ident">ClientStream</span>(<span class="ident">stream</span>, <span class="ident">scheme</span>, <span class="ident">host</span>) <span class="op">=</span> <span class="ident">client_stream</span>;
 
-        <span class='comment'>// Manually split the stream into the write/read ends, so that we can...</span>
-        <span class='kw'>let</span> <span class='ident'>sender</span> <span class='op'>=</span> <span class='ident'>stream</span>.<span class='ident'>try_split</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>receiver</span> <span class='op'>=</span> <span class='ident'>stream</span>;
-        <span class='comment'>// ...wrap them into the adapters...</span>
-        <span class='kw'>let</span> (<span class='ident'>recv_frame</span>, <span class='ident'>recv_handle</span>) <span class='op'>=</span> <span class='ident'>ChannelFrameReceiver</span>::<span class='ident'>new</span>(<span class='ident'>receiver</span>);
-        <span class='kw'>let</span> (<span class='ident'>send_frame</span>, <span class='ident'>send_handle</span>) <span class='op'>=</span> <span class='ident'>ChannelFrameSender</span>::<span class='ident'>new</span>(<span class='ident'>sender</span>);
+        <span class="comment">// Manually split the stream into the write/read ends, so that we can...</span>
+        <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">try_split</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">stream</span>;
+        <span class="comment">// ...wrap them into the adapters...</span>
+        <span class="kw">let</span> (<span class="ident">recv_frame</span>, <span class="ident">recv_handle</span>) <span class="op">=</span> <span class="ident">ChannelFrameReceiver</span>::<span class="ident">new</span>(<span class="ident">receiver</span>);
+        <span class="kw">let</span> (<span class="ident">send_frame</span>, <span class="ident">send_handle</span>) <span class="op">=</span> <span class="ident">ChannelFrameSender</span>::<span class="ident">new</span>(<span class="ident">sender</span>);
 
-        <span class='comment'>// ...and pass the non-blocking/buffering ends into the `HttpConnect` instead of the</span>
-        <span class='comment'>// blocking socket itself.</span>
-        <span class='kw'>let</span> <span class='ident'>conn</span> <span class='op'>=</span> <span class='ident'>ClientConnection</span>::<span class='ident'>with_connection</span>(
-                <span class='ident'>HttpConnection</span>::<span class='ident'>new</span>(
-                    <span class='ident'>send_handle</span>,
-                    <span class='ident'>recv_handle</span>,
-                    <span class='ident'>scheme</span>),
-                <span class='ident'>DefaultSessionState</span>::<span class='ident'>new</span>());
+        <span class="comment">// ...and pass the non-blocking/buffering ends into the `HttpConnect` instead of the</span>
+        <span class="comment">// blocking socket itself.</span>
+        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">ClientConnection</span>::<span class="ident">with_connection</span>(
+                <span class="ident">HttpConnection</span>::<span class="ident">new</span>(
+                    <span class="ident">send_handle</span>,
+                    <span class="ident">recv_handle</span>,
+                    <span class="ident">scheme</span>),
+                <span class="ident">DefaultSessionState</span>::<span class="ident">new</span>());
 
-        <span class='kw'>let</span> <span class='ident'>service</span> <span class='op'>=</span> <span class='ident'>ClientService</span> {
-            <span class='ident'>next_stream_id</span>: <span class='number'>1</span>,
-            <span class='ident'>outstanding_reqs</span>: <span class='number'>0</span>,
-            <span class='ident'>limit</span>: <span class='number'>3</span>,
-            <span class='ident'>conn</span>: <span class='ident'>conn</span>,
-            <span class='ident'>chans</span>: <span class='ident'>HashMap</span>::<span class='ident'>new</span>(),
-            <span class='ident'>work_queue</span>: <span class='ident'>rx</span>,
-            <span class='ident'>request_queue</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-            <span class='ident'>client_count</span>: <span class='number'>0</span>,
-            <span class='ident'>host</span>: <span class='ident'>host</span>.<span class='ident'>as_bytes</span>().<span class='ident'>to_vec</span>(),
-            <span class='ident'>initialized</span>: <span class='bool-val'>false</span>,
+        <span class="kw">let</span> <span class="ident">service</span> <span class="op">=</span> <span class="ident">ClientService</span> {
+            <span class="ident">next_stream_id</span>: <span class="number">1</span>,
+            <span class="ident">outstanding_reqs</span>: <span class="number">0</span>,
+            <span class="ident">limit</span>: <span class="number">3</span>,
+            <span class="ident">conn</span>: <span class="ident">conn</span>,
+            <span class="ident">chans</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
+            <span class="ident">work_queue</span>: <span class="ident">rx</span>,
+            <span class="ident">request_queue</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">client_count</span>: <span class="number">0</span>,
+            <span class="ident">host</span>: <span class="ident">host</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
+            <span class="ident">initialized</span>: <span class="bool-val">false</span>,
         };
 
-        <span class='comment'>// Returns the handles to the channel sender/receiver, so that the client can use them to</span>
-        <span class='comment'>// perform the real IO somewhere.</span>
-        <span class='prelude-val'>Some</span>(<span class='ident'>Service</span>(<span class='ident'>service</span>, <span class='ident'>tx</span>, <span class='ident'>recv_frame</span>, <span class='ident'>send_frame</span>))
+        <span class="comment">// Returns the handles to the channel sender/receiver, so that the client can use them to</span>
+        <span class="comment">// perform the real IO somewhere.</span>
+        <span class="prelude-val">Some</span>(<span class="ident">Service</span>(<span class="ident">service</span>, <span class="ident">tx</span>, <span class="ident">recv_frame</span>, <span class="ident">send_frame</span>))
     }
 
-    <span class='doccomment'>/// Performs one iteration of the service.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// One iteration corresponds to running the next `WorkItem` that the service</span>
-    <span class='doccomment'>/// has queued in its `work_queue`. Essentially, this is a poor-man&#39;s event</span>
-    <span class='doccomment'>/// loop implementation. If there is no work queued for the service, it will</span>
-    <span class='doccomment'>/// *block*, until there is. As such, embedding calls to this method into a</span>
-    <span class='doccomment'>/// real event loop should not be done.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// For `WorkItem::Request` work items, the service will queue the received</span>
-    <span class='doccomment'>/// `AsyncRequest` for sending. It will also attempt to queue it for</span>
-    <span class='doccomment'>/// transmission to the server, unless the concurrent requests limit has been</span>
-    <span class='doccomment'>/// exceeded, in which case the request is kept in an internal FIFO queue and</span>
-    <span class='doccomment'>/// will be sent when its time comes.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// For `WorkItem::HandleFrame` work items, the service will perform a single</span>
-    <span class='doccomment'>/// `handle_next_frame` call on its underlying `ClientConnection` instance.</span>
-    <span class='doccomment'>/// Since the item is queued only when the connection actually has frames to</span>
-    <span class='doccomment'>/// process, this call will never block. If a response got finalized by the</span>
-    <span class='doccomment'>/// handling of the frame, it is shipped to the channel that expects it and</span>
-    <span class='doccomment'>/// a new request from the request queue sent.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// On a successful pass, the function returns an `Ok(())`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `Err` response is returned when there are no more responses to be</span>
-    <span class='doccomment'>/// received and there are no more clients connected to the service (and</span>
-    <span class='doccomment'>/// thus no more requests could ever be issued by the instance). This</span>
-    <span class='doccomment'>/// corresponds to the `ClientServiceErr::Done` variant.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any HTTP/2 error is propagated (wrapped into a ClientServiceErr::Http</span>
-    <span class='doccomment'>/// variant).</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>run_once</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>ClientServiceErr</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>work_item</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>work_queue</span>.<span class='ident'>recv</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>item</span>) <span class='op'>=&gt;</span> <span class='ident'>item</span>,
-            <span class='comment'>// The receive operation can only fail if the sender has</span>
-            <span class='comment'>// disconnected implying no further receives are possible.</span>
-            <span class='comment'>// At that point, we make sure to gracefully stop the service.</span>
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ClientServiceErr</span>::<span class='ident'>Done</span>),
+    <span class="doccomment">/// Performs one iteration of the service.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// One iteration corresponds to running the next `WorkItem` that the service</span>
+    <span class="doccomment">/// has queued in its `work_queue`. Essentially, this is a poor-man&#39;s event</span>
+    <span class="doccomment">/// loop implementation. If there is no work queued for the service, it will</span>
+    <span class="doccomment">/// *block*, until there is. As such, embedding calls to this method into a</span>
+    <span class="doccomment">/// real event loop should not be done.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For `WorkItem::Request` work items, the service will queue the received</span>
+    <span class="doccomment">/// `AsyncRequest` for sending. It will also attempt to queue it for</span>
+    <span class="doccomment">/// transmission to the server, unless the concurrent requests limit has been</span>
+    <span class="doccomment">/// exceeded, in which case the request is kept in an internal FIFO queue and</span>
+    <span class="doccomment">/// will be sent when its time comes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For `WorkItem::HandleFrame` work items, the service will perform a single</span>
+    <span class="doccomment">/// `handle_next_frame` call on its underlying `ClientConnection` instance.</span>
+    <span class="doccomment">/// Since the item is queued only when the connection actually has frames to</span>
+    <span class="doccomment">/// process, this call will never block. If a response got finalized by the</span>
+    <span class="doccomment">/// handling of the frame, it is shipped to the channel that expects it and</span>
+    <span class="doccomment">/// a new request from the request queue sent.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// On a successful pass, the function returns an `Ok(())`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `Err` response is returned when there are no more responses to be</span>
+    <span class="doccomment">/// received and there are no more clients connected to the service (and</span>
+    <span class="doccomment">/// thus no more requests could ever be issued by the instance). This</span>
+    <span class="doccomment">/// corresponds to the `ClientServiceErr::Done` variant.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any HTTP/2 error is propagated (wrapped into a ClientServiceErr::Http</span>
+    <span class="doccomment">/// variant).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_once</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ClientServiceErr</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">work_item</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">work_queue</span>.<span class="ident">recv</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">item</span>) <span class="op">=&gt;</span> <span class="ident">item</span>,
+            <span class="comment">// The receive operation can only fail if the sender has</span>
+            <span class="comment">// disconnected implying no further receives are possible.</span>
+            <span class="comment">// At that point, we make sure to gracefully stop the service.</span>
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ClientServiceErr</span>::<span class="ident">Done</span>),
         };
 
-        <span class='comment'>// Dispatch the work to the corresponding method...</span>
-        <span class='kw'>match</span> <span class='ident'>work_item</span> {
-            <span class='ident'>WorkItem</span>::<span class='ident'>Request</span>(<span class='ident'>async_req</span>) <span class='op'>=&gt;</span> {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Queuing request&quot;</span>);
-                <span class='self'>self</span>.<span class='ident'>request_queue</span>.<span class='ident'>push</span>(<span class='ident'>async_req</span>);
-                <span class='self'>self</span>.<span class='ident'>queue_next_request</span>();
-                <span class='prelude-val'>Ok</span>(())
+        <span class="comment">// Dispatch the work to the corresponding method...</span>
+        <span class="kw">match</span> <span class="ident">work_item</span> {
+            <span class="ident">WorkItem</span>::<span class="ident">Request</span>(<span class="ident">async_req</span>) <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Queuing request&quot;</span>);
+                <span class="self">self</span>.<span class="ident">request_queue</span>.<span class="ident">push</span>(<span class="ident">async_req</span>);
+                <span class="self">self</span>.<span class="ident">queue_next_request</span>();
+                <span class="prelude-val">Ok</span>(())
             },
-            <span class='ident'>WorkItem</span>::<span class='ident'>HandleFrame</span> <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>initialized</span> {
-                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>init</span>());
-                    <span class='self'>self</span>.<span class='ident'>initialized</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
-                    <span class='prelude-val'>Ok</span>(())
-                } <span class='kw'>else</span> {
-                    <span class='self'>self</span>.<span class='ident'>handle_frame</span>()
+            <span class="ident">WorkItem</span>::<span class="ident">HandleFrame</span> <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">initialized</span> {
+                    <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">init</span>());
+                    <span class="self">self</span>.<span class="ident">initialized</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="prelude-val">Ok</span>(())
+                } <span class="kw">else</span> {
+                    <span class="self">self</span>.<span class="ident">handle_frame</span>()
                 }
             },
-            <span class='ident'>WorkItem</span>::<span class='ident'>SendData</span> <span class='op'>=&gt;</span> {
-                <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Will queue some request data&quot;</span>);
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>send_next_data</span>());
-                <span class='prelude-val'>Ok</span>(())
+            <span class="ident">WorkItem</span>::<span class="ident">SendData</span> <span class="op">=&gt;</span> {
+                <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Will queue some request data&quot;</span>);
+                <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">send_next_data</span>());
+                <span class="prelude-val">Ok</span>(())
             }
-            <span class='ident'>WorkItem</span>::<span class='ident'>NewClient</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>client_count</span> <span class='op'>+=</span> <span class='number'>1</span>;
-                <span class='prelude-val'>Ok</span>(())
+            <span class="ident">WorkItem</span>::<span class="ident">NewClient</span> <span class="op">=&gt;</span> {
+                <span class="self">self</span>.<span class="ident">client_count</span> <span class="op">+=</span> <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>(())
             },
-            <span class='ident'>WorkItem</span>::<span class='ident'>ClientLeft</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>client_count</span> <span class='op'>-=</span> <span class='number'>1</span>;
-                <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>client_count</span> <span class='op'>==</span> <span class='number'>0</span> {
-                    <span class='prelude-val'>Err</span>(<span class='ident'>ClientServiceErr</span>::<span class='ident'>Done</span>)
-                } <span class='kw'>else</span> {
-                    <span class='prelude-val'>Ok</span>(())
+            <span class="ident">WorkItem</span>::<span class="ident">ClientLeft</span> <span class="op">=&gt;</span> {
+                <span class="self">self</span>.<span class="ident">client_count</span> <span class="op">-=</span> <span class="number">1</span>;
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">client_count</span> <span class="op">==</span> <span class="number">0</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">ClientServiceErr</span>::<span class="ident">Done</span>)
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">Ok</span>(())
                 }
             }
         }
     }
 
-    <span class='doccomment'>/// A private convenience method that performs the handling of the next received frame.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// It calls the underlying connection&#39;s `handle_next_frame` method and then inspects the</span>
-    <span class='doccomment'>/// changes made to the session, notifying clients of completed requests or queueing new ones,</span>
-    <span class='doccomment'>/// if available.</span>
-    <span class='kw'>fn</span> <span class='ident'>handle_frame</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>ClientServiceErr</span><span class='op'>&gt;</span> {
-        <span class='comment'>// Handles the next frame...</span>
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Handling next frame&quot;</span>);
-        <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>handle_next_frame</span>());
-        <span class='comment'>// ...and then any connections that may have been closed in the meantime</span>
-        <span class='comment'>// are converted to responses and notifications sent to appropriate</span>
-        <span class='comment'>// channels.</span>
-        <span class='self'>self</span>.<span class='ident'>handle_closed</span>();
-        <span class='comment'>// At this point we try to queue another outstanding request (if the</span>
-        <span class='comment'>// limit has not been reached).</span>
-        <span class='self'>self</span>.<span class='ident'>queue_next_request</span>();
+    <span class="doccomment">/// A private convenience method that performs the handling of the next received frame.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It calls the underlying connection&#39;s `handle_next_frame` method and then inspects the</span>
+    <span class="doccomment">/// changes made to the session, notifying clients of completed requests or queueing new ones,</span>
+    <span class="doccomment">/// if available.</span>
+    <span class="kw">fn</span> <span class="ident">handle_frame</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ClientServiceErr</span><span class="op">&gt;</span> {
+        <span class="comment">// Handles the next frame...</span>
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Handling next frame&quot;</span>);
+        <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">handle_next_frame</span>());
+        <span class="comment">// ...and then any connections that may have been closed in the meantime</span>
+        <span class="comment">// are converted to responses and notifications sent to appropriate</span>
+        <span class="comment">// channels.</span>
+        <span class="self">self</span>.<span class="ident">handle_closed</span>();
+        <span class="comment">// At this point we try to queue another outstanding request (if the</span>
+        <span class="comment">// limit has not been reached).</span>
+        <span class="self">self</span>.<span class="ident">queue_next_request</span>();
 
-        <span class='prelude-val'>Ok</span>(())
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class='doccomment'>/// Internal helper method. Sends a request to the server based on the</span>
-    <span class='doccomment'>/// parameters given in the `AsyncRequest`. It blocks until the request is</span>
-    <span class='doccomment'>/// fully transmitted to the server.</span>
-    <span class='kw'>fn</span> <span class='ident'>send_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>async_req</span>: <span class='ident'>AsyncRequest</span>) {
-        <span class='kw'>let</span> (<span class='ident'>req</span>, <span class='ident'>tx</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>create_request</span>(<span class='ident'>async_req</span>);
+    <span class="doccomment">/// Internal helper method. Sends a request to the server based on the</span>
+    <span class="doccomment">/// parameters given in the `AsyncRequest`. It blocks until the request is</span>
+    <span class="doccomment">/// fully transmitted to the server.</span>
+    <span class="kw">fn</span> <span class="ident">send_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">async_req</span>: <span class="ident">AsyncRequest</span>) {
+        <span class="kw">let</span> (<span class="ident">req</span>, <span class="ident">tx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_request</span>(<span class="ident">async_req</span>);
 
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Sending new request... id = {}&quot;</span>, <span class='ident'>req</span>.<span class='ident'>stream</span>.<span class='ident'>id</span>());
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Sending new request... id = {}&quot;</span>, <span class="ident">req</span>.<span class="ident">stream</span>.<span class="ident">id</span>());
 
-        <span class='self'>self</span>.<span class='ident'>chans</span>.<span class='ident'>insert</span>(<span class='ident'>req</span>.<span class='ident'>stream</span>.<span class='ident'>id</span>(), <span class='ident'>tx</span>);
-        <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>start_request</span>(<span class='ident'>req</span>).<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-        <span class='self'>self</span>.<span class='ident'>outstanding_reqs</span> <span class='op'>+=</span> <span class='number'>1</span>;
+        <span class="self">self</span>.<span class="ident">chans</span>.<span class="ident">insert</span>(<span class="ident">req</span>.<span class="ident">stream</span>.<span class="ident">id</span>(), <span class="ident">tx</span>);
+        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">start_request</span>(<span class="ident">req</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">outstanding_reqs</span> <span class="op">+=</span> <span class="number">1</span>;
     }
 
-    <span class='doccomment'>/// Internal helper method. Creates a new `RequestStream` instance based on the</span>
-    <span class='doccomment'>/// given parameters. Such a `RequestStream` instance is ready to be passed to</span>
-    <span class='doccomment'>/// the connection for transmission to the server (i.e. `start_request`).</span>
-    <span class='doccomment'>/// Also returns the sender end of the channel to which the response is to be transmitted,</span>
-    <span class='doccomment'>/// once received.</span>
-    <span class='kw'>fn</span> <span class='ident'>create_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>async_req</span>: <span class='ident'>AsyncRequest</span>)
-            <span class='op'>-&gt;</span> (<span class='ident'>RequestStream</span><span class='op'>&lt;</span><span class='ident'>DefaultStream</span><span class='op'>&gt;</span>, <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>headers</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Header</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-        <span class='ident'>headers</span>.<span class='ident'>extend</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='ident'>async_req</span>.<span class='ident'>method</span>),
-            (<span class='string'>b&quot;:path&quot;</span>.<span class='ident'>to_vec</span>(), <span class='ident'>async_req</span>.<span class='ident'>path</span>),
-            (<span class='string'>b&quot;:authority&quot;</span>.<span class='ident'>to_vec</span>(), <span class='self'>self</span>.<span class='ident'>host</span>.<span class='ident'>clone</span>()),
-            (<span class='string'>b&quot;:scheme&quot;</span>.<span class='ident'>to_vec</span>(), <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>scheme</span>().<span class='ident'>as_bytes</span>().<span class='ident'>to_vec</span>()),
-        ].<span class='ident'>into_iter</span>());
-        <span class='ident'>headers</span>.<span class='ident'>extend</span>(<span class='ident'>async_req</span>.<span class='ident'>headers</span>.<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Internal helper method. Creates a new `RequestStream` instance based on the</span>
+    <span class="doccomment">/// given parameters. Such a `RequestStream` instance is ready to be passed to</span>
+    <span class="doccomment">/// the connection for transmission to the server (i.e. `start_request`).</span>
+    <span class="doccomment">/// Also returns the sender end of the channel to which the response is to be transmitted,</span>
+    <span class="doccomment">/// once received.</span>
+    <span class="kw">fn</span> <span class="ident">create_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">async_req</span>: <span class="ident">AsyncRequest</span>)
+            <span class="op">-&gt;</span> (<span class="ident">RequestStream</span><span class="op">&lt;</span><span class="ident">DefaultStream</span><span class="op">&gt;</span>, <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">headers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="ident">async_req</span>.<span class="ident">method</span>),
+            (<span class="string">b&quot;:path&quot;</span>.<span class="ident">to_vec</span>(), <span class="ident">async_req</span>.<span class="ident">path</span>),
+            (<span class="string">b&quot;:authority&quot;</span>.<span class="ident">to_vec</span>(), <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">clone</span>()),
+            (<span class="string">b&quot;:scheme&quot;</span>.<span class="ident">to_vec</span>(), <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">scheme</span>().<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>()),
+        ].<span class="ident">into_iter</span>());
+        <span class="ident">headers</span>.<span class="ident">extend</span>(<span class="ident">async_req</span>.<span class="ident">headers</span>.<span class="ident">into_iter</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>DefaultStream</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>next_stream_id</span>);
-        <span class='self'>self</span>.<span class='ident'>next_stream_id</span> <span class='op'>+=</span> <span class='number'>2</span>;
-        <span class='kw'>match</span> <span class='ident'>async_req</span>.<span class='ident'>body</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>body</span>) <span class='op'>=&gt;</span> <span class='ident'>stream</span>.<span class='ident'>set_full_data</span>(<span class='ident'>body</span>),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>stream</span>.<span class='ident'>close_local</span>(),
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">DefaultStream</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">next_stream_id</span>);
+        <span class="self">self</span>.<span class="ident">next_stream_id</span> <span class="op">+=</span> <span class="number">2</span>;
+        <span class="kw">match</span> <span class="ident">async_req</span>.<span class="ident">body</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">body</span>) <span class="op">=&gt;</span> <span class="ident">stream</span>.<span class="ident">set_full_data</span>(<span class="ident">body</span>),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">stream</span>.<span class="ident">close_local</span>(),
         };
 
         (
-            <span class='ident'>RequestStream</span> {
-                <span class='ident'>stream</span>: <span class='ident'>stream</span>,
-                <span class='ident'>headers</span>: <span class='ident'>headers</span>,
+            <span class="ident">RequestStream</span> {
+                <span class="ident">stream</span>: <span class="ident">stream</span>,
+                <span class="ident">headers</span>: <span class="ident">headers</span>,
             },
-            <span class='ident'>async_req</span>.<span class='ident'>tx</span>
+            <span class="ident">async_req</span>.<span class="ident">tx</span>
         )
     }
 
-    <span class='doccomment'>/// Internal helper method. Sends a response assembled from the given</span>
-    <span class='doccomment'>/// stream to the corresponding channel that is waiting for the response.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The given `stream` instance is consumed by this method.</span>
-    <span class='kw'>fn</span> <span class='ident'>send_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>stream</span>: <span class='ident'>DefaultStream</span>) {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>chans</span>.<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>stream</span>.<span class='ident'>stream_id</span>) {
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                <span class='comment'>// This should never happen, it means the session gave us</span>
-                <span class='comment'>// a response that we didn&#39;t request.</span>
-                <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Received a response for an unknown request!&quot;</span>);
+    <span class="doccomment">/// Internal helper method. Sends a response assembled from the given</span>
+    <span class="doccomment">/// stream to the corresponding channel that is waiting for the response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The given `stream` instance is consumed by this method.</span>
+    <span class="kw">fn</span> <span class="ident">send_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">DefaultStream</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">chans</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">stream</span>.<span class="ident">stream_id</span>) {
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                <span class="comment">// This should never happen, it means the session gave us</span>
+                <span class="comment">// a response that we didn&#39;t request.</span>
+                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Received a response for an unknown request!&quot;</span>);
             },
-            <span class='prelude-val'>Some</span>(<span class='ident'>tx</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>tx</span>.<span class='ident'>send</span>(<span class='ident'>Response</span> {
-                    <span class='ident'>stream_id</span>: <span class='ident'>stream</span>.<span class='ident'>stream_id</span>,
-                    <span class='ident'>headers</span>: <span class='ident'>stream</span>.<span class='ident'>headers</span>.<span class='ident'>unwrap</span>(),
-                    <span class='ident'>body</span>: <span class='ident'>stream</span>.<span class='ident'>body</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">tx</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(<span class="ident">Response</span> {
+                    <span class="ident">stream_id</span>: <span class="ident">stream</span>.<span class="ident">stream_id</span>,
+                    <span class="ident">headers</span>: <span class="ident">stream</span>.<span class="ident">headers</span>.<span class="ident">unwrap</span>(),
+                    <span class="ident">body</span>: <span class="ident">stream</span>.<span class="ident">body</span>,
                 });
             }
         };
     }
 
-    <span class='doccomment'>/// Internal helper method. Handles all closed streams by sending appropriate</span>
-    <span class='doccomment'>/// notifications to waiting channels.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// For now, the channels are all given a `Response`, even though the</span>
-    <span class='doccomment'>/// stream might end up being closed by the server with an error.</span>
-    <span class='kw'>fn</span> <span class='ident'>handle_closed</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='ident'>done</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>conn</span>.<span class='ident'>state</span>.<span class='ident'>get_closed</span>();
-        <span class='kw'>for</span> <span class='ident'>stream</span> <span class='kw'>in</span> <span class='ident'>done</span> {
-            <span class='self'>self</span>.<span class='ident'>send_response</span>(<span class='ident'>stream</span>);
-            <span class='self'>self</span>.<span class='ident'>outstanding_reqs</span> <span class='op'>-=</span> <span class='number'>1</span>;
+    <span class="doccomment">/// Internal helper method. Handles all closed streams by sending appropriate</span>
+    <span class="doccomment">/// notifications to waiting channels.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For now, the channels are all given a `Response`, even though the</span>
+    <span class="doccomment">/// stream might end up being closed by the server with an error.</span>
+    <span class="kw">fn</span> <span class="ident">handle_closed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">done</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">state</span>.<span class="ident">get_closed</span>();
+        <span class="kw">for</span> <span class="ident">stream</span> <span class="kw">in</span> <span class="ident">done</span> {
+            <span class="self">self</span>.<span class="ident">send_response</span>(<span class="ident">stream</span>);
+            <span class="self">self</span>.<span class="ident">outstanding_reqs</span> <span class="op">-=</span> <span class="number">1</span>;
         }
     }
 
-    <span class='doccomment'>/// Internal helper method. If there are yet unsent requests queued by a</span>
-    <span class='doccomment'>/// client to the service and the service has not exceeded the limit of</span>
-    <span class='doccomment'>/// concurrent requests that it is allowed to issue, it sends a single</span>
-    <span class='doccomment'>/// new request to the server. Blocks until this request is sent.</span>
-    <span class='kw'>fn</span> <span class='ident'>queue_next_request</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>outstanding_reqs</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>limit</span> {
-            <span class='comment'>// Try to queue another request since we haven&#39;t gone over</span>
-            <span class='comment'>// the (arbitrary) limit.</span>
-            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Not over the limit yet. Checking for more requests...&quot;</span>);
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>request_queue</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-                <span class='kw'>let</span> <span class='ident'>async_req</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>request_queue</span>.<span class='ident'>remove</span>(<span class='number'>0</span>);
-                <span class='self'>self</span>.<span class='ident'>send_request</span>(<span class='ident'>async_req</span>);
+    <span class="doccomment">/// Internal helper method. If there are yet unsent requests queued by a</span>
+    <span class="doccomment">/// client to the service and the service has not exceeded the limit of</span>
+    <span class="doccomment">/// concurrent requests that it is allowed to issue, it sends a single</span>
+    <span class="doccomment">/// new request to the server. Blocks until this request is sent.</span>
+    <span class="kw">fn</span> <span class="ident">queue_next_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">outstanding_reqs</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">limit</span> {
+            <span class="comment">// Try to queue another request since we haven&#39;t gone over</span>
+            <span class="comment">// the (arbitrary) limit.</span>
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Not over the limit yet. Checking for more requests...&quot;</span>);
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">request_queue</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw">let</span> <span class="ident">async_req</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request_queue</span>.<span class="ident">remove</span>(<span class="number">0</span>);
+                <span class="self">self</span>.<span class="ident">send_request</span>(<span class="ident">async_req</span>);
             }
         }
     }
 }
 
-<span class='doccomment'>/// A struct representing an HTTP/2 client that receives responses to its</span>
-<span class='doccomment'>/// requests asynchronously. Additionally, this client can be cloned and all</span>
-<span class='doccomment'>/// clones can issue (concurrently) requests to the server, using the same</span>
-<span class='doccomment'>/// underlying HTTP/2 connection.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```no_run</span>
-<span class='doccomment'>/// use solicit::client::Client;</span>
-<span class='doccomment'>/// use solicit::http::client::CleartextConnector;</span>
-<span class='doccomment'>/// use std::thread;</span>
-<span class='doccomment'>/// use std::str;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Connect to a server that supports HTTP/2</span>
-<span class='doccomment'>/// let connector = CleartextConnector::new(&quot;http2bin.org&quot;);</span>
-<span class='doccomment'>/// let client = Client::with_connector(connector).unwrap();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Issue 5 requests from 5 different threads concurrently and wait for all</span>
-<span class='doccomment'>/// // threads to receive their response.</span>
-<span class='doccomment'>/// let threads: Vec&lt;_&gt; = (0..5).map(|i| {</span>
-<span class='doccomment'>///     let this = client.clone();</span>
-<span class='doccomment'>///     thread::spawn(move || {</span>
-<span class='doccomment'>///         let resp = this.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
-<span class='doccomment'>///         let response = resp.recv().unwrap();</span>
-<span class='doccomment'>///         println!(&quot;Thread {} got response ... {}&quot;, i, response.status_code().ok().unwrap());</span>
-<span class='doccomment'>///         println!(&quot;The response contains the following headers:&quot;);</span>
-<span class='doccomment'>///         for header in response.headers.iter() {</span>
-<span class='doccomment'>///             println!(&quot;  {}: {}&quot;,</span>
-<span class='doccomment'>///                   str::from_utf8(&amp;header.0).unwrap(),</span>
-<span class='doccomment'>///                   str::from_utf8(&amp;header.1).unwrap());</span>
-<span class='doccomment'>///         }</span>
-<span class='doccomment'>///     })</span>
-<span class='doccomment'>/// }).collect();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let _: Vec&lt;_&gt; = threads.into_iter().map(|thread| thread.join()).collect();</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Client</span> {
-    <span class='doccomment'>/// The sender side of a channel on which a running `ClientService` expects</span>
-    <span class='doccomment'>/// to receive new requests, which are to be sent to the server.</span>
-    <span class='ident'>sender</span>: <span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>WorkItem</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A struct representing an HTTP/2 client that receives responses to its</span>
+<span class="doccomment">/// requests asynchronously. Additionally, this client can be cloned and all</span>
+<span class="doccomment">/// clones can issue (concurrently) requests to the server, using the same</span>
+<span class="doccomment">/// underlying HTTP/2 connection.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```no_run</span>
+<span class="doccomment">/// use solicit::client::Client;</span>
+<span class="doccomment">/// use solicit::http::client::CleartextConnector;</span>
+<span class="doccomment">/// use std::thread;</span>
+<span class="doccomment">/// use std::str;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Connect to a server that supports HTTP/2</span>
+<span class="doccomment">/// let connector = CleartextConnector::new(&quot;http2bin.org&quot;);</span>
+<span class="doccomment">/// let client = Client::with_connector(connector).unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Issue 5 requests from 5 different threads concurrently and wait for all</span>
+<span class="doccomment">/// // threads to receive their response.</span>
+<span class="doccomment">/// let threads: Vec&lt;_&gt; = (0..5).map(|i| {</span>
+<span class="doccomment">///     let this = client.clone();</span>
+<span class="doccomment">///     thread::spawn(move || {</span>
+<span class="doccomment">///         let resp = this.get(b&quot;/&quot;, &amp;[]).unwrap();</span>
+<span class="doccomment">///         let response = resp.recv().unwrap();</span>
+<span class="doccomment">///         println!(&quot;Thread {} got response ... {}&quot;, i, response.status_code().ok().unwrap());</span>
+<span class="doccomment">///         println!(&quot;The response contains the following headers:&quot;);</span>
+<span class="doccomment">///         for header in response.headers.iter() {</span>
+<span class="doccomment">///             println!(&quot;  {}: {}&quot;,</span>
+<span class="doccomment">///                   str::from_utf8(&amp;header.0).unwrap(),</span>
+<span class="doccomment">///                   str::from_utf8(&amp;header.1).unwrap());</span>
+<span class="doccomment">///         }</span>
+<span class="doccomment">///     })</span>
+<span class="doccomment">/// }).collect();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let _: Vec&lt;_&gt; = threads.into_iter().map(|thread| thread.join()).collect();</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
+    <span class="doccomment">/// The sender side of a channel on which a running `ClientService` expects</span>
+    <span class="doccomment">/// to receive new requests, which are to be sent to the server.</span>
+    <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">WorkItem</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>Client</span> {
-    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Client</span> {
-        <span class='self'>self</span>.<span class='ident'>sender</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>NewClient</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>Client</span> {
-            <span class='ident'>sender</span>: <span class='self'>self</span>.<span class='ident'>sender</span>.<span class='ident'>clone</span>(),
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Client</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Client</span> {
+        <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">NewClient</span>).<span class="ident">unwrap</span>();
+        <span class="ident">Client</span> {
+            <span class="ident">sender</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(),
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Client</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>sender</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>ClientLeft</span>);
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Client</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">ClientLeft</span>);
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Client</span> {
-    <span class='doccomment'>/// Creates a brand new HTTP/2 client. This means that a new HTTP/2</span>
-    <span class='doccomment'>/// connection will be established behind the scenes. A thread is spawned</span>
-    <span class='doccomment'>/// to handle the connection in the background, so that the thread that</span>
-    <span class='doccomment'>/// creates the client can use it asynchronously.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `Client` instance that allows access to the underlying HTTP/2</span>
-    <span class='doccomment'>/// connection on the application level. Only full requests and responses</span>
-    <span class='doccomment'>/// are exposed to users.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The returned `Client` can be cloned and all clones will use the same</span>
-    <span class='doccomment'>/// underlying HTTP/2 connection. Once all cloned instances (as well as the</span>
-    <span class='doccomment'>/// original one) are dropped, the thread that was spawned will also exit</span>
-    <span class='doccomment'>/// gracefully. Any error on the underlying HTTP/2 connection also causes</span>
-    <span class='doccomment'>/// the thread to exit.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the HTTP/2 connection cannot be initialized returns `None`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_connector</span><span class='op'>&lt;</span><span class='ident'>C</span>, <span class='ident'>S</span><span class='op'>&gt;</span>(<span class='ident'>connector</span>: <span class='ident'>C</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Client</span><span class='op'>&gt;</span>
-            <span class='kw'>where</span> <span class='ident'>C</span>: <span class='ident'>HttpConnect</span><span class='op'>&lt;</span><span class='ident'>Stream</span><span class='op'>=</span><span class='ident'>S</span><span class='op'>&gt;</span>, <span class='ident'>S</span>: <span class='ident'>TransportStream</span> <span class='op'>+</span> <span class='ident'>Send</span> <span class='op'>+</span> <span class='lifetime'>&#39;static</span> {
-        <span class='comment'>// Use the provided connector to establish a network connection...</span>
-        <span class='kw'>let</span> <span class='ident'>client_stream</span> <span class='op'>=</span> <span class='ident'>connector</span>.<span class='ident'>connect</span>().<span class='ident'>ok</span>().<span class='ident'>unwrap</span>();
-        <span class='comment'>// Keep a socket handle in order to shut it down once the service stops. This is required</span>
-        <span class='comment'>// because if the service decides to stop (due to all clients disconnecting) while the</span>
-        <span class='comment'>// socket is still open and the read thread waiting, it can happen that the read thread</span>
-        <span class='comment'>// (and as such the socket itself) ends up waiting indefinitely (or well, until the server</span>
-        <span class='comment'>// decides to close it), effectively leaking the socket and thread.</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sck</span> <span class='op'>=</span> <span class='ident'>client_stream</span>.<span class='number'>0</span>.<span class='ident'>try_split</span>().<span class='ident'>unwrap</span>();
+<span class="kw">impl</span> <span class="ident">Client</span> {
+    <span class="doccomment">/// Creates a brand new HTTP/2 client. This means that a new HTTP/2</span>
+    <span class="doccomment">/// connection will be established behind the scenes. A thread is spawned</span>
+    <span class="doccomment">/// to handle the connection in the background, so that the thread that</span>
+    <span class="doccomment">/// creates the client can use it asynchronously.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `Client` instance that allows access to the underlying HTTP/2</span>
+    <span class="doccomment">/// connection on the application level. Only full requests and responses</span>
+    <span class="doccomment">/// are exposed to users.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned `Client` can be cloned and all clones will use the same</span>
+    <span class="doccomment">/// underlying HTTP/2 connection. Once all cloned instances (as well as the</span>
+    <span class="doccomment">/// original one) are dropped, the thread that was spawned will also exit</span>
+    <span class="doccomment">/// gracefully. Any error on the underlying HTTP/2 connection also causes</span>
+    <span class="doccomment">/// the thread to exit.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the HTTP/2 connection cannot be initialized returns `None`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_connector</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">C</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>
+            <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">HttpConnect</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">=</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">S</span>: <span class="ident">TransportStream</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
+        <span class="comment">// Use the provided connector to establish a network connection...</span>
+        <span class="kw">let</span> <span class="ident">client_stream</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">connect</span>().<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// Keep a socket handle in order to shut it down once the service stops. This is required</span>
+        <span class="comment">// because if the service decides to stop (due to all clients disconnecting) while the</span>
+        <span class="comment">// socket is still open and the read thread waiting, it can happen that the read thread</span>
+        <span class="comment">// (and as such the socket itself) ends up waiting indefinitely (or well, until the server</span>
+        <span class="comment">// decides to close it), effectively leaking the socket and thread.</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sck</span> <span class="op">=</span> <span class="ident">client_stream</span>.<span class="number">0</span>.<span class="ident">try_split</span>().<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>service</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>ClientService</span>::<span class='ident'>new</span>(<span class='ident'>client_stream</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>service</span>) <span class='op'>=&gt;</span> <span class='ident'>service</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+        <span class="kw">let</span> <span class="ident">service</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ClientService</span>::<span class="ident">new</span>(<span class="ident">client_stream</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">service</span>) <span class="op">=&gt;</span> <span class="ident">service</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
-        <span class='kw'>let</span> <span class='ident'>Service</span>(<span class='kw-2'>mut</span> <span class='ident'>service</span>, <span class='ident'>rx</span>, <span class='kw-2'>mut</span> <span class='ident'>recv_frame</span>, <span class='kw-2'>mut</span> <span class='ident'>send_frame</span>) <span class='op'>=</span> <span class='ident'>service</span>;
+        <span class="kw">let</span> <span class="ident">Service</span>(<span class="kw-2">mut</span> <span class="ident">service</span>, <span class="ident">rx</span>, <span class="kw-2">mut</span> <span class="ident">recv_frame</span>, <span class="kw-2">mut</span> <span class="ident">send_frame</span>) <span class="op">=</span> <span class="ident">service</span>;
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(_) <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>NewClient</span>) {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(_) <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">NewClient</span>) {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class='comment'>// Keep a handle to the work queue to notify the service of newly read frames, making it so</span>
-        <span class='comment'>// that it never blocks on waiting for frames to read.</span>
-        <span class='kw'>let</span> <span class='ident'>read_notify</span> <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> <span class='ident'>sender_work_queue</span> <span class='op'>=</span> <span class='ident'>rx</span>.<span class='ident'>clone</span>();
+        <span class="comment">// Keep a handle to the work queue to notify the service of newly read frames, making it so</span>
+        <span class="comment">// that it never blocks on waiting for frames to read.</span>
+        <span class="kw">let</span> <span class="ident">read_notify</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">sender_work_queue</span> <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">clone</span>();
 
-        <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-            <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(_) <span class='op'>=</span> <span class='ident'>service</span>.<span class='ident'>run_once</span>() {}
-            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Service thread halting&quot;</span>);
-            <span class='comment'>// This is the one place where it&#39;s okay to unwrap, as if the shutdown fails, there&#39;s</span>
-            <span class='comment'>// really nothing we can do to recover at this point...</span>
-            <span class='comment'>// This forces the reader thread to stop, as the socket is no longer operational.</span>
-            <span class='ident'>sck</span>.<span class='ident'>close</span>().<span class='ident'>unwrap</span>();
+        <span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">||</span> {
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(_) <span class="op">=</span> <span class="ident">service</span>.<span class="ident">run_once</span>() {}
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Service thread halting&quot;</span>);
+            <span class="comment">// This is the one place where it&#39;s okay to unwrap, as if the shutdown fails, there&#39;s</span>
+            <span class="comment">// really nothing we can do to recover at this point...</span>
+            <span class="comment">// This forces the reader thread to stop, as the socket is no longer operational.</span>
+            <span class="ident">sck</span>.<span class="ident">close</span>().<span class="ident">unwrap</span>();
         });
-        <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-            <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(_) <span class='op'>=</span> <span class='ident'>send_frame</span>.<span class='ident'>send_next</span>() {
-                <span class='ident'>sender_work_queue</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>SendData</span>).<span class='ident'>unwrap</span>();
+        <span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">||</span> {
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(_) <span class="op">=</span> <span class="ident">send_frame</span>.<span class="ident">send_next</span>() {
+                <span class="ident">sender_work_queue</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">SendData</span>).<span class="ident">unwrap</span>();
             }
-            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Sender thread halting&quot;</span>);
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Sender thread halting&quot;</span>);
         });
-        <span class='ident'>thread</span>::<span class='ident'>spawn</span>(<span class='kw'>move</span> <span class='op'>||</span> {
-            <span class='kw'>while</span> <span class='kw'>let</span> <span class='prelude-val'>Ok</span>(_) <span class='op'>=</span> <span class='ident'>recv_frame</span>.<span class='ident'>read_next</span>() {
-                <span class='ident'>read_notify</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>HandleFrame</span>).<span class='ident'>unwrap</span>();
+        <span class="ident">thread</span>::<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">||</span> {
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(_) <span class="op">=</span> <span class="ident">recv_frame</span>.<span class="ident">read_next</span>() {
+                <span class="ident">read_notify</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">HandleFrame</span>).<span class="ident">unwrap</span>();
             }
-            <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Reader thread halting&quot;</span>);
+            <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Reader thread halting&quot;</span>);
         });
 
-        <span class='prelude-val'>Some</span>(<span class='ident'>Client</span> {
-            <span class='ident'>sender</span>: <span class='ident'>rx</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">Client</span> {
+            <span class="ident">sender</span>: <span class="ident">rx</span>,
         })
     }
 
-    <span class='doccomment'>/// Issues a new request to the server.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The request&#39;s method, path, and extra headers are provided as parameters.</span>
-    <span class='doccomment'>/// The headers should *never* include any meta-headers (such as `:method`).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The method itself returns immediately upon queuing the request. It does</span>
-    <span class='doccomment'>/// not wait for the request to be transmitted nor for the response to</span>
-    <span class='doccomment'>/// arrive. Once the caller is interested in the final response, they can</span>
-    <span class='doccomment'>/// block on the returned `Receiver` end of a channel which will receive</span>
-    <span class='doccomment'>/// the response once generated.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `Response` instance that the channel receives will contain the full</span>
-    <span class='doccomment'>/// response body and is available only once the full response body has</span>
-    <span class='doccomment'>/// been received.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the method is unable to queue the request, it must mean that the</span>
-    <span class='doccomment'>/// underlying HTTP/2 connection to which this client is associated has</span>
-    <span class='doccomment'>/// failed and it returns `None`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>request</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>method</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>headers</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>], <span class='ident'>body</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>)
-            <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> (<span class='ident'>resp_tx</span>, <span class='ident'>resp_rx</span>): (<span class='ident'>Sender</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span>, <span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;</span>) <span class='op'>=</span>
-                <span class='ident'>mpsc</span>::<span class='ident'>channel</span>();
-        <span class='comment'>// A send can only fail if the receiver is disconnected. If the send</span>
-        <span class='comment'>// fails here, it means that the service hit an error on the underlying</span>
-        <span class='comment'>// HTTP/2 connection and will never come alive again.</span>
-        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>sender</span>.<span class='ident'>send</span>(<span class='ident'>WorkItem</span>::<span class='ident'>Request</span>(<span class='ident'>AsyncRequest</span> {
-            <span class='ident'>method</span>: <span class='ident'>method</span>.<span class='ident'>to_vec</span>(),
-            <span class='ident'>path</span>: <span class='ident'>path</span>.<span class='ident'>to_vec</span>(),
-            <span class='ident'>headers</span>: <span class='ident'>headers</span>.<span class='ident'>to_vec</span>(),
-            <span class='ident'>body</span>: <span class='ident'>body</span>,
-            <span class='ident'>tx</span>: <span class='ident'>resp_tx</span>,
+    <span class="doccomment">/// Issues a new request to the server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The request&#39;s method, path, and extra headers are provided as parameters.</span>
+    <span class="doccomment">/// The headers should *never* include any meta-headers (such as `:method`).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The method itself returns immediately upon queuing the request. It does</span>
+    <span class="doccomment">/// not wait for the request to be transmitted nor for the response to</span>
+    <span class="doccomment">/// arrive. Once the caller is interested in the final response, they can</span>
+    <span class="doccomment">/// block on the returned `Receiver` end of a channel which will receive</span>
+    <span class="doccomment">/// the response once generated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `Response` instance that the channel receives will contain the full</span>
+    <span class="doccomment">/// response body and is available only once the full response body has</span>
+    <span class="doccomment">/// been received.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the method is unable to queue the request, it must mean that the</span>
+    <span class="doccomment">/// underlying HTTP/2 connection to which this client is associated has</span>
+    <span class="doccomment">/// failed and it returns `None`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">method</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">headers</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>], <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>)
+            <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">resp_tx</span>, <span class="ident">resp_rx</span>): (<span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>, <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>) <span class="op">=</span>
+                <span class="ident">mpsc</span>::<span class="ident">channel</span>();
+        <span class="comment">// A send can only fail if the receiver is disconnected. If the send</span>
+        <span class="comment">// fails here, it means that the service hit an error on the underlying</span>
+        <span class="comment">// HTTP/2 connection and will never come alive again.</span>
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">WorkItem</span>::<span class="ident">Request</span>(<span class="ident">AsyncRequest</span> {
+            <span class="ident">method</span>: <span class="ident">method</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">path</span>: <span class="ident">path</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">headers</span>: <span class="ident">headers</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">body</span>: <span class="ident">body</span>,
+            <span class="ident">tx</span>: <span class="ident">resp_tx</span>,
         }));
 
-        <span class='kw'>match</span> <span class='ident'>res</span> {
-            <span class='prelude-val'>Ok</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>resp_rx</span>),
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+        <span class="kw">match</span> <span class="ident">res</span> {
+            <span class="prelude-val">Ok</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">resp_rx</span>),
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='doccomment'>/// Issues a GET request to the server.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A convenience wrapper around the `request` method that sets the correct</span>
-    <span class='doccomment'>/// method.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>headers</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>request</span>(<span class='string'>b&quot;GET&quot;</span>, <span class='ident'>path</span>, <span class='ident'>headers</span>, <span class='prelude-val'>None</span>)
+    <span class="doccomment">/// Issues a GET request to the server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A convenience wrapper around the `request` method that sets the correct</span>
+    <span class="doccomment">/// method.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">headers</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;&gt;</span> {
+        <span class="self">self</span>.<span class="ident">request</span>(<span class="string">b&quot;GET&quot;</span>, <span class="ident">path</span>, <span class="ident">headers</span>, <span class="prelude-val">None</span>)
     }
 
-    <span class='doccomment'>/// Issues a POST request to the server.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns the receiving end of a channel where the `Response` will eventually be pushed.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>post</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>headers</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Header</span>], <span class='ident'>body</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)
-            <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Receiver</span><span class='op'>&lt;</span><span class='ident'>Response</span><span class='op'>&gt;&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>request</span>(<span class='string'>b&quot;POST&quot;</span>, <span class='ident'>path</span>, <span class='ident'>headers</span>, <span class='prelude-val'>Some</span>(<span class='ident'>body</span>))
+    <span class="doccomment">/// Issues a POST request to the server.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the receiving end of a channel where the `Response` will eventually be pushed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">headers</span>: <span class="kw-2">&amp;</span>[<span class="ident">Header</span>], <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)
+            <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;&gt;</span> {
+        <span class="self">self</span>.<span class="ident">request</span>(<span class="string">b&quot;POST&quot;</span>, <span class="ident">path</span>, <span class="ident">headers</span>, <span class="prelude-val">Some</span>(<span class="ident">body</span>))
     }
 }
 </pre>
@@ -1491,18 +1503,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1535,7 +1551,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

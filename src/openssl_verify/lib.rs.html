@@ -9,14 +9,18 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -524,487 +536,487 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Hostname verification for OpenSSL.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! OpenSSL up until version 1.1.0 did not support verification that the</span>
-<span class='doccomment'>//! certificate a server presents matches the domain a client is connecting to.</span>
-<span class='doccomment'>//! This check is crucial, as an attacker otherwise needs only to obtain a</span>
-<span class='doccomment'>//! legitimately signed certificate to *some* domain to execute a</span>
-<span class='doccomment'>//! man-in-the-middle attack.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The implementation in this crate is based off of libcurl&#39;s.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Examples</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! In most cases, the `verify_callback` function should be used in OpenSSL&#39;s</span>
-<span class='doccomment'>//! verification callback:</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! extern crate openssl;</span>
-<span class='doccomment'>//! extern crate openssl_verify;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! use std::net::TcpStream;</span>
-<span class='doccomment'>//! use openssl::ssl::{SslContext, SslMethod, SslStream, SSL_VERIFY_PEER, IntoSsl};</span>
-<span class='doccomment'>//! use openssl_verify::verify_callback;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # fn main() {</span>
-<span class='doccomment'>//! let domain = &quot;google.com&quot;;</span>
-<span class='doccomment'>//! let stream = TcpStream::connect((domain, 443)).unwrap();</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let mut ctx = SslContext::new(SslMethod::Sslv23).unwrap();</span>
-<span class='doccomment'>//! ctx.set_default_verify_paths().unwrap();</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let mut ssl = ctx.into_ssl().unwrap();</span>
-<span class='doccomment'>//! let domain = domain.to_owned();</span>
-<span class='doccomment'>//! ssl.set_verify_callback(SSL_VERIFY_PEER, move |p, x| verify_callback(&amp;domain, p, x));</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let ssl_stream = SslStream::connect(ssl, stream).unwrap();</span>
-<span class='doccomment'>//! # }</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! Hostname verification for OpenSSL.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! OpenSSL up until version 1.1.0 did not support verification that the</span>
+<span class="doccomment">//! certificate a server presents matches the domain a client is connecting to.</span>
+<span class="doccomment">//! This check is crucial, as an attacker otherwise needs only to obtain a</span>
+<span class="doccomment">//! legitimately signed certificate to *some* domain to execute a</span>
+<span class="doccomment">//! man-in-the-middle attack.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The implementation in this crate is based off of libcurl&#39;s.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! In most cases, the `verify_callback` function should be used in OpenSSL&#39;s</span>
+<span class="doccomment">//! verification callback:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! extern crate openssl;</span>
+<span class="doccomment">//! extern crate openssl_verify;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! use std::net::TcpStream;</span>
+<span class="doccomment">//! use openssl::ssl::{SslContext, SslMethod, SslStream, SSL_VERIFY_PEER, IntoSsl};</span>
+<span class="doccomment">//! use openssl_verify::verify_callback;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! let domain = &quot;google.com&quot;;</span>
+<span class="doccomment">//! let stream = TcpStream::connect((domain, 443)).unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut ctx = SslContext::new(SslMethod::Sslv23).unwrap();</span>
+<span class="doccomment">//! ctx.set_default_verify_paths().unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut ssl = ctx.into_ssl().unwrap();</span>
+<span class="doccomment">//! let domain = domain.to_owned();</span>
+<span class="doccomment">//! ssl.set_verify_callback(SSL_VERIFY_PEER, move |p, x| verify_callback(&amp;domain, p, x));</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let ssl_stream = SslStream::connect(ssl, stream).unwrap();</span>
+<span class="doccomment">//! # }</span>
 
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>openssl</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">openssl</span>;
 
-<span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>nid</span>::<span class='ident'>Nid</span>;
-<span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>x509</span>::{<span class='ident'>X509StoreContext</span>, <span class='ident'>X509</span>, <span class='ident'>GeneralNames</span>, <span class='ident'>X509Name</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::<span class='ident'>IpAddr</span>;
+<span class="kw">use</span> <span class="ident">openssl</span>::<span class="ident">nid</span>::<span class="ident">Nid</span>;
+<span class="kw">use</span> <span class="ident">openssl</span>::<span class="ident">x509</span>::{<span class="ident">X509StoreContext</span>, <span class="ident">X509</span>, <span class="ident">GeneralNames</span>, <span class="ident">X509Name</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">IpAddr</span>;
 
-<span class='doccomment'>/// A convenience wrapper around verify_hostname that implements the logic for</span>
-<span class='doccomment'>/// OpenSSL&#39;s certificate verification callback.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If `preverify_ok` is false or the certificate depth is not 0, it will</span>
-<span class='doccomment'>/// simply return the value of `preverify_ok`. It will otherwise validate the</span>
-<span class='doccomment'>/// that the provided fully qualified domain name matches that of the leaf</span>
-<span class='doccomment'>/// certificate.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>verify_callback</span>(<span class='ident'>domain</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>preverify_ok</span>: <span class='ident'>bool</span>, <span class='ident'>x509_ctx</span>: <span class='kw-2'>&amp;</span><span class='ident'>X509StoreContext</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>preverify_ok</span> <span class='op'>||</span> <span class='ident'>x509_ctx</span>.<span class='ident'>error_depth</span>() <span class='op'>!=</span> <span class='number'>0</span> {
-        <span class='kw'>return</span> <span class='ident'>preverify_ok</span>;
+<span class="doccomment">/// A convenience wrapper around verify_hostname that implements the logic for</span>
+<span class="doccomment">/// OpenSSL&#39;s certificate verification callback.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If `preverify_ok` is false or the certificate depth is not 0, it will</span>
+<span class="doccomment">/// simply return the value of `preverify_ok`. It will otherwise validate the</span>
+<span class="doccomment">/// that the provided fully qualified domain name matches that of the leaf</span>
+<span class="doccomment">/// certificate.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_callback</span>(<span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">preverify_ok</span>: <span class="ident">bool</span>, <span class="ident">x509_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">X509StoreContext</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">preverify_ok</span> <span class="op">||</span> <span class="ident">x509_ctx</span>.<span class="ident">error_depth</span>() <span class="op">!=</span> <span class="number">0</span> {
+        <span class="kw">return</span> <span class="ident">preverify_ok</span>;
     }
 
-    <span class='kw'>match</span> <span class='ident'>x509_ctx</span>.<span class='ident'>get_current_cert</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>x509</span>) <span class='op'>=&gt;</span> <span class='ident'>verify_hostname</span>(<span class='ident'>domain</span>, <span class='kw-2'>&amp;</span><span class='ident'>x509</span>),
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-    }
-}
-
-<span class='doccomment'>/// Validates that the certificate matches the provided fully qualified domain</span>
-<span class='doccomment'>/// name.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>verify_hostname</span>(<span class='ident'>domain</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>cert</span>: <span class='kw-2'>&amp;</span><span class='ident'>X509</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='kw'>match</span> <span class='ident'>cert</span>.<span class='ident'>subject_alt_names</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>names</span>) <span class='op'>=&gt;</span> <span class='ident'>verify_subject_alt_names</span>(<span class='ident'>domain</span>, <span class='kw-2'>&amp;</span><span class='ident'>names</span>),
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>verify_subject_name</span>(<span class='ident'>domain</span>, <span class='kw-2'>&amp;</span><span class='ident'>cert</span>.<span class='ident'>subject_name</span>()),
+    <span class="kw">match</span> <span class="ident">x509_ctx</span>.<span class="ident">get_current_cert</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">x509</span>) <span class="op">=&gt;</span> <span class="ident">verify_hostname</span>(<span class="ident">domain</span>, <span class="kw-2">&amp;</span><span class="ident">x509</span>),
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
     }
 }
 
-<span class='kw'>fn</span> <span class='ident'>verify_subject_alt_names</span>(<span class='ident'>domain</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>names</span>: <span class='kw-2'>&amp;</span><span class='ident'>GeneralNames</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='kw'>let</span> <span class='ident'>ip</span> <span class='op'>=</span> <span class='ident'>domain</span>.<span class='ident'>parse</span>();
+<span class="doccomment">/// Validates that the certificate matches the provided fully qualified domain</span>
+<span class="doccomment">/// name.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_hostname</span>(<span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">X509</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">match</span> <span class="ident">cert</span>.<span class="ident">subject_alt_names</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">names</span>) <span class="op">=&gt;</span> <span class="ident">verify_subject_alt_names</span>(<span class="ident">domain</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>),
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">verify_subject_name</span>(<span class="ident">domain</span>, <span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">subject_name</span>()),
+    }
+}
 
-    <span class='kw'>for</span> <span class='ident'>name</span> <span class='kw'>in</span> <span class='ident'>names</span> {
-        <span class='kw'>match</span> <span class='ident'>ip</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>ip</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>actual</span>) <span class='op'>=</span> <span class='ident'>name</span>.<span class='ident'>ipaddress</span>() {
-                    <span class='kw'>if</span> <span class='ident'>matches_ip</span>(<span class='kw-2'>&amp;</span><span class='ident'>ip</span>, <span class='ident'>actual</span>) {
-                        <span class='kw'>return</span> <span class='bool-val'>true</span>;
+<span class="kw">fn</span> <span class="ident">verify_subject_alt_names</span>(<span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">GeneralNames</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> <span class="ident">domain</span>.<span class="ident">parse</span>();
+
+    <span class="kw">for</span> <span class="ident">name</span> <span class="kw">in</span> <span class="ident">names</span> {
+        <span class="kw">match</span> <span class="ident">ip</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">ip</span>) <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">actual</span>) <span class="op">=</span> <span class="ident">name</span>.<span class="ident">ipaddress</span>() {
+                    <span class="kw">if</span> <span class="ident">matches_ip</span>(<span class="kw-2">&amp;</span><span class="ident">ip</span>, <span class="ident">actual</span>) {
+                        <span class="kw">return</span> <span class="bool-val">true</span>;
                     }
                 }
             }
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>pattern</span>) <span class='op'>=</span> <span class='ident'>name</span>.<span class='ident'>dnsname</span>() {
-                    <span class='kw'>if</span> <span class='ident'>matches_dns</span>(<span class='ident'>pattern</span>, <span class='ident'>domain</span>, <span class='bool-val'>false</span>) {
-                        <span class='kw'>return</span> <span class='bool-val'>true</span>;
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pattern</span>) <span class="op">=</span> <span class="ident">name</span>.<span class="ident">dnsname</span>() {
+                    <span class="kw">if</span> <span class="ident">matches_dns</span>(<span class="ident">pattern</span>, <span class="ident">domain</span>, <span class="bool-val">false</span>) {
+                        <span class="kw">return</span> <span class="bool-val">true</span>;
                     }
                 }
             }
         }
     }
 
-    <span class='bool-val'>false</span>
+    <span class="bool-val">false</span>
 }
 
-<span class='kw'>fn</span> <span class='ident'>verify_subject_name</span>(<span class='ident'>domain</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>subject_name</span>: <span class='kw-2'>&amp;</span><span class='ident'>X509Name</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>pattern</span>) <span class='op'>=</span> <span class='ident'>subject_name</span>.<span class='ident'>text_by_nid</span>(<span class='ident'>Nid</span>::<span class='ident'>CN</span>) {
-        <span class='comment'>// Unlike with SANs, IP addresses in the subject name don&#39;t have a</span>
-        <span class='comment'>// different encoding. We need to pass this down to matches_dns to</span>
-        <span class='comment'>// disallow wildcard matches with bogus patterns like *.0.0.1</span>
-        <span class='kw'>let</span> <span class='ident'>is_ip</span> <span class='op'>=</span> <span class='ident'>domain</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>IpAddr</span><span class='op'>&gt;</span>().<span class='ident'>is_ok</span>();
+<span class="kw">fn</span> <span class="ident">verify_subject_name</span>(<span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">subject_name</span>: <span class="kw-2">&amp;</span><span class="ident">X509Name</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pattern</span>) <span class="op">=</span> <span class="ident">subject_name</span>.<span class="ident">text_by_nid</span>(<span class="ident">Nid</span>::<span class="ident">CN</span>) {
+        <span class="comment">// Unlike with SANs, IP addresses in the subject name don&#39;t have a</span>
+        <span class="comment">// different encoding. We need to pass this down to matches_dns to</span>
+        <span class="comment">// disallow wildcard matches with bogus patterns like *.0.0.1</span>
+        <span class="kw">let</span> <span class="ident">is_ip</span> <span class="op">=</span> <span class="ident">domain</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>().<span class="ident">is_ok</span>();
 
-        <span class='kw'>if</span> <span class='ident'>matches_dns</span>(<span class='kw-2'>&amp;</span><span class='ident'>pattern</span>, <span class='ident'>domain</span>, <span class='ident'>is_ip</span>) {
-            <span class='kw'>return</span> <span class='bool-val'>true</span>;
+        <span class="kw">if</span> <span class="ident">matches_dns</span>(<span class="kw-2">&amp;</span><span class="ident">pattern</span>, <span class="ident">domain</span>, <span class="ident">is_ip</span>) {
+            <span class="kw">return</span> <span class="bool-val">true</span>;
         }
     }
 
-    <span class='bool-val'>false</span>
+    <span class="bool-val">false</span>
 }
 
-<span class='kw'>fn</span> <span class='ident'>matches_dns</span>(<span class='kw-2'>mut</span> <span class='ident'>pattern</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='kw-2'>mut</span> <span class='ident'>hostname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>is_ip</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='comment'>// first strip trailing . off of pattern and hostname to normalize</span>
-    <span class='kw'>if</span> <span class='ident'>pattern</span>.<span class='ident'>ends_with</span>(<span class='string'>&#39;.&#39;</span>) {
-        <span class='ident'>pattern</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pattern</span>[..<span class='ident'>pattern</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>];
+<span class="kw">fn</span> <span class="ident">matches_dns</span>(<span class="kw-2">mut</span> <span class="ident">pattern</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ip</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="comment">// first strip trailing . off of pattern and hostname to normalize</span>
+    <span class="kw">if</span> <span class="ident">pattern</span>.<span class="ident">ends_with</span>(<span class="string">&#39;.&#39;</span>) {
+        <span class="ident">pattern</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pattern</span>[..<span class="ident">pattern</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
     }
-    <span class='kw'>if</span> <span class='ident'>hostname</span>.<span class='ident'>ends_with</span>(<span class='string'>&#39;.&#39;</span>) {
-        <span class='ident'>hostname</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>hostname</span>[..<span class='ident'>hostname</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>];
+    <span class="kw">if</span> <span class="ident">hostname</span>.<span class="ident">ends_with</span>(<span class="string">&#39;.&#39;</span>) {
+        <span class="ident">hostname</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">hostname</span>[..<span class="ident">hostname</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
     }
 
-    <span class='ident'>matches_wildcard</span>(<span class='ident'>pattern</span>, <span class='ident'>hostname</span>, <span class='ident'>is_ip</span>).<span class='ident'>unwrap_or_else</span>(<span class='op'>||</span> <span class='ident'>pattern</span> <span class='op'>==</span> <span class='ident'>hostname</span>)
+    <span class="ident">matches_wildcard</span>(<span class="ident">pattern</span>, <span class="ident">hostname</span>, <span class="ident">is_ip</span>).<span class="ident">unwrap_or_else</span>(<span class="op">||</span> <span class="ident">pattern</span> <span class="op">==</span> <span class="ident">hostname</span>)
 }
 
-<span class='kw'>fn</span> <span class='ident'>matches_wildcard</span>(<span class='ident'>pattern</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>hostname</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>is_ip</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
-    <span class='comment'>// IP addresses and internationalized domains can&#39;t involved in wildcards</span>
-    <span class='kw'>if</span> <span class='ident'>is_ip</span> <span class='op'>||</span> <span class='ident'>pattern</span>.<span class='ident'>starts_with</span>(<span class='string'>&quot;xn--&quot;</span>) {
-        <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+<span class="kw">fn</span> <span class="ident">matches_wildcard</span>(<span class="ident">pattern</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ip</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="comment">// IP addresses and internationalized domains can&#39;t involved in wildcards</span>
+    <span class="kw">if</span> <span class="ident">is_ip</span> <span class="op">||</span> <span class="ident">pattern</span>.<span class="ident">starts_with</span>(<span class="string">&quot;xn--&quot;</span>) {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class='kw'>let</span> <span class='ident'>wildcard_location</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>pattern</span>.<span class='ident'>find</span>(<span class='string'>&#39;*&#39;</span>) {
-        <span class='prelude-val'>Some</span>(<span class='ident'>l</span>) <span class='op'>=&gt;</span> <span class='ident'>l</span>,
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">let</span> <span class="ident">wildcard_location</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pattern</span>.<span class="ident">find</span>(<span class="string">&#39;*&#39;</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=&gt;</span> <span class="ident">l</span>,
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dot_idxs</span> <span class='op'>=</span> <span class='ident'>pattern</span>.<span class='ident'>match_indices</span>(<span class='string'>&#39;.&#39;</span>).<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>l</span>, _)<span class='op'>|</span> <span class='ident'>l</span>);
-    <span class='kw'>let</span> <span class='ident'>wildcard_end</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>dot_idxs</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>l</span>) <span class='op'>=&gt;</span> <span class='ident'>l</span>,
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dot_idxs</span> <span class="op">=</span> <span class="ident">pattern</span>.<span class="ident">match_indices</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, _)<span class="op">|</span> <span class="ident">l</span>);
+    <span class="kw">let</span> <span class="ident">wildcard_end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dot_idxs</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=&gt;</span> <span class="ident">l</span>,
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
-    <span class='comment'>// Never match wildcards if the pattern has less than 2 &#39;.&#39;s (no *.com)</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// This is a bit dubious, as it doesn&#39;t disallow other TLDs like *.co.uk.</span>
-    <span class='comment'>// Chrome has a black- and white-list for this, but Firefox (via NSS) does</span>
-    <span class='comment'>// the same thing we do here.</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// The Public Suffix (https://www.publicsuffix.org/) list could</span>
-    <span class='comment'>// potentically be used here, but it&#39;s both huge and updated frequently</span>
-    <span class='comment'>// enough that management would be a PITA.</span>
-    <span class='kw'>if</span> <span class='ident'>dot_idxs</span>.<span class='ident'>next</span>().<span class='ident'>is_none</span>() {
-        <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    <span class="comment">// Never match wildcards if the pattern has less than 2 &#39;.&#39;s (no *.com)</span>
+    <span class="comment">//</span>
+    <span class="comment">// This is a bit dubious, as it doesn&#39;t disallow other TLDs like *.co.uk.</span>
+    <span class="comment">// Chrome has a black- and white-list for this, but Firefox (via NSS) does</span>
+    <span class="comment">// the same thing we do here.</span>
+    <span class="comment">//</span>
+    <span class="comment">// The Public Suffix (https://www.publicsuffix.org/) list could</span>
+    <span class="comment">// potentically be used here, but it&#39;s both huge and updated frequently</span>
+    <span class="comment">// enough that management would be a PITA.</span>
+    <span class="kw">if</span> <span class="ident">dot_idxs</span>.<span class="ident">next</span>().<span class="ident">is_none</span>() {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class='comment'>// Wildcards can only be in the first component</span>
-    <span class='kw'>if</span> <span class='ident'>wildcard_location</span> <span class='op'>&gt;</span> <span class='ident'>wildcard_end</span> {
-        <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    <span class="comment">// Wildcards can only be in the first component</span>
+    <span class="kw">if</span> <span class="ident">wildcard_location</span> <span class="op">&gt;</span> <span class="ident">wildcard_end</span> {
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class='kw'>let</span> <span class='ident'>hostname_label_end</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>hostname</span>.<span class='ident'>find</span>(<span class='string'>&#39;.&#39;</span>) {
-        <span class='prelude-val'>Some</span>(<span class='ident'>l</span>) <span class='op'>=&gt;</span> <span class='ident'>l</span>,
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">let</span> <span class="ident">hostname_label_end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">hostname</span>.<span class="ident">find</span>(<span class="string">&#39;.&#39;</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=&gt;</span> <span class="ident">l</span>,
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
     };
 
-    <span class='comment'>// check that the non-wildcard parts are identical</span>
-    <span class='kw'>if</span> <span class='ident'>pattern</span>[<span class='ident'>wildcard_end</span>..] <span class='op'>!=</span> <span class='ident'>hostname</span>[<span class='ident'>hostname_label_end</span>..] {
-        <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='bool-val'>false</span>);
+    <span class="comment">// check that the non-wildcard parts are identical</span>
+    <span class="kw">if</span> <span class="ident">pattern</span>[<span class="ident">wildcard_end</span>..] <span class="op">!=</span> <span class="ident">hostname</span>[<span class="ident">hostname_label_end</span>..] {
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
     }
 
-    <span class='kw'>let</span> <span class='ident'>wildcard_prefix</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pattern</span>[..<span class='ident'>wildcard_location</span>];
-    <span class='kw'>let</span> <span class='ident'>wildcard_suffix</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pattern</span>[<span class='ident'>wildcard_location</span> <span class='op'>+</span> <span class='number'>1</span>..<span class='ident'>wildcard_end</span>];
+    <span class="kw">let</span> <span class="ident">wildcard_prefix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pattern</span>[..<span class="ident">wildcard_location</span>];
+    <span class="kw">let</span> <span class="ident">wildcard_suffix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pattern</span>[<span class="ident">wildcard_location</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">wildcard_end</span>];
 
-    <span class='kw'>let</span> <span class='ident'>hostname_label</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>hostname</span>[..<span class='ident'>hostname_label_end</span>];
+    <span class="kw">let</span> <span class="ident">hostname_label</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">hostname</span>[..<span class="ident">hostname_label_end</span>];
 
-    <span class='comment'>// check the prefix of the first label</span>
-    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>hostname_label</span>.<span class='ident'>starts_with</span>(<span class='ident'>wildcard_prefix</span>) {
-        <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='bool-val'>false</span>);
+    <span class="comment">// check the prefix of the first label</span>
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">hostname_label</span>.<span class="ident">starts_with</span>(<span class="ident">wildcard_prefix</span>) {
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
     }
 
-    <span class='comment'>// and the suffix</span>
-    <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>hostname_label</span>[<span class='ident'>wildcard_prefix</span>.<span class='ident'>len</span>()..].<span class='ident'>ends_with</span>(<span class='ident'>wildcard_suffix</span>) {
-        <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='bool-val'>false</span>);
+    <span class="comment">// and the suffix</span>
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">hostname_label</span>[<span class="ident">wildcard_prefix</span>.<span class="ident">len</span>()..].<span class="ident">ends_with</span>(<span class="ident">wildcard_suffix</span>) {
+        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
     }
 
-    <span class='prelude-val'>Some</span>(<span class='bool-val'>true</span>)
+    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
 }
 
-<span class='kw'>fn</span> <span class='ident'>matches_ip</span>(<span class='ident'>expected</span>: <span class='kw-2'>&amp;</span><span class='ident'>IpAddr</span>, <span class='ident'>actual</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-    <span class='kw'>match</span> (<span class='ident'>expected</span>, <span class='ident'>actual</span>.<span class='ident'>len</span>()) {
-        (<span class='kw-2'>&amp;</span><span class='ident'>IpAddr</span>::<span class='ident'>V4</span>(<span class='kw-2'>ref</span> <span class='ident'>addr</span>), <span class='number'>4</span>) <span class='op'>=&gt;</span> <span class='ident'>actual</span> <span class='op'>==</span> <span class='ident'>addr</span>.<span class='ident'>octets</span>(),
-        (<span class='kw-2'>&amp;</span><span class='ident'>IpAddr</span>::<span class='ident'>V6</span>(<span class='kw-2'>ref</span> <span class='ident'>addr</span>), <span class='number'>16</span>) <span class='op'>=&gt;</span> {
-            <span class='kw'>let</span> <span class='ident'>segments</span> <span class='op'>=</span> [((<span class='ident'>actual</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>1</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>2</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>3</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>4</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>5</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>6</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>7</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>8</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>9</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>10</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>11</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>12</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>13</span>] <span class='kw'>as</span> <span class='ident'>u16</span>,
-                            ((<span class='ident'>actual</span>[<span class='number'>14</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> <span class='ident'>actual</span>[<span class='number'>15</span>] <span class='kw'>as</span> <span class='ident'>u16</span>];
-            <span class='ident'>segments</span> <span class='op'>==</span> <span class='ident'>addr</span>.<span class='ident'>segments</span>()
+<span class="kw">fn</span> <span class="ident">matches_ip</span>(<span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">match</span> (<span class="ident">expected</span>, <span class="ident">actual</span>.<span class="ident">len</span>()) {
+        (<span class="kw-2">&amp;</span><span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="kw-2">ref</span> <span class="ident">addr</span>), <span class="number">4</span>) <span class="op">=&gt;</span> <span class="ident">actual</span> <span class="op">==</span> <span class="ident">addr</span>.<span class="ident">octets</span>(),
+        (<span class="kw-2">&amp;</span><span class="ident">IpAddr</span>::<span class="ident">V6</span>(<span class="kw-2">ref</span> <span class="ident">addr</span>), <span class="number">16</span>) <span class="op">=&gt;</span> {
+            <span class="kw">let</span> <span class="ident">segments</span> <span class="op">=</span> [((<span class="ident">actual</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">4</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">5</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">6</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">7</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">8</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">9</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">10</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">11</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">12</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">13</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+                            ((<span class="ident">actual</span>[<span class="number">14</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">actual</span>[<span class="number">15</span>] <span class="kw">as</span> <span class="ident">u16</span>];
+            <span class="ident">segments</span> <span class="op">==</span> <span class="ident">addr</span>.<span class="ident">segments</span>()
         }
-        _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+        _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::{<span class='ident'>SslContext</span>, <span class='ident'>SslMethod</span>, <span class='ident'>IntoSsl</span>, <span class='ident'>SslStream</span>, <span class='ident'>SSL_VERIFY_PEER</span>};
-    <span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::<span class='ident'>error</span>::<span class='ident'>SslError</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::<span class='ident'>TcpStream</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>process</span>::{<span class='ident'>Command</span>, <span class='ident'>Child</span>, <span class='ident'>Stdio</span>};
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>sync</span>::<span class='ident'>atomic</span>::{<span class='ident'>AtomicUsize</span>, <span class='ident'>ATOMIC_USIZE_INIT</span>, <span class='ident'>Ordering</span>};
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>thread</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>time</span>::<span class='ident'>Duration</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">openssl</span>::<span class="ident">ssl</span>::{<span class="ident">SslContext</span>, <span class="ident">SslMethod</span>, <span class="ident">IntoSsl</span>, <span class="ident">SslStream</span>, <span class="ident">SSL_VERIFY_PEER</span>};
+    <span class="kw">use</span> <span class="ident">openssl</span>::<span class="ident">ssl</span>::<span class="ident">error</span>::<span class="ident">SslError</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">TcpStream</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">process</span>::{<span class="ident">Command</span>, <span class="ident">Child</span>, <span class="ident">Stdio</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">ATOMIC_USIZE_INIT</span>, <span class="ident">Ordering</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">thread</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class='kw'>static</span> <span class='ident'>NEXT_PORT</span>: <span class='ident'>AtomicUsize</span> <span class='op'>=</span> <span class='ident'>ATOMIC_USIZE_INIT</span>;
+    <span class="kw">static</span> <span class="ident">NEXT_PORT</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">ATOMIC_USIZE_INIT</span>;
 
-    <span class='kw'>struct</span> <span class='ident'>Server</span> {
-        <span class='ident'>child</span>: <span class='ident'>Child</span>,
-        <span class='ident'>port</span>: <span class='ident'>u16</span>,
+    <span class="kw">struct</span> <span class="ident">Server</span> {
+        <span class="ident">child</span>: <span class="ident">Child</span>,
+        <span class="ident">port</span>: <span class="ident">u16</span>,
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Server</span> {
-        <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>child</span>.<span class='ident'>kill</span>();
+    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Server</span> {
+        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+            <span class="kw">let</span> _ <span class="op">=</span> <span class="self">self</span>.<span class="ident">child</span>.<span class="ident">kill</span>();
         }
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Server</span> {
-        <span class='kw'>fn</span> <span class='ident'>start</span>(<span class='ident'>cert</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Server</span> {
-            <span class='kw'>let</span> <span class='ident'>port</span> <span class='op'>=</span> <span class='number'>15410</span> <span class='op'>+</span> <span class='ident'>NEXT_PORT</span>.<span class='ident'>fetch_add</span>(<span class='number'>1</span>, <span class='ident'>Ordering</span>::<span class='ident'>SeqCst</span>) <span class='kw'>as</span> <span class='ident'>u16</span>;
+    <span class="kw">impl</span> <span class="ident">Server</span> {
+        <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Server</span> {
+            <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="number">15410</span> <span class="op">+</span> <span class="ident">NEXT_PORT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering</span>::<span class="ident">SeqCst</span>) <span class="kw">as</span> <span class="ident">u16</span>;
 
-            <span class='kw'>let</span> <span class='ident'>child</span> <span class='op'>=</span> <span class='ident'>Command</span>::<span class='ident'>new</span>(<span class='string'>&quot;openssl&quot;</span>)
-                            .<span class='ident'>arg</span>(<span class='string'>&quot;s_server&quot;</span>)
-                            .<span class='ident'>arg</span>(<span class='string'>&quot;-accept&quot;</span>)
-                            .<span class='ident'>arg</span>(<span class='ident'>port</span>.<span class='ident'>to_string</span>())
-                            .<span class='ident'>arg</span>(<span class='string'>&quot;-cert&quot;</span>)
-                            .<span class='ident'>arg</span>(<span class='ident'>cert</span>)
-                            .<span class='ident'>arg</span>(<span class='string'>&quot;-key&quot;</span>)
-                            .<span class='ident'>arg</span>(<span class='ident'>key</span>)
-                            .<span class='ident'>stdout</span>(<span class='ident'>Stdio</span>::<span class='ident'>null</span>())
-                            .<span class='ident'>stderr</span>(<span class='ident'>Stdio</span>::<span class='ident'>null</span>())
-                            .<span class='ident'>stdin</span>(<span class='ident'>Stdio</span>::<span class='ident'>piped</span>())
-                            .<span class='ident'>spawn</span>()
-                            .<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">Command</span>::<span class="ident">new</span>(<span class="string">&quot;openssl&quot;</span>)
+                            .<span class="ident">arg</span>(<span class="string">&quot;s_server&quot;</span>)
+                            .<span class="ident">arg</span>(<span class="string">&quot;-accept&quot;</span>)
+                            .<span class="ident">arg</span>(<span class="ident">port</span>.<span class="ident">to_string</span>())
+                            .<span class="ident">arg</span>(<span class="string">&quot;-cert&quot;</span>)
+                            .<span class="ident">arg</span>(<span class="ident">cert</span>)
+                            .<span class="ident">arg</span>(<span class="string">&quot;-key&quot;</span>)
+                            .<span class="ident">arg</span>(<span class="ident">key</span>)
+                            .<span class="ident">stdout</span>(<span class="ident">Stdio</span>::<span class="ident">null</span>())
+                            .<span class="ident">stderr</span>(<span class="ident">Stdio</span>::<span class="ident">null</span>())
+                            .<span class="ident">stdin</span>(<span class="ident">Stdio</span>::<span class="ident">piped</span>())
+                            .<span class="ident">spawn</span>()
+                            .<span class="ident">unwrap</span>();
 
-            <span class='ident'>Server</span> {
-                <span class='ident'>child</span>: <span class='ident'>child</span>,
-                <span class='ident'>port</span>: <span class='ident'>port</span>,
+            <span class="ident">Server</span> {
+                <span class="ident">child</span>: <span class="ident">child</span>,
+                <span class="ident">port</span>: <span class="ident">port</span>,
             }
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>connect</span>(<span class='ident'>cert</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> (<span class='ident'>Server</span>, <span class='ident'>TcpStream</span>) {
-        <span class='kw'>let</span> <span class='ident'>server</span> <span class='op'>=</span> <span class='ident'>Server</span>::<span class='ident'>start</span>(<span class='ident'>cert</span>, <span class='ident'>key</span>);
+    <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> (<span class="ident">Server</span>, <span class="ident">TcpStream</span>) {
+        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server</span>::<span class="ident">start</span>(<span class="ident">cert</span>, <span class="ident">key</span>);
 
-        <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>20</span> {
-            <span class='kw'>match</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>((<span class='string'>&quot;localhost&quot;</span>, <span class='ident'>server</span>.<span class='ident'>port</span>)) {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> (<span class='ident'>server</span>, <span class='ident'>s</span>),
-                <span class='prelude-val'>Err</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='kw'>if</span> <span class='ident'>e</span>.<span class='ident'>kind</span>() <span class='op'>==</span> <span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>ConnectionRefused</span> <span class='op'>=&gt;</span> {
-                    <span class='ident'>thread</span>::<span class='ident'>sleep</span>(<span class='ident'>Duration</span>::<span class='ident'>from_millis</span>(<span class='number'>100</span>));
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..<span class="number">20</span> {
+            <span class="kw">match</span> <span class="ident">TcpStream</span>::<span class="ident">connect</span>((<span class="string">&quot;localhost&quot;</span>, <span class="ident">server</span>.<span class="ident">port</span>)) {
+                <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw">return</span> (<span class="ident">server</span>, <span class="ident">s</span>),
+                <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">ConnectionRefused</span> <span class="op">=&gt;</span> {
+                    <span class="ident">thread</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">100</span>));
                 }
-                <span class='prelude-val'>Err</span>(<span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;failed to connect: {}&quot;</span>, <span class='ident'>e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;failed to connect: {}&quot;</span>, <span class="ident">e</span>),
             }
         }
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;server never came online&quot;</span>);
+        <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;server never came online&quot;</span>);
     }
 
-    <span class='kw'>fn</span> <span class='ident'>negotiate</span>(<span class='ident'>cert</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>domain</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>SslStream</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span><span class='op'>&gt;</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> (<span class='ident'>_server</span>, <span class='ident'>stream</span>) <span class='op'>=</span> <span class='ident'>connect</span>(<span class='ident'>cert</span>, <span class='ident'>key</span>);
+    <span class="kw">fn</span> <span class="ident">negotiate</span>(<span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">_server</span>, <span class="ident">stream</span>) <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">cert</span>, <span class="ident">key</span>);
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>ctx</span>.<span class='ident'>set_CA_file</span>(<span class='ident'>cert</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ssl</span> <span class='op'>=</span> <span class='ident'>ctx</span>.<span class='ident'>into_ssl</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">SslContext</span>::<span class="ident">new</span>(<span class="ident">SslMethod</span>::<span class="ident">Sslv23</span>).<span class="ident">unwrap</span>();
+        <span class="ident">ctx</span>.<span class="ident">set_CA_file</span>(<span class="ident">cert</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ssl</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">into_ssl</span>().<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>domain</span> <span class='op'>=</span> <span class='ident'>domain</span>.<span class='ident'>to_owned</span>();
-        <span class='ident'>ssl</span>.<span class='ident'>set_verify_callback</span>(<span class='ident'>SSL_VERIFY_PEER</span>, <span class='kw'>move</span> <span class='op'>|</span><span class='ident'>p</span>, <span class='ident'>x</span><span class='op'>|</span> <span class='ident'>verify_callback</span>(<span class='kw-2'>&amp;</span><span class='ident'>domain</span>, <span class='ident'>p</span>, <span class='ident'>x</span>));
+        <span class="kw">let</span> <span class="ident">domain</span> <span class="op">=</span> <span class="ident">domain</span>.<span class="ident">to_owned</span>();
+        <span class="ident">ssl</span>.<span class="ident">set_verify_callback</span>(<span class="ident">SSL_VERIFY_PEER</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">p</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">verify_callback</span>(<span class="kw-2">&amp;</span><span class="ident">domain</span>, <span class="ident">p</span>, <span class="ident">x</span>));
 
-        <span class='ident'>SslStream</span>::<span class='ident'>connect</span>(<span class='ident'>ssl</span>, <span class='ident'>stream</span>)
+        <span class="ident">SslStream</span>::<span class="ident">connect</span>(<span class="ident">ssl</span>, <span class="ident">stream</span>)
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>google_valid</span>() {
-        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='string'>&quot;google.com:443&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>ctx</span>.<span class='ident'>set_default_verify_paths</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ssl</span> <span class='op'>=</span> <span class='ident'>ctx</span>.<span class='ident'>into_ssl</span>().<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">google_valid</span>() {
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream</span>::<span class="ident">connect</span>(<span class="string">&quot;google.com:443&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">SslContext</span>::<span class="ident">new</span>(<span class="ident">SslMethod</span>::<span class="ident">Sslv23</span>).<span class="ident">unwrap</span>();
+        <span class="ident">ctx</span>.<span class="ident">set_default_verify_paths</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ssl</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">into_ssl</span>().<span class="ident">unwrap</span>();
 
-        <span class='ident'>ssl</span>.<span class='ident'>set_verify_callback</span>(<span class='ident'>SSL_VERIFY_PEER</span>, <span class='op'>|</span><span class='ident'>p</span>, <span class='ident'>x</span><span class='op'>|</span> <span class='ident'>verify_callback</span>(<span class='string'>&quot;google.com&quot;</span>, <span class='ident'>p</span>, <span class='ident'>x</span>));
+        <span class="ident">ssl</span>.<span class="ident">set_verify_callback</span>(<span class="ident">SSL_VERIFY_PEER</span>, <span class="op">|</span><span class="ident">p</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">verify_callback</span>(<span class="string">&quot;google.com&quot;</span>, <span class="ident">p</span>, <span class="ident">x</span>));
 
-        <span class='ident'>SslStream</span>::<span class='ident'>connect</span>(<span class='ident'>ssl</span>, <span class='ident'>stream</span>).<span class='ident'>unwrap</span>();
+        <span class="ident">SslStream</span>::<span class="ident">connect</span>(<span class="ident">ssl</span>, <span class="ident">stream</span>).<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>google_bad_domain</span>() {
-        <span class='kw'>let</span> <span class='ident'>stream</span> <span class='op'>=</span> <span class='ident'>TcpStream</span>::<span class='ident'>connect</span>(<span class='string'>&quot;google.com:443&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='ident'>SslContext</span>::<span class='ident'>new</span>(<span class='ident'>SslMethod</span>::<span class='ident'>Sslv23</span>).<span class='ident'>unwrap</span>();
-        <span class='ident'>ctx</span>.<span class='ident'>set_default_verify_paths</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ssl</span> <span class='op'>=</span> <span class='ident'>ctx</span>.<span class='ident'>into_ssl</span>().<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">google_bad_domain</span>() {
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream</span>::<span class="ident">connect</span>(<span class="string">&quot;google.com:443&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">SslContext</span>::<span class="ident">new</span>(<span class="ident">SslMethod</span>::<span class="ident">Sslv23</span>).<span class="ident">unwrap</span>();
+        <span class="ident">ctx</span>.<span class="ident">set_default_verify_paths</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ssl</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">into_ssl</span>().<span class="ident">unwrap</span>();
 
-        <span class='ident'>ssl</span>.<span class='ident'>set_verify_callback</span>(<span class='ident'>SSL_VERIFY_PEER</span>, <span class='op'>|</span><span class='ident'>p</span>, <span class='ident'>x</span><span class='op'>|</span> <span class='ident'>verify_callback</span>(<span class='string'>&quot;foo.com&quot;</span>, <span class='ident'>p</span>, <span class='ident'>x</span>));
+        <span class="ident">ssl</span>.<span class="ident">set_verify_callback</span>(<span class="ident">SSL_VERIFY_PEER</span>, <span class="op">|</span><span class="ident">p</span>, <span class="ident">x</span><span class="op">|</span> <span class="ident">verify_callback</span>(<span class="string">&quot;foo.com&quot;</span>, <span class="ident">p</span>, <span class="ident">x</span>));
 
-        <span class='ident'>SslStream</span>::<span class='ident'>connect</span>(<span class='ident'>ssl</span>, <span class='ident'>stream</span>).<span class='ident'>unwrap_err</span>();
+        <span class="ident">SslStream</span>::<span class="ident">connect</span>(<span class="ident">ssl</span>, <span class="ident">stream</span>).<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_sname</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-sn.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-sn.key.pem&quot;</span>,
-                  <span class='string'>&quot;foobar.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_sname</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-sn.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-sn.key.pem&quot;</span>,
+                  <span class="string">&quot;foobar.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_sname</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-sn.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-sn.key.pem&quot;</span>,
-                  <span class='string'>&quot;fizzbuzz.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_sname</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-sn.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-sn.key.pem&quot;</span>,
+                  <span class="string">&quot;fizzbuzz.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>sans_prefered_to_cn</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;foobar.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">sans_prefered_to_cn</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;foobar.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_double_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;headfootail.doublewild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_double_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;headfootail.doublewild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_double_wildcard_minimal</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;headtail.doublewild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_double_wildcard_minimal</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;headtail.doublewild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_double_wildcard_footer</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;headfootaill.doublewild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_double_wildcard_footer</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;headfootaill.doublewild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_double_wildcard_header</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;bheadfootaill.doublewild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_double_wildcard_header</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;bheadfootaill.doublewild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_tail_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;footail.tailwild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_tail_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;footail.tailwild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_tail_wildcard_minimal</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;tail.tailwild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_tail_wildcard_minimal</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;tail.tailwild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_tail_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;footaill.tailwild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_tail_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;footaill.tailwild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_head_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;headfoo.headwild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_head_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;headfoo.headwild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_head_wildcard_minimal</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;head.headwild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_head_wildcard_minimal</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;head.headwild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_head_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;bheadfoo.headwild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_head_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;bheadfoo.headwild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_bare_wildcard</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;foo.barewild.com&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_bare_wildcard</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;foo.barewild.com&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_wildcard_too_deep</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;bar.foo.barewild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_wildcard_too_deep</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;bar.foo.barewild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_wildcard_too_short</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;barewild.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_wildcard_too_short</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;barewild.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_ipv4</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;192.168.1.1&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_ipv4</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;192.168.1.1&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_ipv4</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;192.168.1.2&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_ipv4</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;192.168.1.2&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>valid_ipv6</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;2001:DB8:85A3:0:0:8A2E:370:7334&quot;</span>)
-            .<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">valid_ipv6</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;2001:DB8:85A3:0:0:8A2E:370:7334&quot;</span>)
+            .<span class="ident">unwrap</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>invalid_ipv6</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/valid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/valid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;2001:DB8:85A3:0:0:8A2E:370:7335&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">invalid_ipv6</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/valid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/valid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;2001:DB8:85A3:0:0:8A2E:370:7335&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>bogus_wildcard_not_last</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/invalid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/invalid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;server1.foo.example.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bogus_wildcard_not_last</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/invalid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/invalid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;server1.foo.example.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>bogus_wildcard_too_short</span>() {
-        <span class='ident'>negotiate</span>(<span class='string'>&quot;test/invalid-san.cert.pem&quot;</span>,
-                  <span class='string'>&quot;test/invalid-san.key.pem&quot;</span>,
-                  <span class='string'>&quot;foo.com&quot;</span>)
-            .<span class='ident'>unwrap_err</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bogus_wildcard_too_short</span>() {
+        <span class="ident">negotiate</span>(<span class="string">&quot;test/invalid-san.cert.pem&quot;</span>,
+                  <span class="string">&quot;test/invalid-san.key.pem&quot;</span>,
+                  <span class="string">&quot;foo.com&quot;</span>)
+            .<span class="ident">unwrap_err</span>();
     }
 }
 </pre>
@@ -1021,18 +1033,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1065,7 +1081,6 @@
         window.rootPath = "../../";
         window.currentCrate = "openssl_verify";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

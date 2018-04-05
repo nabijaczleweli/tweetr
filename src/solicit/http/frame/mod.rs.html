@@ -9,14 +9,18 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -634,597 +646,597 @@
 <span id="590">590</span>
 <span id="591">591</span>
 <span id="592">592</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains the implementation of HTTP/2 frames.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains the implementation of HTTP/2 frames.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
 
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>StreamId</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">StreamId</span>;
 
-<span class='doccomment'>/// A helper macro that unpacks a sequence of 4 bytes found in the buffer with</span>
-<span class='doccomment'>/// the given identifier, starting at the given offset, into the given integer</span>
-<span class='doccomment'>/// type. Obviously, the integer type should be able to support at least 4</span>
-<span class='doccomment'>/// bytes.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust</span>
-<span class='doccomment'>/// let buf: [u8; 4] = [0, 0, 0, 1];</span>
-<span class='doccomment'>/// assert_eq!(1u32, unpack_octets_4!(buf, 0, u32));</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>macro_escape</span>]</span>
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>unpack_octets_4</span> {
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>buf</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>offset</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tip</span>:<span class='ident'>ty</span>) <span class='op'>=&gt;</span> (
-        ((<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>buf</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>offset</span> <span class='op'>+</span> <span class='number'>0</span>] <span class='kw'>as</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tip</span>) <span class='op'>&lt;&lt;</span> <span class='number'>24</span>) <span class='op'>|</span>
-        ((<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>buf</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>offset</span> <span class='op'>+</span> <span class='number'>1</span>] <span class='kw'>as</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tip</span>) <span class='op'>&lt;&lt;</span> <span class='number'>16</span>) <span class='op'>|</span>
-        ((<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>buf</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>offset</span> <span class='op'>+</span> <span class='number'>2</span>] <span class='kw'>as</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tip</span>) <span class='op'>&lt;&lt;</span>  <span class='number'>8</span>) <span class='op'>|</span>
-        ((<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>buf</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>offset</span> <span class='op'>+</span> <span class='number'>3</span>] <span class='kw'>as</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>tip</span>) <span class='op'>&lt;&lt;</span>  <span class='number'>0</span>)
+<span class="doccomment">/// A helper macro that unpacks a sequence of 4 bytes found in the buffer with</span>
+<span class="doccomment">/// the given identifier, starting at the given offset, into the given integer</span>
+<span class="doccomment">/// type. Obviously, the integer type should be able to support at least 4</span>
+<span class="doccomment">/// bytes.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// let buf: [u8; 4] = [0, 0, 0, 1];</span>
+<span class="doccomment">/// assert_eq!(1u32, unpack_octets_4!(buf, 0, u32));</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">macro_escape</span>]</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">unpack_octets_4</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> (
+        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">0</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">|</span>
+        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">|</span>
+        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">2</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;&lt;</span>  <span class="number">8</span>) <span class="op">|</span>
+        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">buf</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span> <span class="op">+</span> <span class="number">3</span>] <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tip</span>) <span class="op">&lt;&lt;</span>  <span class="number">0</span>)
     );
 }
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>data</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>headers</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>settings</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">data</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">headers</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">settings</span>;
 
-<span class='doccomment'>/// Rexports related to the `DATA` frame.</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>data</span>::{<span class='ident'>DataFlag</span>, <span class='ident'>DataFrame</span>};
-<span class='doccomment'>/// Rexports related to the `HEADERS` frame.</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>headers</span>::{<span class='ident'>HeadersFlag</span>, <span class='ident'>HeadersFrame</span>};
-<span class='doccomment'>/// Rexports related to the `SETTINGS` frame.</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>settings</span>::{<span class='ident'>SettingsFlag</span>, <span class='ident'>SettingsFrame</span>, <span class='ident'>HttpSetting</span>};
+<span class="doccomment">/// Rexports related to the `DATA` frame.</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">data</span>::{<span class="ident">DataFlag</span>, <span class="ident">DataFrame</span>};
+<span class="doccomment">/// Rexports related to the `HEADERS` frame.</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">headers</span>::{<span class="ident">HeadersFlag</span>, <span class="ident">HeadersFrame</span>};
+<span class="doccomment">/// Rexports related to the `SETTINGS` frame.</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">settings</span>::{<span class="ident">SettingsFlag</span>, <span class="ident">SettingsFrame</span>, <span class="ident">HttpSetting</span>};
 
-<span class='doccomment'>/// An alias for the 9-byte buffer that each HTTP/2 frame header must be stored</span>
-<span class='doccomment'>/// in.</span>
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>FrameHeaderBuffer</span> <span class='op'>=</span> [<span class='ident'>u8</span>; <span class='number'>9</span>];
-<span class='doccomment'>/// An alias for the 4-tuple representing the components of each HTTP/2 frame</span>
-<span class='doccomment'>/// header.</span>
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>FrameHeader</span> <span class='op'>=</span> (<span class='ident'>u32</span>, <span class='ident'>u8</span>, <span class='ident'>u8</span>, <span class='ident'>u32</span>);
+<span class="doccomment">/// An alias for the 9-byte buffer that each HTTP/2 frame header must be stored</span>
+<span class="doccomment">/// in.</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FrameHeaderBuffer</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="number">9</span>];
+<span class="doccomment">/// An alias for the 4-tuple representing the components of each HTTP/2 frame</span>
+<span class="doccomment">/// header.</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FrameHeader</span> <span class="op">=</span> (<span class="ident">u32</span>, <span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u32</span>);
 
-<span class='doccomment'>/// Deconstructs a `FrameHeader` into its corresponding 4 components,</span>
-<span class='doccomment'>/// represented as a 4-tuple: `(length, frame_type, flags, stream_id)`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The frame `type` and `flags` components are returned as their original</span>
-<span class='doccomment'>/// octet representation, rather than reinterpreted.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unpack_header</span>(<span class='ident'>header</span>: <span class='kw-2'>&amp;</span><span class='ident'>FrameHeaderBuffer</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeader</span> {
-    <span class='kw'>let</span> <span class='ident'>length</span>: <span class='ident'>u32</span> <span class='op'>=</span>
-        ((<span class='ident'>header</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>u32</span>) <span class='op'>&lt;&lt;</span> <span class='number'>16</span>) <span class='op'>|</span>
-        ((<span class='ident'>header</span>[<span class='number'>1</span>] <span class='kw'>as</span> <span class='ident'>u32</span>) <span class='op'>&lt;&lt;</span>  <span class='number'>8</span>) <span class='op'>|</span>
-        ((<span class='ident'>header</span>[<span class='number'>2</span>] <span class='kw'>as</span> <span class='ident'>u32</span>) <span class='op'>&lt;&lt;</span>  <span class='number'>0</span>);
-    <span class='kw'>let</span> <span class='ident'>frame_type</span> <span class='op'>=</span> <span class='ident'>header</span>[<span class='number'>3</span>];
-    <span class='kw'>let</span> <span class='ident'>flags</span> <span class='op'>=</span> <span class='ident'>header</span>[<span class='number'>4</span>];
-    <span class='kw'>let</span> <span class='ident'>stream_id</span>: <span class='ident'>u32</span> <span class='op'>=</span> <span class='macro'>unpack_octets_4</span><span class='macro'>!</span>(<span class='ident'>header</span>, <span class='number'>5</span>, <span class='ident'>u32</span>);
+<span class="doccomment">/// Deconstructs a `FrameHeader` into its corresponding 4 components,</span>
+<span class="doccomment">/// represented as a 4-tuple: `(length, frame_type, flags, stream_id)`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The frame `type` and `flags` components are returned as their original</span>
+<span class="doccomment">/// octet representation, rather than reinterpreted.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpack_header</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">FrameHeaderBuffer</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeader</span> {
+    <span class="kw">let</span> <span class="ident">length</span>: <span class="ident">u32</span> <span class="op">=</span>
+        ((<span class="ident">header</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">|</span>
+        ((<span class="ident">header</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span>  <span class="number">8</span>) <span class="op">|</span>
+        ((<span class="ident">header</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span>  <span class="number">0</span>);
+    <span class="kw">let</span> <span class="ident">frame_type</span> <span class="op">=</span> <span class="ident">header</span>[<span class="number">3</span>];
+    <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">header</span>[<span class="number">4</span>];
+    <span class="kw">let</span> <span class="ident">stream_id</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="macro">unpack_octets_4</span><span class="macro">!</span>(<span class="ident">header</span>, <span class="number">5</span>, <span class="ident">u32</span>);
 
-    (<span class='ident'>length</span>, <span class='ident'>frame_type</span>, <span class='ident'>flags</span>, <span class='ident'>stream_id</span>)
+    (<span class="ident">length</span>, <span class="ident">frame_type</span>, <span class="ident">flags</span>, <span class="ident">stream_id</span>)
 }
 
-<span class='doccomment'>/// Constructs a buffer of 9 bytes that represents the given `FrameHeader`.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pack_header</span>(<span class='ident'>header</span>: <span class='kw-2'>&amp;</span><span class='ident'>FrameHeader</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeaderBuffer</span> {
-    <span class='kw'>let</span> <span class='kw-2'>&amp;</span>(<span class='ident'>length</span>, <span class='ident'>frame_type</span>, <span class='ident'>flags</span>, <span class='ident'>stream_id</span>) <span class='op'>=</span> <span class='ident'>header</span>;
+<span class="doccomment">/// Constructs a buffer of 9 bytes that represents the given `FrameHeader`.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pack_header</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">FrameHeader</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeaderBuffer</span> {
+    <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="ident">length</span>, <span class="ident">frame_type</span>, <span class="ident">flags</span>, <span class="ident">stream_id</span>) <span class="op">=</span> <span class="ident">header</span>;
 
     [
-        (((<span class='ident'>length</span> <span class='op'>&gt;&gt;</span> <span class='number'>16</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        (((<span class='ident'>length</span> <span class='op'>&gt;&gt;</span>  <span class='number'>8</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        (((<span class='ident'>length</span> <span class='op'>&gt;&gt;</span>  <span class='number'>0</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        <span class='ident'>frame_type</span>,
-        <span class='ident'>flags</span>,
-        (((<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span> <span class='number'>24</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        (((<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span> <span class='number'>16</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        (((<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span>  <span class='number'>8</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-        (((<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span>  <span class='number'>0</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
+        (((<span class="ident">length</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        (((<span class="ident">length</span> <span class="op">&gt;&gt;</span>  <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        (((<span class="ident">length</span> <span class="op">&gt;&gt;</span>  <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        <span class="ident">frame_type</span>,
+        <span class="ident">flags</span>,
+        (((<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        (((<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        (((<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span>  <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+        (((<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span>  <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
     ]
 }
 
-<span class='doccomment'>/// A helper function that parses the given payload, considering it padded.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This means that the first byte is the length of the padding with that many</span>
-<span class='doccomment'>/// 0 bytes expected to follow the actual payload.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Returns</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// A slice of the given payload where the actual one is found and the length</span>
-<span class='doccomment'>/// of the padding.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If the padded payload is invalid (e.g. the length of the padding is equal</span>
-<span class='doccomment'>/// to the total length), returns `None`.</span>
-<span class='kw'>fn</span> <span class='ident'>parse_padded_payload</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>payload</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>u8</span>], <span class='ident'>u8</span>)<span class='op'>&gt;</span> {
-    <span class='kw'>if</span> <span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
-        <span class='comment'>// We make sure not to index the payload before we&#39;re sure how</span>
-        <span class='comment'>// large the buffer is.</span>
-        <span class='comment'>// If this is the case, the frame is invalid as no padding</span>
-        <span class='comment'>// length can be extracted, even though the frame should be</span>
-        <span class='comment'>// padded.</span>
-        <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+<span class="doccomment">/// A helper function that parses the given payload, considering it padded.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This means that the first byte is the length of the padding with that many</span>
+<span class="doccomment">/// 0 bytes expected to follow the actual payload.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Returns</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// A slice of the given payload where the actual one is found and the length</span>
+<span class="doccomment">/// of the padding.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If the padded payload is invalid (e.g. the length of the padding is equal</span>
+<span class="doccomment">/// to the total length), returns `None`.</span>
+<span class="kw">fn</span> <span class="ident">parse_padded_payload</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">u8</span>)<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
+        <span class="comment">// We make sure not to index the payload before we&#39;re sure how</span>
+        <span class="comment">// large the buffer is.</span>
+        <span class="comment">// If this is the case, the frame is invalid as no padding</span>
+        <span class="comment">// length can be extracted, even though the frame should be</span>
+        <span class="comment">// padded.</span>
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
-    <span class='kw'>let</span> <span class='ident'>pad_len</span> <span class='op'>=</span> <span class='ident'>payload</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>usize</span>;
-    <span class='kw'>if</span> <span class='ident'>pad_len</span> <span class='op'>&gt;=</span> <span class='ident'>payload</span>.<span class='ident'>len</span>() {
-        <span class='comment'>// This is invalid: the padding length MUST be less than the</span>
-        <span class='comment'>// total frame size.</span>
-        <span class='kw'>return</span> <span class='prelude-val'>None</span>;
-    }
-
-    <span class='prelude-val'>Some</span>((<span class='kw-2'>&amp;</span><span class='ident'>payload</span>[<span class='number'>1</span>..<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='ident'>pad_len</span>], <span class='ident'>pad_len</span> <span class='kw'>as</span> <span class='ident'>u8</span>))
-}
-
-<span class='doccomment'>/// A trait that all HTTP/2 frame header flags need to implement.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Flag</span> {
-    <span class='doccomment'>/// Returns a bit mask that represents the flag.</span>
-    <span class='kw'>fn</span> <span class='ident'>bitmask</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u8</span>;
-}
-
-<span class='doccomment'>/// A trait that all HTTP/2 frame structs need to implement.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Frame</span>: <span class='ident'>Sized</span> {
-    <span class='doccomment'>/// The type that represents the flags that the particular `Frame` can take.</span>
-    <span class='doccomment'>/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
-    <span class='kw'>type</span> <span class='ident'>FlagType</span>: <span class='ident'>Flag</span>;
-
-    <span class='doccomment'>/// Creates a new `Frame` from the given `RawFrame` (i.e. header and</span>
-    <span class='doccomment'>/// payload), if possible.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// `None` if a valid `Frame` cannot be constructed from the given</span>
-    <span class='doccomment'>/// `RawFrame`. Some reasons why this may happen is a wrong frame type in</span>
-    <span class='doccomment'>/// the header, a body that cannot be decoded according to the particular</span>
-    <span class='doccomment'>/// frame&#39;s rules, etc.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Otherwise, returns a newly constructed `Frame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>from_raw</span>(<span class='ident'>raw_frame</span>: <span class='ident'>RawFrame</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='self'>Self</span><span class='op'>&gt;</span>;
-
-    <span class='doccomment'>/// Tests if the given flag is set for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_set</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>flag</span>: <span class='self'>Self</span>::<span class='ident'>FlagType</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
-    <span class='doccomment'>/// Returns the `StreamId` of the stream to which the frame is associated</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span>;
-    <span class='doccomment'>/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeader</span>;
-
-    <span class='doccomment'>/// Sets the given flag for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>set_flag</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>flag</span>: <span class='self'>Self</span>::<span class='ident'>FlagType</span>);
-
-    <span class='doccomment'>/// Returns a `Vec` with the serialized representation of the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
-}
-
-<span class='doccomment'>/// A struct that defines the format of the raw HTTP/2 frame, i.e. the frame</span>
-<span class='doccomment'>/// as it is read from the wire.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This format is defined in section 4.1. of the HTTP/2 spec.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The `RawFrame` struct simply stores the raw components of an HTTP/2 frame:</span>
-<span class='doccomment'>/// its header and the payload as a sequence of bytes.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// It does not try to interpret the payload bytes, nor do any validation in</span>
-<span class='doccomment'>/// terms of its validity based on the frame type given in the header.</span>
-<span class='doccomment'>/// It is simply a wrapper around the two parts of an HTTP/2 frame.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RawFrame</span> {
-    <span class='doccomment'>/// The raw frame representation, including both the raw header representation</span>
-    <span class='doccomment'>/// (in the first 9 bytes), followed by the raw payload representation.</span>
-    <span class='ident'>raw_content</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-}
-
-<span class='kw'>impl</span> <span class='ident'>RawFrame</span> {
-    <span class='doccomment'>/// Creates a new `RawFrame` with the given `FrameHeader`. The payload is</span>
-    <span class='doccomment'>/// left empty.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>header</span>: <span class='ident'>FrameHeader</span>) <span class='op'>-&gt;</span> <span class='ident'>RawFrame</span> {
-        <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>Vec</span>::<span class='ident'>new</span>())
+    <span class="kw">let</span> <span class="ident">pad_len</span> <span class="op">=</span> <span class="ident">payload</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">if</span> <span class="ident">pad_len</span> <span class="op">&gt;=</span> <span class="ident">payload</span>.<span class="ident">len</span>() {
+        <span class="comment">// This is invalid: the padding length MUST be less than the</span>
+        <span class="comment">// total frame size.</span>
+        <span class="kw">return</span> <span class="prelude-val">None</span>;
     }
 
-    <span class='doccomment'>/// Creates a new `RawFrame` with the given header and payload.</span>
-    <span class='doccomment'>/// Does not do any validation to determine whether the frame is in a correct</span>
-    <span class='doccomment'>/// state as constructed.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_payload</span>(<span class='ident'>header</span>: <span class='ident'>FrameHeader</span>, <span class='ident'>payload</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>RawFrame</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-        <span class='ident'>raw</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span>));
-        <span class='ident'>raw</span>.<span class='ident'>extend</span>(<span class='ident'>payload</span>);
+    <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">payload</span>[<span class="number">1</span>..<span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">pad_len</span>], <span class="ident">pad_len</span> <span class="kw">as</span> <span class="ident">u8</span>))
+}
 
-        <span class='ident'>RawFrame</span> {
-            <span class='ident'>raw_content</span>: <span class='ident'>raw</span>,
+<span class="doccomment">/// A trait that all HTTP/2 frame header flags need to implement.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Flag</span> {
+    <span class="doccomment">/// Returns a bit mask that represents the flag.</span>
+    <span class="kw">fn</span> <span class="ident">bitmask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span>;
+}
+
+<span class="doccomment">/// A trait that all HTTP/2 frame structs need to implement.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Frame</span>: <span class="ident">Sized</span> {
+    <span class="doccomment">/// The type that represents the flags that the particular `Frame` can take.</span>
+    <span class="doccomment">/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
+    <span class="kw">type</span> <span class="ident">FlagType</span>: <span class="ident">Flag</span>;
+
+    <span class="doccomment">/// Creates a new `Frame` from the given `RawFrame` (i.e. header and</span>
+    <span class="doccomment">/// payload), if possible.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `None` if a valid `Frame` cannot be constructed from the given</span>
+    <span class="doccomment">/// `RawFrame`. Some reasons why this may happen is a wrong frame type in</span>
+    <span class="doccomment">/// the header, a body that cannot be decoded according to the particular</span>
+    <span class="doccomment">/// frame&#39;s rules, etc.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Otherwise, returns a newly constructed `Frame`.</span>
+    <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">raw_frame</span>: <span class="ident">RawFrame</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Tests if the given flag is set for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flag</span>: <span class="self">Self</span>::<span class="ident">FlagType</span>) <span class="op">-&gt;</span> <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns the `StreamId` of the stream to which the frame is associated</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span>;
+    <span class="doccomment">/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
+    <span class="kw">fn</span> <span class="ident">get_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeader</span>;
+
+    <span class="doccomment">/// Sets the given flag for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">set_flag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="self">Self</span>::<span class="ident">FlagType</span>);
+
+    <span class="doccomment">/// Returns a `Vec` with the serialized representation of the frame.</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
+}
+
+<span class="doccomment">/// A struct that defines the format of the raw HTTP/2 frame, i.e. the frame</span>
+<span class="doccomment">/// as it is read from the wire.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This format is defined in section 4.1. of the HTTP/2 spec.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `RawFrame` struct simply stores the raw components of an HTTP/2 frame:</span>
+<span class="doccomment">/// its header and the payload as a sequence of bytes.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It does not try to interpret the payload bytes, nor do any validation in</span>
+<span class="doccomment">/// terms of its validity based on the frame type given in the header.</span>
+<span class="doccomment">/// It is simply a wrapper around the two parts of an HTTP/2 frame.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawFrame</span> {
+    <span class="doccomment">/// The raw frame representation, including both the raw header representation</span>
+    <span class="doccomment">/// (in the first 9 bytes), followed by the raw payload representation.</span>
+    <span class="ident">raw_content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">RawFrame</span> {
+    <span class="doccomment">/// Creates a new `RawFrame` with the given `FrameHeader`. The payload is</span>
+    <span class="doccomment">/// left empty.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">header</span>: <span class="ident">FrameHeader</span>) <span class="op">-&gt;</span> <span class="ident">RawFrame</span> {
+        <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">Vec</span>::<span class="ident">new</span>())
+    }
+
+    <span class="doccomment">/// Creates a new `RawFrame` with the given header and payload.</span>
+    <span class="doccomment">/// Does not do any validation to determine whether the frame is in a correct</span>
+    <span class="doccomment">/// state as constructed.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_payload</span>(<span class="ident">header</span>: <span class="ident">FrameHeader</span>, <span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">RawFrame</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="ident">raw</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span>));
+        <span class="ident">raw</span>.<span class="ident">extend</span>(<span class="ident">payload</span>);
+
+        <span class="ident">RawFrame</span> {
+            <span class="ident">raw_content</span>: <span class="ident">raw</span>,
         }
     }
 
-    <span class='doccomment'>/// Creates a new `RawFrame` by parsing the given buffer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `RawFrame` instance constructed from the given buffer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the buffer cannot be parsed into a frame, which includes the payload</span>
-    <span class='doccomment'>/// section having a different length than what was found in the header,</span>
-    <span class='doccomment'>/// `None` is returned.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_buf</span>(<span class='ident'>buf</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>RawFrame</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>buf</span>.<span class='ident'>len</span>() <span class='op'>&lt;</span> <span class='number'>9</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    <span class="doccomment">/// Creates a new `RawFrame` by parsing the given buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `RawFrame` instance constructed from the given buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the buffer cannot be parsed into a frame, which includes the payload</span>
+    <span class="doccomment">/// section having a different length than what was found in the header,</span>
+    <span class="doccomment">/// `None` is returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_buf</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawFrame</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">9</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> <span class='ident'>unpack_header</span>(<span class='kw'>unsafe</span> {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>buf</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>9</span>);
-            <span class='comment'>// We just asserted that this transmute is safe.</span>
-            <span class='ident'>mem</span>::<span class='ident'>transmute</span>(<span class='ident'>buf</span>.<span class='ident'>as_ptr</span>())
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">unpack_header</span>(<span class="kw">unsafe</span> {
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="number">9</span>);
+            <span class="comment">// We just asserted that this transmute is safe.</span>
+            <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">buf</span>.<span class="ident">as_ptr</span>())
         });
-        <span class='kw'>let</span> <span class='ident'>payload_len</span> <span class='op'>=</span> <span class='ident'>header</span>.<span class='number'>0</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
+        <span class="kw">let</span> <span class="ident">payload_len</span> <span class="op">=</span> <span class="ident">header</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>;
 
-        <span class='kw'>if</span> <span class='ident'>buf</span>[<span class='number'>9</span>..].<span class='ident'>len</span>() <span class='op'>!=</span> <span class='ident'>payload_len</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+        <span class="kw">if</span> <span class="ident">buf</span>[<span class="number">9</span>..].<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">payload_len</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class='prelude-val'>Some</span>(<span class='ident'>RawFrame</span> {
-            <span class='ident'>raw_content</span>: <span class='ident'>buf</span>.<span class='ident'>to_vec</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">RawFrame</span> {
+            <span class="ident">raw_content</span>: <span class="ident">buf</span>.<span class="ident">to_vec</span>(),
         })
     }
 
-    <span class='doccomment'>/// Returns a `Vec` of bytes representing the serialized (on-the-wire)</span>
-    <span class='doccomment'>/// representation of this raw frame.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>raw_content</span>.<span class='ident'>clone</span>()
+    <span class="doccomment">/// Returns a `Vec` of bytes representing the serialized (on-the-wire)</span>
+    <span class="doccomment">/// representation of this raw frame.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">raw_content</span>.<span class="ident">clone</span>()
     }
 
-    <span class='doccomment'>/// Returns a `FrameHeader` instance corresponding to the headers of the</span>
-    <span class='doccomment'>/// `RawFrame`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeader</span> {
-        <span class='ident'>unpack_header</span>(<span class='kw'>unsafe</span> {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>raw_content</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>9</span>);
-            <span class='comment'>// We just asserted that this transmute is safe.</span>
-            <span class='ident'>mem</span>::<span class='ident'>transmute</span>(<span class='self'>self</span>.<span class='ident'>raw_content</span>.<span class='ident'>as_ptr</span>())
+    <span class="doccomment">/// Returns a `FrameHeader` instance corresponding to the headers of the</span>
+    <span class="doccomment">/// `RawFrame`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeader</span> {
+        <span class="ident">unpack_header</span>(<span class="kw">unsafe</span> {
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">raw_content</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="number">9</span>);
+            <span class="comment">// We just asserted that this transmute is safe.</span>
+            <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="self">self</span>.<span class="ident">raw_content</span>.<span class="ident">as_ptr</span>())
         })
     }
 
-    <span class='doccomment'>/// Returns a slice representing the payload of the `RawFrame`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>payload</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>] {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>raw_content</span>[<span class='number'>9</span>..]
+    <span class="doccomment">/// Returns a slice representing the payload of the `RawFrame`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_content</span>[<span class="number">9</span>..]
     }
 }
 
-<span class='doccomment'>/// Provide a conversion into a `Vec`.</span>
-<span class='kw'>impl</span> <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>RawFrame</span> {
-    <span class='kw'>fn</span> <span class='ident'>into</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> { <span class='self'>self</span>.<span class='ident'>raw_content</span> }
+<span class="doccomment">/// Provide a conversion into a `Vec`.</span>
+<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">RawFrame</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">raw_content</span> }
 }
 
-<span class='doccomment'>/// Provide a conversion from a `Vec`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This conversion is unchecked and could cause the resulting `RawFrame` to be an</span>
-<span class='doccomment'>/// invalid HTTP/2 frame.</span>
-<span class='kw'>impl</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>RawFrame</span> {
-    <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>raw</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>RawFrame</span> { <span class='ident'>RawFrame</span> { <span class='ident'>raw_content</span>: <span class='ident'>raw</span> } }
+<span class="doccomment">/// Provide a conversion from a `Vec`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This conversion is unchecked and could cause the resulting `RawFrame` to be an</span>
+<span class="doccomment">/// invalid HTTP/2 frame.</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> <span class="kw">for</span> <span class="ident">RawFrame</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">raw</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">RawFrame</span> { <span class="ident">RawFrame</span> { <span class="ident">raw_content</span>: <span class="ident">raw</span> } }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{
-        <span class='ident'>unpack_header</span>,
-        <span class='ident'>pack_header</span>,
-        <span class='ident'>RawFrame</span>,
-        <span class='ident'>FrameHeader</span>,
-        <span class='ident'>Frame</span>,
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{
+        <span class="ident">unpack_header</span>,
+        <span class="ident">pack_header</span>,
+        <span class="ident">RawFrame</span>,
+        <span class="ident">FrameHeader</span>,
+        <span class="ident">Frame</span>,
     };
 
-    <span class='doccomment'>/// Tests that the `unpack_header` function correctly returns the</span>
-    <span class='doccomment'>/// components of HTTP/2 frame headers.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_unpack_header</span>() {
+    <span class="doccomment">/// Tests that the `unpack_header` function correctly returns the</span>
+    <span class="doccomment">/// components of HTTP/2 frame headers.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_unpack_header</span>() {
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>9</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">9</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>4</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>200</span>, <span class='number'>100</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>4</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1</span>, <span class='number'>200</span>, <span class='number'>100</span>, <span class='number'>4</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">200</span>, <span class="number">100</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">1</span>, <span class="number">200</span>, <span class="number">100</span>, <span class="number">4</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>256</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">256</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>256</span> <span class='op'>*</span> <span class='number'>256</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">256</span> <span class="op">*</span> <span class="number">256</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>((<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>((<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>), <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>), <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>1</span>, <span class='number'>1</span>, <span class='number'>1</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(
-                ((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span> <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>16</span>) <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>)),
-                <span class='ident'>unpack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>));
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(
+                ((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>)),
+                <span class="ident">unpack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>));
         }
     }
 
-    <span class='doccomment'>/// Tests that the `pack_header` function correctly returns the buffer</span>
-    <span class='doccomment'>/// corresponding to components of HTTP/2 frame headers.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_pack_header</span>() {
+    <span class="doccomment">/// Tests that the `pack_header` function correctly returns the buffer</span>
+    <span class="doccomment">/// corresponding to components of HTTP/2 frame headers.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_pack_header</span>() {
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>9</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">9</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>4</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>200</span>, <span class='number'>100</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>4</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>1</span>, <span class='number'>200</span>, <span class='number'>100</span>, <span class='number'>4</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">200</span>, <span class="number">100</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">4</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">1</span>, <span class="number">200</span>, <span class="number">100</span>, <span class="number">4</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>256</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">256</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>256</span> <span class='op'>*</span> <span class='number'>256</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">256</span> <span class="op">*</span> <span class="number">256</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>)), <span class='ident'>header</span>);
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)), <span class="ident">header</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> [<span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0xFF</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>1</span>, <span class='number'>1</span>, <span class='number'>1</span>];
-            <span class='kw'>let</span> <span class='ident'>header_components</span> <span class='op'>=</span> (
-                (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span> <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>16</span>) <span class='op'>+</span> (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>24</span>)
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> [<span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0xFF</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>];
+            <span class="kw">let</span> <span class="ident">header_components</span> <span class="op">=</span> (
+                (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">16</span>) <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>)
             );
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header_components</span>), <span class='ident'>header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header_components</span>), <span class="ident">header</span>);
         }
     }
 
-    <span class='doccomment'>/// Builds a test frame of the given type with the given header and</span>
-    <span class='doccomment'>/// payload, by using the `Frame::from_raw` method.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>build_test_frame</span><span class='op'>&lt;</span><span class='ident'>F</span>: <span class='ident'>Frame</span><span class='op'>&gt;</span>(<span class='ident'>header</span>: <span class='kw-2'>&amp;</span><span class='ident'>FrameHeader</span>, <span class='ident'>payload</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>F</span> {
-        <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>.<span class='ident'>clone</span>(), <span class='ident'>payload</span>.<span class='ident'>to_vec</span>());
-        <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(<span class='ident'>raw</span>).<span class='ident'>unwrap</span>()
+    <span class="doccomment">/// Builds a test frame of the given type with the given header and</span>
+    <span class="doccomment">/// payload, by using the `Frame::from_raw` method.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_test_frame</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Frame</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">FrameHeader</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">F</span> {
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>.<span class="ident">clone</span>(), <span class="ident">payload</span>.<span class="ident">to_vec</span>());
+        <span class="ident">Frame</span>::<span class="ident">from_raw</span>(<span class="ident">raw</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class='doccomment'>/// Builds a `Vec` containing the given data as a padded HTTP/2 frame.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// It first places the length of the padding, followed by the data,</span>
-    <span class='doccomment'>/// followed by `pad_len` zero bytes.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>build_padded_frame_payload</span>(<span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>pad_len</span>: <span class='ident'>u8</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>sz</span> <span class='op'>=</span> <span class='number'>1</span> <span class='op'>+</span> <span class='ident'>data</span>.<span class='ident'>len</span>() <span class='op'>+</span> <span class='ident'>pad_len</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>payload</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>sz</span>);
-        <span class='ident'>payload</span>.<span class='ident'>push</span>(<span class='ident'>pad_len</span>);
-        <span class='ident'>payload</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-        <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>pad_len</span> { <span class='ident'>payload</span>.<span class='ident'>push</span>(<span class='number'>0</span>); }
+    <span class="doccomment">/// Builds a `Vec` containing the given data as a padded HTTP/2 frame.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It first places the length of the padding, followed by the data,</span>
+    <span class="doccomment">/// followed by `pad_len` zero bytes.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_padded_frame_payload</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">pad_len</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">pad_len</span> <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">sz</span>);
+        <span class="ident">payload</span>.<span class="ident">push</span>(<span class="ident">pad_len</span>);
+        <span class="ident">payload</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+        <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pad_len</span> { <span class="ident">payload</span>.<span class="ident">push</span>(<span class="number">0</span>); }
 
-        <span class='ident'>payload</span>
+        <span class="ident">payload</span>
     }
 
-    <span class='doccomment'>/// Tests that the `RawFrame::with_payload` method correctly constructs a</span>
-    <span class='doccomment'>/// `RawFrame` from the given parts.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_frame_with_payload</span>() {
-        <span class='comment'>// Correct frame</span>
+    <span class="doccomment">/// Tests that the `RawFrame::with_payload` method correctly constructs a</span>
+    <span class="doccomment">/// `RawFrame` from the given parts.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_frame_with_payload</span>() {
+        <span class="comment">// Correct frame</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>data</span>.<span class='ident'>to_vec</span>());
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">data</span>.<span class="ident">to_vec</span>());
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='ident'>data</span>)
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="ident">data</span>)
         }
-        <span class='comment'>// Correct frame with trailing data</span>
+        <span class="comment">// Correct frame with trailing data</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123456&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='number'>3</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123456&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="number">3</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>data</span>.<span class='ident'>to_vec</span>());
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">data</span>.<span class="ident">to_vec</span>());
 
-            <span class='comment'>// No validation of whether the parts form a correct frame</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='ident'>data</span>)
+            <span class="comment">// No validation of whether the parts form a correct frame</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="ident">data</span>)
         }
-        <span class='comment'>// Missing payload chunk</span>
+        <span class="comment">// Missing payload chunk</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='number'>6</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="number">6</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>data</span>.<span class='ident'>to_vec</span>());
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">data</span>.<span class="ident">to_vec</span>());
 
-            <span class='comment'>// No validation of whether the parts form a correct frame</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='ident'>data</span>)
-        }
-    }
-
-    <span class='doccomment'>/// Tests that the `RawFrame::from_buf` method correctly constructs a</span>
-    <span class='doccomment'>/// `RawFrame` from a given buffer.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_frame_from_buffer</span>() {
-        <span class='comment'>// Correct frame</span>
-        {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
-            };
-
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='ident'>data</span>)
-        }
-        <span class='comment'>// Correct frame with trailing data</span>
-        {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>].<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
-            };
-
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>is_none</span>());
-        }
-        <span class='comment'>// Missing payload chunk</span>
-        {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>[..<span class='number'>2</span>].<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
-            };
-
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>is_none</span>());
-        }
-        <span class='comment'>// Missing header chunk</span>
-        {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='number'>0</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>)[..<span class='number'>5</span>].<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
-            };
-
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>is_none</span>());
-        }
-        <span class='comment'>// Completely empty buffer</span>
-        {
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span>[]).<span class='ident'>is_none</span>());
+            <span class="comment">// No validation of whether the parts form a correct frame</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="ident">data</span>)
         }
     }
 
-    <span class='doccomment'>/// Tests that constructing a `RawFrame` from a `Vec&lt;u8&gt;` by using the `From&lt;Vec&lt;u8&gt;&gt;`</span>
-    <span class='doccomment'>/// trait implementation works as expected.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_frame_from_vec_buffer_unchecked</span>() {
-        <span class='comment'>// Correct frame</span>
+    <span class="doccomment">/// Tests that the `RawFrame::from_buf` method correctly constructs a</span>
+    <span class="doccomment">/// `RawFrame` from a given buffer.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_frame_from_buffer</span>() {
+        <span class="comment">// Correct frame</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
             };
-            <span class='kw'>let</span> <span class='ident'>buf_clone</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>clone</span>();
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from</span>(<span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='ident'>data</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>serialize</span>(), <span class='ident'>buf_clone</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="ident">data</span>)
         }
-        <span class='comment'>// Correct frame with trailing data</span>
+        <span class="comment">// Correct frame with trailing data</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='string'>b&quot;12345&quot;</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>].<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
             };
-            <span class='kw'>let</span> <span class='ident'>buf_clone</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>clone</span>();
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from</span>(<span class='ident'>buf</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='string'>b&quot;12312345&quot;</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>serialize</span>(), <span class='ident'>buf_clone</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">is_none</span>());
         }
-        <span class='comment'>// Missing payload chunk</span>
+        <span class="comment">// Missing payload chunk</span>
         {
-            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>[..<span class='number'>2</span>].<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>[..<span class="number">2</span>].<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
             };
-            <span class='kw'>let</span> <span class='ident'>buf_clone</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>clone</span>();
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from</span>(<span class='ident'>buf</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>header</span>(), <span class='ident'>header</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>payload</span>(), <span class='string'>b&quot;12&quot;</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>serialize</span>(), <span class='ident'>buf_clone</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">is_none</span>());
         }
-        <span class='comment'>// Missing header chunk</span>
+        <span class="comment">// Missing header chunk</span>
         {
-            <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='number'>0</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-                <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>)[..<span class='number'>5</span>].<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-                <span class='ident'>buf</span>
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="number">0</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>)[..<span class="number">5</span>].<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
             };
-            <span class='kw'>let</span> <span class='ident'>buf_clone</span> <span class='op'>=</span> <span class='ident'>buf</span>.<span class='ident'>clone</span>();
 
-            <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from</span>(<span class='ident'>buf</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>serialize</span>(), <span class='ident'>buf_clone</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">is_none</span>());
         }
-        <span class='comment'>// Completely empty buffer</span>
+        <span class="comment">// Completely empty buffer</span>
         {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>RawFrame</span>::<span class='ident'>from</span>(<span class='macro'>vec</span><span class='macro'>!</span>[]).<span class='ident'>serialize</span>(), <span class='kw-2'>&amp;</span>[]);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span>[]).<span class="ident">is_none</span>());
         }
     }
 
-    <span class='doccomment'>/// Tests that the `RawFrame::serialize` method correctly serializes a</span>
-    <span class='doccomment'>/// `RawFrame`.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_frame_serialize</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>
+    <span class="doccomment">/// Tests that constructing a `RawFrame` from a `Vec&lt;u8&gt;` by using the `From&lt;Vec&lt;u8&gt;&gt;`</span>
+    <span class="doccomment">/// trait implementation works as expected.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_frame_from_vec_buffer_unchecked</span>() {
+        <span class="comment">// Correct frame</span>
+        {
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
+            };
+            <span class="kw">let</span> <span class="ident">buf_clone</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">clone</span>();
+
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from</span>(<span class="ident">buf</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="ident">data</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">serialize</span>(), <span class="ident">buf_clone</span>);
+        }
+        <span class="comment">// Correct frame with trailing data</span>
+        {
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="string">b&quot;12345&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
+            };
+            <span class="kw">let</span> <span class="ident">buf_clone</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">clone</span>();
+
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from</span>(<span class="ident">buf</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="string">b&quot;12312345&quot;</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">serialize</span>(), <span class="ident">buf_clone</span>);
+        }
+        <span class="comment">// Missing payload chunk</span>
+        {
+            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>[..<span class="number">2</span>].<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
+            };
+            <span class="kw">let</span> <span class="ident">buf_clone</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">clone</span>();
+
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from</span>(<span class="ident">buf</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">header</span>(), <span class="ident">header</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">payload</span>(), <span class="string">b&quot;12&quot;</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">serialize</span>(), <span class="ident">buf_clone</span>);
+        }
+        <span class="comment">// Missing header chunk</span>
+        {
+            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="number">0</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>)[..<span class="number">5</span>].<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+                <span class="ident">buf</span>
+            };
+            <span class="kw">let</span> <span class="ident">buf_clone</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">clone</span>();
+
+            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from</span>(<span class="ident">buf</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">serialize</span>(), <span class="ident">buf_clone</span>);
+        }
+        <span class="comment">// Completely empty buffer</span>
+        {
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">RawFrame</span>::<span class="ident">from</span>(<span class="macro">vec</span><span class="macro">!</span>[]).<span class="ident">serialize</span>(), <span class="kw-2">&amp;</span>[]);
+        }
+    }
+
+    <span class="doccomment">/// Tests that the `RawFrame::serialize` method correctly serializes a</span>
+    <span class="doccomment">/// `RawFrame`.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_frame_serialize</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>raw</span>.<span class='ident'>serialize</span>(), <span class='ident'>buf</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">raw</span>.<span class="ident">serialize</span>(), <span class="ident">buf</span>);
     }
 
-    <span class='doccomment'>/// Tests that converting a `RawFrame` into a `Vec` works correctly.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_raw_frame_into_vec</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>
+    <span class="doccomment">/// Tests that converting a `RawFrame` into a `Vec` works correctly.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_raw_frame_into_vec</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>raw</span> <span class='op'>=</span> <span class='ident'>RawFrame</span>::<span class='ident'>from_buf</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">RawFrame</span>::<span class="ident">from_buf</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>serialized</span> <span class='op'>=</span> <span class='ident'>raw</span>.<span class='ident'>serialize</span>();
-        <span class='kw'>let</span> <span class='ident'>vec</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>raw</span>.<span class='ident'>into</span>();
-        <span class='comment'>// The vector is equivalent to the original buffer?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vec</span>, <span class='ident'>buf</span>);
-        <span class='comment'>// The vector and the serialized representation are also equivalent</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>vec</span>, <span class='ident'>serialized</span>);
+        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">serialize</span>();
+        <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">into</span>();
+        <span class="comment">// The vector is equivalent to the original buffer?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, <span class="ident">buf</span>);
+        <span class="comment">// The vector and the serialized representation are also equivalent</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">vec</span>, <span class="ident">serialized</span>);
     }
 }
 </pre>
@@ -1241,18 +1253,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1285,7 +1301,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

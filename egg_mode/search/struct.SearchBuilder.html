@@ -9,14 +9,18 @@
 
     <title>egg_mode::search::SearchBuilder - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>search</a></p><script>window.sidebarCurrent = {name: 'SearchBuilder', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct SearchBuilder</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.lang">lang</a><a href="#method.result_type">result_type</a><a href="#method.count">count</a><a href="#method.until">until</a><a href="#method.geocode">geocode</a><a href="#method.call">call</a></div></div><p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>search</a></p><script>window.sidebarCurrent = {name: 'SearchBuilder', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,31 +54,35 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>search</a>::<wbr><a class='struct' href=''>SearchBuilder</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>search</a>::<wbr><a class="struct" href=''>SearchBuilder</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-903' class='srclink' href='../../src/egg_mode/search.rs.html#86-94' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>#[must_use = "SearchBuilder is lazy and won't do anything unless `call`ed"]
-pub struct SearchBuilder&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Represents a tweet search query before being sent.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../../egg_mode/search/struct.SearchBuilder.html' title='egg_mode::search::SearchBuilder'>SearchBuilder</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-911' class='srclink' href='../../src/egg_mode/search.rs.html#96-177' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.lang' class='method'><span id='lang.v' class='invisible'><code>fn <a href='#method.lang' class='fnname'>lang</a>(self, lang: &amp;'a <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; Self</code></span></h4>
+               </span><a class='srclink' href='../../src/egg_mode/search.rs.html#86-94' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'><div class="docblock attributes">#[must_use = "SearchBuilder is lazy and won\'t do anything unless `call`ed"]
+</div>pub struct SearchBuilder&lt;'a&gt; { /* fields omitted */ }</pre><div class='docblock'><p>Represents a tweet search query before being sent.</p>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../../egg_mode/search/struct.SearchBuilder.html" title="struct egg_mode::search::SearchBuilder">SearchBuilder</a>&lt;'a&gt;</code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#96-177' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.lang' class="method"><span id='lang.v' class='invisible'><code>pub fn <a href='#method.lang' class='fnname'>lang</a>(self, lang: &amp;'a <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#99-104' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Restrict search results to those that have been machine-parsed as the given two-letter
 language code.</p>
-</div><h4 id='method.result_type' class='method'><span id='result_type.v' class='invisible'><code>fn <a href='#method.result_type' class='fnname'>result_type</a>(self, result_type: <a class='enum' href='../../egg_mode/search/enum.ResultType.html' title='egg_mode::search::ResultType'>ResultType</a>) -&gt; Self</code></span></h4>
+</div><h4 id='method.result_type' class="method"><span id='result_type.v' class='invisible'><code>pub fn <a href='#method.result_type' class='fnname'>result_type</a>(self, result_type: <a class="enum" href="../../egg_mode/search/enum.ResultType.html" title="enum egg_mode::search::ResultType">ResultType</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#107-112' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Specify the type of search results to include. The default is <code>Recent</code>.</p>
-</div><h4 id='method.count' class='method'><span id='count.v' class='invisible'><code>fn <a href='#method.count' class='fnname'>count</a>(self, count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; Self</code></span></h4>
+</div><h4 id='method.count' class="method"><span id='count.v' class='invisible'><code>pub fn <a href='#method.count' class='fnname'>count</a>(self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#115-120' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Set the number of tweets to return per-page, up to a maximum of 100. The default is 15.</p>
-</div><h4 id='method.until' class='method'><span id='until.v' class='invisible'><code>fn <a href='#method.until' class='fnname'>until</a>(self, year: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, month: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>, day: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>) -&gt; Self</code></span></h4>
+</div><h4 id='method.until' class="method"><span id='until.v' class='invisible'><code>pub fn <a href='#method.until' class='fnname'>until</a>(self, year: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>, month: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>, day: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#125-130' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns tweets created before the given date. Keep in mind that search is limited to the
-last 7 days of results, so giving a date here that&#39;s older than a week will return no
+last 7 days of results, so giving a date here that's older than a week will return no
 results.</p>
-</div><h4 id='method.geocode' class='method'><span id='geocode.v' class='invisible'><code>fn <a href='#method.geocode' class='fnname'>geocode</a>(self, latitude: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, longitude: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, radius: <a class='enum' href='../../egg_mode/search/enum.Distance.html' title='egg_mode::search::Distance'>Distance</a>) -&gt; Self</code></span></h4>
+</div><h4 id='method.geocode' class="method"><span id='geocode.v' class='invisible'><code>pub fn <a href='#method.geocode' class='fnname'>geocode</a>(self, latitude: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f32.html">f32</a>, longitude: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.f32.html">f32</a>, radius: <a class="enum" href="../../egg_mode/search/enum.Distance.html" title="enum egg_mode::search::Distance">Distance</a>) -&gt; Self</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#135-140' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Restricts results to users located within the given radius of the given coordinate. This is
-preferably populated from location-tagged tweets, but can be filled in from the user&#39;s
+preferably populated from location-tagged tweets, but can be filled in from the user's
 profile as a fallback.</p>
-</div><h4 id='method.call' class='method'><span id='call.v' class='invisible'><code>fn <a href='#method.call' class='fnname'>call</a>(self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; con_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; access_token: &amp;<a class='struct' href='../../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../egg_mode/type.WebResponse.html' title='egg_mode::WebResponse'>WebResponse</a>&lt;<a class='struct' href='../../egg_mode/search/struct.SearchResult.html' title='egg_mode::search::SearchResult'>SearchResult</a>&lt;'a&gt;&gt;</code></span></h4>
+</div><h4 id='method.call' class="method"><span id='call.v' class='invisible'><code>pub fn <a href='#method.call' class='fnname'>call</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;con_token: &amp;<a class="struct" href="../../egg_mode/struct.Token.html" title="struct egg_mode::Token">Token</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;access_token: &amp;<a class="struct" href="../../egg_mode/struct.Token.html" title="struct egg_mode::Token">Token</a><br>) -&gt; <a class="type" href="../../egg_mode/type.WebResponse.html" title="type egg_mode::WebResponse">WebResponse</a>&lt;<a class="struct" href="../../egg_mode/search/struct.SearchResult.html" title="struct egg_mode::search::SearchResult">SearchResult</a>&lt;'a&gt;&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/search.rs.html#143-176' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Finalize the search terms and return the first page of responses.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -81,18 +97,22 @@ profile as a fallback.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -125,7 +145,6 @@ profile as a fallback.</p>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

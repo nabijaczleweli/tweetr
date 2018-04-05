@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/unicase-1.4.0/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/unicase-1.4.2/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -252,215 +264,223 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>deny</span>(<span class='ident'>missing_docs</span>))]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>deny</span>(<span class='ident'>warnings</span>))]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;heap_size&quot;</span>, <span class='ident'>feature</span>(<span class='ident'>custom_derive</span>, <span class='ident'>plugin</span>))]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;heap_size&quot;</span>, <span class='ident'>plugin</span>(<span class='ident'>heapsize_plugin</span>))]</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+</pre><pre class="rust ">
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">missing_docs</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;heap_size&quot;</span>, <span class="ident">feature</span>(<span class="ident">custom_derive</span>, <span class="ident">plugin</span>))]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;heap_size&quot;</span>, <span class="ident">plugin</span>(<span class="ident">heapsize_plugin</span>))]</span>
 
-<span class='doccomment'>//! # Case</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Case provices a way of specifying strings that are case-insensitive.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ## Example</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```rust</span>
-<span class='doccomment'>//! use unicase::UniCase;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let a = UniCase(&quot;foobar&quot;);</span>
-<span class='doccomment'>//! let b = UniCase(&quot;FoObAr&quot;);</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! assert_eq!(a, b);</span>
-<span class='doccomment'>//! ```</span>
+<span class="doccomment">//! # Case</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Case provices a way of specifying strings that are case-insensitive.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use unicase::UniCase;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let a = UniCase(&quot;foobar&quot;);</span>
+<span class="doccomment">//! let b = UniCase(&quot;FoObAr&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(a, b);</span>
+<span class="doccomment">//! ```</span>
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;heap_size&quot;</span>)]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>heapsize</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;heap_size&quot;</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">heapsize</span>;
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ascii</span>::<span class='ident'>AsciiExt</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>iter_cmp</span>)]</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>::<span class='ident'>Ordering</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>hash</span>::{<span class='ident'>Hash</span>, <span class='ident'>Hasher</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Deref</span>, <span class='ident'>DerefMut</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__unicase__iter_cmp</span>)]</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 
-<span class='doccomment'>/// Case Insensitive wrapper of strings.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>cfg_attr</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;heap_size&quot;</span>, <span class='ident'>derive</span>(<span class='ident'>HeapSizeOf</span>))]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(<span class='kw'>pub</span> <span class='ident'>S</span>);
+<span class="doccomment">/// Case Insensitive wrapper of strings.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;heap_size&quot;</span>, <span class="ident">derive</span>(<span class="ident">HeapSizeOf</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">S</span>);
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>Deref</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='kw'>type</span> <span class='ident'>Target</span> <span class='op'>=</span> <span class='ident'>S</span>;
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>deref</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>S</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">S</span>;
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">deref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">S</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> <span class='ident'>DerefMut</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>deref_mut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>S</span> {
-        <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='number'>0</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">deref_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>iter_cmp</span>)]</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>PartialOrd</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='self'>Self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Ordering</span><span class='op'>&gt;</span> {
-        <span class='prelude-val'>Some</span>(<span class='self'>self</span>.<span class='ident'>cmp</span>(<span class='ident'>other</span>))
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__unicase__iter_cmp</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>iter_cmp</span>)]</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>Ord</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='self'>Self</span>) <span class='op'>-&gt;</span> <span class='ident'>Ordering</span> {
-        <span class='kw'>let</span> <span class='ident'>self_chars</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>as_ref</span>().<span class='ident'>chars</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span>.<span class='ident'>to_ascii_lowercase</span>());
-        <span class='kw'>let</span> <span class='ident'>other_chars</span> <span class='op'>=</span> <span class='ident'>other</span>.<span class='ident'>as_ref</span>().<span class='ident'>chars</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span>.<span class='ident'>to_ascii_lowercase</span>());
-        <span class='ident'>self_chars</span>.<span class='ident'>cmp</span>(<span class='ident'>other_chars</span>)
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__unicase__iter_cmp</span>)]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+        <span class="kw">let</span> <span class="ident">self_chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">chars</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>());
+        <span class="kw">let</span> <span class="ident">other_chars</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">as_ref</span>().<span class="ident">chars</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>());
+        <span class="ident">self_chars</span>.<span class="ident">cmp</span>(<span class="ident">other_chars</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>as_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>str</span> {
-        <span class='self'>self</span>.<span class='number'>0</span>.<span class='ident'>as_ref</span>()
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
     }
 
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>fmt</span>::<span class='ident'>Display</span><span class='op'>&gt;</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>fmt</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>fmt</span>::<span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='number'>0</span>, <span class='ident'>fmt</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">fmt</span>::<span class="ident">Display</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">fmt</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S1</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;</span>, <span class='ident'>S2</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>PartialEq</span><span class='op'>&lt;</span><span class='ident'>S2</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S1</span><span class='op'>&gt;</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>S2</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>as_ref</span>().<span class='ident'>eq_ignore_ascii_case</span>(<span class='ident'>other</span>.<span class='ident'>as_ref</span>())
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S1</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">S2</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">S2</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S1</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">S2</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">other</span>.<span class="ident">as_ref</span>())
     }
 }
 
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>Eq</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {}
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>FromStr</span><span class='op'>&gt;</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span>;
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>, <span class='op'>&lt;</span><span class='ident'>S</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span><span class='op'>&gt;</span> {
-        <span class='ident'>s</span>.<span class='ident'>parse</span>().<span class='ident'>map</span>(<span class='ident'>UniCase</span>)
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">FromStr</span><span class="op">&gt;</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
+        <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">UniCase</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span> <span class='ident'>Hash</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>hash</span><span class='op'>&lt;</span><span class='ident'>H</span>: <span class='ident'>Hasher</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>hasher</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>H</span>) {
-        <span class='kw'>for</span> <span class='ident'>byte</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>as_ref</span>().<span class='ident'>bytes</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>b</span><span class='op'>|</span> <span class='ident'>b</span>.<span class='ident'>to_ascii_lowercase</span>()) {
-            <span class='ident'>hasher</span>.<span class='ident'>write</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>byte</span>]);
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hasher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">bytes</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">to_ascii_lowercase</span>()) {
+            <span class="ident">hasher</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[<span class="ident">byte</span>]);
         }
     }
 }
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>from_impl</span> {
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span>:<span class='ident'>ty</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span>:<span class='ident'>ty</span>; <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>by</span>:<span class='ident'>ident</span>) <span class='op'>=&gt;</span> (
-        <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>From</span><span class='op'>&lt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span><span class='op'>&gt;</span> {
-            <span class='kw'>fn</span> <span class='ident'>from</span>(<span class='ident'>s</span>: <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-                <span class='ident'>UniCase</span>(<span class='ident'>s</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>by</span>())
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">from_impl</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ty</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>:<span class="ident">ident</span>) <span class="op">=&gt;</span> (
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+                <span class="ident">UniCase</span>(<span class="ident">s</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">by</span>())
             }
         }
     );
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span>:<span class='ident'>ty</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span>:<span class='ident'>ty</span>) <span class='op'>=&gt;</span> ( <span class='macro'>from_impl</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>from</span> <span class='op'>=&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span>; <span class='ident'>into</span>); )
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ty</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> ( <span class="macro">from_impl</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>; <span class="ident">into</span>); )
 }
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>into_impl</span> {
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span>:<span class='ident'>ty</span>) <span class='op'>=&gt;</span> (
-        <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Into</span><span class='op'>&lt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span><span class='op'>&gt;</span> {
-            <span class='kw'>fn</span> <span class='ident'>into</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>to</span> {
-                <span class='self'>self</span>.<span class='number'>0</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">into_impl</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> (
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UniCase</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span> {
+                <span class="self">self</span>.<span class="number">0</span>
             }
         }
     );
 }
 
-<span class='macro'>from_impl</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span> <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>);
-<span class='macro'>from_impl</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span> <span class='op'>=&gt;</span> <span class='ident'>String</span>);
-<span class='macro'>from_impl</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>String</span> <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>; <span class='ident'>as_ref</span>);
-<span class='macro'>from_impl</span><span class='macro'>!</span>(<span class='ident'>String</span> <span class='op'>=&gt;</span> <span class='ident'>String</span>);
+<span class="macro">from_impl</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+<span class="macro">from_impl</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> <span class="op">=&gt;</span> <span class="ident">String</span>);
+<span class="macro">from_impl</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>; <span class="ident">as_ref</span>);
+<span class="macro">from_impl</span><span class="macro">!</span>(<span class="ident">String</span> <span class="op">=&gt;</span> <span class="ident">String</span>);
 
-<span class='macro'>into_impl</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>);
-<span class='macro'>into_impl</span><span class='macro'>!</span>(<span class='ident'>String</span>);
+<span class="macro">into_impl</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+<span class="macro">into_impl</span><span class="macro">!</span>(<span class="ident">String</span>);
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>UniCase</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>hash</span>::{<span class='ident'>Hash</span>, <span class='ident'>Hasher</span>, <span class='ident'>SipHasher</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">UniCase</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">__unicase__default_hasher</span>))]</span>
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">hash</span>::<span class="ident">SipHasher</span> <span class="kw">as</span> <span class="ident">DefaultHasher</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__unicase__default_hasher</span>)]</span>
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">hash_map</span>::<span class="ident">DefaultHasher</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>hash</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Hash</span><span class='op'>&gt;</span>(<span class='ident'>t</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>u64</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>SipHasher</span>::<span class='ident'>new</span>();
-        <span class='ident'>t</span>.<span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>s</span>);
-        <span class='ident'>s</span>.<span class='ident'>finish</span>()
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Hash</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">u64</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">DefaultHasher</span>::<span class="ident">new</span>();
+        <span class="ident">t</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>);
+        <span class="ident">s</span>.<span class="ident">finish</span>()
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_copy_for_refs</span>() {
-        <span class='kw'>fn</span> <span class='ident'>foo</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(_: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {}
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_copy_for_refs</span>() {
+        <span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(_: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {}
 
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;foobar&quot;</span>);
-        <span class='ident'>foo</span>(<span class='ident'>a</span>);
-        <span class='ident'>foo</span>(<span class='ident'>a</span>);
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;foobar&quot;</span>);
+        <span class="ident">foo</span>(<span class="ident">a</span>);
+        <span class="ident">foo</span>(<span class="ident">a</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_case_insensitive</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;foobar&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;FOOBAR&quot;</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_case_insensitive</span>() {
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;foobar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;FOOBAR&quot;</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>b</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>), <span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>), <span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_different_string_types</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;foobar&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='string'>&quot;FOOBAR&quot;</span>.<span class='ident'>to_owned</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>b</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='ident'>b</span>), <span class='ident'>a</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_different_string_types</span>() {
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;foobar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="string">&quot;FOOBAR&quot;</span>.<span class="ident">to_owned</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>, <span class="ident">b</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="ident">b</span>), <span class="ident">a</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>iter_cmp</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_case_cmp</span>() {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;foobar&quot;</span>) <span class='op'>==</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;FOOBAR&quot;</span>));
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;a&quot;</span>) <span class='op'>&lt;</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;B&quot;</span>));
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">__unicase__iter_cmp</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_case_cmp</span>() {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;foobar&quot;</span>) <span class="op">==</span> <span class="ident">UniCase</span>(<span class="string">&quot;FOOBAR&quot;</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;a&quot;</span>) <span class="op">&lt;</span> <span class="ident">UniCase</span>(<span class="string">&quot;B&quot;</span>));
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;A&quot;</span>) <span class='op'>&lt;</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;b&quot;</span>));
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;aa&quot;</span>) <span class='op'>&gt;</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;a&quot;</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;A&quot;</span>) <span class="op">&lt;</span> <span class="ident">UniCase</span>(<span class="string">&quot;b&quot;</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;aa&quot;</span>) <span class="op">&gt;</span> <span class="ident">UniCase</span>(<span class="string">&quot;a&quot;</span>));
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;a&quot;</span>) <span class='op'>&lt;</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;aa&quot;</span>));
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>UniCase</span>(<span class='string'>&quot;a&quot;</span>) <span class='op'>&lt;</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;AA&quot;</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;a&quot;</span>) <span class="op">&lt;</span> <span class="ident">UniCase</span>(<span class="string">&quot;aa&quot;</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">UniCase</span>(<span class="string">&quot;a&quot;</span>) <span class="op">&lt;</span> <span class="ident">UniCase</span>(<span class="string">&quot;AA&quot;</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_from_impls</span>() {
-        <span class='kw'>let</span> <span class='ident'>view</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;foobar&quot;</span>;
-        <span class='kw'>let</span> _: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>into</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_from_impls</span>() {
+        <span class="kw">let</span> <span class="ident">view</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;foobar&quot;</span>;
+        <span class="kw">let</span> _: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">into</span>();
 
-        <span class='kw'>let</span> <span class='ident'>owned</span>: <span class='ident'>String</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>to_owned</span>();
-        <span class='kw'>let</span> _: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='ident'>owned</span>).<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>owned</span>.<span class='ident'>into</span>();
+        <span class="kw">let</span> <span class="ident">owned</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">to_owned</span>();
+        <span class="kw">let</span> _: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">owned</span>).<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">owned</span>.<span class="ident">into</span>();
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_into_impls</span>() {
-        <span class='kw'>let</span> <span class='ident'>view</span>: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>UniCase</span>(<span class='string'>&quot;foobar&quot;</span>);
-        <span class='kw'>let</span> _: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='kw-2'>&amp;</span><span class='ident'>str</span> <span class='op'>=</span> <span class='ident'>view</span>.<span class='ident'>into</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_into_impls</span>() {
+        <span class="kw">let</span> <span class="ident">view</span>: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">UniCase</span>(<span class="string">&quot;foobar&quot;</span>);
+        <span class="kw">let</span> _: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">view</span>.<span class="ident">into</span>();
 
-        <span class='kw'>let</span> <span class='ident'>owned</span>: <span class='ident'>UniCase</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='string'>&quot;foobar&quot;</span>.<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='ident'>String</span> <span class='op'>=</span> <span class='ident'>owned</span>.<span class='ident'>clone</span>().<span class='ident'>into</span>();
-        <span class='kw'>let</span> _: <span class='kw-2'>&amp;</span><span class='ident'>str</span> <span class='op'>=</span> <span class='ident'>owned</span>.<span class='ident'>as_ref</span>();
+        <span class="kw">let</span> <span class="ident">owned</span>: <span class="ident">UniCase</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;foobar&quot;</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="ident">String</span> <span class="op">=</span> <span class="ident">owned</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
+        <span class="kw">let</span> _: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">owned</span>.<span class="ident">as_ref</span>();
     }
 }
 </pre>
@@ -477,18 +497,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -521,7 +545,6 @@
         window.rootPath = "../../";
         window.currentCrate = "unicase";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

@@ -9,14 +9,18 @@
 
     <title>openssl::ssl::SslCipher - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a></p><script>window.sidebarCurrent = {name: 'SslCipher', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct SslCipher</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.name">name</a><a href="#method.version">version</a><a href="#method.bits">bits</a><a href="#method.description">description</a></div></div><p class='location'><a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a></p><script>window.sidebarCurrent = {name: 'SslCipher', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,20 +54,24 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a>::<wbr><a class='struct' href=''>SslCipher</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>openssl</a>::<wbr><a href='index.html'>ssl</a>::<wbr><a class="struct" href=''>SslCipher</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1383' class='srclink' href='../../src/openssl/ssl/mod.rs.html#855-858' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct SslCipher&lt;'a&gt; { /* fields omitted */ }</pre><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class='struct' href='../../openssl/ssl/struct.SslCipher.html' title='openssl::ssl::SslCipher'>SslCipher</a>&lt;'a&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1387' class='srclink' href='../../src/openssl/ssl/mod.rs.html#860-914' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.name' class='method'><span id='name.v' class='invisible'><code>fn <a href='#method.name' class='fnname'>name</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
+               </span><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#855-858' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct SslCipher&lt;'a&gt; { /* fields omitted */ }</pre>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl&lt;'a&gt; <a class="struct" href="../../openssl/ssl/struct.SslCipher.html" title="struct openssl::ssl::SslCipher">SslCipher</a>&lt;'a&gt;</code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#860-914' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.name' class="method"><span id='name.v' class='invisible'><code>pub fn <a href='#method.name' class='fnname'>name</a>(&amp;self) -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#862-869' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the name of cipher.</p>
-</div><h4 id='method.version' class='method'><span id='version.v' class='invisible'><code>fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;'static <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></span></h4>
+</div><h4 id='method.version' class="method"><span id='version.v' class='invisible'><code>pub fn <a href='#method.version' class='fnname'>version</a>(&amp;self) -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#872-879' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the SSL/TLS protocol version that first defined the cipher.</p>
-</div><h4 id='method.bits' class='method'><span id='bits.v' class='invisible'><code>fn <a href='#method.bits' class='fnname'>bits</a>(&amp;self) -&gt; <a class='struct' href='../../openssl/ssl/struct.CipherBits.html' title='openssl::ssl::CipherBits'>CipherBits</a></code></span></h4>
+</div><h4 id='method.bits' class="method"><span id='bits.v' class='invisible'><code>pub fn <a href='#method.bits' class='fnname'>bits</a>(&amp;self) -&gt; <a class="struct" href="../../openssl/ssl/struct.CipherBits.html" title="struct openssl::ssl::CipherBits">CipherBits</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#882-898' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the number of bits used for the cipher.</p>
-</div><h4 id='method.description' class='method'><span id='description.v' class='invisible'><code>fn <a href='#method.description' class='fnname'>description</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></span></h4>
+</div><h4 id='method.description' class="method"><span id='description.v' class='invisible'><code>pub fn <a href='#method.description' class='fnname'>description</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/openssl/ssl/mod.rs.html#901-913' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns a textual description of the cipher used</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -70,18 +86,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -114,7 +134,6 @@
         window.rootPath = "../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

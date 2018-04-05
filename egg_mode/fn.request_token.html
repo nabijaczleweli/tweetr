@@ -9,14 +9,18 @@
 
     <title>egg_mode::request_token - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../dark.css">
+    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
+    <script src="../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc fn">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         <p class='location'><a href='index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'request_token', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,20 +54,18 @@
         </form>
     </nav>
 
-    <section id='main' class="content fn">
-<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>egg_mode</a>::<wbr><a class='fn' href=''>request_token</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Function <a href='index.html'>egg_mode</a>::<wbr><a class="fn" href=''>request_token</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-131' class='srclink' href='../src/egg_mode/auth.rs.html#307-333' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn request_token&lt;S:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;(con_token: &amp;<a class='struct' href='../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; callback: S)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../egg_mode/struct.Token.html' title='egg_mode::Token'>Token</a>&lt;'static&gt;, <a class='enum' href='../egg_mode/error/enum.Error.html' title='egg_mode::error::Error'>Error</a>&gt;</pre><div class='docblock'><p>With the given consumer Token, ask Twitter for a request Token that can be
-used to request access to the user&#39;s account.</p>
-
-<p>This can be considered Step 1 in obtaining access to a user&#39;s account. With
+               </span><a class='srclink' href='../src/egg_mode/auth.rs.html#307-333' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn request_token&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;con_token: &amp;<a class="struct" href="../egg_mode/struct.Token.html" title="struct egg_mode::Token">Token</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;callback: S<br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="../egg_mode/struct.Token.html" title="struct egg_mode::Token">Token</a>&lt;'static&gt;, <a class="enum" href="../egg_mode/error/enum.Error.html" title="enum egg_mode::error::Error">Error</a>&gt;</pre><div class='docblock'><p>With the given consumer Token, ask Twitter for a request Token that can be
+used to request access to the user's account.</p>
+<p>This can be considered Step 1 in obtaining access to a user's account. With
 this Token, a web-based application can use <code>authenticate_url</code>, and a
 desktop-based application can use <code>authorize_url</code> to perform the authorization
 request.</p>
-
 <p>The parameter <code>callback</code> is used to provide an OAuth Callback URL for a web-
 or mobile-based application to receive the results of the authorization request.
 To use the PIN-Based Auth request, this must be set to <code>&quot;oob&quot;</code>. The resulting
@@ -74,18 +84,22 @@ request.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -118,7 +132,6 @@ request.</p>
         window.rootPath = "../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>
 </body>

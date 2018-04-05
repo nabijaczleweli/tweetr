@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/method.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/method.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>method.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -242,205 +254,205 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The HTTP request method</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>convert</span>::<span class='ident'>AsRef</span>;
+</pre><pre class="rust ">
+<span class="doccomment">//! The HTTP request method</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">AsRef</span>;
 
-<span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>;
-<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>Method</span>::{<span class='ident'>Options</span>, <span class='ident'>Get</span>, <span class='ident'>Post</span>, <span class='ident'>Put</span>, <span class='ident'>Delete</span>, <span class='ident'>Head</span>, <span class='ident'>Trace</span>, <span class='ident'>Connect</span>, <span class='ident'>Patch</span>,
-                   <span class='ident'>Extension</span>};
+<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">Method</span>::{<span class="ident">Options</span>, <span class="ident">Get</span>, <span class="ident">Post</span>, <span class="ident">Put</span>, <span class="ident">Delete</span>, <span class="ident">Head</span>, <span class="ident">Trace</span>, <span class="ident">Connect</span>, <span class="ident">Patch</span>,
+                   <span class="ident">Extension</span>};
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde-serialization&quot;</span>)]</span>
-<span class='kw'>use</span> <span class='ident'>serde</span>::{<span class='ident'>Deserialize</span>, <span class='ident'>Deserializer</span>, <span class='ident'>Serialize</span>, <span class='ident'>Serializer</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-serialization&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 
-<span class='doccomment'>/// The Request Method (VERB)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Currently includes 8 variants representing the 8 methods defined in</span>
-<span class='doccomment'>/// [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH,</span>
-<span class='doccomment'>/// and an Extension variant for all extensions.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// It may make sense to grow this to include all variants currently</span>
-<span class='doccomment'>/// registered with IANA, if they are at all common to use.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>Hash</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Method</span> {
-    <span class='doccomment'>/// OPTIONS</span>
-    <span class='ident'>Options</span>,
-    <span class='doccomment'>/// GET</span>
-    <span class='ident'>Get</span>,
-    <span class='doccomment'>/// POST</span>
-    <span class='ident'>Post</span>,
-    <span class='doccomment'>/// PUT</span>
-    <span class='ident'>Put</span>,
-    <span class='doccomment'>/// DELETE</span>
-    <span class='ident'>Delete</span>,
-    <span class='doccomment'>/// HEAD</span>
-    <span class='ident'>Head</span>,
-    <span class='doccomment'>/// TRACE</span>
-    <span class='ident'>Trace</span>,
-    <span class='doccomment'>/// CONNECT</span>
-    <span class='ident'>Connect</span>,
-    <span class='doccomment'>/// PATCH</span>
-    <span class='ident'>Patch</span>,
-    <span class='doccomment'>/// Method extensions. An example would be `let m = Extension(&quot;FOO&quot;.to_string())`.</span>
-    <span class='ident'>Extension</span>(<span class='ident'>String</span>)
+<span class="doccomment">/// The Request Method (VERB)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Currently includes 8 variants representing the 8 methods defined in</span>
+<span class="doccomment">/// [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH,</span>
+<span class="doccomment">/// and an Extension variant for all extensions.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It may make sense to grow this to include all variants currently</span>
+<span class="doccomment">/// registered with IANA, if they are at all common to use.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Method</span> {
+    <span class="doccomment">/// OPTIONS</span>
+    <span class="ident">Options</span>,
+    <span class="doccomment">/// GET</span>
+    <span class="ident">Get</span>,
+    <span class="doccomment">/// POST</span>
+    <span class="ident">Post</span>,
+    <span class="doccomment">/// PUT</span>
+    <span class="ident">Put</span>,
+    <span class="doccomment">/// DELETE</span>
+    <span class="ident">Delete</span>,
+    <span class="doccomment">/// HEAD</span>
+    <span class="ident">Head</span>,
+    <span class="doccomment">/// TRACE</span>
+    <span class="ident">Trace</span>,
+    <span class="doccomment">/// CONNECT</span>
+    <span class="ident">Connect</span>,
+    <span class="doccomment">/// PATCH</span>
+    <span class="ident">Patch</span>,
+    <span class="doccomment">/// Method extensions. An example would be `let m = Extension(&quot;FOO&quot;.to_string())`.</span>
+    <span class="ident">Extension</span>(<span class="ident">String</span>)
 }
 
-<span class='kw'>impl</span> <span class='ident'>AsRef</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
-    <span class='kw'>fn</span> <span class='ident'>as_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>str</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>Options</span> <span class='op'>=&gt;</span> <span class='string'>&quot;OPTIONS&quot;</span>,
-            <span class='ident'>Get</span> <span class='op'>=&gt;</span> <span class='string'>&quot;GET&quot;</span>,
-            <span class='ident'>Post</span> <span class='op'>=&gt;</span> <span class='string'>&quot;POST&quot;</span>,
-            <span class='ident'>Put</span> <span class='op'>=&gt;</span> <span class='string'>&quot;PUT&quot;</span>,
-            <span class='ident'>Delete</span> <span class='op'>=&gt;</span> <span class='string'>&quot;DELETE&quot;</span>,
-            <span class='ident'>Head</span> <span class='op'>=&gt;</span> <span class='string'>&quot;HEAD&quot;</span>,
-            <span class='ident'>Trace</span> <span class='op'>=&gt;</span> <span class='string'>&quot;TRACE&quot;</span>,
-            <span class='ident'>Connect</span> <span class='op'>=&gt;</span> <span class='string'>&quot;CONNECT&quot;</span>,
-            <span class='ident'>Patch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;PATCH&quot;</span>,
-            <span class='ident'>Extension</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>as_ref</span>()
+<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Options</span> <span class="op">=&gt;</span> <span class="string">&quot;OPTIONS&quot;</span>,
+            <span class="ident">Get</span> <span class="op">=&gt;</span> <span class="string">&quot;GET&quot;</span>,
+            <span class="ident">Post</span> <span class="op">=&gt;</span> <span class="string">&quot;POST&quot;</span>,
+            <span class="ident">Put</span> <span class="op">=&gt;</span> <span class="string">&quot;PUT&quot;</span>,
+            <span class="ident">Delete</span> <span class="op">=&gt;</span> <span class="string">&quot;DELETE&quot;</span>,
+            <span class="ident">Head</span> <span class="op">=&gt;</span> <span class="string">&quot;HEAD&quot;</span>,
+            <span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="string">&quot;TRACE&quot;</span>,
+            <span class="ident">Connect</span> <span class="op">=&gt;</span> <span class="string">&quot;CONNECT&quot;</span>,
+            <span class="ident">Patch</span> <span class="op">=&gt;</span> <span class="string">&quot;PATCH&quot;</span>,
+            <span class="ident">Extension</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">as_ref</span>()
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Method</span> {
-    <span class='doccomment'>/// Whether a method is considered &quot;safe&quot;, meaning the request is</span>
-    <span class='doccomment'>/// essentially read-only.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.1)</span>
-    <span class='doccomment'>/// for more words.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>safe</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>Get</span> <span class='op'>|</span> <span class='ident'>Head</span> <span class='op'>|</span> <span class='ident'>Options</span> <span class='op'>|</span> <span class='ident'>Trace</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-            _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>
+<span class="kw">impl</span> <span class="ident">Method</span> {
+    <span class="doccomment">/// Whether a method is considered &quot;safe&quot;, meaning the request is</span>
+    <span class="doccomment">/// essentially read-only.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.1)</span>
+    <span class="doccomment">/// for more words.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Get</span> <span class="op">|</span> <span class="ident">Head</span> <span class="op">|</span> <span class="ident">Options</span> <span class="op">|</span> <span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>
         }
     }
 
-    <span class='doccomment'>/// Whether a method is considered &quot;idempotent&quot;, meaning the request has</span>
-    <span class='doccomment'>/// the same result is executed multiple times.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.2) for</span>
-    <span class='doccomment'>/// more words.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>idempotent</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>safe</span>() {
-            <span class='bool-val'>true</span>
-        } <span class='kw'>else</span> {
-            <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-                <span class='ident'>Put</span> <span class='op'>|</span> <span class='ident'>Delete</span> <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
-                _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>
+    <span class="doccomment">/// Whether a method is considered &quot;idempotent&quot;, meaning the request has</span>
+    <span class="doccomment">/// the same result is executed multiple times.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.2) for</span>
+    <span class="doccomment">/// more words.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idempotent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">safe</span>() {
+            <span class="bool-val">true</span>
+        } <span class="kw">else</span> {
+            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+                <span class="ident">Put</span> <span class="op">|</span> <span class="ident">Delete</span> <span class="op">=&gt;</span> <span class="bool-val">true</span>,
+                _ <span class="op">=&gt;</span> <span class="bool-val">false</span>
             }
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> <span class='ident'>Error</span>;
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Method</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>s</span> <span class='op'>==</span> <span class='string'>&quot;&quot;</span> {
-            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Method</span>)
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Ok</span>(<span class='kw'>match</span> <span class='ident'>s</span> {
-                <span class='string'>&quot;OPTIONS&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Options</span>,
-                <span class='string'>&quot;GET&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Get</span>,
-                <span class='string'>&quot;POST&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Post</span>,
-                <span class='string'>&quot;PUT&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Put</span>,
-                <span class='string'>&quot;DELETE&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Delete</span>,
-                <span class='string'>&quot;HEAD&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Head</span>,
-                <span class='string'>&quot;TRACE&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Trace</span>,
-                <span class='string'>&quot;CONNECT&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Connect</span>,
-                <span class='string'>&quot;PATCH&quot;</span> <span class='op'>=&gt;</span> <span class='ident'>Patch</span>,
-                _ <span class='op'>=&gt;</span> <span class='ident'>Extension</span>(<span class='ident'>s</span>.<span class='ident'>to_owned</span>())
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Method</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="string">&quot;&quot;</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Method</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">s</span> {
+                <span class="string">&quot;OPTIONS&quot;</span> <span class="op">=&gt;</span> <span class="ident">Options</span>,
+                <span class="string">&quot;GET&quot;</span> <span class="op">=&gt;</span> <span class="ident">Get</span>,
+                <span class="string">&quot;POST&quot;</span> <span class="op">=&gt;</span> <span class="ident">Post</span>,
+                <span class="string">&quot;PUT&quot;</span> <span class="op">=&gt;</span> <span class="ident">Put</span>,
+                <span class="string">&quot;DELETE&quot;</span> <span class="op">=&gt;</span> <span class="ident">Delete</span>,
+                <span class="string">&quot;HEAD&quot;</span> <span class="op">=&gt;</span> <span class="ident">Head</span>,
+                <span class="string">&quot;TRACE&quot;</span> <span class="op">=&gt;</span> <span class="ident">Trace</span>,
+                <span class="string">&quot;CONNECT&quot;</span> <span class="op">=&gt;</span> <span class="ident">Connect</span>,
+                <span class="string">&quot;PATCH&quot;</span> <span class="op">=&gt;</span> <span class="ident">Patch</span>,
+                _ <span class="op">=&gt;</span> <span class="ident">Extension</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())
             })
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>fmt</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>fmt</span>.<span class='ident'>write_str</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>Options</span> <span class='op'>=&gt;</span> <span class='string'>&quot;OPTIONS&quot;</span>,
-            <span class='ident'>Get</span> <span class='op'>=&gt;</span> <span class='string'>&quot;GET&quot;</span>,
-            <span class='ident'>Post</span> <span class='op'>=&gt;</span> <span class='string'>&quot;POST&quot;</span>,
-            <span class='ident'>Put</span> <span class='op'>=&gt;</span> <span class='string'>&quot;PUT&quot;</span>,
-            <span class='ident'>Delete</span> <span class='op'>=&gt;</span> <span class='string'>&quot;DELETE&quot;</span>,
-            <span class='ident'>Head</span> <span class='op'>=&gt;</span> <span class='string'>&quot;HEAD&quot;</span>,
-            <span class='ident'>Trace</span> <span class='op'>=&gt;</span> <span class='string'>&quot;TRACE&quot;</span>,
-            <span class='ident'>Connect</span> <span class='op'>=&gt;</span> <span class='string'>&quot;CONNECT&quot;</span>,
-            <span class='ident'>Patch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;PATCH&quot;</span>,
-            <span class='ident'>Extension</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='ident'>s</span>.<span class='ident'>as_ref</span>()
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Options</span> <span class="op">=&gt;</span> <span class="string">&quot;OPTIONS&quot;</span>,
+            <span class="ident">Get</span> <span class="op">=&gt;</span> <span class="string">&quot;GET&quot;</span>,
+            <span class="ident">Post</span> <span class="op">=&gt;</span> <span class="string">&quot;POST&quot;</span>,
+            <span class="ident">Put</span> <span class="op">=&gt;</span> <span class="string">&quot;PUT&quot;</span>,
+            <span class="ident">Delete</span> <span class="op">=&gt;</span> <span class="string">&quot;DELETE&quot;</span>,
+            <span class="ident">Head</span> <span class="op">=&gt;</span> <span class="string">&quot;HEAD&quot;</span>,
+            <span class="ident">Trace</span> <span class="op">=&gt;</span> <span class="string">&quot;TRACE&quot;</span>,
+            <span class="ident">Connect</span> <span class="op">=&gt;</span> <span class="string">&quot;CONNECT&quot;</span>,
+            <span class="ident">Patch</span> <span class="op">=&gt;</span> <span class="string">&quot;PATCH&quot;</span>,
+            <span class="ident">Extension</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="ident">s</span>.<span class="ident">as_ref</span>()
         })
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde-serialization&quot;</span>)]</span>
-<span class='kw'>impl</span> <span class='ident'>Serialize</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
-    <span class='kw'>fn</span> <span class='ident'>serialize</span><span class='op'>&lt;</span><span class='ident'>S</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>serializer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>S</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>S</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>S</span>: <span class='ident'>Serializer</span> {
-        <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>).<span class='ident'>serialize</span>(<span class='ident'>serializer</span>)
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-serialization&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">S</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+        <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde-serialization&quot;</span>)]</span>
-<span class='kw'>impl</span> <span class='ident'>Deserialize</span> <span class='kw'>for</span> <span class='ident'>Method</span> {
-    <span class='kw'>fn</span> <span class='ident'>deserialize</span><span class='op'>&lt;</span><span class='ident'>D</span><span class='op'>&gt;</span>(<span class='ident'>deserializer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Method</span>, <span class='ident'>D</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> <span class='kw'>where</span> <span class='ident'>D</span>: <span class='ident'>Deserializer</span> {
-        <span class='kw'>let</span> <span class='ident'>string_representation</span>: <span class='ident'>String</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>Deserialize</span>::<span class='ident'>deserialize</span>(<span class='ident'>deserializer</span>));
-        <span class='prelude-val'>Ok</span>(<span class='ident'>FromStr</span>::<span class='ident'>from_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>string_representation</span>[..]).<span class='ident'>unwrap</span>())
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-serialization&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">Deserialize</span> <span class="kw">for</span> <span class="ident">Method</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">D</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Method</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">D</span>: <span class="ident">Deserializer</span> {
+        <span class="kw">let</span> <span class="ident">string_representation</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">Deserialize</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>));
+        <span class="prelude-val">Ok</span>(<span class="ident">FromStr</span>::<span class="ident">from_str</span>(<span class="kw-2">&amp;</span><span class="ident">string_representation</span>[..]).<span class="ident">unwrap</span>())
     }
 } 
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-    <span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Method</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Method</span>::{<span class='ident'>Get</span>, <span class='ident'>Post</span>, <span class='ident'>Put</span>, <span class='ident'>Extension</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+    <span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Method</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Method</span>::{<span class="ident">Get</span>, <span class="ident">Post</span>, <span class="ident">Put</span>, <span class="ident">Extension</span>};
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_safe</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='bool-val'>true</span>, <span class='ident'>Get</span>.<span class='ident'>safe</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='bool-val'>false</span>, <span class='ident'>Post</span>.<span class='ident'>safe</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_safe</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="bool-val">true</span>, <span class="ident">Get</span>.<span class="ident">safe</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="bool-val">false</span>, <span class="ident">Post</span>.<span class="ident">safe</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_idempotent</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='bool-val'>true</span>, <span class='ident'>Get</span>.<span class='ident'>idempotent</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='bool-val'>true</span>, <span class='ident'>Put</span>.<span class='ident'>idempotent</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='bool-val'>false</span>, <span class='ident'>Post</span>.<span class='ident'>idempotent</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_idempotent</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="bool-val">true</span>, <span class="ident">Get</span>.<span class="ident">idempotent</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="bool-val">true</span>, <span class="ident">Put</span>.<span class="ident">idempotent</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="bool-val">false</span>, <span class="ident">Post</span>.<span class="ident">idempotent</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_from_str</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Get</span>, <span class='ident'>FromStr</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;GET&quot;</span>).<span class='ident'>unwrap</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Extension</span>(<span class='string'>&quot;MOVE&quot;</span>.<span class='ident'>to_owned</span>()),
-                   <span class='ident'>FromStr</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;MOVE&quot;</span>).<span class='ident'>unwrap</span>());
-        <span class='kw'>let</span> <span class='ident'>x</span>: <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Method</span>, _<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>FromStr</span>::<span class='ident'>from_str</span>(<span class='string'>&quot;&quot;</span>);
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>Method</span>) <span class='op'>=</span> <span class='ident'>x</span> {
-        } <span class='kw'>else</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;An empty method is invalid!&quot;</span>)
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_from_str</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Get</span>, <span class="ident">FromStr</span>::<span class="ident">from_str</span>(<span class="string">&quot;GET&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Extension</span>(<span class="string">&quot;MOVE&quot;</span>.<span class="ident">to_owned</span>()),
+                   <span class="ident">FromStr</span>::<span class="ident">from_str</span>(<span class="string">&quot;MOVE&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let</span> <span class="ident">x</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Method</span>, _<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">FromStr</span>::<span class="ident">from_str</span>(<span class="string">&quot;&quot;</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Method</span>) <span class="op">=</span> <span class="ident">x</span> {
+        } <span class="kw">else</span> {
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;An empty method is invalid!&quot;</span>)
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_fmt</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&quot;GET&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>Get</span>));
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='string'>&quot;MOVE&quot;</span>.<span class='ident'>to_owned</span>(),
-                   <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>Extension</span>(<span class='string'>&quot;MOVE&quot;</span>.<span class='ident'>to_owned</span>())));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_fmt</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;GET&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">Get</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;MOVE&quot;</span>.<span class="ident">to_owned</span>(),
+                   <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">Extension</span>(<span class="string">&quot;MOVE&quot;</span>.<span class="ident">to_owned</span>())));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hashable</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>counter</span>: <span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='ident'>Method</span>,<span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-        <span class='ident'>counter</span>.<span class='ident'>insert</span>(<span class='ident'>Get</span>, <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='number'>1</span>), <span class='ident'>counter</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>Get</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hashable</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Method</span>,<span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+        <span class="ident">counter</span>.<span class="ident">insert</span>(<span class="ident">Get</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">1</span>), <span class="ident">counter</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">Get</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_as_str</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Get</span>.<span class='ident'>as_ref</span>(), <span class='string'>&quot;GET&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Post</span>.<span class='ident'>as_ref</span>(), <span class='string'>&quot;POST&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Put</span>.<span class='ident'>as_ref</span>(), <span class='string'>&quot;PUT&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Extension</span>(<span class='string'>&quot;MOVE&quot;</span>.<span class='ident'>to_owned</span>()).<span class='ident'>as_ref</span>(), <span class='string'>&quot;MOVE&quot;</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_as_str</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Get</span>.<span class="ident">as_ref</span>(), <span class="string">&quot;GET&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Post</span>.<span class="ident">as_ref</span>(), <span class="string">&quot;POST&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Put</span>.<span class="ident">as_ref</span>(), <span class="string">&quot;PUT&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Extension</span>(<span class="string">&quot;MOVE&quot;</span>.<span class="ident">to_owned</span>()).<span class="ident">as_ref</span>(), <span class="string">&quot;MOVE&quot;</span>);
     }
 }
 </pre>
@@ -457,18 +469,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -501,7 +517,6 @@
         window.rootPath = "../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

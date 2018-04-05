@@ -9,14 +9,18 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -885,848 +897,848 @@
 <span id="841">841</span>
 <span id="842">842</span>
 <span id="843">843</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>libc</span>::{<span class='ident'>c_int</span>, <span class='ident'>c_ulong</span>, <span class='ident'>c_void</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ffi</span>::{<span class='ident'>CStr</span>, <span class='ident'>CString</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>::<span class='ident'>Ordering</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::{<span class='ident'>fmt</span>, <span class='ident'>ptr</span>, <span class='ident'>mem</span>};
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">c_int</span>, <span class="ident">c_ulong</span>, <span class="ident">c_void</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::{<span class="ident">CStr</span>, <span class="ident">CString</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">ptr</span>, <span class="ident">mem</span>};
 
-<span class='kw'>use</span> <span class='ident'>ffi</span>;
-<span class='kw'>use</span> <span class='ident'>ssl</span>::<span class='ident'>error</span>::<span class='ident'>SslError</span>;
+<span class="kw">use</span> <span class="ident">ffi</span>;
+<span class="kw">use</span> <span class="ident">ssl</span>::<span class="ident">error</span>::<span class="ident">SslError</span>;
 
-<span class='doccomment'>/// A signed arbitrary-precision integer.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// `BigNum` provides wrappers around OpenSSL&#39;s checked arithmetic functions. Additionally, it</span>
-<span class='doccomment'>/// implements the standard operators (`std::ops`), which perform unchecked arithmetic, unwrapping</span>
-<span class='doccomment'>/// the returned `Result` of the checked operations.</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>BigNum</span>(<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ffi</span>::<span class='ident'>BIGNUM</span>);
+<span class="doccomment">/// A signed arbitrary-precision integer.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// `BigNum` provides wrappers around OpenSSL&#39;s checked arithmetic functions. Additionally, it</span>
+<span class="doccomment">/// implements the standard operators (`std::ops`), which perform unchecked arithmetic, unwrapping</span>
+<span class="doccomment">/// the returned `Result` of the checked operations.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BigNum</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">BIGNUM</span>);
 
-<span class='doccomment'>/// Specifies the desired properties of a randomly generated `BigNum`.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>RNGProperty</span> {
-    <span class='doccomment'>/// The most significant bit of the number is allowed to be 0.</span>
-    <span class='ident'>MsbMaybeZero</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1</span>,
-    <span class='doccomment'>/// The MSB should be set to 1.</span>
-    <span class='ident'>MsbOne</span> <span class='op'>=</span> <span class='number'>0</span>,
-    <span class='doccomment'>/// The two most significant bits of the number will be set to 1, so that the product of two</span>
-    <span class='doccomment'>/// such random numbers will always have `2 * bits` length.</span>
-    <span class='ident'>TwoMsbOne</span> <span class='op'>=</span> <span class='number'>1</span>,
+<span class="doccomment">/// Specifies the desired properties of a randomly generated `BigNum`.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RNGProperty</span> {
+    <span class="doccomment">/// The most significant bit of the number is allowed to be 0.</span>
+    <span class="ident">MsbMaybeZero</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>,
+    <span class="doccomment">/// The MSB should be set to 1.</span>
+    <span class="ident">MsbOne</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// The two most significant bits of the number will be set to 1, so that the product of two</span>
+    <span class="doccomment">/// such random numbers will always have `2 * bits` length.</span>
+    <span class="ident">TwoMsbOne</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>with_ctx</span>(
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span>:<span class='ident'>block</span>) <span class='op'>=&gt;</span> ({
-        <span class='kw'>let</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_CTX_new</span>();
-        <span class='kw'>if</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>).<span class='ident'>is_null</span>() {
-            <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
-        } <span class='kw'>else</span> {
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span>;
-            <span class='ident'>ffi</span>::<span class='ident'>BN_CTX_free</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>);
-            <span class='ident'>r</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">with_ctx</span>(
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">block</span>) <span class="op">=&gt;</span> ({
+        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_CTX_new</span>();
+        <span class="kw">if</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>).<span class="ident">is_null</span>() {
+            <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>;
+            <span class="ident">ffi</span>::<span class="ident">BN_CTX_free</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
+            <span class="ident">r</span>
         }
     });
 );
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>with_bn</span>(
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span>:<span class='ident'>block</span>) <span class='op'>=&gt;</span> ({
-        <span class='kw'>let</span> <span class='ident'>tmp</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new</span>();
-        <span class='kw'>match</span> <span class='ident'>tmp</span> {
-            <span class='prelude-val'>Ok</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span> {
-                    <span class='prelude-val'>Ok</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>)
-                } <span class='kw'>else</span> {
-                    <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">with_bn</span>(
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">block</span>) <span class="op">=&gt;</span> ({
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new</span>();
+        <span class="kw">match</span> <span class="ident">tmp</span> {
+            <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span> {
+                    <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)
+                } <span class="kw">else</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
                 }
             },
-            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         }
     });
 );
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>with_bn_in_ctx</span>(
-    (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ctx_name</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span>:<span class='ident'>block</span>) <span class='op'>=&gt;</span> ({
-        <span class='kw'>let</span> <span class='ident'>tmp</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new</span>();
-        <span class='kw'>match</span> <span class='ident'>tmp</span> {
-            <span class='prelude-val'>Ok</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ctx_name</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_CTX_new</span>();
-                <span class='kw'>if</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ctx_name</span>).<span class='ident'>is_null</span>() {
-                    <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
-                } <span class='kw'>else</span> {
-                    <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span>
-                        <span class='kw'>if</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>action</span> {
-                            <span class='prelude-val'>Ok</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>)
-                        } <span class='kw'>else</span> {
-                            <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">with_bn_in_ctx</span>(
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx_name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">block</span>) <span class="op">=&gt;</span> ({
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new</span>();
+        <span class="kw">match</span> <span class="ident">tmp</span> {
+            <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx_name</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_CTX_new</span>();
+                <span class="kw">if</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx_name</span>).<span class="ident">is_null</span>() {
+                    <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
+                } <span class="kw">else</span> {
+                    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span>
+                        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span> {
+                            <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)
+                        } <span class="kw">else</span> {
+                            <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
                         };
-                    <span class='ident'>ffi</span>::<span class='ident'>BN_CTX_free</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>ctx_name</span>);
-                    <span class='ident'>r</span>
+                    <span class="ident">ffi</span>::<span class="ident">BN_CTX_free</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx_name</span>);
+                    <span class="ident">r</span>
                 }
             },
-            <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
         }
     });
 );
 
-<span class='kw'>impl</span> <span class='ident'>BigNum</span> {
-    <span class='doccomment'>/// Creates a new `BigNum` with the value 0.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>ffi</span>::<span class='ident'>init</span>();
+<span class="kw">impl</span> <span class="ident">BigNum</span> {
+    <span class="doccomment">/// Creates a new `BigNum` with the value 0.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="ident">ffi</span>::<span class="ident">init</span>();
 
-            <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='macro'>try_ssl_null</span><span class='macro'>!</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_new</span>());
-            <span class='prelude-val'>Ok</span>(<span class='ident'>BigNum</span>(<span class='ident'>v</span>))
+            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">try_ssl_null</span><span class="macro">!</span>(<span class="ident">ffi</span>::<span class="ident">BN_new</span>());
+            <span class="prelude-val">Ok</span>(<span class="ident">BigNum</span>(<span class="ident">v</span>))
         }
     }
 
-    <span class='doccomment'>/// Creates a new `BigNum` with the given value.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_from</span>(<span class='ident'>n</span>: <span class='ident'>u64</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='ident'>BigNum</span>::<span class='ident'>new</span>().<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='kw'>unsafe</span> {
-            <span class='macro'>try_ssl</span><span class='macro'>!</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_set_word</span>(<span class='ident'>v</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>c_ulong</span>));
-            <span class='prelude-val'>Ok</span>(<span class='ident'>v</span>)
+    <span class="doccomment">/// Creates a new `BigNum` with the given value.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from</span>(<span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="ident">BigNum</span>::<span class="ident">new</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">unsafe</span> {
+            <span class="macro">try_ssl</span><span class="macro">!</span>(<span class="ident">ffi</span>::<span class="ident">BN_set_word</span>(<span class="ident">v</span>.<span class="ident">raw</span>(), <span class="ident">n</span> <span class="kw">as</span> <span class="ident">c_ulong</span>));
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
         })
     }
 
-    <span class='doccomment'>/// Creates a `BigNum` from a decimal string.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_dec_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='ident'>BigNum</span>::<span class='ident'>new</span>().<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>c_str</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>s</span>.<span class='ident'>as_bytes</span>()).<span class='ident'>unwrap</span>();
-            <span class='macro'>try_ssl</span><span class='macro'>!</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_dec2bn</span>(<span class='ident'>v</span>.<span class='ident'>raw_ptr</span>(), <span class='ident'>c_str</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _));
-            <span class='prelude-val'>Ok</span>(<span class='ident'>v</span>)
+    <span class="doccomment">/// Creates a `BigNum` from a decimal string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dec_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="ident">BigNum</span>::<span class="ident">new</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">c_str</span> <span class="op">=</span> <span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+            <span class="macro">try_ssl</span><span class="macro">!</span>(<span class="ident">ffi</span>::<span class="ident">BN_dec2bn</span>(<span class="ident">v</span>.<span class="ident">raw_ptr</span>(), <span class="ident">c_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _));
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
         })
     }
 
-    <span class='doccomment'>/// Creates a `BigNum` from a hexadecimal string.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_hex_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='ident'>BigNum</span>::<span class='ident'>new</span>().<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>c_str</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>s</span>.<span class='ident'>as_bytes</span>()).<span class='ident'>unwrap</span>();
-            <span class='macro'>try_ssl</span><span class='macro'>!</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_hex2bn</span>(<span class='ident'>v</span>.<span class='ident'>raw_ptr</span>(), <span class='ident'>c_str</span>.<span class='ident'>as_ptr</span>() <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _));
-            <span class='prelude-val'>Ok</span>(<span class='ident'>v</span>)
+    <span class="doccomment">/// Creates a `BigNum` from a hexadecimal string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="ident">BigNum</span>::<span class="ident">new</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">c_str</span> <span class="op">=</span> <span class="ident">CString</span>::<span class="ident">new</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+            <span class="macro">try_ssl</span><span class="macro">!</span>(<span class="ident">ffi</span>::<span class="ident">BN_hex2bn</span>(<span class="ident">v</span>.<span class="ident">raw_ptr</span>(), <span class="ident">c_str</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _));
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
         })
     }
 
-    <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>new_from_ffi</span>(<span class='ident'>orig</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ffi</span>::<span class='ident'>BIGNUM</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>orig</span>.<span class='ident'>is_null</span>() {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Null Pointer was supplied to BigNum::new_from_ffi&quot;</span>);
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new_from_ffi</span>(<span class="ident">orig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">BIGNUM</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">orig</span>.<span class="ident">is_null</span>() {
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Null Pointer was supplied to BigNum::new_from_ffi&quot;</span>);
         }
-        <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_dup</span>(<span class='ident'>orig</span>);
-        <span class='kw'>if</span> <span class='ident'>r</span>.<span class='ident'>is_null</span>() {
-            <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>BigNum</span>(<span class='ident'>r</span>))
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_dup</span>(<span class="ident">orig</span>);
+        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_null</span>() {
+            <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">BigNum</span>(<span class="ident">r</span>))
         }
     }
 
-    <span class='doccomment'>/// Creates a new `BigNum` from an unsigned, big-endian encoded number of arbitrary length.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let bignum = BigNum::new_from_slice(&amp;[0x12, 0x00, 0x34]).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(bignum, BigNum::new_from(0x120034).unwrap());</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_from_slice</span>(<span class='ident'>n</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='ident'>BigNum</span>::<span class='ident'>new</span>().<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='kw'>unsafe</span> {
-            <span class='macro'>try_ssl_null</span><span class='macro'>!</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_bin2bn</span>(<span class='ident'>n</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>n</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>v</span>.<span class='ident'>raw</span>()));
-            <span class='prelude-val'>Ok</span>(<span class='ident'>v</span>)
+    <span class="doccomment">/// Creates a new `BigNum` from an unsigned, big-endian encoded number of arbitrary length.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let bignum = BigNum::new_from_slice(&amp;[0x12, 0x00, 0x34]).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(bignum, BigNum::new_from(0x120034).unwrap());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">n</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="ident">BigNum</span>::<span class="ident">new</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="kw">unsafe</span> {
+            <span class="macro">try_ssl_null</span><span class="macro">!</span>(<span class="ident">ffi</span>::<span class="ident">BN_bin2bn</span>(<span class="ident">n</span>.<span class="ident">as_ptr</span>(), <span class="ident">n</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">v</span>.<span class="ident">raw</span>()));
+            <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
         })
     }
 
-    <span class='doccomment'>/// Returns the square of `self`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let ref n = BigNum::new_from(10).unwrap();</span>
-    <span class='doccomment'>/// let squared = BigNum::new_from(100).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(n.checked_sqr().unwrap(), squared);</span>
-    <span class='doccomment'>/// assert_eq!(n * n, squared);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_sqr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_sqr</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Returns the square of `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let ref n = BigNum::new_from(10).unwrap();</span>
+    <span class="doccomment">/// let squared = BigNum::new_from(100).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(n.checked_sqr().unwrap(), squared);</span>
+    <span class="doccomment">/// assert_eq!(n * n, squared);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_sqr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_sqr</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Returns the unsigned remainder of the division `self / n`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_nnmod</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_nnmod</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Returns the unsigned remainder of the division `self / n`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_nnmod</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_nnmod</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Equivalent to `(self + a) mod n`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let ref s = BigNum::new_from(10).unwrap();</span>
-    <span class='doccomment'>/// let ref a = BigNum::new_from(20).unwrap();</span>
-    <span class='doccomment'>/// let ref n = BigNum::new_from(29).unwrap();</span>
-    <span class='doccomment'>/// let result = BigNum::new_from(1).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(s.checked_mod_add(a, n).unwrap(), result);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_add</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mod_add</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Equivalent to `(self + a) mod n`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let ref s = BigNum::new_from(10).unwrap();</span>
+    <span class="doccomment">/// let ref a = BigNum::new_from(20).unwrap();</span>
+    <span class="doccomment">/// let ref n = BigNum::new_from(29).unwrap();</span>
+    <span class="doccomment">/// let result = BigNum::new_from(1).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(s.checked_mod_add(a, n).unwrap(), result);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mod_add</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Equivalent to `(self - a) mod n`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mod_sub</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Equivalent to `(self - a) mod n`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mod_sub</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Equivalent to `(self * a) mod n`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mod_mul</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Equivalent to `(self * a) mod n`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mod_mul</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Equivalent to `self² mod n`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_sqr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mod_sqr</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Equivalent to `self² mod n`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_sqr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mod_sqr</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Raises `self` to the `p`th power.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_exp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>p</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_exp</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>p</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Raises `self` to the `p`th power.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_exp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_exp</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">p</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Equivalent to `self.checked_exp(p) mod n`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_exp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>p</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mod_exp</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>p</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Equivalent to `self.checked_exp(p) mod n`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_exp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mod_exp</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">p</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Calculates the modular multiplicative inverse of `self` modulo `n`, that is, an integer `r`</span>
-    <span class='doccomment'>/// such that `(self * r) % n == 1`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod_inv</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>n</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='op'>!</span><span class='ident'>ffi</span>::<span class='ident'>BN_mod_inverse</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>).<span class='ident'>is_null</span>()
+    <span class="doccomment">/// Calculates the modular multiplicative inverse of `self` modulo `n`, that is, an integer `r`</span>
+    <span class="doccomment">/// such that `(self * r) % n == 1`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod_inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="op">!</span><span class="ident">ffi</span>::<span class="ident">BN_mod_inverse</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>).<span class="ident">is_null</span>()
             })
         }
     }
 
-    <span class='doccomment'>/// Add an `unsigned long` to `self`. This is more efficient than adding a `BigNum`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_word</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>w</span>: <span class='ident'>c_ulong</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_add_word</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>w</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="doccomment">/// Add an `unsigned long` to `self`. This is more efficient than adding a `BigNum`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_word</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">c_ulong</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_add_word</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">w</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sub_word</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>w</span>: <span class='ident'>c_ulong</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_sub_word</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>w</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sub_word</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">c_ulong</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_sub_word</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">w</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mul_word</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>w</span>: <span class='ident'>c_ulong</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_mul_word</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>w</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_word</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">c_ulong</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_mul_word</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">w</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>div_word</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>w</span>: <span class='ident'>c_ulong</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>c_ulong</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_div_word</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>w</span>);
-            <span class='kw'>if</span> <span class='ident'>result</span> <span class='op'>!=</span> <span class='op'>!</span><span class='number'>0</span> <span class='kw'>as</span> <span class='ident'>c_ulong</span> {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>result</span>)
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">div_word</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">w</span>: <span class="ident">c_ulong</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_ulong</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_div_word</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">w</span>);
+            <span class="kw">if</span> <span class="ident">result</span> <span class="op">!=</span> <span class="op">!</span><span class="number">0</span> <span class="kw">as</span> <span class="ident">c_ulong</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mod_word</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>w</span>: <span class='ident'>c_ulong</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>c_ulong</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_mod_word</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>w</span>);
-            <span class='kw'>if</span> <span class='ident'>result</span> <span class='op'>!=</span> <span class='op'>!</span><span class='number'>0</span> <span class='kw'>as</span> <span class='ident'>c_ulong</span> {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>result</span>)
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mod_word</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="ident">c_ulong</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">c_ulong</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_mod_word</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">w</span>);
+            <span class="kw">if</span> <span class="ident">result</span> <span class="op">!=</span> <span class="op">!</span><span class="number">0</span> <span class="kw">as</span> <span class="ident">c_ulong</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='doccomment'>/// Computes the greatest common denominator of `self` and `a`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_gcd</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_gcd</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Computes the greatest common denominator of `self` and `a`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_gcd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_gcd</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Generates a prime number.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Parameters</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// * `bits`: The length of the prime in bits (lower bound).</span>
-    <span class='doccomment'>/// * `safe`: If true, returns a &quot;safe&quot; prime `p` so that `(p-1)/2` is also prime.</span>
-    <span class='doccomment'>/// * `add`/`rem`: If `add` is set to `Some(add)`, `p % add == rem` will hold, where `p` is the</span>
-    <span class='doccomment'>///   generated prime and `rem` is `1` if not specified (`None`).</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_generate_prime</span>(<span class='ident'>bits</span>: <span class='ident'>i32</span>,
-                                  <span class='ident'>safe</span>: <span class='ident'>bool</span>,
-                                  <span class='ident'>add</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>BigNum</span><span class='op'>&gt;</span>,
-                                  <span class='ident'>rem</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>BigNum</span><span class='op'>&gt;</span>)
-                                  <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='kw'>let</span> <span class='ident'>add_arg</span> <span class='op'>=</span> <span class='ident'>add</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>a</span><span class='op'>|</span> <span class='ident'>a</span>.<span class='ident'>raw</span>()).<span class='ident'>unwrap_or</span>(<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>());
-                <span class='kw'>let</span> <span class='ident'>rem_arg</span> <span class='op'>=</span> <span class='ident'>rem</span>.<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>r</span><span class='op'>|</span> <span class='ident'>r</span>.<span class='ident'>raw</span>()).<span class='ident'>unwrap_or</span>(<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>());
+    <span class="doccomment">/// Generates a prime number.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Parameters</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `bits`: The length of the prime in bits (lower bound).</span>
+    <span class="doccomment">/// * `safe`: If true, returns a &quot;safe&quot; prime `p` so that `(p-1)/2` is also prime.</span>
+    <span class="doccomment">/// * `add`/`rem`: If `add` is set to `Some(add)`, `p % add == rem` will hold, where `p` is the</span>
+    <span class="doccomment">///   generated prime and `rem` is `1` if not specified (`None`).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_generate_prime</span>(<span class="ident">bits</span>: <span class="ident">i32</span>,
+                                  <span class="ident">safe</span>: <span class="ident">bool</span>,
+                                  <span class="ident">add</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNum</span><span class="op">&gt;</span>,
+                                  <span class="ident">rem</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BigNum</span><span class="op">&gt;</span>)
+                                  <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="kw">let</span> <span class="ident">add_arg</span> <span class="op">=</span> <span class="ident">add</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">raw</span>()).<span class="ident">unwrap_or</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>());
+                <span class="kw">let</span> <span class="ident">rem_arg</span> <span class="op">=</span> <span class="ident">rem</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">raw</span>()).<span class="ident">unwrap_or</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>());
 
-                <span class='ident'>ffi</span>::<span class='ident'>BN_generate_prime_ex</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(),
-                                          <span class='ident'>bits</span> <span class='kw'>as</span> <span class='ident'>c_int</span>,
-                                          <span class='ident'>safe</span> <span class='kw'>as</span> <span class='ident'>c_int</span>,
-                                          <span class='ident'>add_arg</span>,
-                                          <span class='ident'>rem_arg</span>,
-                                          <span class='ident'>ptr</span>::<span class='ident'>null</span>()) <span class='op'>==</span> <span class='number'>1</span>
+                <span class="ident">ffi</span>::<span class="ident">BN_generate_prime_ex</span>(<span class="ident">r</span>.<span class="ident">raw</span>(),
+                                          <span class="ident">bits</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+                                          <span class="ident">safe</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+                                          <span class="ident">add_arg</span>,
+                                          <span class="ident">rem_arg</span>,
+                                          <span class="ident">ptr</span>::<span class="ident">null</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Checks whether `self` is prime.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Performs a Miller-Rabin probabilistic primality test with `checks` iterations.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Return Value</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns `true` if `self` is prime with an error probability of less than `0.25 ^ checks`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_prime</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>checks</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_ctx</span><span class='macro'>!</span>(<span class='ident'>ctx</span>, {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_is_prime_ex</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>checks</span> <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>ctx</span>, <span class='ident'>ptr</span>::<span class='ident'>null</span>()) <span class='op'>==</span> <span class='number'>1</span>)
+    <span class="doccomment">/// Checks whether `self` is prime.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Performs a Miller-Rabin probabilistic primality test with `checks` iterations.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Return Value</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `true` if `self` is prime with an error probability of less than `0.25 ^ checks`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">checks</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_ctx</span><span class="macro">!</span>(<span class="ident">ctx</span>, {
+                <span class="prelude-val">Ok</span>(<span class="ident">ffi</span>::<span class="ident">BN_is_prime_ex</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">checks</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">ctx</span>, <span class="ident">ptr</span>::<span class="ident">null</span>()) <span class="op">==</span> <span class="number">1</span>)
             })
         }
     }
 
-    <span class='doccomment'>/// Checks whether `self` is prime with optional trial division.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If `do_trial_division` is `true`, first performs trial division by a number of small primes.</span>
-    <span class='doccomment'>/// Then, like `is_prime`, performs a Miller-Rabin probabilistic primality test with `checks`</span>
-    <span class='doccomment'>/// iterations.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Return Value</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns `true` if `self` is prime with an error probability of less than `0.25 ^ checks`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_prime_fast</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>checks</span>: <span class='ident'>i32</span>, <span class='ident'>do_trial_division</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_ctx</span><span class='macro'>!</span>(<span class='ident'>ctx</span>, {
-                <span class='prelude-val'>Ok</span>(<span class='ident'>ffi</span>::<span class='ident'>BN_is_prime_fasttest_ex</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(),
-                                                <span class='ident'>checks</span> <span class='kw'>as</span> <span class='ident'>c_int</span>,
-                                                <span class='ident'>ctx</span>,
-                                                <span class='ident'>do_trial_division</span> <span class='kw'>as</span> <span class='ident'>c_int</span>,
-                                                <span class='ident'>ptr</span>::<span class='ident'>null</span>()) <span class='op'>==</span> <span class='number'>1</span>)
+    <span class="doccomment">/// Checks whether `self` is prime with optional trial division.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If `do_trial_division` is `true`, first performs trial division by a number of small primes.</span>
+    <span class="doccomment">/// Then, like `is_prime`, performs a Miller-Rabin probabilistic primality test with `checks`</span>
+    <span class="doccomment">/// iterations.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Return Value</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `true` if `self` is prime with an error probability of less than `0.25 ^ checks`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_prime_fast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">checks</span>: <span class="ident">i32</span>, <span class="ident">do_trial_division</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_ctx</span><span class="macro">!</span>(<span class="ident">ctx</span>, {
+                <span class="prelude-val">Ok</span>(<span class="ident">ffi</span>::<span class="ident">BN_is_prime_fasttest_ex</span>(<span class="self">self</span>.<span class="ident">raw</span>(),
+                                                <span class="ident">checks</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+                                                <span class="ident">ctx</span>,
+                                                <span class="ident">do_trial_division</span> <span class="kw">as</span> <span class="ident">c_int</span>,
+                                                <span class="ident">ptr</span>::<span class="ident">null</span>()) <span class="op">==</span> <span class="number">1</span>)
             })
         }
     }
 
-    <span class='doccomment'>/// Generates a cryptographically strong pseudo-random `BigNum`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Parameters</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// * `bits`: Length of the number in bits.</span>
-    <span class='doccomment'>/// * `prop`: The desired properties of the number.</span>
-    <span class='doccomment'>/// * `odd`: If `true`, the generated number will be odd.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_new_random</span>(<span class='ident'>bits</span>: <span class='ident'>i32</span>, <span class='ident'>prop</span>: <span class='ident'>RNGProperty</span>, <span class='ident'>odd</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_rand</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='ident'>bits</span> <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>prop</span> <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>odd</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Generates a cryptographically strong pseudo-random `BigNum`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Parameters</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// * `bits`: Length of the number in bits.</span>
+    <span class="doccomment">/// * `prop`: The desired properties of the number.</span>
+    <span class="doccomment">/// * `odd`: If `true`, the generated number will be odd.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_new_random</span>(<span class="ident">bits</span>: <span class="ident">i32</span>, <span class="ident">prop</span>: <span class="ident">RNGProperty</span>, <span class="ident">odd</span>: <span class="ident">bool</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_rand</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="ident">bits</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">prop</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">odd</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// The cryptographically weak counterpart to `checked_new_random`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_new_pseudo_random</span>(<span class='ident'>bits</span>: <span class='ident'>i32</span>,
-                                     <span class='ident'>prop</span>: <span class='ident'>RNGProperty</span>,
-                                     <span class='ident'>odd</span>: <span class='ident'>bool</span>)
-                                     <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_pseudo_rand</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='ident'>bits</span> <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>prop</span> <span class='kw'>as</span> <span class='ident'>c_int</span>, <span class='ident'>odd</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// The cryptographically weak counterpart to `checked_new_random`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_new_pseudo_random</span>(<span class="ident">bits</span>: <span class="ident">i32</span>,
+                                     <span class="ident">prop</span>: <span class="ident">RNGProperty</span>,
+                                     <span class="ident">odd</span>: <span class="ident">bool</span>)
+                                     <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_pseudo_rand</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="ident">bits</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">prop</span> <span class="kw">as</span> <span class="ident">c_int</span>, <span class="ident">odd</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Generates a cryptographically strong pseudo-random `BigNum` `r` in the range</span>
-    <span class='doccomment'>/// `0 &lt;= r &lt; self`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_rand_in_range</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_rand_range</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Generates a cryptographically strong pseudo-random `BigNum` `r` in the range</span>
+    <span class="doccomment">/// `0 &lt;= r &lt; self`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_rand_in_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_rand_range</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// The cryptographically weak counterpart to `checked_rand_in_range`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_pseudo_rand_in_range</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_pseudo_rand_range</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// The cryptographically weak counterpart to `checked_rand_in_range`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_pseudo_rand_in_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_pseudo_rand_range</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Sets bit `n`. Equivalent to `self |= (1 &lt;&lt; n)`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// When setting a bit outside of `self`, it is expanded.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_bit</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_set_bit</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="doccomment">/// Sets bit `n`. Equivalent to `self |= (1 &lt;&lt; n)`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When setting a bit outside of `self`, it is expanded.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_bit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_set_bit</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='doccomment'>/// Clears bit `n`, setting it to 0. Equivalent to `self &amp;= ~(1 &lt;&lt; n)`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// When clearing a bit outside of `self`, an error is returned.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>clear_bit</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_clear_bit</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="doccomment">/// Clears bit `n`, setting it to 0. Equivalent to `self &amp;= ~(1 &lt;&lt; n)`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When clearing a bit outside of `self`, an error is returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_bit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_clear_bit</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='doccomment'>/// Returns `true` if the `n`th bit of `self` is set to 1, `false` otherwise.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_bit_set</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>unsafe</span> { <span class='ident'>ffi</span>::<span class='ident'>BN_is_bit_set</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span> }
+    <span class="doccomment">/// Returns `true` if the `n`th bit of `self` is set to 1, `false` otherwise.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bit_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi</span>::<span class="ident">BN_is_bit_set</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span> }
     }
 
-    <span class='doccomment'>/// Truncates `self` to the lowest `n` bits.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// An error occurs if `self` is already shorter than `n` bits.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mask_bits</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='ident'>ffi</span>::<span class='ident'>BN_mask_bits</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span> {
-                <span class='prelude-val'>Ok</span>(())
-            } <span class='kw'>else</span> {
-                <span class='prelude-val'>Err</span>(<span class='ident'>SslError</span>::<span class='ident'>get</span>())
+    <span class="doccomment">/// Truncates `self` to the lowest `n` bits.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An error occurs if `self` is already shorter than `n` bits.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mask_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="ident">ffi</span>::<span class="ident">BN_mask_bits</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">n</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Ok</span>(())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">SslError</span>::<span class="ident">get</span>())
             }
         }
     }
 
-    <span class='doccomment'>/// Returns `self`, shifted left by 1 bit. `self` may be negative.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let ref s = BigNum::new_from(0b0100).unwrap();</span>
-    <span class='doccomment'>/// let result = BigNum::new_from(0b1000).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(s.checked_shl1().unwrap(), result);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let ref s = -BigNum::new_from(8).unwrap();</span>
-    <span class='doccomment'>/// let result = -BigNum::new_from(16).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // (-8) &lt;&lt; 1 == -16</span>
-    <span class='doccomment'>/// assert_eq!(s.checked_shl1().unwrap(), result);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_shl1</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_lshift1</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Returns `self`, shifted left by 1 bit. `self` may be negative.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let ref s = BigNum::new_from(0b0100).unwrap();</span>
+    <span class="doccomment">/// let result = BigNum::new_from(0b1000).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(s.checked_shl1().unwrap(), result);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let ref s = -BigNum::new_from(8).unwrap();</span>
+    <span class="doccomment">/// let result = -BigNum::new_from(16).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // (-8) &lt;&lt; 1 == -16</span>
+    <span class="doccomment">/// assert_eq!(s.checked_shl1().unwrap(), result);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_shl1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_lshift1</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Returns `self`, shifted right by 1 bit. `self` may be negative.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_shr1</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_rshift1</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="doccomment">/// Returns `self`, shifted right by 1 bit. `self` may be negative.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_shr1</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_rshift1</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_add</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_add</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_add</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_sub</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_sub</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_mul</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_mul</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_div</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_div</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_div</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="ident">ptr</span>::<span class="ident">null_mut</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_mod</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn_in_ctx</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='ident'>ctx</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_div</span>(<span class='ident'>ptr</span>::<span class='ident'>null_mut</span>(), <span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>a</span>.<span class='ident'>raw</span>(), <span class='ident'>ctx</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_mod</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn_in_ctx</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="ident">ctx</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_div</span>(<span class="ident">ptr</span>::<span class="ident">null_mut</span>(), <span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">a</span>.<span class="ident">raw</span>(), <span class="ident">ctx</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_shl</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_lshift</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='op'>*</span><span class='ident'>a</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_shl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_lshift</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="kw-2">*</span><span class="ident">a</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>checked_shr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>a</span>: <span class='kw-2'>&amp;</span><span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>BigNum</span>, <span class='ident'>SslError</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='macro'>with_bn</span><span class='macro'>!</span>(<span class='ident'>r</span>, {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_rshift</span>(<span class='ident'>r</span>.<span class='ident'>raw</span>(), <span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='op'>*</span><span class='ident'>a</span> <span class='kw'>as</span> <span class='ident'>c_int</span>) <span class='op'>==</span> <span class='number'>1</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_shr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigNum</span>, <span class="ident">SslError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="macro">with_bn</span><span class="macro">!</span>(<span class="ident">r</span>, {
+                <span class="ident">ffi</span>::<span class="ident">BN_rshift</span>(<span class="ident">r</span>.<span class="ident">raw</span>(), <span class="self">self</span>.<span class="ident">raw</span>(), <span class="kw-2">*</span><span class="ident">a</span> <span class="kw">as</span> <span class="ident">c_int</span>) <span class="op">==</span> <span class="number">1</span>
             })
         }
     }
 
-    <span class='doccomment'>/// Inverts the sign of `self`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let mut s = BigNum::new_from(8).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// s.negate();</span>
-    <span class='doccomment'>/// assert_eq!(s, -BigNum::new_from(8).unwrap());</span>
-    <span class='doccomment'>/// s.negate();</span>
-    <span class='doccomment'>/// assert_eq!(s, BigNum::new_from(8).unwrap());</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>negate</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> { <span class='ident'>ffi</span>::<span class='ident'>BN_set_negative</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>is_negative</span>() <span class='kw'>as</span> <span class='ident'>c_int</span>) }
+    <span class="doccomment">/// Inverts the sign of `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let mut s = BigNum::new_from(8).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// s.negate();</span>
+    <span class="doccomment">/// assert_eq!(s, -BigNum::new_from(8).unwrap());</span>
+    <span class="doccomment">/// s.negate();</span>
+    <span class="doccomment">/// assert_eq!(s, BigNum::new_from(8).unwrap());</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> { <span class="ident">ffi</span>::<span class="ident">BN_set_negative</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="op">!</span><span class="self">self</span>.<span class="ident">is_negative</span>() <span class="kw">as</span> <span class="ident">c_int</span>) }
     }
 
-    <span class='doccomment'>/// Compare the absolute values of `self` and `oth`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// # use std::cmp::Ordering;</span>
-    <span class='doccomment'>/// let s = -BigNum::new_from(8).unwrap();</span>
-    <span class='doccomment'>/// let o = BigNum::new_from(8).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(s.abs_cmp(o), Ordering::Equal);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>abs_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>oth</span>: <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>Ordering</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_ucmp</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>oth</span>.<span class='ident'>raw</span>()) <span class='kw'>as</span> <span class='ident'>i32</span>;
-            <span class='kw'>if</span> <span class='ident'>res</span> <span class='op'>&lt;</span> <span class='number'>0</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Less</span>
-            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>res</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Greater</span>
-            } <span class='kw'>else</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Equal</span>
+    <span class="doccomment">/// Compare the absolute values of `self` and `oth`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// # use std::cmp::Ordering;</span>
+    <span class="doccomment">/// let s = -BigNum::new_from(8).unwrap();</span>
+    <span class="doccomment">/// let o = BigNum::new_from(8).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(s.abs_cmp(o), Ordering::Equal);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abs_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oth</span>: <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_ucmp</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">oth</span>.<span class="ident">raw</span>()) <span class="kw">as</span> <span class="ident">i32</span>;
+            <span class="kw">if</span> <span class="ident">res</span> <span class="op">&lt;</span> <span class="number">0</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Less</span>
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">res</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Greater</span>
+            } <span class="kw">else</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Equal</span>
             }
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_negative</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>unsafe</span> { (<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>raw</span>()).<span class='ident'>neg</span> <span class='op'>==</span> <span class='number'>1</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_negative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">raw</span>()).<span class="ident">neg</span> <span class="op">==</span> <span class="number">1</span> }
     }
 
-    <span class='doccomment'>/// Returns the number of significant bits in `self`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>num_bits</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>i32</span> {
-        <span class='kw'>unsafe</span> { <span class='ident'>ffi</span>::<span class='ident'>BN_num_bits</span>(<span class='self'>self</span>.<span class='ident'>raw</span>()) <span class='kw'>as</span> <span class='ident'>i32</span> }
+    <span class="doccomment">/// Returns the number of significant bits in `self`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi</span>::<span class="ident">BN_num_bits</span>(<span class="self">self</span>.<span class="ident">raw</span>()) <span class="kw">as</span> <span class="ident">i32</span> }
     }
 
-    <span class='doccomment'>/// Returns the size of `self` in bytes.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>num_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>i32</span> {
-        (<span class='self'>self</span>.<span class='ident'>num_bits</span>() <span class='op'>+</span> <span class='number'>7</span>) <span class='op'>/</span> <span class='number'>8</span>
+    <span class="doccomment">/// Returns the size of `self` in bytes.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
+        (<span class="self">self</span>.<span class="ident">num_bits</span>() <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>
     }
 
-    <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>raw</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ffi</span>::<span class='ident'>BIGNUM</span> {
-        <span class='kw'>let</span> <span class='ident'>BigNum</span>(<span class='ident'>n</span>) <span class='op'>=</span> <span class='op'>*</span><span class='self'>self</span>;
-        <span class='ident'>n</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">BIGNUM</span> {
+        <span class="kw">let</span> <span class="ident">BigNum</span>(<span class="ident">n</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="ident">n</span>
     }
 
-    <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>raw_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw'>const</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ffi</span>::<span class='ident'>BIGNUM</span> {
-        <span class='kw'>let</span> <span class='ident'>BigNum</span>(<span class='kw-2'>ref</span> <span class='ident'>n</span>) <span class='op'>=</span> <span class='op'>*</span><span class='self'>self</span>;
-        <span class='ident'>n</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">BIGNUM</span> {
+        <span class="kw">let</span> <span class="ident">BigNum</span>(<span class="kw-2">ref</span> <span class="ident">n</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="ident">n</span>
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>into_raw</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ffi</span>::<span class='ident'>BIGNUM</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>me</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='ident'>mem</span>::<span class='ident'>replace</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>me</span>.<span class='number'>0</span>, <span class='ident'>ptr</span>::<span class='ident'>null_mut</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">BIGNUM</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">me</span>.<span class="number">0</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>())
     }
 
-    <span class='doccomment'>/// Returns a big-endian byte vector representation of the absolute value of `self`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// `self` can be recreated by using `new_from_slice`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let s = -BigNum::new_from(4543).unwrap();</span>
-    <span class='doccomment'>/// let r = BigNum::new_from(4543).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let s_vec = s.to_vec();</span>
-    <span class='doccomment'>/// assert_eq!(BigNum::new_from_slice(&amp;s_vec).unwrap(), r);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_vec</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>size</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>num_bytes</span>() <span class='kw'>as</span> <span class='ident'>usize</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>size</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>ffi</span>::<span class='ident'>BN_bn2bin</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>v</span>.<span class='ident'>as_mut_ptr</span>());
-            <span class='ident'>v</span>.<span class='ident'>set_len</span>(<span class='ident'>size</span>);
+    <span class="doccomment">/// Returns a big-endian byte vector representation of the absolute value of `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `self` can be recreated by using `new_from_slice`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let s = -BigNum::new_from(4543).unwrap();</span>
+    <span class="doccomment">/// let r = BigNum::new_from(4543).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let s_vec = s.to_vec();</span>
+    <span class="doccomment">/// assert_eq!(BigNum::new_from_slice(&amp;s_vec).unwrap(), r);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">num_bytes</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">size</span>);
+        <span class="kw">unsafe</span> {
+            <span class="ident">ffi</span>::<span class="ident">BN_bn2bin</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">v</span>.<span class="ident">as_mut_ptr</span>());
+            <span class="ident">v</span>.<span class="ident">set_len</span>(<span class="ident">size</span>);
         }
-        <span class='ident'>v</span>
+        <span class="ident">v</span>
     }
 
-    <span class='doccomment'>/// Returns a decimal string representation of `self`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let s = -BigNum::new_from(12345).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(s.to_dec_str(), &quot;-12345&quot;);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_dec_str</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_bn2dec</span>(<span class='self'>self</span>.<span class='ident'>raw</span>());
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>buf</span>.<span class='ident'>is_null</span>());
-            <span class='kw'>let</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>buf</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _).<span class='ident'>to_bytes</span>().<span class='ident'>to_vec</span>())
-                          .<span class='ident'>unwrap</span>();
-            <span class='ident'>ffi</span>::<span class='ident'>CRYPTO_free</span>(<span class='ident'>buf</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>);
-            <span class='ident'>str</span>
+    <span class="doccomment">/// Returns a decimal string representation of `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let s = -BigNum::new_from(12345).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(s.to_dec_str(), &quot;-12345&quot;);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_dec_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_bn2dec</span>(<span class="self">self</span>.<span class="ident">raw</span>());
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_null</span>());
+            <span class="kw">let</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _).<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>())
+                          .<span class="ident">unwrap</span>();
+            <span class="ident">ffi</span>::<span class="ident">CRYPTO_free</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>);
+            <span class="ident">str</span>
         }
     }
 
-    <span class='doccomment'>/// Returns a hexadecimal string representation of `self`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # use openssl::bn::BigNum;</span>
-    <span class='doccomment'>/// let s = -BigNum::new_from(0x99ff).unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(s.to_hex_str(), &quot;-99FF&quot;);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_hex_str</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_bn2hex</span>(<span class='self'>self</span>.<span class='ident'>raw</span>());
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>buf</span>.<span class='ident'>is_null</span>());
-            <span class='kw'>let</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>CStr</span>::<span class='ident'>from_ptr</span>(<span class='ident'>buf</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _).<span class='ident'>to_bytes</span>().<span class='ident'>to_vec</span>())
-                          .<span class='ident'>unwrap</span>();
-            <span class='ident'>ffi</span>::<span class='ident'>CRYPTO_free</span>(<span class='ident'>buf</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>);
-            <span class='ident'>str</span>
+    <span class="doccomment">/// Returns a hexadecimal string representation of `self`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use openssl::bn::BigNum;</span>
+    <span class="doccomment">/// let s = -BigNum::new_from(0x99ff).unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(s.to_hex_str(), &quot;-99FF&quot;);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_hex_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_bn2hex</span>(<span class="self">self</span>.<span class="ident">raw</span>());
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_null</span>());
+            <span class="kw">let</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">CStr</span>::<span class="ident">from_ptr</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _).<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>())
+                          .<span class="ident">unwrap</span>();
+            <span class="ident">ffi</span>::<span class="ident">CRYPTO_free</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>);
+            <span class="ident">str</span>
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Debug</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>to_dec_str</span>())
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_dec_str</span>())
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Eq</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {}
-<span class='kw'>impl</span> <span class='ident'>PartialEq</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-    <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>unsafe</span> { <span class='ident'>ffi</span>::<span class='ident'>BN_cmp</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>oth</span>.<span class='ident'>raw</span>()) <span class='op'>==</span> <span class='number'>0</span> }
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BigNum</span> {}
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">unsafe</span> { <span class="ident">ffi</span>::<span class="ident">BN_cmp</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">oth</span>.<span class="ident">raw</span>()) <span class="op">==</span> <span class="number">0</span> }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Ord</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>Ordering</span> {
-        <span class='self'>self</span>.<span class='ident'>partial_cmp</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+        <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>PartialOrd</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-    <span class='kw'>fn</span> <span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Ordering</span><span class='op'>&gt;</span> {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_cmp</span>(<span class='self'>self</span>.<span class='ident'>raw</span>(), <span class='ident'>oth</span>.<span class='ident'>raw</span>());
-            <span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>v</span> <span class='op'>==</span> <span class='number'>0</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Equal</span>
-            } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>v</span> <span class='op'>&lt;</span> <span class='number'>0</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Less</span>
-            } <span class='kw'>else</span> {
-                <span class='ident'>Ordering</span>::<span class='ident'>Greater</span>
+<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_cmp</span>(<span class="self">self</span>.<span class="ident">raw</span>(), <span class="ident">oth</span>.<span class="ident">raw</span>());
+            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">v</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Equal</span>
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">v</span> <span class="op">&lt;</span> <span class="number">0</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Less</span>
+            } <span class="kw">else</span> {
+                <span class="ident">Ordering</span>::<span class="ident">Greater</span>
             };
-            <span class='prelude-val'>Some</span>(<span class='ident'>ret</span>)
+            <span class="prelude-val">Some</span>(<span class="ident">ret</span>)
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>raw</span>().<span class='ident'>is_null</span>() {
-                <span class='ident'>ffi</span>::<span class='ident'>BN_clear_free</span>(<span class='self'>self</span>.<span class='ident'>raw</span>());
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">raw</span>().<span class="ident">is_null</span>() {
+                <span class="ident">ffi</span>::<span class="ident">BN_clear_free</span>(<span class="self">self</span>.<span class="ident">raw</span>());
             }
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>      <span class='comment'>// This module only contains impls, so it&#39;s empty when generating docs</span>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>unchecked</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Add</span>, <span class='ident'>Div</span>, <span class='ident'>Mul</span>, <span class='ident'>Neg</span>, <span class='ident'>Rem</span>, <span class='ident'>Shl</span>, <span class='ident'>Shr</span>, <span class='ident'>Sub</span>};
-    <span class='kw'>use</span> <span class='ident'>ffi</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>BigNum</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>      <span class="comment">// This module only contains impls, so it&#39;s empty when generating docs</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">unchecked</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Div</span>, <span class="ident">Mul</span>, <span class="ident">Neg</span>, <span class="ident">Rem</span>, <span class="ident">Shl</span>, <span class="ident">Shr</span>, <span class="ident">Sub</span>};
+    <span class="kw">use</span> <span class="ident">ffi</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">BigNum</span>;
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_add</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_add</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_sub</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_mul</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_mul</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>div</span>(<span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_div</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_div</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Rem</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>rem</span>(<span class='self'>self</span>, <span class='ident'>oth</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_mod</span>(<span class='ident'>oth</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">oth</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_mod</span>(<span class="ident">oth</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Shl</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>shl</span>(<span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_shl</span>(<span class='kw-2'>&amp;</span><span class='ident'>n</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_shl</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Shr</span><span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shr</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>shr</span>(<span class='self'>self</span>, <span class='ident'>n</span>: <span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='self'>self</span>.<span class='ident'>checked_shr</span>(<span class='kw-2'>&amp;</span><span class='ident'>n</span>).<span class='ident'>unwrap</span>()
+        <span class="kw">fn</span> <span class="ident">shr</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="self">self</span>.<span class="ident">checked_shr</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">unwrap</span>()
         }
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='kw'>unsafe</span> {
-                <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi</span>::<span class='ident'>BN_dup</span>(<span class='self'>self</span>.<span class='ident'>raw</span>());
-                <span class='kw'>if</span> <span class='ident'>r</span>.<span class='ident'>is_null</span>() {
-                    <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Unexpected null pointer from BN_dup(..)&quot;</span>)
-                } <span class='kw'>else</span> {
-                    <span class='ident'>BigNum</span>(<span class='ident'>r</span>)
+    <span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+        <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="kw">unsafe</span> {
+                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi</span>::<span class="ident">BN_dup</span>(<span class="self">self</span>.<span class="ident">raw</span>());
+                <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_null</span>() {
+                    <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Unexpected null pointer from BN_dup(..)&quot;</span>)
+                } <span class="kw">else</span> {
+                    <span class="ident">BigNum</span>(<span class="ident">r</span>)
                 }
             }
         }
     }
 
-    <span class='kw'>impl</span> <span class='ident'>Neg</span> <span class='kw'>for</span> <span class='ident'>BigNum</span> {
-        <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>BigNum</span>;
+    <span class="kw">impl</span> <span class="ident">Neg</span> <span class="kw">for</span> <span class="ident">BigNum</span> {
+        <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigNum</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>neg</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>BigNum</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>clone</span>();
-            <span class='ident'>n</span>.<span class='ident'>negate</span>();
-            <span class='ident'>n</span>
+        <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">BigNum</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
+            <span class="ident">n</span>.<span class="ident">negate</span>();
+            <span class="ident">n</span>
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>bn</span>::<span class='ident'>BigNum</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">bn</span>::<span class="ident">BigNum</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_to_from_slice</span>() {
-        <span class='kw'>let</span> <span class='ident'>v0</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new_from</span>(<span class='number'>10203004_u64</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>vec</span> <span class='op'>=</span> <span class='ident'>v0</span>.<span class='ident'>to_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>v1</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new_from_slice</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec</span>).<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_to_from_slice</span>() {
+        <span class="kw">let</span> <span class="ident">v0</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new_from</span>(<span class="number">10203004_u64</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">v0</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">vec</span>).<span class="ident">unwrap</span>();
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>v0</span> <span class='op'>==</span> <span class='ident'>v1</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">v0</span> <span class="op">==</span> <span class="ident">v1</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_negation</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new_from</span>(<span class='number'>909829283_u64</span>).<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_negation</span>() {
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new_from</span>(<span class="number">909829283_u64</span>).<span class="ident">unwrap</span>();
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>a</span>.<span class='ident'>is_negative</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>((<span class='op'>-</span><span class='ident'>a</span>).<span class='ident'>is_negative</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">is_negative</span>());
+        <span class="macro">assert</span><span class="macro">!</span>((<span class="op">-</span><span class="ident">a</span>).<span class="ident">is_negative</span>());
     }
 
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_prime_numbers</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>new_from</span>(<span class='number'>19029017_u64</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>p</span> <span class='op'>=</span> <span class='ident'>BigNum</span>::<span class='ident'>checked_generate_prime</span>(<span class='number'>128</span>, <span class='bool-val'>true</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>)).<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_prime_numbers</span>() {
+        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">new_from</span>(<span class="number">19029017_u64</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">BigNum</span>::<span class="ident">checked_generate_prime</span>(<span class="number">128</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>)).<span class="ident">unwrap</span>();
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>p</span>.<span class='ident'>is_prime</span>(<span class='number'>100</span>).<span class='ident'>unwrap</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>p</span>.<span class='ident'>is_prime_fast</span>(<span class='number'>100</span>, <span class='bool-val'>true</span>).<span class='ident'>unwrap</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">p</span>.<span class="ident">is_prime</span>(<span class="number">100</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">p</span>.<span class="ident">is_prime_fast</span>(<span class="number">100</span>, <span class="bool-val">true</span>).<span class="ident">unwrap</span>());
     }
 }
 </pre>
@@ -1743,18 +1755,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1787,7 +1803,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

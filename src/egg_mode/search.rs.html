@@ -9,14 +9,18 @@
 
     <title>search.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -290,253 +302,253 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Structs and methods for searching for tweets.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Since there are several optional parameters for searches, egg-mode handles it with a builder</span>
-<span class='doccomment'>//! pattern. To begin, call `search` with your requested search term. Additional parameters can be</span>
-<span class='doccomment'>//! added onto the `SearchBuilder` struct that is returned. When you&#39;re ready to load the first</span>
-<span class='doccomment'>//! page of results, hand your tokens to `call`.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```rust,no_run</span>
-<span class='doccomment'>//! # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>//! # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>//! use egg_mode::search::{self, ResultType};</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let search = search::search(&quot;rustlang&quot;)</span>
-<span class='doccomment'>//!                     .result_type(ResultType::Recent)</span>
-<span class='doccomment'>//!                     .call(&amp;con_token, &amp;access_token)</span>
-<span class='doccomment'>//!                     .unwrap();</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! for tweet in &amp;search.response.statuses {</span>
-<span class='doccomment'>//!     println!(&quot;(@{}) {}&quot;, tweet.user.screen_name, tweet.text);</span>
-<span class='doccomment'>//! }</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Once you have your `SearchResult`, you can navigate the search results by calling `older` and</span>
-<span class='doccomment'>//! `newer` to get the next and previous pages, respsectively. In addition, you can see your</span>
-<span class='doccomment'>//! original query in the search result struct as well, so you can categorize multiple searches by</span>
-<span class='doccomment'>//! their query. While this is given as a regular field, note that modifying `query` will not</span>
-<span class='doccomment'>//! change what is searched for when you call `older` or `newer`; the `SearchResult` keeps its</span>
-<span class='doccomment'>//! search arguments in a separate private field.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! Structs and methods for searching for tweets.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Since there are several optional parameters for searches, egg-mode handles it with a builder</span>
+<span class="doccomment">//! pattern. To begin, call `search` with your requested search term. Additional parameters can be</span>
+<span class="doccomment">//! added onto the `SearchBuilder` struct that is returned. When you&#39;re ready to load the first</span>
+<span class="doccomment">//! page of results, hand your tokens to `call`.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust,no_run</span>
+<span class="doccomment">//! # let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">//! # let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">//! use egg_mode::search::{self, ResultType};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let search = search::search(&quot;rustlang&quot;)</span>
+<span class="doccomment">//!                     .result_type(ResultType::Recent)</span>
+<span class="doccomment">//!                     .call(&amp;con_token, &amp;access_token)</span>
+<span class="doccomment">//!                     .unwrap();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! for tweet in &amp;search.response.statuses {</span>
+<span class="doccomment">//!     println!(&quot;(@{}) {}&quot;, tweet.user.screen_name, tweet.text);</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Once you have your `SearchResult`, you can navigate the search results by calling `older` and</span>
+<span class="doccomment">//! `newer` to get the next and previous pages, respsectively. In addition, you can see your</span>
+<span class="doccomment">//! original query in the search result struct as well, so you can categorize multiple searches by</span>
+<span class="doccomment">//! their query. While this is given as a regular field, note that modifying `query` will not</span>
+<span class="doccomment">//! change what is searched for when you call `older` or `newer`; the `SearchResult` keeps its</span>
+<span class="doccomment">//! search arguments in a separate private field.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
-<span class='kw'>use</span> <span class='ident'>rustc_serialize</span>::<span class='ident'>json</span>;
+<span class="kw">use</span> <span class="ident">rustc_serialize</span>::<span class="ident">json</span>;
 
-<span class='kw'>use</span> <span class='ident'>auth</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>;
-<span class='kw'>use</span> <span class='ident'>error</span>::<span class='ident'>Error</span>::{<span class='ident'>InvalidResponse</span>, <span class='ident'>MissingValue</span>};
-<span class='kw'>use</span> <span class='ident'>links</span>;
-<span class='kw'>use</span> <span class='ident'>tweet</span>::<span class='ident'>Tweet</span>;
-<span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
+<span class="kw">use</span> <span class="ident">auth</span>;
+<span class="kw">use</span> <span class="ident">error</span>;
+<span class="kw">use</span> <span class="ident">error</span>::<span class="ident">Error</span>::{<span class="ident">InvalidResponse</span>, <span class="ident">MissingValue</span>};
+<span class="kw">use</span> <span class="ident">links</span>;
+<span class="kw">use</span> <span class="ident">tweet</span>::<span class="ident">Tweet</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="kw-2">*</span>;
 
-<span class='doccomment'>///Begin setting up a tweet search with the given query.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>search</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>query</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>SearchBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>SearchBuilder</span> {
-        <span class='ident'>query</span>: <span class='ident'>query</span>,
-        <span class='ident'>lang</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>result_type</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>count</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>until</span>: <span class='prelude-val'>None</span>,
-        <span class='ident'>geocode</span>: <span class='prelude-val'>None</span>,
+<span class="doccomment">///Begin setting up a tweet search with the given query.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">SearchBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">SearchBuilder</span> {
+        <span class="ident">query</span>: <span class="ident">query</span>,
+        <span class="ident">lang</span>: <span class="prelude-val">None</span>,
+        <span class="ident">result_type</span>: <span class="prelude-val">None</span>,
+        <span class="ident">count</span>: <span class="prelude-val">None</span>,
+        <span class="ident">until</span>: <span class="prelude-val">None</span>,
+        <span class="ident">geocode</span>: <span class="prelude-val">None</span>,
     }
 }
 
-<span class='doccomment'>///Represents what kind of tweets should be included in search results.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ResultType</span> {
-    <span class='doccomment'>///Return only the most recent tweets in the response.</span>
-    <span class='ident'>Recent</span>,
-    <span class='doccomment'>///Return only the most popular tweets in the response.</span>
-    <span class='ident'>Popular</span>,
-    <span class='doccomment'>///Include both popular and real-time results in the response.</span>
-    <span class='ident'>Mixed</span>,
+<span class="doccomment">///Represents what kind of tweets should be included in search results.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResultType</span> {
+    <span class="doccomment">///Return only the most recent tweets in the response.</span>
+    <span class="ident">Recent</span>,
+    <span class="doccomment">///Return only the most popular tweets in the response.</span>
+    <span class="ident">Popular</span>,
+    <span class="doccomment">///Include both popular and real-time results in the response.</span>
+    <span class="ident">Mixed</span>,
 }
 
-<span class='doccomment'>///Display impl that turns the variants into strings that can be used as search parameters.</span>
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>ResultType</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>ResultType</span>::<span class='ident'>Recent</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;recent&quot;</span>),
-            <span class='ident'>ResultType</span>::<span class='ident'>Popular</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;popular&quot;</span>),
-            <span class='ident'>ResultType</span>::<span class='ident'>Mixed</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;mixed&quot;</span>),
+<span class="doccomment">///Display impl that turns the variants into strings that can be used as search parameters.</span>
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ResultType</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">ResultType</span>::<span class="ident">Recent</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;recent&quot;</span>),
+            <span class="ident">ResultType</span>::<span class="ident">Popular</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;popular&quot;</span>),
+            <span class="ident">ResultType</span>::<span class="ident">Mixed</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;mixed&quot;</span>),
         }
     }
 }
 
-<span class='doccomment'>///Represents a radius around a given location to return search results for.</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Distance</span> {
-    <span class='doccomment'>///A radius given in miles.</span>
-    <span class='ident'>Miles</span>(<span class='ident'>u32</span>),
-    <span class='doccomment'>///A radius given in kilometers.</span>
-    <span class='ident'>Kilometers</span>(<span class='ident'>u32</span>),
+<span class="doccomment">///Represents a radius around a given location to return search results for.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Distance</span> {
+    <span class="doccomment">///A radius given in miles.</span>
+    <span class="ident">Miles</span>(<span class="ident">u32</span>),
+    <span class="doccomment">///A radius given in kilometers.</span>
+    <span class="ident">Kilometers</span>(<span class="ident">u32</span>),
 }
 
-<span class='doccomment'>///Represents a tweet search query before being sent.</span>
-<span class='attribute'>#[<span class='ident'>must_use</span> <span class='op'>=</span> <span class='string'>&quot;SearchBuilder is lazy and won&#39;t do anything unless `call`ed&quot;</span>]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SearchBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///The text to search for.</span>
-    <span class='ident'>query</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>,
-    <span class='ident'>lang</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span><span class='op'>&gt;</span>,
-    <span class='ident'>result_type</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ResultType</span><span class='op'>&gt;</span>,
-    <span class='ident'>count</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>u32</span><span class='op'>&gt;</span>,
-    <span class='ident'>until</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>u32</span>, <span class='ident'>u32</span>, <span class='ident'>u32</span>)<span class='op'>&gt;</span>,
-    <span class='ident'>geocode</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='ident'>f32</span>, <span class='ident'>f32</span>, <span class='ident'>Distance</span>)<span class='op'>&gt;</span>
+<span class="doccomment">///Represents a tweet search query before being sent.</span>
+<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;SearchBuilder is lazy and won&#39;t do anything unless `call`ed&quot;</span>]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SearchBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///The text to search for.</span>
+    <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    <span class="ident">lang</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">result_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultType</span><span class="op">&gt;</span>,
+    <span class="ident">count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">until</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
+    <span class="ident">geocode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">f32</span>, <span class="ident">f32</span>, <span class="ident">Distance</span>)<span class="op">&gt;</span>
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>SearchBuilder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Restrict search results to those that have been machine-parsed as the given two-letter</span>
-    <span class='doccomment'>///language code.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lang</span>(<span class='self'>self</span>, <span class='ident'>lang</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>SearchBuilder</span> {
-            <span class='ident'>lang</span>: <span class='prelude-val'>Some</span>(<span class='ident'>lang</span>),
-            ..<span class='self'>self</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SearchBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Restrict search results to those that have been machine-parsed as the given two-letter</span>
+    <span class="doccomment">///language code.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lang</span>(<span class="self">self</span>, <span class="ident">lang</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">SearchBuilder</span> {
+            <span class="ident">lang</span>: <span class="prelude-val">Some</span>(<span class="ident">lang</span>),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Specify the type of search results to include. The default is `Recent`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>result_type</span>(<span class='self'>self</span>, <span class='ident'>result_type</span>: <span class='ident'>ResultType</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>SearchBuilder</span> {
-            <span class='ident'>result_type</span>: <span class='prelude-val'>Some</span>(<span class='ident'>result_type</span>),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Specify the type of search results to include. The default is `Recent`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">result_type</span>(<span class="self">self</span>, <span class="ident">result_type</span>: <span class="ident">ResultType</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">SearchBuilder</span> {
+            <span class="ident">result_type</span>: <span class="prelude-val">Some</span>(<span class="ident">result_type</span>),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Set the number of tweets to return per-page, up to a maximum of 100. The default is 15.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>count</span>(<span class='self'>self</span>, <span class='ident'>count</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>SearchBuilder</span> {
-            <span class='ident'>count</span>: <span class='prelude-val'>Some</span>(<span class='ident'>count</span>),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Set the number of tweets to return per-page, up to a maximum of 100. The default is 15.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">SearchBuilder</span> {
+            <span class="ident">count</span>: <span class="prelude-val">Some</span>(<span class="ident">count</span>),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Returns tweets created before the given date. Keep in mind that search is limited to the</span>
-    <span class='doccomment'>///last 7 days of results, so giving a date here that&#39;s older than a week will return no</span>
-    <span class='doccomment'>///results.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>until</span>(<span class='self'>self</span>, <span class='ident'>year</span>: <span class='ident'>u32</span>, <span class='ident'>month</span>: <span class='ident'>u32</span>, <span class='ident'>day</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>SearchBuilder</span> {
-            <span class='ident'>until</span>: <span class='prelude-val'>Some</span>((<span class='ident'>year</span>, <span class='ident'>month</span>, <span class='ident'>day</span>)),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Returns tweets created before the given date. Keep in mind that search is limited to the</span>
+    <span class="doccomment">///last 7 days of results, so giving a date here that&#39;s older than a week will return no</span>
+    <span class="doccomment">///results.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">until</span>(<span class="self">self</span>, <span class="ident">year</span>: <span class="ident">u32</span>, <span class="ident">month</span>: <span class="ident">u32</span>, <span class="ident">day</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">SearchBuilder</span> {
+            <span class="ident">until</span>: <span class="prelude-val">Some</span>((<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>)),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Restricts results to users located within the given radius of the given coordinate. This is</span>
-    <span class='doccomment'>///preferably populated from location-tagged tweets, but can be filled in from the user&#39;s</span>
-    <span class='doccomment'>///profile as a fallback.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>geocode</span>(<span class='self'>self</span>, <span class='ident'>latitude</span>: <span class='ident'>f32</span>, <span class='ident'>longitude</span>: <span class='ident'>f32</span>, <span class='ident'>radius</span>: <span class='ident'>Distance</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span> {
-        <span class='ident'>SearchBuilder</span> {
-            <span class='ident'>geocode</span>: <span class='prelude-val'>Some</span>((<span class='ident'>latitude</span>, <span class='ident'>longitude</span>, <span class='ident'>radius</span>)),
-            ..<span class='self'>self</span>
+    <span class="doccomment">///Restricts results to users located within the given radius of the given coordinate. This is</span>
+    <span class="doccomment">///preferably populated from location-tagged tweets, but can be filled in from the user&#39;s</span>
+    <span class="doccomment">///profile as a fallback.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">geocode</span>(<span class="self">self</span>, <span class="ident">latitude</span>: <span class="ident">f32</span>, <span class="ident">longitude</span>: <span class="ident">f32</span>, <span class="ident">radius</span>: <span class="ident">Distance</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+        <span class="ident">SearchBuilder</span> {
+            <span class="ident">geocode</span>: <span class="prelude-val">Some</span>((<span class="ident">latitude</span>, <span class="ident">longitude</span>, <span class="ident">radius</span>)),
+            ..<span class="self">self</span>
         }
     }
 
-    <span class='doccomment'>///Finalize the search terms and return the first page of responses.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='self'>self</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
+    <span class="doccomment">///Finalize the search terms and return the first page of responses.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
 
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;q&quot;</span>, <span class='self'>self</span>.<span class='ident'>query</span>);
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;q&quot;</span>, <span class="self">self</span>.<span class="ident">query</span>);
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>lang</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>lang</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;lang&quot;</span>, <span class='ident'>lang</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lang</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">lang</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;lang&quot;</span>, <span class="ident">lang</span>);
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>result_type</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>result_type</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;result_type&quot;</span>, <span class='ident'>result_type</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result_type</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">result_type</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;result_type&quot;</span>, <span class="ident">result_type</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>count</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>count</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;count&quot;</span>, <span class='ident'>count</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">count</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;count&quot;</span>, <span class="ident">count</span>.<span class="ident">to_string</span>());
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>((<span class='ident'>year</span>, <span class='ident'>month</span>, <span class='ident'>day</span>)) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>until</span> {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;until&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}-{}-{}&quot;</span>, <span class='ident'>year</span>, <span class='ident'>month</span>, <span class='ident'>day</span>));
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">until</span> {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;until&quot;</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{}-{}-{}&quot;</span>, <span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>));
         }
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>((<span class='ident'>lat</span>, <span class='ident'>lon</span>, <span class='ident'>radius</span>)) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>geocode</span> {
-            <span class='kw'>match</span> <span class='ident'>radius</span> {
-                <span class='ident'>Distance</span>::<span class='ident'>Miles</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;geocode&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:.6},{:.6},{}mi&quot;</span>, <span class='ident'>lat</span>, <span class='ident'>lon</span>, <span class='ident'>r</span>)),
-                <span class='ident'>Distance</span>::<span class='ident'>Kilometers</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;geocode&quot;</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:.6},{:.6},{}km&quot;</span>, <span class='ident'>lat</span>, <span class='ident'>lon</span>, <span class='ident'>r</span>)),
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">lat</span>, <span class="ident">lon</span>, <span class="ident">radius</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">geocode</span> {
+            <span class="kw">match</span> <span class="ident">radius</span> {
+                <span class="ident">Distance</span>::<span class="ident">Miles</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;geocode&quot;</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:.6},{:.6},{}mi&quot;</span>, <span class="ident">lat</span>, <span class="ident">lon</span>, <span class="ident">r</span>)),
+                <span class="ident">Distance</span>::<span class="ident">Kilometers</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;geocode&quot;</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:.6},{:.6},{}km&quot;</span>, <span class="ident">lat</span>, <span class="ident">lon</span>, <span class="ident">r</span>)),
             };
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>statuses</span>::<span class='ident'>SEARCH</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">statuses</span>::<span class="ident">SEARCH</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span>: <span class='ident'>Response</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>));
-        <span class='ident'>ret</span>.<span class='ident'>response</span>.<span class='ident'>params</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>params</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>));
+        <span class="ident">ret</span>.<span class="ident">response</span>.<span class="ident">params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
 }
 
-<span class='doccomment'>///Represents a page of search results, along with metadata to request the next or previous page.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SearchResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///The list of statuses in this page of results.</span>
-    <span class='kw'>pub</span> <span class='ident'>statuses</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Tweet</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>///The query used to generate this page of results. Note that changing this will not affect the</span>
-    <span class='doccomment'>///`next_page` method.</span>
-    <span class='kw'>pub</span> <span class='ident'>query</span>: <span class='ident'>String</span>,
-    <span class='ident'>max_id</span>: <span class='ident'>i64</span>,
-    <span class='ident'>since_id</span>: <span class='ident'>i64</span>,
-    <span class='ident'>params</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>ParamList</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
+<span class="doccomment">///Represents a page of search results, along with metadata to request the next or previous page.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SearchResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///The list of statuses in this page of results.</span>
+    <span class="kw">pub</span> <span class="ident">statuses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Tweet</span><span class="op">&gt;</span>,
+    <span class="doccomment">///The query used to generate this page of results. Note that changing this will not affect the</span>
+    <span class="doccomment">///`next_page` method.</span>
+    <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">String</span>,
+    <span class="ident">max_id</span>: <span class="ident">i64</span>,
+    <span class="ident">since_id</span>: <span class="ident">i64</span>,
+    <span class="ident">params</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParamList</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>FromJson</span> <span class='kw'>for</span> <span class='ident'>SearchResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>from_json</span>(<span class='ident'>input</span>: <span class='kw-2'>&amp;</span><span class='ident'>json</span>::<span class='ident'>Json</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>input</span>.<span class='ident'>is_object</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>InvalidResponse</span>(<span class='string'>&quot;SearchResult received json that wasn&#39;t an object&quot;</span>, <span class='prelude-val'>Some</span>(<span class='ident'>input</span>.<span class='ident'>to_string</span>())));
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromJson</span> <span class="kw">for</span> <span class="ident">SearchResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from_json</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">json</span>::<span class="ident">Json</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_object</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidResponse</span>(<span class="string">&quot;SearchResult received json that wasn&#39;t an object&quot;</span>, <span class="prelude-val">Some</span>(<span class="ident">input</span>.<span class="ident">to_string</span>())));
         }
 
-        <span class='kw'>let</span> <span class='ident'>metadata</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>input</span>.<span class='ident'>find</span>(<span class='string'>&quot;search_metadata&quot;</span>).<span class='ident'>ok_or</span>(<span class='ident'>MissingValue</span>(<span class='string'>&quot;search_metadata&quot;</span>)));
+        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">input</span>.<span class="ident">find</span>(<span class="string">&quot;search_metadata&quot;</span>).<span class="ident">ok_or</span>(<span class="ident">MissingValue</span>(<span class="string">&quot;search_metadata&quot;</span>)));
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>SearchResult</span> {
-            <span class='ident'>statuses</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>input</span>, <span class='string'>&quot;statuses&quot;</span>)),
-            <span class='ident'>query</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>metadata</span>, <span class='string'>&quot;query&quot;</span>)),
-            <span class='ident'>max_id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>metadata</span>, <span class='string'>&quot;max_id&quot;</span>)),
-            <span class='ident'>since_id</span>: <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>field</span>(<span class='ident'>metadata</span>, <span class='string'>&quot;since_id&quot;</span>)),
-            <span class='ident'>params</span>: <span class='prelude-val'>None</span>,
+        <span class="prelude-val">Ok</span>(<span class="ident">SearchResult</span> {
+            <span class="ident">statuses</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">input</span>, <span class="string">&quot;statuses&quot;</span>)),
+            <span class="ident">query</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">metadata</span>, <span class="string">&quot;query&quot;</span>)),
+            <span class="ident">max_id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">metadata</span>, <span class="string">&quot;max_id&quot;</span>)),
+            <span class="ident">since_id</span>: <span class="macro">try</span><span class="macro">!</span>(<span class="ident">field</span>(<span class="ident">metadata</span>, <span class="string">&quot;since_id&quot;</span>)),
+            <span class="ident">params</span>: <span class="prelude-val">None</span>,
         })
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>SearchResult</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>///Load the next page of search results for the same query.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>older</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>params</span>.<span class='ident'>as_ref</span>().<span class='ident'>cloned</span>().<span class='ident'>unwrap_or_default</span>();
-        <span class='ident'>params</span>.<span class='ident'>remove</span>(<span class='string'>&quot;since_id&quot;</span>);
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SearchResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">///Load the next page of search results for the same query.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">older</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;since_id&quot;</span>);
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>min_id</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>statuses</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> <span class='ident'>t</span>.<span class='ident'>id</span>).<span class='ident'>min</span>() {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;max_id&quot;</span>, (<span class='ident'>min_id</span> <span class='op'>-</span> <span class='number'>1</span>).<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>).<span class="ident">min</span>() {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;max_id&quot;</span>, (<span class="ident">min_id</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">to_string</span>());
         }
-        <span class='kw'>else</span> {
-            <span class='ident'>params</span>.<span class='ident'>remove</span>(<span class='string'>&quot;max_id&quot;</span>);
+        <span class="kw">else</span> {
+            <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;max_id&quot;</span>);
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>statuses</span>::<span class='ident'>SEARCH</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">statuses</span>::<span class="ident">SEARCH</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span>: <span class='ident'>Response</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>));
-        <span class='ident'>ret</span>.<span class='ident'>response</span>.<span class='ident'>params</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>params</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>));
+        <span class="ident">ret</span>.<span class="ident">response</span>.<span class="ident">params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
 
-    <span class='doccomment'>///Load the previous page of search results for the same query.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>newer</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>params</span>.<span class='ident'>as_ref</span>().<span class='ident'>cloned</span>().<span class='ident'>unwrap_or_default</span>();
-        <span class='ident'>params</span>.<span class='ident'>remove</span>(<span class='string'>&quot;max_id&quot;</span>);
+    <span class="doccomment">///Load the previous page of search results for the same query.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
+        <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;max_id&quot;</span>);
 
-        <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>max_id</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>statuses</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>t</span><span class='op'>|</span> <span class='ident'>t</span>.<span class='ident'>id</span>).<span class='ident'>max</span>() {
-            <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;since_id&quot;</span>, <span class='ident'>max_id</span>.<span class='ident'>to_string</span>());
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">statuses</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>).<span class="ident">max</span>() {
+            <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;since_id&quot;</span>, <span class="ident">max_id</span>.<span class="ident">to_string</span>());
         }
-        <span class='kw'>else</span> {
-            <span class='ident'>params</span>.<span class='ident'>remove</span>(<span class='string'>&quot;since_id&quot;</span>);
+        <span class="kw">else</span> {
+            <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;since_id&quot;</span>);
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>statuses</span>::<span class='ident'>SEARCH</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">statuses</span>::<span class="ident">SEARCH</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span>: <span class='ident'>Response</span><span class='op'>&lt;</span><span class='ident'>SearchResult</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>));
-        <span class='ident'>ret</span>.<span class='ident'>response</span>.<span class='ident'>params</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>params</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>ret</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">SearchResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>));
+        <span class="ident">ret</span>.<span class="ident">response</span>.<span class="ident">params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
     }
 }
 </pre>
@@ -553,18 +565,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -597,7 +613,6 @@
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

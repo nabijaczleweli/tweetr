@@ -9,14 +9,18 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -534,300 +546,300 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! A TOML-parsing library</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! This library is an implementation in Rust of a parser for TOML configuration</span>
-<span class='doccomment'>//! files [1]. It is focused around high quality errors including specific spans</span>
-<span class='doccomment'>//! and detailed error messages when things go wrong.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! This implementation currently passes the language agnostic [test suite][2].</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Example</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! let toml = r#&quot;</span>
-<span class='doccomment'>//!     [test]</span>
-<span class='doccomment'>//!     foo = &quot;bar&quot;</span>
-<span class='doccomment'>//! &quot;#;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let value = toml::Parser::new(toml).parse().unwrap();</span>
-<span class='doccomment'>//! println!(&quot;{:?}&quot;, value);</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Conversions</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! This library also supports using the standard `Encodable` and `Decodable`</span>
-<span class='doccomment'>//! traits with TOML values. This library provides the following conversion</span>
-<span class='doccomment'>//! capabilities:</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! * `String` =&gt; `toml::Value` - via `Parser`</span>
-<span class='doccomment'>//! * `toml::Value` =&gt; `String` - via `Display`</span>
-<span class='doccomment'>//! * `toml::Value` =&gt; rust object - via `Decoder`</span>
-<span class='doccomment'>//! * rust object =&gt; `toml::Value` - via `Encoder`</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Convenience functions for performing multiple conversions at a time are also</span>
-<span class='doccomment'>//! provided.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! [1]: https://github.com/mojombo/toml</span>
-<span class='doccomment'>//! [2]: https://github.com/BurntSushi/toml-test</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! A TOML-parsing library</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This library is an implementation in Rust of a parser for TOML configuration</span>
+<span class="doccomment">//! files [1]. It is focused around high quality errors including specific spans</span>
+<span class="doccomment">//! and detailed error messages when things go wrong.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This implementation currently passes the language agnostic [test suite][2].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! let toml = r#&quot;</span>
+<span class="doccomment">//!     [test]</span>
+<span class="doccomment">//!     foo = &quot;bar&quot;</span>
+<span class="doccomment">//! &quot;#;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let value = toml::Parser::new(toml).parse().unwrap();</span>
+<span class="doccomment">//! println!(&quot;{:?}&quot;, value);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Conversions</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This library also supports using the standard `Encodable` and `Decodable`</span>
+<span class="doccomment">//! traits with TOML values. This library provides the following conversion</span>
+<span class="doccomment">//! capabilities:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * `String` =&gt; `toml::Value` - via `Parser`</span>
+<span class="doccomment">//! * `toml::Value` =&gt; `String` - via `Display`</span>
+<span class="doccomment">//! * `toml::Value` =&gt; rust object - via `Decoder`</span>
+<span class="doccomment">//! * rust object =&gt; `toml::Value` - via `Encoder`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Convenience functions for performing multiple conversions at a time are also</span>
+<span class="doccomment">//! provided.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [1]: https://github.com/mojombo/toml</span>
+<span class="doccomment">//! [2]: https://github.com/BurntSushi/toml-test</span>
 
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>doc</span>(<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://alexcrichton.com/toml-rs&quot;</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>missing_docs</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>cfg_attr</span>(<span class='ident'>test</span>, <span class='ident'>deny</span>(<span class='ident'>warnings</span>))]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;http://alexcrichton.com/toml-rs&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde&quot;</span>)]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serde</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rustc_serialize</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>BTreeMap</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">BTreeMap</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>parser</span>::{<span class='ident'>Parser</span>, <span class='ident'>ParserError</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser</span>::{<span class="ident">Parser</span>, <span class="ident">ParserError</span>};
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>, <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde&quot;</span>))]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>encoder</span>::{<span class='ident'>Encoder</span>, <span class='ident'>Error</span>, <span class='ident'>EncoderState</span>, <span class='ident'>encode</span>, <span class='ident'>encode_str</span>};
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>, <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde&quot;</span>))]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>decoder</span>::{<span class='ident'>Decoder</span>, <span class='ident'>DecodeError</span>, <span class='ident'>DecodeErrorKind</span>, <span class='ident'>decode</span>, <span class='ident'>decode_str</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">encoder</span>::{<span class="ident">Encoder</span>, <span class="ident">Error</span>, <span class="ident">EncoderState</span>, <span class="ident">encode</span>, <span class="ident">encode_str</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">decoder</span>::{<span class="ident">Decoder</span>, <span class="ident">DecodeError</span>, <span class="ident">DecodeErrorKind</span>, <span class="ident">decode</span>, <span class="ident">decode_str</span>};
 
-<span class='kw'>mod</span> <span class='ident'>parser</span>;
-<span class='kw'>mod</span> <span class='ident'>display</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>, <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde&quot;</span>))]</span>
-<span class='kw'>mod</span> <span class='ident'>encoder</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>, <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;serde&quot;</span>))]</span>
-<span class='kw'>mod</span> <span class='ident'>decoder</span>;
+<span class="kw">mod</span> <span class="ident">parser</span>;
+<span class="kw">mod</span> <span class="ident">display</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">encoder</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">decoder</span>;
 
-<span class='doccomment'>/// Representation of a TOML value.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>allow</span>(<span class='ident'>missing_docs</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Value</span> {
-    <span class='ident'>String</span>(<span class='ident'>String</span>),
-    <span class='ident'>Integer</span>(<span class='ident'>i64</span>),
-    <span class='ident'>Float</span>(<span class='ident'>f64</span>),
-    <span class='ident'>Boolean</span>(<span class='ident'>bool</span>),
-    <span class='ident'>Datetime</span>(<span class='ident'>String</span>),
-    <span class='ident'>Array</span>(<span class='ident'>Array</span>),
-    <span class='ident'>Table</span>(<span class='ident'>Table</span>),
+<span class="doccomment">/// Representation of a TOML value.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span> {
+    <span class="ident">String</span>(<span class="ident">String</span>),
+    <span class="ident">Integer</span>(<span class="ident">i64</span>),
+    <span class="ident">Float</span>(<span class="ident">f64</span>),
+    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
+    <span class="ident">Datetime</span>(<span class="ident">String</span>),
+    <span class="ident">Array</span>(<span class="ident">Array</span>),
+    <span class="ident">Table</span>(<span class="ident">Table</span>),
 }
 
-<span class='doccomment'>/// Type representing a TOML array, payload of the `Value::Array` variant</span>
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Array</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>;
+<span class="doccomment">/// Type representing a TOML array, payload of the `Value::Array` variant</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Array</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>;
 
-<span class='doccomment'>/// Type representing a TOML table, payload of the `Value::Table` variant</span>
-<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>Table</span> <span class='op'>=</span> <span class='ident'>BTreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Value</span><span class='op'>&gt;</span>;
+<span class="doccomment">/// Type representing a TOML table, payload of the `Value::Table` variant</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Table</span> <span class="op">=</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span>;
 
-<span class='kw'>impl</span> <span class='ident'>Value</span> {
-    <span class='doccomment'>/// Tests whether this and another value have the same type.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>same_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>match</span> (<span class='self'>self</span>, <span class='ident'>other</span>) {
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>String</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>String</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Integer</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Integer</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Float</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Float</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Boolean</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Boolean</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Datetime</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Datetime</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Array</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Array</span>(..)) <span class='op'>|</span>
-            (<span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Table</span>(..), <span class='kw-2'>&amp;</span><span class='ident'>Value</span>::<span class='ident'>Table</span>(..)) <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
+<span class="kw">impl</span> <span class="ident">Value</span> {
+    <span class="doccomment">/// Tests whether this and another value have the same type.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">same_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">String</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">String</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Integer</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Integer</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Float</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Float</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Boolean</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Boolean</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Datetime</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Datetime</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Array</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Array</span>(..)) <span class="op">|</span>
+            (<span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Table</span>(..), <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Table</span>(..)) <span class="op">=&gt;</span> <span class="bool-val">true</span>,
 
-            _ <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            _ <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
 
-    <span class='doccomment'>/// Returns a human-readable representation of the type of this value.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>type_str</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>Value</span>::<span class='ident'>String</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;string&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Integer</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;integer&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Float</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;float&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Boolean</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;boolean&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Datetime</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;datetime&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Array</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;array&quot;</span>,
-            <span class='ident'>Value</span>::<span class='ident'>Table</span>(..) <span class='op'>=&gt;</span> <span class='string'>&quot;table&quot;</span>,
+    <span class="doccomment">/// Returns a human-readable representation of the type of this value.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Value</span>::<span class="ident">String</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;string&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Integer</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;integer&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Float</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;float&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Boolean</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;boolean&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Datetime</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;datetime&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Array</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;array&quot;</span>,
+            <span class="ident">Value</span>::<span class="ident">Table</span>(..) <span class="op">=&gt;</span> <span class="string">&quot;table&quot;</span>,
         }
     }
 
-    <span class='doccomment'>/// Extracts the string of this value if it is a string.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_str</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>String</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>s</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the string of this value if it is a string.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">String</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the integer value if it is an integer.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_integer</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Integer</span>(<span class='ident'>i</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>i</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the integer value if it is an integer.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_integer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Integer</span>(<span class="ident">i</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the float value if it is a float.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_float</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Float</span>(<span class='ident'>f</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>f</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the float value if it is a float.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Float</span>(<span class="ident">f</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the boolean value if it is a boolean.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_bool</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Boolean</span>(<span class='ident'>b</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>b</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the boolean value if it is a boolean.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Boolean</span>(<span class="ident">b</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">b</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the datetime value if it is a datetime.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Note that a parsed TOML value will only contain ISO 8601 dates. An</span>
-    <span class='doccomment'>/// example date is:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```notrust</span>
-    <span class='doccomment'>/// 1979-05-27T07:32:00Z</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_datetime</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Datetime</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>s</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the datetime value if it is a datetime.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note that a parsed TOML value will only contain ISO 8601 dates. An</span>
+    <span class="doccomment">/// example date is:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```notrust</span>
+    <span class="doccomment">/// 1979-05-27T07:32:00Z</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Datetime</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the array value if it is an array.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span>[<span class='ident'>Value</span>]<span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>s</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the array value if it is an array.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">Value</span>]<span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Extracts the table value if it is a table.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_table</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Table</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> { <span class='ident'>Value</span>::<span class='ident'>Table</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>s</span>), _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span> }
+    <span class="doccomment">/// Extracts the table value if it is a table.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Table</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> { <span class="ident">Value</span>::<span class="ident">Table</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>), _ <span class="op">=&gt;</span> <span class="prelude-val">None</span> }
     }
 
-    <span class='doccomment'>/// Lookups for value at specified path.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Uses &#39;.&#39; as a path separator.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Note: arrays have zero-based indexes.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Note: empty path returns self.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # #![allow(unstable)]</span>
-    <span class='doccomment'>/// let toml = r#&quot;</span>
-    <span class='doccomment'>///      [test]</span>
-    <span class='doccomment'>///      foo = &quot;bar&quot;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///      [[values]]</span>
-    <span class='doccomment'>///      foo = &quot;baz&quot;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///      [[values]]</span>
-    <span class='doccomment'>///      foo = &quot;qux&quot;</span>
-    <span class='doccomment'>/// &quot;#;</span>
-    <span class='doccomment'>/// let value: toml::Value = toml.parse().unwrap();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let foo = value.lookup(&quot;test.foo&quot;).unwrap();</span>
-    <span class='doccomment'>/// assert_eq!(foo.as_str().unwrap(), &quot;bar&quot;);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let foo = value.lookup(&quot;values.1.foo&quot;).unwrap();</span>
-    <span class='doccomment'>/// assert_eq!(foo.as_str().unwrap(), &quot;qux&quot;);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let no_bar = value.lookup(&quot;test.bar&quot;);</span>
-    <span class='doccomment'>/// assert_eq!(no_bar.is_none(), true);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lookup</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>ref</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>Parser</span>::<span class='ident'>new</span>(<span class='ident'>path</span>).<span class='ident'>lookup</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>path</span>) <span class='op'>=&gt;</span> <span class='ident'>path</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="doccomment">/// Lookups for value at specified path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Uses &#39;.&#39; as a path separator.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note: arrays have zero-based indexes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note: empty path returns self.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #![allow(unstable)]</span>
+    <span class="doccomment">/// let toml = r#&quot;</span>
+    <span class="doccomment">///      [test]</span>
+    <span class="doccomment">///      foo = &quot;bar&quot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///      [[values]]</span>
+    <span class="doccomment">///      foo = &quot;baz&quot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///      [[values]]</span>
+    <span class="doccomment">///      foo = &quot;qux&quot;</span>
+    <span class="doccomment">/// &quot;#;</span>
+    <span class="doccomment">/// let value: toml::Value = toml.parse().unwrap();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let foo = value.lookup(&quot;test.foo&quot;).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(foo.as_str().unwrap(), &quot;bar&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let foo = value.lookup(&quot;values.1.foo&quot;).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(foo.as_str().unwrap(), &quot;qux&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let no_bar = value.lookup(&quot;test.bar&quot;);</span>
+    <span class="doccomment">/// assert_eq!(no_bar.is_none(), true);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">ref</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="ident">path</span>).<span class="ident">lookup</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=&gt;</span> <span class="ident">path</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cur_value</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='kw'>if</span> <span class='ident'>path</span>.<span class='ident'>is_empty</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>cur_value</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_value</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cur_value</span>)
         }
 
-        <span class='kw'>for</span> <span class='ident'>key</span> <span class='kw'>in</span> <span class='ident'>path</span> {
-            <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>cur_value</span> {
-                <span class='ident'>Value</span>::<span class='ident'>Table</span>(<span class='kw-2'>ref</span> <span class='ident'>hm</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>match</span> <span class='ident'>hm</span>.<span class='ident'>get</span>(<span class='ident'>key</span>) {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>cur_value</span> <span class='op'>=</span> <span class='ident'>v</span>,
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+        <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="ident">path</span> {
+            <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">cur_value</span> {
+                <span class="ident">Value</span>::<span class="ident">Table</span>(<span class="kw-2">ref</span> <span class="ident">hm</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">hm</span>.<span class="ident">get</span>(<span class="ident">key</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">cur_value</span> <span class="op">=</span> <span class="ident">v</span>,
+                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
                     }
                 },
-                <span class='ident'>Value</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='ident'>v</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>match</span> <span class='ident'>key</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>() {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>idx</span>) <span class='kw'>if</span> <span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='ident'>v</span>.<span class='ident'>len</span>() <span class='op'>=&gt;</span> <span class='ident'>cur_value</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[<span class='ident'>idx</span>],
-                        _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+                <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">ok</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">=&gt;</span> <span class="ident">cur_value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>[<span class="ident">idx</span>],
+                        _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
                     }
                 },
-                _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+                _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
             }
         };
 
-        <span class='prelude-val'>Some</span>(<span class='ident'>cur_value</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">cur_value</span>)
 
     }
-    <span class='doccomment'>/// Lookups for mutable value at specified path.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Uses &#39;.&#39; as a path separator.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Note: arrays have zero-based indexes.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Note: empty path returns self.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # #![allow(unstable)]</span>
-    <span class='doccomment'>/// let toml = r#&quot;</span>
-    <span class='doccomment'>///      [test]</span>
-    <span class='doccomment'>///      foo = &quot;bar&quot;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///      [[values]]</span>
-    <span class='doccomment'>///      foo = &quot;baz&quot;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>///      [[values]]</span>
-    <span class='doccomment'>///      foo = &quot;qux&quot;</span>
-    <span class='doccomment'>/// &quot;#;</span>
-    <span class='doccomment'>/// let mut value: toml::Value = toml.parse().unwrap();</span>
-    <span class='doccomment'>/// {</span>
-    <span class='doccomment'>///    let string = value.lookup_mut(&quot;test.foo&quot;).unwrap();</span>
-    <span class='doccomment'>///    assert_eq!(string, &amp;mut toml::Value::String(String::from(&quot;bar&quot;)));</span>
-    <span class='doccomment'>///    *string = toml::Value::String(String::from(&quot;foo&quot;));</span>
-    <span class='doccomment'>/// }</span>
-    <span class='doccomment'>/// let result = value.lookup_mut(&quot;test.foo&quot;).unwrap();</span>
-    <span class='doccomment'>/// assert_eq!(result.as_str().unwrap(), &quot;foo&quot;);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lookup_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>path</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Value</span><span class='op'>&gt;</span> {
-       <span class='kw'>let</span> <span class='kw-2'>ref</span> <span class='ident'>path</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>Parser</span>::<span class='ident'>new</span>(<span class='ident'>path</span>).<span class='ident'>lookup</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>path</span>) <span class='op'>=&gt;</span> <span class='ident'>path</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="doccomment">/// Lookups for mutable value at specified path.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Uses &#39;.&#39; as a path separator.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note: arrays have zero-based indexes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Note: empty path returns self.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # #![allow(unstable)]</span>
+    <span class="doccomment">/// let toml = r#&quot;</span>
+    <span class="doccomment">///      [test]</span>
+    <span class="doccomment">///      foo = &quot;bar&quot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///      [[values]]</span>
+    <span class="doccomment">///      foo = &quot;baz&quot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///      [[values]]</span>
+    <span class="doccomment">///      foo = &quot;qux&quot;</span>
+    <span class="doccomment">/// &quot;#;</span>
+    <span class="doccomment">/// let mut value: toml::Value = toml.parse().unwrap();</span>
+    <span class="doccomment">/// {</span>
+    <span class="doccomment">///    let string = value.lookup_mut(&quot;test.foo&quot;).unwrap();</span>
+    <span class="doccomment">///    assert_eq!(string, &amp;mut toml::Value::String(String::from(&quot;bar&quot;)));</span>
+    <span class="doccomment">///    *string = toml::Value::String(String::from(&quot;foo&quot;));</span>
+    <span class="doccomment">/// }</span>
+    <span class="doccomment">/// let result = value.lookup_mut(&quot;test.foo&quot;).unwrap();</span>
+    <span class="doccomment">/// assert_eq!(result.as_str().unwrap(), &quot;foo&quot;);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Value</span><span class="op">&gt;</span> {
+       <span class="kw">let</span> <span class="kw-2">ref</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="ident">path</span>).<span class="ident">lookup</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=&gt;</span> <span class="ident">path</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='kw'>if</span> <span class='ident'>path</span>.<span class='ident'>is_empty</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>cur</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cur</span>)
         }
 
-        <span class='kw'>for</span> <span class='ident'>key</span> <span class='kw'>in</span> <span class='ident'>path</span> {
-            <span class='kw'>let</span> <span class='ident'>tmp</span> <span class='op'>=</span> <span class='ident'>cur</span>;
-            <span class='kw'>match</span> <span class='op'>*</span><span class='ident'>tmp</span> {
-                <span class='ident'>Value</span>::<span class='ident'>Table</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>hm</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>match</span> <span class='ident'>hm</span>.<span class='ident'>get_mut</span>(<span class='ident'>key</span>) {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='ident'>v</span>,
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+        <span class="kw">for</span> <span class="ident">key</span> <span class="kw">in</span> <span class="ident">path</span> {
+            <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">cur</span>;
+            <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">tmp</span> {
+                <span class="ident">Value</span>::<span class="ident">Table</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">hm</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">hm</span>.<span class="ident">get_mut</span>(<span class="ident">key</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">v</span>,
+                        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
                     }
                 }
-                <span class='ident'>Value</span>::<span class='ident'>Array</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>v</span>) <span class='op'>=&gt;</span> {
-                    <span class='kw'>match</span> <span class='ident'>key</span>.<span class='ident'>parse</span>::<span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>().<span class='ident'>ok</span>() {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>idx</span>) <span class='kw'>if</span> <span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='ident'>v</span>.<span class='ident'>len</span>() <span class='op'>=&gt;</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>v</span>[<span class='ident'>idx</span>],
-                        _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+                <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">match</span> <span class="ident">key</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">ok</span>() {
+                        <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="ident">v</span>.<span class="ident">len</span>() <span class="op">=&gt;</span> <span class="ident">cur</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>[<span class="ident">idx</span>],
+                        _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
                     }
                 }
-                _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+                _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
            }
         }
-        <span class='prelude-val'>Some</span>(<span class='ident'>cur</span>)
+        <span class="prelude-val">Some</span>(<span class="ident">cur</span>)
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Value</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>ParserError</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Value</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>ParserError</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>p</span> <span class='op'>=</span> <span class='ident'>Parser</span>::<span class='ident'>new</span>(<span class='ident'>s</span>);
-        <span class='kw'>match</span> <span class='ident'>p</span>.<span class='ident'>parse</span>().<span class='ident'>map</span>(<span class='ident'>Value</span>::<span class='ident'>Table</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>n</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>n</span>),
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='ident'>p</span>.<span class='ident'>errors</span>),
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Value</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParserError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParserError</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Parser</span>::<span class="ident">new</span>(<span class="ident">s</span>);
+        <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">Value</span>::<span class="ident">Table</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">n</span>),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">p</span>.<span class="ident">errors</span>),
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Value</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Value</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_mut_change</span>() {
-        <span class='kw'>let</span> <span class='ident'>toml</span> <span class='op'>=</span> <span class='string'>r#&quot;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_mut_change</span>() {
+        <span class="kw">let</span> <span class="ident">toml</span> <span class="op">=</span> <span class="string">r#&quot;
               [test]
               foo = &quot;bar&quot;
 
@@ -838,18 +850,18 @@
               foo = &quot;qux&quot;
         &quot;#</span>;
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='ident'>toml</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">toml</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
         {
-          <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;values.0.foo&quot;</span>).<span class='ident'>unwrap</span>();
-          <span class='op'>*</span><span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>Value</span>::<span class='ident'>String</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;bar&quot;</span>));
+          <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;values.0.foo&quot;</span>).<span class="ident">unwrap</span>();
+          <span class="kw-2">*</span><span class="ident">foo</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;bar&quot;</span>));
         }
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;values.0.foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;values.0.foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_mut_valid</span>() {
-        <span class='kw'>let</span> <span class='ident'>toml</span> <span class='op'>=</span> <span class='string'>r#&quot;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_mut_valid</span>() {
+        <span class="kw">let</span> <span class="ident">toml</span> <span class="op">=</span> <span class="string">r#&quot;
               [test]
               foo = &quot;bar&quot;
 
@@ -860,66 +872,66 @@
               foo = &quot;qux&quot;
         &quot;#</span>;
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='ident'>toml</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">toml</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
         {
-            <span class='kw'>let</span> <span class='ident'>test_foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;test.foo&quot;</span>).<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>test_foo</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+            <span class="kw">let</span> <span class="ident">test_foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;test.foo&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">test_foo</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
         }
 
         {
-            <span class='kw'>let</span> <span class='ident'>foo1</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;values.1.foo&quot;</span>).<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>foo1</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;qux&quot;</span>);
+            <span class="kw">let</span> <span class="ident">foo1</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;values.1.foo&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">foo1</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;qux&quot;</span>);
         }
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;test.bar&quot;</span>).<span class='ident'>is_none</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;test.foo.bar&quot;</span>).<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;test.bar&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;test.foo.bar&quot;</span>).<span class="ident">is_none</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_mut_invalid_index</span>() {
-        <span class='kw'>let</span> <span class='ident'>toml</span> <span class='op'>=</span> <span class='string'>r#&quot;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_mut_invalid_index</span>() {
+        <span class="kw">let</span> <span class="ident">toml</span> <span class="op">=</span> <span class="string">r#&quot;
             [[values]]
             foo = &quot;baz&quot;
         &quot;#</span>;
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='ident'>toml</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">toml</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
         {
-            <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;test.foo&quot;</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+            <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;test.foo&quot;</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
         }
 
         {
-            <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;values.100.foo&quot;</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+            <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;values.100.foo&quot;</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
         }
 
         {
-            <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;values.str.foo&quot;</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+            <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;values.str.foo&quot;</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_mut_self</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>r#&quot;foo = &quot;bar&quot;&quot;#</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_mut_self</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">r#&quot;foo = &quot;bar&quot;&quot;#</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
         {
-            <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+            <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
         }
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>as_table</span>().<span class='ident'>is_some</span>());
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">as_table</span>().<span class="ident">is_some</span>());
 
-        <span class='kw'>let</span> <span class='ident'>baz</span> <span class='op'>=</span> <span class='ident'>foo</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>baz</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">baz</span> <span class="op">=</span> <span class="ident">foo</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">baz</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_valid</span>() {
-        <span class='kw'>let</span> <span class='ident'>toml</span> <span class='op'>=</span> <span class='string'>r#&quot;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_valid</span>() {
+        <span class="kw">let</span> <span class="ident">toml</span> <span class="op">=</span> <span class="string">r#&quot;
               [test]
               foo = &quot;bar&quot;
 
@@ -930,100 +942,100 @@
               foo = &quot;qux&quot;
         &quot;#</span>;
 
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='ident'>toml</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">toml</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>test_foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;test.foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>test_foo</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">test_foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;test.foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">test_foo</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>foo1</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;values.1.foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>foo1</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;qux&quot;</span>);
+        <span class="kw">let</span> <span class="ident">foo1</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;values.1.foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">foo1</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;qux&quot;</span>);
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;test.bar&quot;</span>).<span class='ident'>is_none</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;test.foo.bar&quot;</span>).<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;test.bar&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;test.foo.bar&quot;</span>).<span class="ident">is_none</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_invalid_index</span>() {
-        <span class='kw'>let</span> <span class='ident'>toml</span> <span class='op'>=</span> <span class='string'>r#&quot;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_invalid_index</span>() {
+        <span class="kw">let</span> <span class="ident">toml</span> <span class="op">=</span> <span class="string">r#&quot;
             [[values]]
             foo = &quot;baz&quot;
         &quot;#</span>;
 
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='ident'>toml</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">toml</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;test.foo&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;test.foo&quot;</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;values.100.foo&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;values.100.foo&quot;</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;values.str.foo&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>is_none</span>());
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;values.str.foo&quot;</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_self</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>r#&quot;foo = &quot;bar&quot;&quot;#</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_self</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">r#&quot;foo = &quot;bar&quot;&quot;#</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>foo</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>foo</span>.<span class='ident'>as_table</span>().<span class='ident'>is_some</span>());
+        <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">foo</span>.<span class="ident">as_table</span>().<span class="ident">is_some</span>());
 
-        <span class='kw'>let</span> <span class='ident'>baz</span> <span class='op'>=</span> <span class='ident'>foo</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;foo&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>baz</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>(), <span class='string'>&quot;bar&quot;</span>);
+        <span class="kw">let</span> <span class="ident">baz</span> <span class="op">=</span> <span class="ident">foo</span>.<span class="ident">lookup</span>(<span class="string">&quot;foo&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">baz</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>(), <span class="string">&quot;bar&quot;</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_advanced</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table]\n\&quot;value\&quot; = 0&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>looked</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;table.\&quot;value\&quot;&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>looked</span>, <span class='ident'>Value</span>::<span class='ident'>Integer</span>(<span class='number'>0</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_advanced</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table]\n\&quot;value\&quot; = 0&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">looked</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;table.\&quot;value\&quot;&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">looked</span>, <span class="ident">Value</span>::<span class="ident">Integer</span>(<span class="number">0</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_advanced_table</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table.\&quot;name.other\&quot;]\nvalue = \&quot;my value\&quot;&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>looked</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>r#&quot;table.&quot;name.other&quot;.value&quot;#</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>looked</span>, <span class='ident'>Value</span>::<span class='ident'>String</span>(<span class='ident'>String</span>::<span class='ident'>from</span>(<span class='string'>&quot;my value&quot;</span>)));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_advanced_table</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table.\&quot;name.other\&quot;]\nvalue = \&quot;my value\&quot;&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">looked</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">r#&quot;table.&quot;name.other&quot;.value&quot;#</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">looked</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;my value&quot;</span>)));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>lookup_mut_advanced</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>looked</span> <span class='op'>=</span> <span class='ident'>value</span>.<span class='ident'>lookup_mut</span>(<span class='string'>&quot;table.\&quot;value\&quot;.1&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>looked</span>, <span class='ident'>Value</span>::<span class='ident'>Integer</span>(<span class='number'>1</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">lookup_mut_advanced</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">looked</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup_mut</span>(<span class="string">&quot;table.\&quot;value\&quot;.1&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">looked</span>, <span class="ident">Value</span>::<span class="ident">Integer</span>(<span class="number">1</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>single_dot</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;.&quot;</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">single_dot</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="prelude-val">None</span>, <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;.&quot;</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>array_dot</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;0.&quot;</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">array_dot</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="prelude-val">None</span>, <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;0.&quot;</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>dot_inside</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;table.\&quot;value.0\&quot;&quot;</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">dot_inside</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="prelude-val">None</span>, <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;table.\&quot;value.0\&quot;&quot;</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>table_with_quotes</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table.\&quot;element\&quot;]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='prelude-val'>None</span>, <span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;\&quot;table.element\&quot;.\&quot;value\&quot;.0&quot;</span>));
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">table_with_quotes</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table.\&quot;element\&quot;]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="prelude-val">None</span>, <span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;\&quot;table.element\&quot;.\&quot;value\&quot;.0&quot;</span>));
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>table_with_quotes_2</span>() {
-        <span class='kw'>let</span> <span class='ident'>value</span>: <span class='ident'>Value</span> <span class='op'>=</span> <span class='string'>&quot;[table.\&quot;element\&quot;]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class='ident'>parse</span>().<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>Value</span>::<span class='ident'>Integer</span>(<span class='number'>0</span>), <span class='op'>*</span><span class='ident'>value</span>.<span class='ident'>lookup</span>(<span class='string'>&quot;table.\&quot;element\&quot;.\&quot;value\&quot;.0&quot;</span>).<span class='ident'>unwrap</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">table_with_quotes_2</span>() {
+        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="string">&quot;[table.\&quot;element\&quot;]\n\&quot;value\&quot; = [0, 1, 2]&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">Value</span>::<span class="ident">Integer</span>(<span class="number">0</span>), <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">lookup</span>(<span class="string">&quot;table.\&quot;element\&quot;.\&quot;value\&quot;.0&quot;</span>).<span class="ident">unwrap</span>());
     }
 
 }
@@ -1041,18 +1053,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1085,7 +1101,6 @@
         window.rootPath = "../../";
         window.currentCrate = "toml";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

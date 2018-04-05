@@ -9,14 +9,18 @@
 
     <title>encoder.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -433,396 +445,396 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Implements all functionality related to encoding header blocks using</span>
-<span class='doccomment'>//! HPACK.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Clients should use the `Encoder` struct as the API for performing HPACK</span>
-<span class='doccomment'>//! encoding.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! # Examples</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Encodes a header using a literal encoding.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```rust</span>
-<span class='doccomment'>//! use hpack::Encoder;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let mut encoder = Encoder::new();</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let headers = vec![</span>
-<span class='doccomment'>//!     (b&quot;custom-key&quot;.to_vec(), b&quot;custom-value&quot;.to_vec()),</span>
-<span class='doccomment'>//! ];</span>
-<span class='doccomment'>//! // First encoding...</span>
-<span class='doccomment'>//! let result = encoder.encode(&amp;headers);</span>
-<span class='doccomment'>//! // The result is a literal encoding of the header name and value, with an</span>
-<span class='doccomment'>//! // initial byte representing the type of the encoding</span>
-<span class='doccomment'>//! // (incremental indexing).</span>
-<span class='doccomment'>//! assert_eq!(</span>
-<span class='doccomment'>//!     vec![0x40,</span>
-<span class='doccomment'>//!          10, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;k&#39;, b&#39;e&#39;, b&#39;y&#39;,</span>
-<span class='doccomment'>//!          12, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;v&#39;, b&#39;a&#39;, b&#39;l&#39;,</span>
-<span class='doccomment'>//!          b&#39;u&#39;, b&#39;e&#39;],</span>
-<span class='doccomment'>//!     result);</span>
-<span class='doccomment'>//! ```</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Encodes some pseudo-headers that are already found in the static table.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ```rust</span>
-<span class='doccomment'>//! use hpack::Encoder;</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! let mut encoder = Encoder::new();</span>
-<span class='doccomment'>//! let headers = vec![</span>
-<span class='doccomment'>//!     (b&quot;:method&quot;.to_vec(), b&quot;GET&quot;.to_vec()),</span>
-<span class='doccomment'>//!     (b&quot;:path&quot;.to_vec(), b&quot;/&quot;.to_vec()),</span>
-<span class='doccomment'>//! ];</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! // The headers are encoded by providing their index (with a bit flag</span>
-<span class='doccomment'>//! // indicating that the indexed representation is used).</span>
-<span class='doccomment'>//! assert_eq!(encoder.encode(&amp;headers), vec![2 | 0x80, 4 | 0x80]);</span>
-<span class='doccomment'>//! ```</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>Wrapping</span>;
+</pre><pre class="rust ">
+<span class="doccomment">//! Implements all functionality related to encoding header blocks using</span>
+<span class="doccomment">//! HPACK.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Clients should use the `Encoder` struct as the API for performing HPACK</span>
+<span class="doccomment">//! encoding.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Encodes a header using a literal encoding.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use hpack::Encoder;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut encoder = Encoder::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let headers = vec![</span>
+<span class="doccomment">//!     (b&quot;custom-key&quot;.to_vec(), b&quot;custom-value&quot;.to_vec()),</span>
+<span class="doccomment">//! ];</span>
+<span class="doccomment">//! // First encoding...</span>
+<span class="doccomment">//! let result = encoder.encode(&amp;headers);</span>
+<span class="doccomment">//! // The result is a literal encoding of the header name and value, with an</span>
+<span class="doccomment">//! // initial byte representing the type of the encoding</span>
+<span class="doccomment">//! // (incremental indexing).</span>
+<span class="doccomment">//! assert_eq!(</span>
+<span class="doccomment">//!     vec![0x40,</span>
+<span class="doccomment">//!          10, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;k&#39;, b&#39;e&#39;, b&#39;y&#39;,</span>
+<span class="doccomment">//!          12, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;v&#39;, b&#39;a&#39;, b&#39;l&#39;,</span>
+<span class="doccomment">//!          b&#39;u&#39;, b&#39;e&#39;],</span>
+<span class="doccomment">//!     result);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Encodes some pseudo-headers that are already found in the static table.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use hpack::Encoder;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let mut encoder = Encoder::new();</span>
+<span class="doccomment">//! let headers = vec![</span>
+<span class="doccomment">//!     (b&quot;:method&quot;.to_vec(), b&quot;GET&quot;.to_vec()),</span>
+<span class="doccomment">//!     (b&quot;:path&quot;.to_vec(), b&quot;/&quot;.to_vec()),</span>
+<span class="doccomment">//! ];</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // The headers are encoded by providing their index (with a bit flag</span>
+<span class="doccomment">//! // indicating that the indexed representation is used).</span>
+<span class="doccomment">//! assert_eq!(encoder.encode(&amp;headers), vec![2 | 0x80, 4 | 0x80]);</span>
+<span class="doccomment">//! ```</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">num</span>::<span class="ident">Wrapping</span>;
 
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>STATIC_TABLE</span>;
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>HeaderTable</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">STATIC_TABLE</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">HeaderTable</span>;
 
 
-<span class='doccomment'>/// Encode an integer to the representation defined by HPACK.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Returns a newly allocated `Vec` containing the encoded bytes.</span>
-<span class='doccomment'>/// Only `prefix_size` lowest-order bits of the first byte in the</span>
-<span class='doccomment'>/// array are guaranteed to be used.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encode_integer</span>(<span class='kw-2'>mut</span> <span class='ident'>value</span>: <span class='ident'>usize</span>, <span class='ident'>prefix_size</span>: <span class='ident'>u8</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>Wrapping</span>(<span class='ident'>mask</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>prefix_size</span> <span class='op'>&gt;=</span> <span class='number'>8</span> {
-        <span class='ident'>Wrapping</span>(<span class='number'>0xFF</span>)
-    } <span class='kw'>else</span> {
-        <span class='ident'>Wrapping</span>(<span class='number'>1u8</span> <span class='op'>&lt;&lt;</span> <span class='ident'>prefix_size</span>) <span class='op'>-</span> <span class='ident'>Wrapping</span>(<span class='number'>1</span>)
+<span class="doccomment">/// Encode an integer to the representation defined by HPACK.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns a newly allocated `Vec` containing the encoded bytes.</span>
+<span class="doccomment">/// Only `prefix_size` lowest-order bits of the first byte in the</span>
+<span class="doccomment">/// array are guaranteed to be used.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_integer</span>(<span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">usize</span>, <span class="ident">prefix_size</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">Wrapping</span>(<span class="ident">mask</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">prefix_size</span> <span class="op">&gt;=</span> <span class="number">8</span> {
+        <span class="ident">Wrapping</span>(<span class="number">0xFF</span>)
+    } <span class="kw">else</span> {
+        <span class="ident">Wrapping</span>(<span class="number">1u8</span> <span class="op">&lt;&lt;</span> <span class="ident">prefix_size</span>) <span class="op">-</span> <span class="ident">Wrapping</span>(<span class="number">1</span>)
     };
-    <span class='kw'>let</span> <span class='ident'>mask</span> <span class='op'>=</span> <span class='ident'>mask</span> <span class='kw'>as</span> <span class='ident'>usize</span>;
-    <span class='kw'>if</span> <span class='ident'>value</span> <span class='op'>&lt;</span> <span class='ident'>mask</span> {
-        <span class='comment'>// Right now, the caller would need to be the one to combine</span>
-        <span class='comment'>// the other part of the prefix byte (but would know that it&#39;s</span>
-        <span class='comment'>// safe to do so using the bit-wise or).</span>
-        <span class='kw'>return</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>value</span> <span class='kw'>as</span> <span class='ident'>u8</span>];
+    <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">mask</span> <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">mask</span> {
+        <span class="comment">// Right now, the caller would need to be the one to combine</span>
+        <span class="comment">// the other part of the prefix byte (but would know that it&#39;s</span>
+        <span class="comment">// safe to do so using the bit-wise or).</span>
+        <span class="kw">return</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>];
     }
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-    <span class='ident'>res</span>.<span class='ident'>push</span>(<span class='ident'>mask</span> <span class='kw'>as</span> <span class='ident'>u8</span>);
-    <span class='ident'>value</span> <span class='op'>-=</span> <span class='ident'>mask</span>;
-    <span class='kw'>while</span> <span class='ident'>value</span> <span class='op'>&gt;=</span> <span class='number'>128</span> {
-        <span class='ident'>res</span>.<span class='ident'>push</span>(((<span class='ident'>value</span> <span class='op'>%</span> <span class='number'>128</span>) <span class='op'>+</span> <span class='number'>128</span>) <span class='kw'>as</span> <span class='ident'>u8</span>);
-        <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>value</span> <span class='op'>/</span> <span class='number'>128</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+    <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">mask</span> <span class="kw">as</span> <span class="ident">u8</span>);
+    <span class="ident">value</span> <span class="op">-=</span> <span class="ident">mask</span>;
+    <span class="kw">while</span> <span class="ident">value</span> <span class="op">&gt;=</span> <span class="number">128</span> {
+        <span class="ident">res</span>.<span class="ident">push</span>(((<span class="ident">value</span> <span class="op">%</span> <span class="number">128</span>) <span class="op">+</span> <span class="number">128</span>) <span class="kw">as</span> <span class="ident">u8</span>);
+        <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">/</span> <span class="number">128</span>;
     }
-    <span class='ident'>res</span>.<span class='ident'>push</span>(<span class='ident'>value</span> <span class='kw'>as</span> <span class='ident'>u8</span>);
+    <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u8</span>);
 
-    <span class='ident'>res</span>
+    <span class="ident">res</span>
 }
 
-<span class='doccomment'>/// Represents an HPACK encoder. Allows clients to encode arbitrary header sets</span>
-<span class='doccomment'>/// and tracks the encoding context. That is, encoding subsequent header sets</span>
-<span class='doccomment'>/// will use the context built by previous encode calls.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This is the main API for performing HPACK encoding of headers.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Encoding a header two times in a row produces two different</span>
-<span class='doccomment'>/// representations, due to the utilization of HPACK compression.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust</span>
-<span class='doccomment'>/// use hpack::Encoder;</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut encoder = Encoder::new();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let headers = vec![</span>
-<span class='doccomment'>///     (b&quot;custom-key&quot;.to_vec(), b&quot;custom-value&quot;.to_vec()),</span>
-<span class='doccomment'>/// ];</span>
-<span class='doccomment'>/// // First encoding...</span>
-<span class='doccomment'>/// let result = encoder.encode(&amp;headers);</span>
-<span class='doccomment'>/// // The result is a literal encoding of the header name and value, with an</span>
-<span class='doccomment'>/// // initial byte representing the type of the encoding</span>
-<span class='doccomment'>/// // (incremental indexing).</span>
-<span class='doccomment'>/// assert_eq!(</span>
-<span class='doccomment'>///     vec![0x40,</span>
-<span class='doccomment'>///          10, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;k&#39;, b&#39;e&#39;, b&#39;y&#39;,</span>
-<span class='doccomment'>///          12, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;v&#39;, b&#39;a&#39;, b&#39;l&#39;,</span>
-<span class='doccomment'>///          b&#39;u&#39;, b&#39;e&#39;],</span>
-<span class='doccomment'>///     result);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Encode the same headers again!</span>
-<span class='doccomment'>/// let result = encoder.encode(&amp;headers);</span>
-<span class='doccomment'>/// // The result is simply the index of the header in the header table (62),</span>
-<span class='doccomment'>/// // with a flag representing that the decoder should use the index.</span>
-<span class='doccomment'>/// assert_eq!(vec![0x80 | 62], result);</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Encoder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// The header table represents the encoder&#39;s context</span>
-    <span class='ident'>header_table</span>: <span class='ident'>HeaderTable</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// Represents an HPACK encoder. Allows clients to encode arbitrary header sets</span>
+<span class="doccomment">/// and tracks the encoding context. That is, encoding subsequent header sets</span>
+<span class="doccomment">/// will use the context built by previous encode calls.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is the main API for performing HPACK encoding of headers.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Encoding a header two times in a row produces two different</span>
+<span class="doccomment">/// representations, due to the utilization of HPACK compression.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use hpack::Encoder;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut encoder = Encoder::new();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let headers = vec![</span>
+<span class="doccomment">///     (b&quot;custom-key&quot;.to_vec(), b&quot;custom-value&quot;.to_vec()),</span>
+<span class="doccomment">/// ];</span>
+<span class="doccomment">/// // First encoding...</span>
+<span class="doccomment">/// let result = encoder.encode(&amp;headers);</span>
+<span class="doccomment">/// // The result is a literal encoding of the header name and value, with an</span>
+<span class="doccomment">/// // initial byte representing the type of the encoding</span>
+<span class="doccomment">/// // (incremental indexing).</span>
+<span class="doccomment">/// assert_eq!(</span>
+<span class="doccomment">///     vec![0x40,</span>
+<span class="doccomment">///          10, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;k&#39;, b&#39;e&#39;, b&#39;y&#39;,</span>
+<span class="doccomment">///          12, b&#39;c&#39;, b&#39;u&#39;, b&#39;s&#39;, b&#39;t&#39;, b&#39;o&#39;, b&#39;m&#39;, b&#39;-&#39;, b&#39;v&#39;, b&#39;a&#39;, b&#39;l&#39;,</span>
+<span class="doccomment">///          b&#39;u&#39;, b&#39;e&#39;],</span>
+<span class="doccomment">///     result);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Encode the same headers again!</span>
+<span class="doccomment">/// let result = encoder.encode(&amp;headers);</span>
+<span class="doccomment">/// // The result is simply the index of the header in the header table (62),</span>
+<span class="doccomment">/// // with a flag representing that the decoder should use the index.</span>
+<span class="doccomment">/// assert_eq!(vec![0x80 | 62], result);</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The header table represents the encoder&#39;s context</span>
+    <span class="ident">header_table</span>: <span class="ident">HeaderTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Encoder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Creates a new `Encoder` with a default static table, as defined by the</span>
-    <span class='doccomment'>/// HPACK spec (Appendix A).</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Encoder</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-        <span class='ident'>Encoder</span> {
-            <span class='ident'>header_table</span>: <span class='ident'>HeaderTable</span>::<span class='ident'>with_static_table</span>(<span class='ident'>STATIC_TABLE</span>),
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new `Encoder` with a default static table, as defined by the</span>
+    <span class="doccomment">/// HPACK spec (Appendix A).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">Encoder</span> {
+            <span class="ident">header_table</span>: <span class="ident">HeaderTable</span>::<span class="ident">with_static_table</span>(<span class="ident">STATIC_TABLE</span>),
         }
     }
 
-    <span class='doccomment'>/// Encodes the given headers using the HPACK rules and returns a newly</span>
-    <span class='doccomment'>/// allocated `Vec` containing the bytes representing the encoded header</span>
-    <span class='doccomment'>/// set.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The encoder so far supports only a single, extremely simple encoding</span>
-    <span class='doccomment'>/// strategy, whereby each header is represented as an indexed header if</span>
-    <span class='doccomment'>/// already found in the header table and a literal otherwise. When a</span>
-    <span class='doccomment'>/// header isn&#39;t found in the table, it is added if the header name wasn&#39;t</span>
-    <span class='doccomment'>/// found either (i.e. there are never two header names with different</span>
-    <span class='doccomment'>/// values in the produced header table). Strings are always encoded as</span>
-    <span class='doccomment'>/// literals (Huffman encoding is not used).</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>headers</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoded</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+    <span class="doccomment">/// Encodes the given headers using the HPACK rules and returns a newly</span>
+    <span class="doccomment">/// allocated `Vec` containing the bytes representing the encoded header</span>
+    <span class="doccomment">/// set.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The encoder so far supports only a single, extremely simple encoding</span>
+    <span class="doccomment">/// strategy, whereby each header is represented as an indexed header if</span>
+    <span class="doccomment">/// already found in the header table and a literal otherwise. When a</span>
+    <span class="doccomment">/// header isn&#39;t found in the table, it is added if the header name wasn&#39;t</span>
+    <span class="doccomment">/// found either (i.e. there are never two header names with different</span>
+    <span class="doccomment">/// values in the produced header table). Strings are always encoded as</span>
+    <span class="doccomment">/// literals (Huffman encoding is not used).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
-        <span class='kw'>for</span> <span class='ident'>header</span> <span class='kw'>in</span> <span class='ident'>headers</span>.<span class='ident'>iter</span>() {
-            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>header_table</span>.<span class='ident'>find_header</span>((<span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>0</span>, <span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>1</span>)) {
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                    <span class='comment'>// The name of the header is in no tables: need to encode</span>
-                    <span class='comment'>// it with both a literal name and value.</span>
-                    <span class='self'>self</span>.<span class='ident'>encode_literal</span>(<span class='ident'>header</span>, <span class='bool-val'>true</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>encoded</span>);
-                    <span class='self'>self</span>.<span class='ident'>header_table</span>.<span class='ident'>add_header</span>(<span class='ident'>header</span>.<span class='number'>0</span>.<span class='ident'>clone</span>(), <span class='ident'>header</span>.<span class='number'>1</span>.<span class='ident'>clone</span>());
+        <span class="kw">for</span> <span class="ident">header</span> <span class="kw">in</span> <span class="ident">headers</span>.<span class="ident">iter</span>() {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header_table</span>.<span class="ident">find_header</span>((<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">1</span>)) {
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {
+                    <span class="comment">// The name of the header is in no tables: need to encode</span>
+                    <span class="comment">// it with both a literal name and value.</span>
+                    <span class="self">self</span>.<span class="ident">encode_literal</span>(<span class="ident">header</span>, <span class="bool-val">true</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoded</span>);
+                    <span class="self">self</span>.<span class="ident">header_table</span>.<span class="ident">add_header</span>(<span class="ident">header</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">header</span>.<span class="number">1</span>.<span class="ident">clone</span>());
                 },
-                <span class='prelude-val'>Some</span>((<span class='ident'>index</span>, <span class='bool-val'>false</span>)) <span class='op'>=&gt;</span> {
-                    <span class='comment'>// The name of the header is at the given index, but the</span>
-                    <span class='comment'>// value does not match the current one: need to encode</span>
-                    <span class='comment'>// only the value as a literal.</span>
-                    <span class='self'>self</span>.<span class='ident'>encode_indexed_name</span>((<span class='ident'>index</span>, <span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>1</span>), <span class='bool-val'>false</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>encoded</span>);
+                <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="bool-val">false</span>)) <span class="op">=&gt;</span> {
+                    <span class="comment">// The name of the header is at the given index, but the</span>
+                    <span class="comment">// value does not match the current one: need to encode</span>
+                    <span class="comment">// only the value as a literal.</span>
+                    <span class="self">self</span>.<span class="ident">encode_indexed_name</span>((<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">1</span>), <span class="bool-val">false</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoded</span>);
                 },
-                <span class='prelude-val'>Some</span>((<span class='ident'>index</span>, <span class='bool-val'>true</span>)) <span class='op'>=&gt;</span> {
-                    <span class='comment'>// The full header was found in one of the tables, so we</span>
-                    <span class='comment'>// just encode the index.</span>
-                    <span class='self'>self</span>.<span class='ident'>encode_indexed</span>(<span class='ident'>index</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>encoded</span>);
+                <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="bool-val">true</span>)) <span class="op">=&gt;</span> {
+                    <span class="comment">// The full header was found in one of the tables, so we</span>
+                    <span class="comment">// just encode the index.</span>
+                    <span class="self">self</span>.<span class="ident">encode_indexed</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoded</span>);
                 }
             };
         }
 
-        <span class='ident'>encoded</span>
+        <span class="ident">encoded</span>
     }
 
-    <span class='doccomment'>/// Encodes a header as a literal (i.e. both the name and the value are</span>
-    <span class='doccomment'>/// encoded as a string literal) and places the result in the given buffer</span>
-    <span class='doccomment'>/// `buf`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Parameters</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// - `header` - the header to be encoded</span>
-    <span class='doccomment'>/// - `should_index` - indicates whether the given header should be indexed, i.e.</span>
-    <span class='doccomment'>///                    inserted into the dynamic table</span>
-    <span class='doccomment'>/// - `buf` - The buffer into which the result is placed</span>
-    <span class='doccomment'>///</span>
-    <span class='kw'>fn</span> <span class='ident'>encode_literal</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
-                      <span class='ident'>header</span>: <span class='kw-2'>&amp;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>),
-                      <span class='ident'>should_index</span>: <span class='ident'>bool</span>,
-                      <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='ident'>mask</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>should_index</span> {
-            <span class='number'>0x40</span>
-        } <span class='kw'>else</span> {
-            <span class='number'>0x0</span>
+    <span class="doccomment">/// Encodes a header as a literal (i.e. both the name and the value are</span>
+    <span class="doccomment">/// encoded as a string literal) and places the result in the given buffer</span>
+    <span class="doccomment">/// `buf`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Parameters</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - `header` - the header to be encoded</span>
+    <span class="doccomment">/// - `should_index` - indicates whether the given header should be indexed, i.e.</span>
+    <span class="doccomment">///                    inserted into the dynamic table</span>
+    <span class="doccomment">/// - `buf` - The buffer into which the result is placed</span>
+    <span class="doccomment">///</span>
+    <span class="kw">fn</span> <span class="ident">encode_literal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                      <span class="ident">header</span>: <span class="kw-2">&amp;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
+                      <span class="ident">should_index</span>: <span class="ident">bool</span>,
+                      <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_index</span> {
+            <span class="number">0x40</span>
+        } <span class="kw">else</span> {
+            <span class="number">0x0</span>
         };
 
-        <span class='ident'>buf</span>.<span class='ident'>push</span>(<span class='ident'>mask</span>);
-        <span class='self'>self</span>.<span class='ident'>encode_string_literal</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>0</span>, <span class='ident'>buf</span>);
-        <span class='self'>self</span>.<span class='ident'>encode_string_literal</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>1</span>, <span class='ident'>buf</span>);
+        <span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">mask</span>);
+        <span class="self">self</span>.<span class="ident">encode_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">0</span>, <span class="ident">buf</span>);
+        <span class="self">self</span>.<span class="ident">encode_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">1</span>, <span class="ident">buf</span>);
     }
 
-    <span class='doccomment'>/// Encodes a string literal and places the result in the given buffer</span>
-    <span class='doccomment'>/// `buf`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The function does not consider Huffman encoding for now, but always</span>
-    <span class='doccomment'>/// produces a string literal representations, according to the HPACK spec</span>
-    <span class='doccomment'>/// section 5.2.</span>
-    <span class='kw'>fn</span> <span class='ident'>encode_string_literal</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>octet_str</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>encode_integer</span>(<span class='ident'>octet_str</span>.<span class='ident'>len</span>(), <span class='number'>7</span>).<span class='ident'>into_iter</span>());
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>octet_str</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Encodes a string literal and places the result in the given buffer</span>
+    <span class="doccomment">/// `buf`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The function does not consider Huffman encoding for now, but always</span>
+    <span class="doccomment">/// produces a string literal representations, according to the HPACK spec</span>
+    <span class="doccomment">/// section 5.2.</span>
+    <span class="kw">fn</span> <span class="ident">encode_string_literal</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">octet_str</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">encode_integer</span>(<span class="ident">octet_str</span>.<span class="ident">len</span>(), <span class="number">7</span>).<span class="ident">into_iter</span>());
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">octet_str</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
     }
 
-    <span class='doccomment'>/// Encodes a header whose name is indexed and places the result in the</span>
-    <span class='doccomment'>/// given buffer `buf`.</span>
-    <span class='kw'>fn</span> <span class='ident'>encode_indexed_name</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>header</span>: (<span class='ident'>usize</span>, <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>), <span class='ident'>should_index</span>: <span class='ident'>bool</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> (<span class='ident'>mask</span>, <span class='ident'>prefix</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>should_index</span> {
-            (<span class='number'>0x40</span>, <span class='number'>6</span>)
-        } <span class='kw'>else</span> {
-            (<span class='number'>0x0</span>, <span class='number'>4</span>)
+    <span class="doccomment">/// Encodes a header whose name is indexed and places the result in the</span>
+    <span class="doccomment">/// given buffer `buf`.</span>
+    <span class="kw">fn</span> <span class="ident">encode_indexed_name</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">header</span>: (<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="ident">should_index</span>: <span class="ident">bool</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> (<span class="ident">mask</span>, <span class="ident">prefix</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_index</span> {
+            (<span class="number">0x40</span>, <span class="number">6</span>)
+        } <span class="kw">else</span> {
+            (<span class="number">0x0</span>, <span class="number">4</span>)
         };
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoded_index</span> <span class='op'>=</span> <span class='ident'>encode_integer</span>(<span class='ident'>header</span>.<span class='number'>0</span>, <span class='ident'>prefix</span>);
-        <span class='ident'>encoded_index</span>[<span class='number'>0</span>] <span class='op'>|=</span> <span class='ident'>mask</span>;
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>encoded_index</span>.<span class='ident'>into_iter</span>());
-        <span class='comment'>// So far, we rely on just one strategy for encoding string literals.</span>
-        <span class='self'>self</span>.<span class='ident'>encode_string_literal</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>.<span class='number'>1</span>, <span class='ident'>buf</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoded_index</span> <span class="op">=</span> <span class="ident">encode_integer</span>(<span class="ident">header</span>.<span class="number">0</span>, <span class="ident">prefix</span>);
+        <span class="ident">encoded_index</span>[<span class="number">0</span>] <span class="op">|=</span> <span class="ident">mask</span>;
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">encoded_index</span>.<span class="ident">into_iter</span>());
+        <span class="comment">// So far, we rely on just one strategy for encoding string literals.</span>
+        <span class="self">self</span>.<span class="ident">encode_string_literal</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="number">1</span>, <span class="ident">buf</span>);
     }
 
-    <span class='doccomment'>/// Encodes an indexed header (a header that is fully in the header table)</span>
-    <span class='doccomment'>/// and places the result in the given buffer `buf`.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The encoding is according to the rules of the HPACK spec, section 6.1.</span>
-    <span class='kw'>fn</span> <span class='ident'>encode_indexed</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>index</span>: <span class='ident'>usize</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoded</span> <span class='op'>=</span> <span class='ident'>encode_integer</span>(<span class='ident'>index</span>, <span class='number'>7</span>);
-        <span class='comment'>// We need to set the most significant bit, since the bit-pattern is</span>
-        <span class='comment'>// `1xxxxxxx` for indexed headers.</span>
-        <span class='ident'>encoded</span>[<span class='number'>0</span>] <span class='op'>|=</span> <span class='number'>0x80</span>;
+    <span class="doccomment">/// Encodes an indexed header (a header that is fully in the header table)</span>
+    <span class="doccomment">/// and places the result in the given buffer `buf`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The encoding is according to the rules of the HPACK spec, section 6.1.</span>
+    <span class="kw">fn</span> <span class="ident">encode_indexed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">encode_integer</span>(<span class="ident">index</span>, <span class="number">7</span>);
+        <span class="comment">// We need to set the most significant bit, since the bit-pattern is</span>
+        <span class="comment">// `1xxxxxxx` for indexed headers.</span>
+        <span class="ident">encoded</span>[<span class="number">0</span>] <span class="op">|=</span> <span class="number">0x80</span>;
 
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>encoded</span>.<span class='ident'>into_iter</span>());
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">encoded</span>.<span class="ident">into_iter</span>());
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>encode_integer</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Encoder</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">encode_integer</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Encoder</span>;
 
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>Decoder</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">Decoder</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_encode_integer</span>() {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>10</span>, <span class='number'>5</span>), [<span class='number'>10</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>1337</span>, <span class='number'>5</span>), [<span class='number'>31</span>, <span class='number'>154</span>, <span class='number'>10</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>127</span>, <span class='number'>7</span>), [<span class='number'>127</span>, <span class='number'>0</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>255</span>, <span class='number'>8</span>), [<span class='number'>255</span>, <span class='number'>0</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>254</span>, <span class='number'>8</span>), [<span class='number'>254</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>1</span>, <span class='number'>8</span>), [<span class='number'>1</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>0</span>, <span class='number'>8</span>), [<span class='number'>0</span>]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encode_integer</span>(<span class='number'>255</span>, <span class='number'>7</span>), [<span class='number'>127</span>, <span class='number'>128</span>, <span class='number'>1</span>]);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_encode_integer</span>() {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">10</span>, <span class="number">5</span>), [<span class="number">10</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">1337</span>, <span class="number">5</span>), [<span class="number">31</span>, <span class="number">154</span>, <span class="number">10</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">127</span>, <span class="number">7</span>), [<span class="number">127</span>, <span class="number">0</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">255</span>, <span class="number">8</span>), [<span class="number">255</span>, <span class="number">0</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">254</span>, <span class="number">8</span>), [<span class="number">254</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">1</span>, <span class="number">8</span>), [<span class="number">1</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">0</span>, <span class="number">8</span>), [<span class="number">0</span>]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encode_integer</span>(<span class="number">255</span>, <span class="number">7</span>), [<span class="number">127</span>, <span class="number">128</span>, <span class="number">1</span>]);
     }
 
-    <span class='doccomment'>/// A helper function that checks whether the given buffer can be decoded</span>
-    <span class='doccomment'>/// into a set of headers that corresponds to the given `headers` list.</span>
-    <span class='doccomment'>/// Relies on using the `hpack::decoder::Decoder`` struct for</span>
-    <span class='doccomment'>/// performing the decoding.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `bool` indicating whether such a decoding can be performed.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_decodable</span>(<span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>headers</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>decoder</span> <span class='op'>=</span> <span class='ident'>Decoder</span>::<span class='ident'>new</span>();
-        <span class='kw'>match</span> <span class='ident'>decoder</span>.<span class='ident'>decode</span>(<span class='ident'>buf</span>).<span class='ident'>ok</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>h</span>) <span class='op'>=&gt;</span> <span class='ident'>h</span> <span class='op'>==</span> <span class='op'>*</span><span class='ident'>headers</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+    <span class="doccomment">/// A helper function that checks whether the given buffer can be decoded</span>
+    <span class="doccomment">/// into a set of headers that corresponds to the given `headers` list.</span>
+    <span class="doccomment">/// Relies on using the `hpack::decoder::Decoder`` struct for</span>
+    <span class="doccomment">/// performing the decoding.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `bool` indicating whether such a decoding can be performed.</span>
+    <span class="kw">fn</span> <span class="ident">is_decodable</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">headers</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">Decoder</span>::<span class="ident">new</span>();
+        <span class="kw">match</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="ident">buf</span>).<span class="ident">ok</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">h</span>) <span class="op">=&gt;</span> <span class="ident">h</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">headers</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="bool-val">false</span>,
         }
     }
 
-    <span class='doccomment'>/// Tests that encoding only the `:method` header works.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_encode_only_method</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>: <span class='ident'>Encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;GET&quot;</span>.<span class='ident'>to_vec</span>()),
+    <span class="doccomment">/// Tests that encoding only the `:method` header works.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_encode_only_method</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;GET&quot;</span>.<span class="ident">to_vec</span>()),
         ];
 
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>result</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>is_decodable</span>(<span class='kw-2'>&amp;</span><span class='ident'>result</span>, <span class='kw-2'>&amp;</span><span class='ident'>headers</span>));
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_decodable</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
     }
 
-    <span class='doccomment'>/// Tests that when a single custom header is sent it gets indexed by the</span>
-    <span class='doccomment'>/// coder.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_custom_header_gets_indexed</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>: <span class='ident'>Encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;custom-key&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;custom-value&quot;</span>.<span class='ident'>to_vec</span>()),
+    <span class="doccomment">/// Tests that when a single custom header is sent it gets indexed by the</span>
+    <span class="doccomment">/// coder.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_custom_header_gets_indexed</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;custom-key&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;custom-value&quot;</span>.<span class="ident">to_vec</span>()),
         ];
 
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>is_decodable</span>(<span class='kw-2'>&amp;</span><span class='ident'>result</span>, <span class='kw-2'>&amp;</span><span class='ident'>headers</span>));
-        <span class='comment'>// The header is in the encoder&#39;s dynamic table.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encoder</span>.<span class='ident'>header_table</span>.<span class='ident'>dynamic_table</span>.<span class='ident'>to_vec</span>(), <span class='ident'>headers</span>);
-        <span class='comment'>// ...but also indicated as such in the output.</span>
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='number'>0x40</span> <span class='op'>==</span> (<span class='number'>0x40</span> <span class='kw-2'>&amp;</span> <span class='ident'>result</span>[<span class='number'>0</span>]));
-        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>result</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_decodable</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
+        <span class="comment">// The header is in the encoder&#39;s dynamic table.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoder</span>.<span class="ident">header_table</span>.<span class="ident">dynamic_table</span>.<span class="ident">to_vec</span>(), <span class="ident">headers</span>);
+        <span class="comment">// ...but also indicated as such in the output.</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="number">0x40</span> <span class="op">==</span> (<span class="number">0x40</span> <span class="op">&amp;</span> <span class="ident">result</span>[<span class="number">0</span>]));
+        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>);
     }
 
-    <span class='doccomment'>/// Tests that when a header gets added to the dynamic table, the encoder</span>
-    <span class='doccomment'>/// will use the index, instead of the literal representation on the next</span>
-    <span class='doccomment'>/// encoding of the same header.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_uses_index_on_second_iteration</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>: <span class='ident'>Encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;custom-key&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;custom-value&quot;</span>.<span class='ident'>to_vec</span>()),
+    <span class="doccomment">/// Tests that when a header gets added to the dynamic table, the encoder</span>
+    <span class="doccomment">/// will use the index, instead of the literal representation on the next</span>
+    <span class="doccomment">/// encoding of the same header.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_uses_index_on_second_iteration</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;custom-key&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;custom-value&quot;</span>.<span class="ident">to_vec</span>()),
         ];
-        <span class='comment'>// First encoding...</span>
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+        <span class="comment">// First encoding...</span>
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-        <span class='comment'>// Encode the same headers again!</span>
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+        <span class="comment">// Encode the same headers again!</span>
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-        <span class='comment'>// The header is in the encoder&#39;s dynamic table.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encoder</span>.<span class='ident'>header_table</span>.<span class='ident'>dynamic_table</span>.<span class='ident'>to_vec</span>(), <span class='ident'>headers</span>);
-        <span class='comment'>// The output is a single index byte?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>result</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
-        <span class='comment'>// The index is correctly encoded:</span>
-        <span class='comment'>// - The most significant bit is set</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>0x80</span> <span class='kw-2'>&amp;</span> <span class='ident'>result</span>[<span class='number'>0</span>], <span class='number'>0x80</span>);
-        <span class='comment'>// - The other 7 bits decode to an integer giving the index in the full</span>
-        <span class='comment'>//   header address space.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>result</span>[<span class='number'>0</span>] <span class='op'>^</span> <span class='number'>0x80</span>, <span class='number'>62</span>);
-        <span class='comment'>// The header table actually contains the header at that index?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(
-            <span class='ident'>encoder</span>.<span class='ident'>header_table</span>.<span class='ident'>get_from_table</span>(<span class='number'>62</span>).<span class='ident'>unwrap</span>(),
-            (<span class='kw-2'>&amp;</span><span class='ident'>headers</span>[<span class='number'>0</span>].<span class='number'>0</span>[..], <span class='kw-2'>&amp;</span><span class='ident'>headers</span>[<span class='number'>0</span>].<span class='number'>1</span>[..]));
+        <span class="comment">// The header is in the encoder&#39;s dynamic table.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encoder</span>.<span class="ident">header_table</span>.<span class="ident">dynamic_table</span>.<span class="ident">to_vec</span>(), <span class="ident">headers</span>);
+        <span class="comment">// The output is a single index byte?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="comment">// The index is correctly encoded:</span>
+        <span class="comment">// - The most significant bit is set</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="number">0x80</span> <span class="op">&amp;</span> <span class="ident">result</span>[<span class="number">0</span>], <span class="number">0x80</span>);
+        <span class="comment">// - The other 7 bits decode to an integer giving the index in the full</span>
+        <span class="comment">//   header address space.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>[<span class="number">0</span>] <span class="op">^</span> <span class="number">0x80</span>, <span class="number">62</span>);
+        <span class="comment">// The header table actually contains the header at that index?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">encoder</span>.<span class="ident">header_table</span>.<span class="ident">get_from_table</span>(<span class="number">62</span>).<span class="ident">unwrap</span>(),
+            (<span class="kw-2">&amp;</span><span class="ident">headers</span>[<span class="number">0</span>].<span class="number">0</span>[..], <span class="kw-2">&amp;</span><span class="ident">headers</span>[<span class="number">0</span>].<span class="number">1</span>[..]));
     }
 
-    <span class='doccomment'>/// Tests that when a header name is indexed, but the value isn&#39;t, the</span>
-    <span class='doccomment'>/// header is represented by an index (for the name) and a literal (for</span>
-    <span class='doccomment'>/// the value).</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_name_indexed_value_not</span>() {
+    <span class="doccomment">/// Tests that when a header name is indexed, but the value isn&#39;t, the</span>
+    <span class="doccomment">/// header is represented by an index (for the name) and a literal (for</span>
+    <span class="doccomment">/// the value).</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_name_indexed_value_not</span>() {
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>: <span class='ident'>Encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-            <span class='comment'>// `:method` is in the static table, but only for GET and POST</span>
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-                (<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;PUT&quot;</span>.<span class='ident'>to_vec</span>()),
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+            <span class="comment">// `:method` is in the static table, but only for GET and POST</span>
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+                (<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;PUT&quot;</span>.<span class="ident">to_vec</span>()),
             ];
 
-            <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-            <span class='comment'>// The first byte represents the index in the header table: last</span>
-            <span class='comment'>// occurrence of `:method` is at index 3.</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>result</span>[<span class='number'>0</span>], <span class='number'>3</span>);
-            <span class='comment'>// The rest of it correctly represents PUT?</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>result</span>[<span class='number'>1</span>..], <span class='kw-2'>&amp;</span>[<span class='number'>3</span>, <span class='string'>b&#39;P&#39;</span>, <span class='string'>b&#39;U&#39;</span>, <span class='string'>b&#39;T&#39;</span>]);
+            <span class="comment">// The first byte represents the index in the header table: last</span>
+            <span class="comment">// occurrence of `:method` is at index 3.</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>[<span class="number">0</span>], <span class="number">3</span>);
+            <span class="comment">// The rest of it correctly represents PUT?</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>[<span class="number">1</span>..], <span class="kw-2">&amp;</span>[<span class="number">3</span>, <span class="string">b&#39;P&#39;</span>, <span class="string">b&#39;U&#39;</span>, <span class="string">b&#39;T&#39;</span>]);
         }
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span>: <span class='ident'>Encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-            <span class='comment'>// `:method` is in the static table, but only for GET and POST</span>
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-                (<span class='string'>b&quot;:authority&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;example.com&quot;</span>.<span class='ident'>to_vec</span>()),
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">Encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+            <span class="comment">// `:method` is in the static table, but only for GET and POST</span>
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+                (<span class="string">b&quot;:authority&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;example.com&quot;</span>.<span class="ident">to_vec</span>()),
             ];
 
-            <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>result</span>[<span class='number'>0</span>], <span class='number'>1</span>);
-            <span class='comment'>// The rest of it correctly represents PUT?</span>
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(
-                <span class='kw-2'>&amp;</span><span class='ident'>result</span>[<span class='number'>1</span>..],
-                <span class='kw-2'>&amp;</span>[<span class='number'>11</span>, <span class='string'>b&#39;e&#39;</span>, <span class='string'>b&#39;x&#39;</span>, <span class='string'>b&#39;a&#39;</span>, <span class='string'>b&#39;m&#39;</span>, <span class='string'>b&#39;p&#39;</span>, <span class='string'>b&#39;l&#39;</span>, <span class='string'>b&#39;e&#39;</span>, <span class='string'>b&#39;.&#39;</span>, <span class='string'>b&#39;c&#39;</span>, <span class='string'>b&#39;o&#39;</span>, <span class='string'>b&#39;m&#39;</span>])
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">result</span>[<span class="number">0</span>], <span class="number">1</span>);
+            <span class="comment">// The rest of it correctly represents PUT?</span>
+            <span class="macro">assert_eq</span><span class="macro">!</span>(
+                <span class="kw-2">&amp;</span><span class="ident">result</span>[<span class="number">1</span>..],
+                <span class="kw-2">&amp;</span>[<span class="number">11</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;.&#39;</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;m&#39;</span>])
         }
     }
 
-    <span class='doccomment'>/// Tests that multiple headers are correctly encoded (i.e. can be decoded</span>
-    <span class='doccomment'>/// back to their original representation).</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_multiple_headers_encoded</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encoder</span> <span class='op'>=</span> <span class='ident'>Encoder</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            (<span class='string'>b&quot;custom-key&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;custom-value&quot;</span>.<span class='ident'>to_vec</span>()),
-            (<span class='string'>b&quot;:method&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;GET&quot;</span>.<span class='ident'>to_vec</span>()),
-            (<span class='string'>b&quot;:path&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;/some/path&quot;</span>.<span class='ident'>to_vec</span>()),
+    <span class="doccomment">/// Tests that multiple headers are correctly encoded (i.e. can be decoded</span>
+    <span class="doccomment">/// back to their original representation).</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_multiple_headers_encoded</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Encoder</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            (<span class="string">b&quot;custom-key&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;custom-value&quot;</span>.<span class="ident">to_vec</span>()),
+            (<span class="string">b&quot;:method&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;GET&quot;</span>.<span class="ident">to_vec</span>()),
+            (<span class="string">b&quot;:path&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;/some/path&quot;</span>.<span class="ident">to_vec</span>()),
         ];
 
-        <span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>encoder</span>.<span class='ident'>encode</span>(<span class='kw-2'>&amp;</span><span class='ident'>headers</span>);
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>);
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>is_decodable</span>(<span class='kw-2'>&amp;</span><span class='ident'>result</span>, <span class='kw-2'>&amp;</span><span class='ident'>headers</span>));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">is_decodable</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">headers</span>));
     }
 }
 </pre>
@@ -839,18 +851,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -883,7 +899,6 @@
         window.rootPath = "../../";
         window.currentCrate = "hpack";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

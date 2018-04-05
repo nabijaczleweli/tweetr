@@ -9,14 +9,18 @@
 
     <title>crypto::symmetriccipher::Decryptor - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>symmetriccipher</a></p><script>window.sidebarCurrent = {name: 'Decryptor', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Trait Decryptor</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#required-methods">Required Methods</a><div class="sidebar-links"><a href="#tymethod.decrypt">decrypt</a></div><a class="sidebar-title" href="#foreign-impls">Implementations on Foreign Types</a><div class="sidebar-links"><a href="#impl-Decryptor">Box&lt;SynchronousStreamCipher + &#39;static&gt;</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>symmetriccipher</a></p><script>window.sidebarCurrent = {name: 'Decryptor', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,30 +54,39 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>symmetriccipher</a>::<wbr><a class='trait' href=''>Decryptor</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>symmetriccipher</a>::<wbr><a class="trait" href=''>Decryptor</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-5064' class='srclink' href='../../src/crypto/symmetriccipher.rs.html#41-44' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/crypto/symmetriccipher.rs.html#41-44' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Decryptor {
-    fn <a href='#tymethod.decrypt' class='fnname'>decrypt</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input: &amp;mut <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output: &amp;mut <a class='struct' href='../../crypto/buffer/struct.RefWriteBuffer.html' title='crypto::buffer::RefWriteBuffer'>RefWriteBuffer</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eof: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='../../crypto/buffer/enum.BufferResult.html' title='crypto::buffer::BufferResult'>BufferResult</a>, <a class='enum' href='../../crypto/symmetriccipher/enum.SymmetricCipherError.html' title='crypto::symmetriccipher::SymmetricCipherError'>SymmetricCipherError</a>&gt;;
+    fn <a href='#tymethod.decrypt' class='fnname'>decrypt</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;input: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefWriteBuffer.html" title="struct crypto::buffer::RefWriteBuffer">RefWriteBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;eof: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a><br>&nbsp;&nbsp;&nbsp;&nbsp;) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="enum" href="../../crypto/buffer/enum.BufferResult.html" title="enum crypto::buffer::BufferResult">BufferResult</a>, <a class="enum" href="../../crypto/symmetriccipher/enum.SymmetricCipherError.html" title="enum crypto::symmetriccipher::SymmetricCipherError">SymmetricCipherError</a>&gt;;
 }</pre>
-            <h2 id='required-methods'>Required Methods</h2>
+            <h2 id='required-methods' class='small-section-header'>
+              Required Methods<a href='#required-methods' class='anchor'></a>
+            </h2>
             <div class='methods'>
-        <h3 id='tymethod.decrypt' class='method stab '><span id='decrypt.v' class='invisible'><code>fn <a href='#tymethod.decrypt' class='fnname'>decrypt</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; input: &amp;mut <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output: &amp;mut <a class='struct' href='../../crypto/buffer/struct.RefWriteBuffer.html' title='crypto::buffer::RefWriteBuffer'>RefWriteBuffer</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; eof: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='enum' href='../../crypto/buffer/enum.BufferResult.html' title='crypto::buffer::BufferResult'>BufferResult</a>, <a class='enum' href='../../crypto/symmetriccipher/enum.SymmetricCipherError.html' title='crypto::symmetriccipher::SymmetricCipherError'>SymmetricCipherError</a>&gt;</code></span></h3></div>
-        <h2 id='implementors'>Implementors</h2>
+        <h3 id='tymethod.decrypt' class='method'><span id='decrypt.v' class='invisible'><code>fn <a href='#tymethod.decrypt' class='fnname'>decrypt</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;input: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;output: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefWriteBuffer.html" title="struct crypto::buffer::RefWriteBuffer">RefWriteBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;eof: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a><br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="enum" href="../../crypto/buffer/enum.BufferResult.html" title="enum crypto::buffer::BufferResult">BufferResult</a>, <a class="enum" href="../../crypto/symmetriccipher/enum.SymmetricCipherError.html" title="enum crypto::symmetriccipher::SymmetricCipherError">SymmetricCipherError</a>&gt;</code></span></h3></div>
+                <h2 id='foreign-impls' class='small-section-header'>
+                  Implementations on Foreign Types<a href='#foreign-impls' class='anchor'></a>
+                </h2>
+            <h3 id='impl-Decryptor' class='impl'><span class='in-band'><code>impl <a class="trait" href="../../crypto/symmetriccipher/trait.Decryptor.html" title="trait crypto::symmetriccipher::Decryptor">Decryptor</a> for <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="trait" href="../../crypto/symmetriccipher/trait.SynchronousStreamCipher.html" title="trait crypto::symmetriccipher::SynchronousStreamCipher">SynchronousStreamCipher</a> + 'static&gt;</code><a href='#impl-Decryptor' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/symmetriccipher.rs.html#65-70' title='goto source code'>[src]</a></span></h3>
+<span class='docblock autohide'><div class='impl-items'><h4 id='method.decrypt' class="method"><span id='decrypt.v-1' class='invisible'><code>fn <a href='#method.decrypt' class='fnname'>decrypt</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;input: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;output: &amp;mut <a class="struct" href="../../crypto/buffer/struct.RefWriteBuffer.html" title="struct crypto::buffer::RefWriteBuffer">RefWriteBuffer</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a><br>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="enum" href="../../crypto/buffer/enum.BufferResult.html" title="enum crypto::buffer::BufferResult">BufferResult</a>, <a class="enum" href="../../crypto/symmetriccipher/enum.SymmetricCipherError.html" title="enum crypto::symmetriccipher::SymmetricCipherError">SymmetricCipherError</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/crypto/symmetriccipher.rs.html#66-69' title='goto source code'>[src]</a></span></h4>
+</div></span>
+        <h2 id='implementors' class='small-section-header'>
+          Implementors<a href='#implementors' class='anchor'></a>
+        </h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;T:&nbsp;<a class='trait' href='../../crypto/symmetriccipher/trait.BlockDecryptor.html' title='crypto::symmetriccipher::BlockDecryptor'>BlockDecryptor</a>, X:&nbsp;<a class='trait' href='../../crypto/blockmodes/trait.PaddingProcessor.html' title='crypto::blockmodes::PaddingProcessor'>PaddingProcessor</a>&gt; Decryptor for <a class='struct' href='../../crypto/blockmodes/struct.EcbDecryptor.html' title='crypto::blockmodes::EcbDecryptor'>EcbDecryptor</a>&lt;T, X&gt;</code></li>
-<li><code>impl&lt;T:&nbsp;<a class='trait' href='../../crypto/symmetriccipher/trait.BlockDecryptor.html' title='crypto::symmetriccipher::BlockDecryptor'>BlockDecryptor</a>, X:&nbsp;<a class='trait' href='../../crypto/blockmodes/trait.PaddingProcessor.html' title='crypto::blockmodes::PaddingProcessor'>PaddingProcessor</a>&gt; Decryptor for <a class='struct' href='../../crypto/blockmodes/struct.CbcDecryptor.html' title='crypto::blockmodes::CbcDecryptor'>CbcDecryptor</a>&lt;T, X&gt;</code></li>
-<li><code>impl&lt;A:&nbsp;<a class='trait' href='../../crypto/symmetriccipher/trait.BlockEncryptor.html' title='crypto::symmetriccipher::BlockEncryptor'>BlockEncryptor</a>&gt; Decryptor for <a class='struct' href='../../crypto/blockmodes/struct.CtrMode.html' title='crypto::blockmodes::CtrMode'>CtrMode</a>&lt;A&gt;</code></li>
-<li><code>impl&lt;A:&nbsp;<a class='trait' href='../../crypto/symmetriccipher/trait.BlockEncryptorX8.html' title='crypto::symmetriccipher::BlockEncryptorX8'>BlockEncryptorX8</a>&gt; Decryptor for <a class='struct' href='../../crypto/blockmodes/struct.CtrModeX8.html' title='crypto::blockmodes::CtrModeX8'>CtrModeX8</a>&lt;A&gt;</code></li>
-<li><code>impl Decryptor for <a class='struct' href='../../crypto/chacha20/struct.ChaCha20.html' title='crypto::chacha20::ChaCha20'>ChaCha20</a></code></li>
-<li><code>impl Decryptor for <a class='struct' href='../../crypto/hc128/struct.Hc128.html' title='crypto::hc128::Hc128'>Hc128</a></code></li>
-<li><code>impl Decryptor for <a class='struct' href='../../crypto/rc4/struct.Rc4.html' title='crypto::rc4::Rc4'>Rc4</a></code></li>
-<li><code>impl Decryptor for <a class='struct' href='../../crypto/salsa20/struct.Salsa20.html' title='crypto::salsa20::Salsa20'>Salsa20</a></code></li>
-<li><code>impl Decryptor for <a class='struct' href='../../crypto/sosemanuk/struct.Sosemanuk.html' title='crypto::sosemanuk::Sosemanuk'>Sosemanuk</a></code></li>
-<li><code>impl Decryptor for <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../crypto/symmetriccipher/trait.SynchronousStreamCipher.html' title='crypto::symmetriccipher::SynchronousStreamCipher'>SynchronousStreamCipher</a> + 'static&gt;</code></li>
+    <li><div class='out-of-band'><a class='srclink' href='../../src/crypto/blockmodes.rs.html#560-565' title='goto source code'>[src]</a></div><code>impl&lt;T:&nbsp;<a class="trait" href="../../crypto/symmetriccipher/trait.BlockDecryptor.html" title="trait crypto::symmetriccipher::BlockDecryptor">BlockDecryptor</a>, X:&nbsp;<a class="trait" href="../../crypto/blockmodes/trait.PaddingProcessor.html" title="trait crypto::blockmodes::PaddingProcessor">PaddingProcessor</a>&gt; Decryptor for <a class="struct" href="../../crypto/blockmodes/struct.EcbDecryptor.html" title="struct crypto::blockmodes::EcbDecryptor">EcbDecryptor</a>&lt;T, X&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/blockmodes.rs.html#656-661' title='goto source code'>[src]</a></div><code>impl&lt;T:&nbsp;<a class="trait" href="../../crypto/symmetriccipher/trait.BlockDecryptor.html" title="trait crypto::symmetriccipher::BlockDecryptor">BlockDecryptor</a>, X:&nbsp;<a class="trait" href="../../crypto/blockmodes/trait.PaddingProcessor.html" title="trait crypto::blockmodes::PaddingProcessor">PaddingProcessor</a>&gt; Decryptor for <a class="struct" href="../../crypto/blockmodes/struct.CbcDecryptor.html" title="struct crypto::blockmodes::CbcDecryptor">CbcDecryptor</a>&lt;T, X&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/blockmodes.rs.html#730-735' title='goto source code'>[src]</a></div><code>impl&lt;A:&nbsp;<a class="trait" href="../../crypto/symmetriccipher/trait.BlockEncryptor.html" title="trait crypto::symmetriccipher::BlockEncryptor">BlockEncryptor</a>&gt; Decryptor for <a class="struct" href="../../crypto/blockmodes/struct.CtrMode.html" title="struct crypto::blockmodes::CtrMode">CtrMode</a>&lt;A&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/blockmodes.rs.html#805-810' title='goto source code'>[src]</a></div><code>impl&lt;A:&nbsp;<a class="trait" href="../../crypto/symmetriccipher/trait.BlockEncryptorX8.html" title="trait crypto::symmetriccipher::BlockEncryptorX8">BlockEncryptorX8</a>&gt; Decryptor for <a class="struct" href="../../crypto/blockmodes/struct.CtrModeX8.html" title="struct crypto::blockmodes::CtrModeX8">CtrModeX8</a>&lt;A&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/chacha20.rs.html#270-275' title='goto source code'>[src]</a></div><code>impl Decryptor for <a class="struct" href="../../crypto/chacha20/struct.ChaCha20.html" title="struct crypto::chacha20::ChaCha20">ChaCha20</a></code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/hc128.rs.html#173-178' title='goto source code'>[src]</a></div><code>impl Decryptor for <a class="struct" href="../../crypto/hc128/struct.Hc128.html" title="struct crypto::hc128::Hc128">Hc128</a></code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/rc4.rs.html#64-69' title='goto source code'>[src]</a></div><code>impl Decryptor for <a class="struct" href="../../crypto/rc4/struct.Rc4.html" title="struct crypto::rc4::Rc4">Rc4</a></code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/salsa20.rs.html#241-246' title='goto source code'>[src]</a></div><code>impl Decryptor for <a class="struct" href="../../crypto/salsa20/struct.Salsa20.html" title="struct crypto::salsa20::Salsa20">Salsa20</a></code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/sosemanuk.rs.html#2322-2327' title='goto source code'>[src]</a></div><code>impl Decryptor for <a class="struct" href="../../crypto/sosemanuk/struct.Sosemanuk.html" title="struct crypto::sosemanuk::Sosemanuk">Sosemanuk</a></code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/crypto/symmetriccipher/trait.Decryptor.js">
                  </script></section>
@@ -81,18 +102,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -125,7 +150,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

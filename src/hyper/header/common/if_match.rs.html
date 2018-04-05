@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/if_match.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/if_match.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>if_match.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -111,76 +123,76 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>EntityTag</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">header</span>::<span class="ident">EntityTag</span>;
 
-<span class='macro'>header</span><span class='macro'>!</span> {
-    <span class='doccomment'>/// `If-Match` header, defined in</span>
-    <span class='doccomment'>/// [RFC7232](https://tools.ietf.org/html/rfc7232#section-3.1)</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `If-Match` header field makes the request method conditional on</span>
-    <span class='doccomment'>/// the recipient origin server either having at least one current</span>
-    <span class='doccomment'>/// representation of the target resource, when the field-value is &quot;*&quot;,</span>
-    <span class='doccomment'>/// or having a current representation of the target resource that has an</span>
-    <span class='doccomment'>/// entity-tag matching a member of the list of entity-tags provided in</span>
-    <span class='doccomment'>/// the field-value.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// An origin server MUST use the strong comparison function when</span>
-    <span class='doccomment'>/// comparing entity-tags for `If-Match`, since the client</span>
-    <span class='doccomment'>/// intends this precondition to prevent the method from being applied if</span>
-    <span class='doccomment'>/// there have been any changes to the representation data.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # ABNF</span>
-    <span class='doccomment'>/// ```plain</span>
-    <span class='doccomment'>/// If-Match = &quot;*&quot; / 1#entity-tag</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Example values</span>
-    <span class='doccomment'>/// * `&quot;xyzzy&quot;`</span>
-    <span class='doccomment'>/// * &quot;xyzzy&quot;, &quot;r2d2xxxx&quot;, &quot;c3piozzzz&quot;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, IfMatch};</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// headers.set(IfMatch::Any);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, IfMatch, EntityTag};</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     IfMatch::Items(vec![</span>
-    <span class='doccomment'>///         EntityTag::new(false, &quot;xyzzy&quot;.to_owned()),</span>
-    <span class='doccomment'>///         EntityTag::new(false, &quot;foobar&quot;.to_owned()),</span>
-    <span class='doccomment'>///         EntityTag::new(false, &quot;bazquux&quot;.to_owned()),</span>
-    <span class='doccomment'>///     ])</span>
-    <span class='doccomment'>/// );</span>
-    <span class='doccomment'>/// ```</span>
-    (<span class='ident'>IfMatch</span>, <span class='string'>&quot;If-Match&quot;</span>) <span class='op'>=&gt;</span> {<span class='ident'>Any</span> <span class='op'>/</span> (<span class='ident'>EntityTag</span>)<span class='op'>+</span>}
+<span class="macro">header</span><span class="macro">!</span> {
+    <span class="doccomment">/// `If-Match` header, defined in</span>
+    <span class="doccomment">/// [RFC7232](https://tools.ietf.org/html/rfc7232#section-3.1)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `If-Match` header field makes the request method conditional on</span>
+    <span class="doccomment">/// the recipient origin server either having at least one current</span>
+    <span class="doccomment">/// representation of the target resource, when the field-value is &quot;*&quot;,</span>
+    <span class="doccomment">/// or having a current representation of the target resource that has an</span>
+    <span class="doccomment">/// entity-tag matching a member of the list of entity-tags provided in</span>
+    <span class="doccomment">/// the field-value.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// An origin server MUST use the strong comparison function when</span>
+    <span class="doccomment">/// comparing entity-tags for `If-Match`, since the client</span>
+    <span class="doccomment">/// intends this precondition to prevent the method from being applied if</span>
+    <span class="doccomment">/// there have been any changes to the representation data.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # ABNF</span>
+    <span class="doccomment">/// ```plain</span>
+    <span class="doccomment">/// If-Match = &quot;*&quot; / 1#entity-tag</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example values</span>
+    <span class="doccomment">/// * `&quot;xyzzy&quot;`</span>
+    <span class="doccomment">/// * &quot;xyzzy&quot;, &quot;r2d2xxxx&quot;, &quot;c3piozzzz&quot;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use hyper::header::{Headers, IfMatch};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// headers.set(IfMatch::Any);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use hyper::header::{Headers, IfMatch, EntityTag};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// headers.set(</span>
+    <span class="doccomment">///     IfMatch::Items(vec![</span>
+    <span class="doccomment">///         EntityTag::new(false, &quot;xyzzy&quot;.to_owned()),</span>
+    <span class="doccomment">///         EntityTag::new(false, &quot;foobar&quot;.to_owned()),</span>
+    <span class="doccomment">///         EntityTag::new(false, &quot;bazquux&quot;.to_owned()),</span>
+    <span class="doccomment">///     ])</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    (<span class="ident">IfMatch</span>, <span class="string">&quot;If-Match&quot;</span>) <span class="op">=&gt;</span> {<span class="ident">Any</span> <span class="op">/</span> (<span class="ident">EntityTag</span>)<span class="op">+</span>}
 
-    <span class='ident'>test_if_match</span> {
-        <span class='macro'>test_header</span><span class='macro'>!</span>(
-            <span class='ident'>test1</span>,
-            <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;\&quot;xyzzy\&quot;&quot;</span>],
-            <span class='prelude-val'>Some</span>(<span class='ident'>HeaderField</span>::<span class='ident'>Items</span>(
-                <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>EntityTag</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>, <span class='string'>&quot;xyzzy&quot;</span>.<span class='ident'>to_owned</span>())])));
-        <span class='macro'>test_header</span><span class='macro'>!</span>(
-            <span class='ident'>test2</span>,
-            <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;\&quot;xyzzy\&quot;, \&quot;r2d2xxxx\&quot;, \&quot;c3piozzzz\&quot;&quot;</span>],
-            <span class='prelude-val'>Some</span>(<span class='ident'>HeaderField</span>::<span class='ident'>Items</span>(
-                <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>EntityTag</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>, <span class='string'>&quot;xyzzy&quot;</span>.<span class='ident'>to_owned</span>()),
-                     <span class='ident'>EntityTag</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>, <span class='string'>&quot;r2d2xxxx&quot;</span>.<span class='ident'>to_owned</span>()),
-                     <span class='ident'>EntityTag</span>::<span class='ident'>new</span>(<span class='bool-val'>false</span>, <span class='string'>&quot;c3piozzzz&quot;</span>.<span class='ident'>to_owned</span>())])));
-        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>test3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;*&quot;</span>], <span class='prelude-val'>Some</span>(<span class='ident'>IfMatch</span>::<span class='ident'>Any</span>));
+    <span class="ident">test_if_match</span> {
+        <span class="macro">test_header</span><span class="macro">!</span>(
+            <span class="ident">test1</span>,
+            <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;\&quot;xyzzy\&quot;&quot;</span>],
+            <span class="prelude-val">Some</span>(<span class="ident">HeaderField</span>::<span class="ident">Items</span>(
+                <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">EntityTag</span>::<span class="ident">new</span>(<span class="bool-val">false</span>, <span class="string">&quot;xyzzy&quot;</span>.<span class="ident">to_owned</span>())])));
+        <span class="macro">test_header</span><span class="macro">!</span>(
+            <span class="ident">test2</span>,
+            <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;\&quot;xyzzy\&quot;, \&quot;r2d2xxxx\&quot;, \&quot;c3piozzzz\&quot;&quot;</span>],
+            <span class="prelude-val">Some</span>(<span class="ident">HeaderField</span>::<span class="ident">Items</span>(
+                <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">EntityTag</span>::<span class="ident">new</span>(<span class="bool-val">false</span>, <span class="string">&quot;xyzzy&quot;</span>.<span class="ident">to_owned</span>()),
+                     <span class="ident">EntityTag</span>::<span class="ident">new</span>(<span class="bool-val">false</span>, <span class="string">&quot;r2d2xxxx&quot;</span>.<span class="ident">to_owned</span>()),
+                     <span class="ident">EntityTag</span>::<span class="ident">new</span>(<span class="bool-val">false</span>, <span class="string">&quot;c3piozzzz&quot;</span>.<span class="ident">to_owned</span>())])));
+        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">test3</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;*&quot;</span>], <span class="prelude-val">Some</span>(<span class="ident">IfMatch</span>::<span class="ident">Any</span>));
     }
 }
 
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>star</span>, <span class='ident'>IfMatch</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;*&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>single</span> , <span class='ident'>IfMatch</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;\&quot;xyzzy\&quot;&quot;</span>.<span class='ident'>to_vec</span>()] });
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>multi</span>, <span class='ident'>IfMatch</span>,
-              { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;\&quot;xyzzy\&quot;, \&quot;r2d2xxxx\&quot;, \&quot;c3piozzzz\&quot;&quot;</span>.<span class='ident'>to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">star</span>, <span class="ident">IfMatch</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;*&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">single</span> , <span class="ident">IfMatch</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;\&quot;xyzzy\&quot;&quot;</span>.<span class="ident">to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">multi</span>, <span class="ident">IfMatch</span>,
+              { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;\&quot;xyzzy\&quot;, \&quot;r2d2xxxx\&quot;, \&quot;c3piozzzz\&quot;&quot;</span>.<span class="ident">to_vec</span>()] });
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -195,18 +207,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -239,7 +255,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

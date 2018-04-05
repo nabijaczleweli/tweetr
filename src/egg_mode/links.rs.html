@@ -9,14 +9,18 @@
 
     <title>links.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -95,59 +107,59 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-</pre><pre class='rust '>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>auth</span> {
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>REQUEST_TOKEN</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/oauth/request_token&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>ACCESS_TOKEN</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/oauth/access_token&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>AUTHORIZE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/oauth/authorize&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>AUTHENTICATE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/oauth/authenticate&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>VERIFY_CREDENTIALS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/account/verify_credentials.json&quot;</span>;
+</pre><pre class="rust ">
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">auth</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REQUEST_TOKEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/oauth/request_token&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ACCESS_TOKEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/oauth/access_token&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AUTHORIZE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/oauth/authorize&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AUTHENTICATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/oauth/authenticate&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERIFY_CREDENTIALS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/account/verify_credentials.json&quot;</span>;
 }
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>users</span> {
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>LOOKUP</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/users/lookup.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SHOW</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/users/show.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SEARCH</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/users/search.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDS_LIST</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friends/list.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDS_IDS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friends/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FOLLOWERS_LIST</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/followers/list.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FOLLOWERS_IDS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/followers/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>BLOCKS_LIST</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/blocks/list.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>BLOCKS_IDS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/blocks/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MUTES_LIST</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/mutes/users/list.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MUTES_IDS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/mutes/users/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FOLLOW</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/create.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UNFOLLOW</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/destroy.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDSHIPS_INCOMING</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/incoming.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDSHIPS_OUTGOING</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/outgoing.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDSHIP_SHOW</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/show.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDSHIP_UPDATE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/update.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDS_NO_RETWEETS</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/no_retweets/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FRIENDSHIP_LOOKUP</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/friendships/lookup.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>BLOCK</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/blocks/create.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UNBLOCK</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/blocks/destroy.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>REPORT_SPAM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/users/report_spam.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MUTE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/mutes/users/create.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UNMUTE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/mutes/users/destroy.json&quot;</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">users</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LOOKUP</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/users/lookup.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHOW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/users/show.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SEARCH</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/users/search.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDS_LIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friends/list.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDS_IDS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friends/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FOLLOWERS_LIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/followers/list.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FOLLOWERS_IDS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/followers/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLOCKS_LIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/blocks/list.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLOCKS_IDS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/blocks/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MUTES_LIST</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/mutes/users/list.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MUTES_IDS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/mutes/users/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FOLLOW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/create.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNFOLLOW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/destroy.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDSHIPS_INCOMING</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/incoming.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDSHIPS_OUTGOING</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/outgoing.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDSHIP_SHOW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/show.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDSHIP_UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/update.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDS_NO_RETWEETS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/no_retweets/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FRIENDSHIP_LOOKUP</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/friendships/lookup.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLOCK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/blocks/create.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNBLOCK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/blocks/destroy.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REPORT_SPAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/users/report_spam.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MUTE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/mutes/users/create.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNMUTE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/mutes/users/destroy.json&quot;</span>;
 }
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>statuses</span> {
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SHOW</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/show.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>RETWEETS_OF_STEM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/retweets&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>LOOKUP</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/lookup.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>HOME_TIMELINE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/home_timeline.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MENTIONS_TIMELINE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/mentions_timeline.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>USER_TIMELINE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/user_timeline.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>RETWEETS_OF_ME</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/retweets_of_me.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>RETWEETERS_OF</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/retweeters/ids.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>LIKES_OF</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/favorites/list.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SEARCH</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/search/tweets.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>RETWEET_STEM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/retweet&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UNRETWEET_STEM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/unretweet&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>LIKE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/favorites/create.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UNLIKE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/favorites/destroy.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>UPDATE</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/update.json&quot;</span>;
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>DELETE_STEM</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;https://api.twitter.com/1.1/statuses/destroy&quot;</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">statuses</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHOW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/show.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RETWEETS_OF_STEM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/retweets&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LOOKUP</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/lookup.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HOME_TIMELINE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/home_timeline.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MENTIONS_TIMELINE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/mentions_timeline.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_TIMELINE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/user_timeline.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RETWEETS_OF_ME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/retweets_of_me.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RETWEETERS_OF</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/retweeters/ids.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIKES_OF</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/favorites/list.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SEARCH</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/search/tweets.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RETWEET_STEM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/retweet&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNRETWEET_STEM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/unretweet&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIKE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/favorites/create.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNLIKE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/favorites/destroy.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UPDATE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/update.json&quot;</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE_STEM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;https://api.twitter.com/1.1/statuses/destroy&quot;</span>;
 }
 </pre>
 </section>
@@ -163,18 +175,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -207,7 +223,6 @@
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

@@ -9,14 +9,18 @@
 
     <title>hmac.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -559,522 +571,522 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
-</pre><pre class='rust '>
-<span class='comment'>// Copyright 2013 Jack Lloyd</span>
-<span class='comment'>//</span>
-<span class='comment'>// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
-<span class='comment'>// you may not use this file except in compliance with the License.</span>
-<span class='comment'>// You may obtain a copy of the License at</span>
-<span class='comment'>//</span>
-<span class='comment'>//     http://www.apache.org/licenses/LICENSE-2.0</span>
-<span class='comment'>//</span>
-<span class='comment'>// Unless required by applicable law or agreed to in writing, software</span>
-<span class='comment'>// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class='comment'>// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class='comment'>// See the License for the specific language governing permissions and</span>
-<span class='comment'>// limitations under the License.</span>
-<span class='comment'>//</span>
+</pre><pre class="rust ">
+<span class="comment">// Copyright 2013 Jack Lloyd</span>
+<span class="comment">//</span>
+<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="comment">// you may not use this file except in compliance with the License.</span>
+<span class="comment">// You may obtain a copy of the License at</span>
+<span class="comment">//</span>
+<span class="comment">//     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="comment">//</span>
+<span class="comment">// Unless required by applicable law or agreed to in writing, software</span>
+<span class="comment">// distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="comment">// See the License for the specific language governing permissions and</span>
+<span class="comment">// limitations under the License.</span>
+<span class="comment">//</span>
 
-<span class='kw'>use</span> <span class='ident'>libc</span>::{<span class='ident'>c_int</span>, <span class='ident'>c_uint</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+<span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">c_int</span>, <span class="ident">c_uint</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-<span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>hash</span>::<span class='ident'>Type</span>;
-<span class='kw'>use</span> <span class='ident'>ffi</span>;
-<span class='kw'>use</span> <span class='ident'>ffi_extras</span>;
+<span class="kw">use</span> <span class="ident">crypto</span>::<span class="ident">hash</span>::<span class="ident">Type</span>;
+<span class="kw">use</span> <span class="ident">ffi</span>;
+<span class="kw">use</span> <span class="ident">ffi_extras</span>;
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='kw'>enum</span> <span class='ident'>State</span> {
-    <span class='ident'>Reset</span>,
-    <span class='ident'>Updated</span>,
-    <span class='ident'>Finalized</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">enum</span> <span class="ident">State</span> {
+    <span class="ident">Reset</span>,
+    <span class="ident">Updated</span>,
+    <span class="ident">Finalized</span>,
 }
 
-<span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>State</span>::<span class='op'>*</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">State</span>::<span class="kw-2">*</span>;
 
-<span class='doccomment'>/// Provides HMAC computation.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Calculate a HMAC in one go.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use openssl::crypto::hash::Type;</span>
-<span class='doccomment'>/// use openssl::crypto::hmac::hmac;</span>
-<span class='doccomment'>/// let key = b&quot;Jefe&quot;;</span>
-<span class='doccomment'>/// let data = b&quot;what do ya want for nothing?&quot;;</span>
-<span class='doccomment'>/// let spec = b&quot;\x75\x0c\x78\x3e\x6a\xb0\xb5\x03\xea\xa8\x6e\x31\x0a\x5d\xb7\x38&quot;;</span>
-<span class='doccomment'>/// let res = hmac(Type::MD5, key, data);</span>
-<span class='doccomment'>/// assert_eq!(res, spec);</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Use the `Write` trait to supply the input in chunks.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use std::io::prelude::*;</span>
-<span class='doccomment'>/// use openssl::crypto::hash::Type;</span>
-<span class='doccomment'>/// use openssl::crypto::hmac::HMAC;</span>
-<span class='doccomment'>/// let key = b&quot;Jefe&quot;;</span>
-<span class='doccomment'>/// let data: &amp;[&amp;[u8]] = &amp;[b&quot;what do ya &quot;, b&quot;want for nothing?&quot;];</span>
-<span class='doccomment'>/// let spec = b&quot;\x75\x0c\x78\x3e\x6a\xb0\xb5\x03\xea\xa8\x6e\x31\x0a\x5d\xb7\x38&quot;;</span>
-<span class='doccomment'>/// let mut h = HMAC::new(Type::MD5, &amp;*key);</span>
-<span class='doccomment'>/// h.write_all(data[0]);</span>
-<span class='doccomment'>/// h.write_all(data[1]);</span>
-<span class='doccomment'>/// let res = h.finish();</span>
-<span class='doccomment'>/// assert_eq!(res, spec);</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HMAC</span> {
-    <span class='ident'>ctx</span>: <span class='ident'>ffi</span>::<span class='ident'>HMAC_CTX</span>,
-    <span class='ident'>type_</span>: <span class='ident'>Type</span>,
-    <span class='ident'>state</span>: <span class='ident'>State</span>,
+<span class="doccomment">/// Provides HMAC computation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Calculate a HMAC in one go.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use openssl::crypto::hash::Type;</span>
+<span class="doccomment">/// use openssl::crypto::hmac::hmac;</span>
+<span class="doccomment">/// let key = b&quot;Jefe&quot;;</span>
+<span class="doccomment">/// let data = b&quot;what do ya want for nothing?&quot;;</span>
+<span class="doccomment">/// let spec = b&quot;\x75\x0c\x78\x3e\x6a\xb0\xb5\x03\xea\xa8\x6e\x31\x0a\x5d\xb7\x38&quot;;</span>
+<span class="doccomment">/// let res = hmac(Type::MD5, key, data);</span>
+<span class="doccomment">/// assert_eq!(res, spec);</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Use the `Write` trait to supply the input in chunks.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use std::io::prelude::*;</span>
+<span class="doccomment">/// use openssl::crypto::hash::Type;</span>
+<span class="doccomment">/// use openssl::crypto::hmac::HMAC;</span>
+<span class="doccomment">/// let key = b&quot;Jefe&quot;;</span>
+<span class="doccomment">/// let data: &amp;[&amp;[u8]] = &amp;[b&quot;what do ya &quot;, b&quot;want for nothing?&quot;];</span>
+<span class="doccomment">/// let spec = b&quot;\x75\x0c\x78\x3e\x6a\xb0\xb5\x03\xea\xa8\x6e\x31\x0a\x5d\xb7\x38&quot;;</span>
+<span class="doccomment">/// let mut h = HMAC::new(Type::MD5, &amp;*key);</span>
+<span class="doccomment">/// h.write_all(data[0]);</span>
+<span class="doccomment">/// h.write_all(data[1]);</span>
+<span class="doccomment">/// let res = h.finish();</span>
+<span class="doccomment">/// assert_eq!(res, spec);</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HMAC</span> {
+    <span class="ident">ctx</span>: <span class="ident">ffi</span>::<span class="ident">HMAC_CTX</span>,
+    <span class="ident">type_</span>: <span class="ident">Type</span>,
+    <span class="ident">state</span>: <span class="ident">State</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>HMAC</span> {
-    <span class='doccomment'>/// Creates a new `HMAC` with the specified hash type using the `key`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>ty</span>: <span class='ident'>Type</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>HMAC</span> {
-        <span class='ident'>ffi</span>::<span class='ident'>init</span>();
+<span class="kw">impl</span> <span class="ident">HMAC</span> {
+    <span class="doccomment">/// Creates a new `HMAC` with the specified hash type using the `key`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ty</span>: <span class="ident">Type</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">HMAC</span> {
+        <span class="ident">ffi</span>::<span class="ident">init</span>();
 
-        <span class='kw'>let</span> <span class='ident'>ctx</span> <span class='op'>=</span> <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span> <span class='op'>=</span> ::<span class='ident'>std</span>::<span class='ident'>mem</span>::<span class='ident'>uninitialized</span>();
-            <span class='ident'>ffi</span>::<span class='ident'>HMAC_CTX_init</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ctx</span>);
-            <span class='ident'>ctx</span>
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">uninitialized</span>();
+            <span class="ident">ffi</span>::<span class="ident">HMAC_CTX_init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>);
+            <span class="ident">ctx</span>
         };
-        <span class='kw'>let</span> <span class='ident'>md</span> <span class='op'>=</span> <span class='ident'>ty</span>.<span class='ident'>evp_md</span>();
+        <span class="kw">let</span> <span class="ident">md</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">evp_md</span>();
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span> {
-            <span class='ident'>ctx</span>: <span class='ident'>ctx</span>,
-            <span class='ident'>type_</span>: <span class='ident'>ty</span>,
-            <span class='ident'>state</span>: <span class='ident'>Finalized</span>,
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span> {
+            <span class="ident">ctx</span>: <span class="ident">ctx</span>,
+            <span class="ident">type_</span>: <span class="ident">ty</span>,
+            <span class="ident">state</span>: <span class="ident">Finalized</span>,
         };
-        <span class='ident'>h</span>.<span class='ident'>init_once</span>(<span class='ident'>md</span>, <span class='ident'>key</span>);
-        <span class='ident'>h</span>
+        <span class="ident">h</span>.<span class="ident">init_once</span>(<span class="ident">md</span>, <span class="ident">key</span>);
+        <span class="ident">h</span>
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>init_once</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>md</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>ffi</span>::<span class='ident'>EVP_MD</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_Init_ex</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>,
-                                             <span class='ident'>key</span>.<span class='ident'>as_ptr</span>(),
-                                             <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_int</span>,
-                                             <span class='ident'>md</span>,
-                                             <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='number'>1</span>);
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">init_once</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">md</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">EVP_MD</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi_extras</span>::<span class="ident">HMAC_Init_ex</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>,
+                                             <span class="ident">key</span>.<span class="ident">as_ptr</span>(),
+                                             <span class="ident">key</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_int</span>,
+                                             <span class="ident">md</span>,
+                                             <span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">1</span>);
         }
-        <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>Reset</span>;
+        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">Reset</span>;
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>state</span> {
-            <span class='ident'>Reset</span> <span class='op'>=&gt;</span> <span class='kw'>return</span>,
-            <span class='ident'>Updated</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>finalize</span>();
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
+            <span class="ident">Reset</span> <span class="op">=&gt;</span> <span class="kw">return</span>,
+            <span class="ident">Updated</span> <span class="op">=&gt;</span> {
+                <span class="self">self</span>.<span class="ident">finalize</span>();
             }
-            <span class='ident'>Finalized</span> <span class='op'>=&gt;</span> (),
+            <span class="ident">Finalized</span> <span class="op">=&gt;</span> (),
         }
-        <span class='comment'>// If the key and/or md is not supplied it&#39;s reused from the last time</span>
-        <span class='comment'>// avoiding redundant initializations</span>
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_Init_ex</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>,
-                                             <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _,
-                                             <span class='number'>0</span>,
-                                             <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _,
-                                             <span class='number'>0</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> _);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='number'>1</span>);
+        <span class="comment">// If the key and/or md is not supplied it&#39;s reused from the last time</span>
+        <span class="comment">// avoiding redundant initializations</span>
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi_extras</span>::<span class="ident">HMAC_Init_ex</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>,
+                                             <span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _,
+                                             <span class="number">0</span>,
+                                             <span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _,
+                                             <span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> _);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">1</span>);
         }
-        <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>Reset</span>;
+        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">Reset</span>;
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>update</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>Finalized</span> {
-            <span class='self'>self</span>.<span class='ident'>init</span>();
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">Finalized</span> {
+            <span class="self">self</span>.<span class="ident">init</span>();
         }
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_Update</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>, <span class='ident'>data</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>data</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='number'>1</span>);
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi_extras</span>::<span class="ident">HMAC_Update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">c_uint</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">1</span>);
         }
-        <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>Updated</span>;
+        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">Updated</span>;
     }
 
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>finalize</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>==</span> <span class='ident'>Finalized</span> {
-            <span class='self'>self</span>.<span class='ident'>init</span>();
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">Finalized</span> {
+            <span class="self">self</span>.<span class="ident">init</span>();
         }
-        <span class='kw'>let</span> <span class='ident'>md_len</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>type_</span>.<span class='ident'>md_len</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='ident'>md_len</span>).<span class='ident'>collect</span>();
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='number'>0</span>;
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_Final</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>, <span class='ident'>res</span>.<span class='ident'>as_mut_ptr</span>(), <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
-            <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>=</span> <span class='ident'>Finalized</span>;
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>len</span> <span class='kw'>as</span> <span class='ident'>usize</span>, <span class='ident'>md_len</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='number'>1</span>);
+        <span class="kw">let</span> <span class="ident">md_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">type_</span>.<span class="ident">md_len</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="ident">md_len</span>).<span class="ident">collect</span>();
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi_extras</span>::<span class="ident">HMAC_Final</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">res</span>.<span class="ident">as_mut_ptr</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
+            <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">Finalized</span>;
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">md_len</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">1</span>);
         }
-        <span class='ident'>res</span>
+        <span class="ident">res</span>
     }
 
-    <span class='doccomment'>/// Returns the hash of the data written since creation or</span>
-    <span class='doccomment'>/// the last `finish` and resets the hasher.</span>
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>finish</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>finalize</span>()
-    }
-}
-
-<span class='kw'>impl</span> <span class='ident'>Write</span> <span class='kw'>for</span> <span class='ident'>HMAC</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>update</span>(<span class='ident'>buf</span>);
-        <span class='prelude-val'>Ok</span>(<span class='ident'>buf</span>.<span class='ident'>len</span>())
-    }
-
-    <span class='kw'>fn</span> <span class='ident'>flush</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='prelude-val'>Ok</span>(())
+    <span class="doccomment">/// Returns the hash of the data written since creation or</span>
+    <span class="doccomment">/// the last `finish` and resets the hasher.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">finalize</span>()
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>HMAC</span> {
-    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>HMAC</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ctx</span>: <span class='ident'>ffi</span>::<span class='ident'>HMAC_CTX</span>;
-        <span class='kw'>unsafe</span> {
-            <span class='ident'>ctx</span> <span class='op'>=</span> ::<span class='ident'>std</span>::<span class='ident'>mem</span>::<span class='ident'>uninitialized</span>();
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_CTX_copy</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ctx</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>ctx</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>r</span>, <span class='number'>1</span>);
+<span class="kw">impl</span> <span class="ident">Write</span> <span class="kw">for</span> <span class="ident">HMAC</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">buf</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">len</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">HMAC</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">HMAC</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span>: <span class="ident">ffi</span>::<span class="ident">HMAC_CTX</span>;
+        <span class="kw">unsafe</span> {
+            <span class="ident">ctx</span> <span class="op">=</span> ::<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">uninitialized</span>();
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi_extras</span>::<span class="ident">HMAC_CTX_copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ctx</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">r</span>, <span class="number">1</span>);
         }
-        <span class='ident'>HMAC</span> {
-            <span class='ident'>ctx</span>: <span class='ident'>ctx</span>,
-            <span class='ident'>type_</span>: <span class='self'>self</span>.<span class='ident'>type_</span>,
-            <span class='ident'>state</span>: <span class='self'>self</span>.<span class='ident'>state</span>,
+        <span class="ident">HMAC</span> {
+            <span class="ident">ctx</span>: <span class="ident">ctx</span>,
+            <span class="ident">type_</span>: <span class="self">self</span>.<span class="ident">type_</span>,
+            <span class="ident">state</span>: <span class="self">self</span>.<span class="ident">state</span>,
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>HMAC</span> {
-    <span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>unsafe</span> {
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>state</span> <span class='op'>!=</span> <span class='ident'>Finalized</span> {
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='self'>self</span>.<span class='ident'>type_</span>.<span class='ident'>md_len</span>()).<span class='ident'>collect</span>();
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='number'>0</span>;
-                <span class='ident'>ffi_extras</span>::<span class='ident'>HMAC_Final</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>, <span class='ident'>buf</span>.<span class='ident'>as_mut_ptr</span>(), <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>len</span>);
+<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">HMAC</span> {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!=</span> <span class="ident">Finalized</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">type_</span>.<span class="ident">md_len</span>()).<span class="ident">collect</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="ident">ffi_extras</span>::<span class="ident">HMAC_Final</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">buf</span>.<span class="ident">as_mut_ptr</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">len</span>);
             }
-            <span class='ident'>ffi</span>::<span class='ident'>HMAC_CTX_cleanup</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>ctx</span>);
+            <span class="ident">ffi</span>::<span class="ident">HMAC_CTX_cleanup</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ctx</span>);
         }
     }
 }
 
-<span class='doccomment'>/// Computes the HMAC of the `data` with the hash `t` and `key`.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>hmac</span>(<span class='ident'>t</span>: <span class='ident'>Type</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>t</span>, <span class='ident'>key</span>);
-    <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h</span>.<span class='ident'>write_all</span>(<span class='ident'>data</span>);
-    <span class='ident'>h</span>.<span class='ident'>finish</span>()
+<span class="doccomment">/// Computes the HMAC of the `data` with the hash `t` and `key`.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hmac</span>(<span class="ident">t</span>: <span class="ident">Type</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">t</span>, <span class="ident">key</span>);
+    <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h</span>.<span class="ident">write_all</span>(<span class="ident">data</span>);
+    <span class="ident">h</span>.<span class="ident">finish</span>()
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>;
-    <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>hex</span>::<span class='ident'>FromHex</span>;
-    <span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>hash</span>::<span class='ident'>Type</span>;
-    <span class='kw'>use</span> <span class='ident'>crypto</span>::<span class='ident'>hash</span>::<span class='ident'>Type</span>::<span class='op'>*</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>hmac</span>, <span class='ident'>HMAC</span>};
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>;
+    <span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">hex</span>::<span class="ident">FromHex</span>;
+    <span class="kw">use</span> <span class="ident">crypto</span>::<span class="ident">hash</span>::<span class="ident">Type</span>;
+    <span class="kw">use</span> <span class="ident">crypto</span>::<span class="ident">hash</span>::<span class="ident">Type</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">hmac</span>, <span class="ident">HMAC</span>};
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>test_hmac</span>(<span class='ident'>ty</span>: <span class='ident'>Type</span>, <span class='ident'>tests</span>: <span class='kw-2'>&amp;</span>[(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)]) {
-        <span class='kw'>for</span> <span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>key</span>, <span class='kw-2'>ref</span> <span class='ident'>data</span>, <span class='kw-2'>ref</span> <span class='ident'>res</span>) <span class='kw'>in</span> <span class='ident'>tests</span>.<span class='ident'>iter</span>() {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hmac</span>(<span class='ident'>ty</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>data</span>), <span class='op'>*</span><span class='ident'>res</span>);
+    <span class="kw">fn</span> <span class="ident">test_hmac</span>(<span class="ident">ty</span>: <span class="ident">Type</span>, <span class="ident">tests</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)]) {
+        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">key</span>, <span class="kw-2">ref</span> <span class="ident">data</span>, <span class="kw-2">ref</span> <span class="ident">res</span>) <span class="kw">in</span> <span class="ident">tests</span>.<span class="ident">iter</span>() {
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hmac</span>(<span class="ident">ty</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">data</span>), <span class="kw-2">*</span><span class="ident">res</span>);
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_recycle</span>(<span class='ident'>h</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>HMAC</span>, <span class='ident'>test</span>: <span class='kw-2'>&amp;</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)) {
-        <span class='kw'>let</span> <span class='kw-2'>&amp;</span>(_, <span class='kw-2'>ref</span> <span class='ident'>data</span>, <span class='kw-2'>ref</span> <span class='ident'>res</span>) <span class='op'>=</span> <span class='ident'>test</span>;
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>data</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>h</span>.<span class='ident'>finish</span>(), <span class='op'>*</span><span class='ident'>res</span>);
+    <span class="kw">fn</span> <span class="ident">test_hmac_recycle</span>(<span class="ident">h</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HMAC</span>, <span class="ident">test</span>: <span class="kw-2">&amp;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)) {
+        <span class="kw">let</span> <span class="kw-2">&amp;</span>(_, <span class="kw-2">ref</span> <span class="ident">data</span>, <span class="kw-2">ref</span> <span class="ident">res</span>) <span class="op">=</span> <span class="ident">test</span>;
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">data</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">h</span>.<span class="ident">finish</span>(), <span class="kw-2">*</span><span class="ident">res</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_md5</span>() {
-        <span class='comment'>// test vectors from RFC 2202</span>
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>7</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0x0b_u8</span>).<span class='ident'>take</span>(<span class='number'>16</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Hi There&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;9294727a3638bb1c13f48ef8158bfc9d&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='string'>b&quot;Jefe&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>b&quot;what do ya want for nothing?&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;750c783e6ab0b503eaa86e310a5db738&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>16</span>).<span class='ident'>collect</span>(),
-              <span class='ident'>repeat</span>(<span class='number'>0xdd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>(),
-              <span class='string'>&quot;56be34521d144c88dbb8c733f0e8b3f6&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='string'>&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>(),
-              <span class='ident'>repeat</span>(<span class='number'>0xcd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>(),
-              <span class='string'>&quot;697eaf0aca3a3aea3a75164746ffaa79&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0x0c_u8</span>).<span class='ident'>take</span>(<span class='number'>16</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test With Truncation&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;56461ef2342edc00f9bab995690efd4c&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key \
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_md5</span>() {
+        <span class="comment">// test vectors from RFC 2202</span>
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">7</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0x0b_u8</span>).<span class="ident">take</span>(<span class="number">16</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Hi There&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;9294727a3638bb1c13f48ef8158bfc9d&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="string">b&quot;Jefe&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">b&quot;what do ya want for nothing?&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;750c783e6ab0b503eaa86e310a5db738&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">16</span>).<span class="ident">collect</span>(),
+              <span class="ident">repeat</span>(<span class="number">0xdd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>(),
+              <span class="string">&quot;56be34521d144c88dbb8c733f0e8b3f6&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="string">&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>(),
+              <span class="ident">repeat</span>(<span class="number">0xcd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>(),
+              <span class="string">&quot;697eaf0aca3a3aea3a75164746ffaa79&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0x0c_u8</span>).<span class="ident">take</span>(<span class="number">16</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test With Truncation&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;56461ef2342edc00f9bab995690efd4c&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key \
                and Larger Than One Block-Size Data&quot;</span>
-                  .<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>())];
+                  .<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>())];
 
-        <span class='ident'>test_hmac</span>(<span class='ident'>MD5</span>, <span class='kw-2'>&amp;</span><span class='ident'>tests</span>);
+        <span class="ident">test_hmac</span>(<span class="ident">MD5</span>, <span class="kw-2">&amp;</span><span class="ident">tests</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_md5_recycle</span>() {
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>2</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key \
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_md5_recycle</span>() {
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">2</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key \
                and Larger Than One Block-Size Data&quot;</span>
-                  .<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>())];
+                  .<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>())];
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>MD5</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>0</span>);
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>100usize</span> {
-            <span class='kw'>let</span> <span class='ident'>test</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='ident'>i</span> <span class='op'>%</span> <span class='number'>2</span>];
-            <span class='ident'>test_hmac_recycle</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>h</span>, <span class='ident'>test</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">MD5</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">0</span>);
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100usize</span> {
+            <span class="kw">let</span> <span class="ident">test</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="ident">i</span> <span class="op">%</span> <span class="number">2</span>];
+            <span class="ident">test_hmac_recycle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">h</span>, <span class="ident">test</span>);
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_finish_twice</span>() {
-        <span class='kw'>let</span> <span class='ident'>test</span>: (<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>) <span class='op'>=</span>
-            (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-             <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-             <span class='string'>&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>());
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_finish_twice</span>() {
+        <span class="kw">let</span> <span class="ident">test</span>: (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span>
+            (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+             <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+             <span class="string">&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>Type</span>::<span class='ident'>MD5</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>test</span>.<span class='number'>0</span>);
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>test</span>.<span class='number'>1</span>);
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h</span>.<span class='ident'>finish</span>();
-        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>h</span>.<span class='ident'>finish</span>();
-        <span class='kw'>let</span> <span class='ident'>null</span> <span class='op'>=</span> <span class='ident'>hmac</span>(<span class='ident'>Type</span>::<span class='ident'>MD5</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>test</span>.<span class='number'>0</span>, <span class='kw-2'>&amp;</span>[]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>null</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">Type</span>::<span class="ident">MD5</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">test</span>.<span class="number">0</span>);
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">test</span>.<span class="number">1</span>);
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h</span>.<span class="ident">finish</span>();
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">finish</span>();
+        <span class="kw">let</span> <span class="ident">null</span> <span class="op">=</span> <span class="ident">hmac</span>(<span class="ident">Type</span>::<span class="ident">MD5</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">test</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span>[]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">null</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_clone</span>() {
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>2</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key \
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_clone</span>() {
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">2</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key \
                and Larger Than One Block-Size Data&quot;</span>
-                  .<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>())];
-        <span class='kw'>let</span> <span class='ident'>p</span> <span class='op'>=</span> <span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>0</span>.<span class='ident'>len</span>() <span class='op'>/</span> <span class='number'>2</span>;
-        <span class='kw'>let</span> <span class='ident'>h0</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>Type</span>::<span class='ident'>MD5</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>0</span>);
+                  .<span class="ident">to_vec</span>(),
+              <span class="string">&quot;6f630fad67cda0ee1fb1f562db3aa53e&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>())];
+        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">tests</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>;
+        <span class="kw">let</span> <span class="ident">h0</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">Type</span>::<span class="ident">MD5</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">0</span>);
 
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Clone a new hmac&quot;</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h1</span> <span class='op'>=</span> <span class='ident'>h0</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h1</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>1</span>[..<span class='ident'>p</span>]);
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Clone a new hmac&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h1</span> <span class="op">=</span> <span class="ident">h0</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">1</span>[..<span class="ident">p</span>]);
         {
-            <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Clone an updated hmac&quot;</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h2</span> <span class='op'>=</span> <span class='ident'>h1</span>.<span class='ident'>clone</span>();
-            <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h2</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>1</span>[<span class='ident'>p</span>..]);
-            <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>h2</span>.<span class='ident'>finish</span>();
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>2</span>);
+            <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Clone an updated hmac&quot;</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">clone</span>();
+            <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h2</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">1</span>[<span class="ident">p</span>..]);
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">h2</span>.<span class="ident">finish</span>();
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">tests</span>[<span class="number">0</span>].<span class="number">2</span>);
         }
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h1</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>1</span>[<span class='ident'>p</span>..]);
-        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>h1</span>.<span class='ident'>finish</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>2</span>);
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">1</span>[<span class="ident">p</span>..]);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">finish</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">tests</span>[<span class="number">0</span>].<span class="number">2</span>);
 
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Clone a finished hmac&quot;</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h3</span> <span class='op'>=</span> <span class='ident'>h1</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>h3</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>tests</span>[<span class='number'>1</span>].<span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>h3</span>.<span class='ident'>finish</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>res</span>, <span class='ident'>tests</span>[<span class='number'>1</span>].<span class='number'>2</span>);
+        <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Clone a finished hmac&quot;</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h3</span> <span class="op">=</span> <span class="ident">h1</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> _ <span class="op">=</span> <span class="ident">h3</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tests</span>[<span class="number">1</span>].<span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">h3</span>.<span class="ident">finish</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="ident">tests</span>[<span class="number">1</span>].<span class="number">2</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha1</span>() {
-        <span class='comment'>// test vectors from RFC 2202</span>
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>7</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0x0b_u8</span>).<span class='ident'>take</span>(<span class='number'>20</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Hi There&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;b617318655057264e28bc0b6fb378c8ef146be00&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='string'>b&quot;Jefe&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>b&quot;what do ya want for nothing?&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;effcdf6ae5eb2fa2d27416d5f184df9c259a7c79&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>20</span>).<span class='ident'>collect</span>(),
-              <span class='ident'>repeat</span>(<span class='number'>0xdd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>(),
-              <span class='string'>&quot;125d7342b9ac11cd91a39af48aa17b4f63f175d3&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='string'>&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>(),
-              <span class='ident'>repeat</span>(<span class='number'>0xcd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>(),
-              <span class='string'>&quot;4c9007f4026250c6bc8414f9bf50c86c2d7235da&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0x0c_u8</span>).<span class='ident'>take</span>(<span class='number'>20</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test With Truncation&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;4c1a03424b55e07fe7f27be1d58bb9324a9a5a04&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;aa4ae5e15272d00e95705637ce8a3b55ed402112&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key \
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha1</span>() {
+        <span class="comment">// test vectors from RFC 2202</span>
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">7</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0x0b_u8</span>).<span class="ident">take</span>(<span class="number">20</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Hi There&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;b617318655057264e28bc0b6fb378c8ef146be00&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="string">b&quot;Jefe&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">b&quot;what do ya want for nothing?&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;effcdf6ae5eb2fa2d27416d5f184df9c259a7c79&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">20</span>).<span class="ident">collect</span>(),
+              <span class="ident">repeat</span>(<span class="number">0xdd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>(),
+              <span class="string">&quot;125d7342b9ac11cd91a39af48aa17b4f63f175d3&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="string">&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>(),
+              <span class="ident">repeat</span>(<span class="number">0xcd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>(),
+              <span class="string">&quot;4c9007f4026250c6bc8414f9bf50c86c2d7235da&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0x0c_u8</span>).<span class="ident">take</span>(<span class="number">20</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test With Truncation&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;4c1a03424b55e07fe7f27be1d58bb9324a9a5a04&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;aa4ae5e15272d00e95705637ce8a3b55ed402112&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key \
                and Larger Than One Block-Size Data&quot;</span>
-                  .<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;e8e99d0f45237d786d6bbaa7965c7808bbff1a91&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>())];
+                  .<span class="ident">to_vec</span>(),
+              <span class="string">&quot;e8e99d0f45237d786d6bbaa7965c7808bbff1a91&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>())];
 
-        <span class='ident'>test_hmac</span>(<span class='ident'>SHA1</span>, <span class='kw-2'>&amp;</span><span class='ident'>tests</span>);
+        <span class="ident">test_hmac</span>(<span class="ident">SHA1</span>, <span class="kw-2">&amp;</span><span class="ident">tests</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha1_recycle</span>() {
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>2</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;aa4ae5e15272d00e95705637ce8a3b55ed402112&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>80</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key \
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha1_recycle</span>() {
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">2</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>(),
+              <span class="string">&quot;aa4ae5e15272d00e95705637ce8a3b55ed402112&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">80</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key \
                and Larger Than One Block-Size Data&quot;</span>
-                  .<span class='ident'>to_vec</span>(),
-              <span class='string'>&quot;e8e99d0f45237d786d6bbaa7965c7808bbff1a91&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>())];
+                  .<span class="ident">to_vec</span>(),
+              <span class="string">&quot;e8e99d0f45237d786d6bbaa7965c7808bbff1a91&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>())];
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>SHA1</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>tests</span>[<span class='number'>0</span>].<span class='number'>0</span>);
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>100usize</span> {
-            <span class='kw'>let</span> <span class='ident'>test</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='ident'>i</span> <span class='op'>%</span> <span class='number'>2</span>];
-            <span class='ident'>test_hmac_recycle</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>h</span>, <span class='ident'>test</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">SHA1</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tests</span>[<span class="number">0</span>].<span class="number">0</span>);
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100usize</span> {
+            <span class="kw">let</span> <span class="ident">test</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="ident">i</span> <span class="op">%</span> <span class="number">2</span>];
+            <span class="ident">test_hmac_recycle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">h</span>, <span class="ident">test</span>);
         }
     }
 
 
 
-    <span class='kw'>fn</span> <span class='ident'>test_sha2</span>(<span class='ident'>ty</span>: <span class='ident'>Type</span>, <span class='ident'>results</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) {
-        <span class='comment'>// test vectors from RFC 4231</span>
-        <span class='kw'>let</span> <span class='ident'>tests</span>: [(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>); <span class='number'>6</span>] <span class='op'>=</span>
-            [(<span class='ident'>repeat</span>(<span class='number'>0xb_u8</span>).<span class='ident'>take</span>(<span class='number'>20</span>).<span class='ident'>collect</span>(), <span class='string'>b&quot;Hi There&quot;</span>.<span class='ident'>to_vec</span>()),
-             (<span class='string'>b&quot;Jefe&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;what do ya want for nothing?&quot;</span>.<span class='ident'>to_vec</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>20</span>).<span class='ident'>collect</span>(), <span class='ident'>repeat</span>(<span class='number'>0xdd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>()),
-             (<span class='string'>&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class='ident'>from_hex</span>().<span class='ident'>unwrap</span>(),
-              <span class='ident'>repeat</span>(<span class='number'>0xcd_u8</span>).<span class='ident'>take</span>(<span class='number'>50</span>).<span class='ident'>collect</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>131</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class='ident'>to_vec</span>()),
-             (<span class='ident'>repeat</span>(<span class='number'>0xaa_u8</span>).<span class='ident'>take</span>(<span class='number'>131</span>).<span class='ident'>collect</span>(),
-              <span class='string'>b&quot;This is a test using a larger than block-size key and a \
+    <span class="kw">fn</span> <span class="ident">test_sha2</span>(<span class="ident">ty</span>: <span class="ident">Type</span>, <span class="ident">results</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) {
+        <span class="comment">// test vectors from RFC 4231</span>
+        <span class="kw">let</span> <span class="ident">tests</span>: [(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>); <span class="number">6</span>] <span class="op">=</span>
+            [(<span class="ident">repeat</span>(<span class="number">0xb_u8</span>).<span class="ident">take</span>(<span class="number">20</span>).<span class="ident">collect</span>(), <span class="string">b&quot;Hi There&quot;</span>.<span class="ident">to_vec</span>()),
+             (<span class="string">b&quot;Jefe&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;what do ya want for nothing?&quot;</span>.<span class="ident">to_vec</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">20</span>).<span class="ident">collect</span>(), <span class="ident">repeat</span>(<span class="number">0xdd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>()),
+             (<span class="string">&quot;0102030405060708090a0b0c0d0e0f10111213141516171819&quot;</span>.<span class="ident">from_hex</span>().<span class="ident">unwrap</span>(),
+              <span class="ident">repeat</span>(<span class="number">0xcd_u8</span>).<span class="ident">take</span>(<span class="number">50</span>).<span class="ident">collect</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">131</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;Test Using Larger Than Block-Size Key - Hash Key First&quot;</span>.<span class="ident">to_vec</span>()),
+             (<span class="ident">repeat</span>(<span class="number">0xaa_u8</span>).<span class="ident">take</span>(<span class="number">131</span>).<span class="ident">collect</span>(),
+              <span class="string">b&quot;This is a test using a larger than block-size key and a \
                larger than block-size data. The key needs to be hashed \
                before being used by the HMAC algorithm.&quot;</span>
-                  .<span class='ident'>to_vec</span>())];
+                  .<span class="ident">to_vec</span>())];
 
-        <span class='kw'>for</span> (<span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>key</span>, <span class='kw-2'>ref</span> <span class='ident'>data</span>), <span class='ident'>res</span>) <span class='kw'>in</span> <span class='ident'>tests</span>.<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>results</span>.<span class='ident'>iter</span>()) {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>hmac</span>(<span class='ident'>ty</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>data</span>), <span class='op'>*</span><span class='ident'>res</span>);
+        <span class="kw">for</span> (<span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">key</span>, <span class="kw-2">ref</span> <span class="ident">data</span>), <span class="ident">res</span>) <span class="kw">in</span> <span class="ident">tests</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">results</span>.<span class="ident">iter</span>()) {
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">hmac</span>(<span class="ident">ty</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">data</span>), <span class="kw-2">*</span><span class="ident">res</span>);
         }
 
-        <span class='comment'>// recycle test</span>
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>h</span> <span class='op'>=</span> <span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>ty</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>tests</span>[<span class='number'>5</span>].<span class='number'>0</span>);
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>100usize</span> {
-            <span class='kw'>let</span> <span class='ident'>test</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>tests</span>[<span class='number'>4</span> <span class='op'>+</span> <span class='ident'>i</span> <span class='op'>%</span> <span class='number'>2</span>];
-            <span class='kw'>let</span> <span class='ident'>tup</span> <span class='op'>=</span> (<span class='ident'>test</span>.<span class='number'>0</span>.<span class='ident'>clone</span>(), <span class='ident'>test</span>.<span class='number'>1</span>.<span class='ident'>clone</span>(), <span class='ident'>results</span>[<span class='number'>4</span> <span class='op'>+</span> <span class='ident'>i</span> <span class='op'>%</span> <span class='number'>2</span>].<span class='ident'>clone</span>());
-            <span class='ident'>test_hmac_recycle</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>h</span>, <span class='kw-2'>&amp;</span><span class='ident'>tup</span>);
+        <span class="comment">// recycle test</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">ty</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">tests</span>[<span class="number">5</span>].<span class="number">0</span>);
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100usize</span> {
+            <span class="kw">let</span> <span class="ident">test</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">tests</span>[<span class="number">4</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">2</span>];
+            <span class="kw">let</span> <span class="ident">tup</span> <span class="op">=</span> (<span class="ident">test</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">test</span>.<span class="number">1</span>.<span class="ident">clone</span>(), <span class="ident">results</span>[<span class="number">4</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">2</span>].<span class="ident">clone</span>());
+            <span class="ident">test_hmac_recycle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">tup</span>);
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha224</span>() {
-        <span class='kw'>let</span> <span class='ident'>results</span> <span class='op'>=</span> [<span class='string'>&quot;896fb1128abbdf196832107cd49df33f47b4b1169912ba4f53684b22&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;a30e01098bc6dbbf45690f3a7e9e6d0f8bbea2a39e6148008fd05e44&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;7fb3cb3588c6c1f6ffa9694d7d6ad2649365b0c1f65d69d1ec8333ea&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;6c11506874013cac6a2abc1bb382627cec6a90d86efc012de7afec5a&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;95e9a0db962095adaebe9b2d6f0dbce2d499f112f2d2b7273fa6870e&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;3a854166ac5d9f023f54d517d0b39dbd946770db9c2b95c9f6f565d1&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>()];
-        <span class='ident'>test_sha2</span>(<span class='ident'>SHA224</span>, <span class='kw-2'>&amp;</span><span class='ident'>results</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha224</span>() {
+        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> [<span class="string">&quot;896fb1128abbdf196832107cd49df33f47b4b1169912ba4f53684b22&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;a30e01098bc6dbbf45690f3a7e9e6d0f8bbea2a39e6148008fd05e44&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;7fb3cb3588c6c1f6ffa9694d7d6ad2649365b0c1f65d69d1ec8333ea&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;6c11506874013cac6a2abc1bb382627cec6a90d86efc012de7afec5a&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;95e9a0db962095adaebe9b2d6f0dbce2d499f112f2d2b7273fa6870e&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;3a854166ac5d9f023f54d517d0b39dbd946770db9c2b95c9f6f565d1&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>()];
+        <span class="ident">test_sha2</span>(<span class="ident">SHA224</span>, <span class="kw-2">&amp;</span><span class="ident">results</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha256</span>() {
-        <span class='kw'>let</span> <span class='ident'>results</span> <span class='op'>=</span> [<span class='string'>&quot;b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;773ea91e36800e46854db8ebd09181a72959098b3ef8c122d9635514ced565fe&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;82558a389a443c0ea4cc819899f2083a85f0faa3e578f8077a2e3ff46729665b&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>()];
-        <span class='ident'>test_sha2</span>(<span class='ident'>SHA256</span>, <span class='kw-2'>&amp;</span><span class='ident'>results</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha256</span>() {
+        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> [<span class="string">&quot;b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;773ea91e36800e46854db8ebd09181a72959098b3ef8c122d9635514ced565fe&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;82558a389a443c0ea4cc819899f2083a85f0faa3e578f8077a2e3ff46729665b&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2&quot;</span>
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>()];
+        <span class="ident">test_sha2</span>(<span class="ident">SHA256</span>, <span class="kw-2">&amp;</span><span class="ident">results</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha384</span>() {
-        <span class='kw'>let</span> <span class='ident'>results</span> <span class='op'>=</span> [<span class='string'>&quot;afd03944d84895626b0825f4ab46907f15f9dadbe4101ec682aa034c7cebc59cfaea9ea90\
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha384</span>() {
+        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> [<span class="string">&quot;afd03944d84895626b0825f4ab46907f15f9dadbe4101ec682aa034c7cebc59cfaea9ea90\
                         76ede7f4af152e8b2fa9cb6&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;af45d2e376484031617f78d2b58a6b1b9c7ef464f5a01b47e42ec3736322445e8e2240ca5\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;af45d2e376484031617f78d2b58a6b1b9c7ef464f5a01b47e42ec3736322445e8e2240ca5\
                         e69e2c78b3239ecfab21649&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;88062608d3e6ad8a0aa2ace014c8a86f0aa635d947ac9febe83ef4e55966144b2a5ab39dc\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;88062608d3e6ad8a0aa2ace014c8a86f0aa635d947ac9febe83ef4e55966144b2a5ab39dc\
                         13814b94e3ab6e101a34f27&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;3e8a69b7783c25851933ab6290af6ca77a9981480850009cc5577c6e1f573b4e6801dd23c\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;3e8a69b7783c25851933ab6290af6ca77a9981480850009cc5577c6e1f573b4e6801dd23c\
                         4a7d679ccf8a386c674cffb&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;4ece084485813e9088d2c63a041bc5b44f9ef1012a2b588f3cd11f05033ac4c60c2ef6ab4\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;4ece084485813e9088d2c63a041bc5b44f9ef1012a2b588f3cd11f05033ac4c60c2ef6ab4\
                         030fe8296248df163f44952&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;6617178e941f020d351e2f254e8fd32c602420feb0b8fb9adccebb82461e99c5a678cc31e\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;6617178e941f020d351e2f254e8fd32c602420feb0b8fb9adccebb82461e99c5a678cc31e\
                         799176d3860e6110c46523e&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>()];
-        <span class='ident'>test_sha2</span>(<span class='ident'>SHA384</span>, <span class='kw-2'>&amp;</span><span class='ident'>results</span>);
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>()];
+        <span class="ident">test_sha2</span>(<span class="ident">SHA384</span>, <span class="kw-2">&amp;</span><span class="ident">results</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_hmac_sha512</span>() {
-        <span class='kw'>let</span> <span class='ident'>results</span> <span class='op'>=</span> [<span class='string'>&quot;87aa7cdea5ef619d4ff0b4241a1d6cb02379f4e2ce4ec2787ad0b30545e17cdedaa833b7d\
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_hmac_sha512</span>() {
+        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> [<span class="string">&quot;87aa7cdea5ef619d4ff0b4241a1d6cb02379f4e2ce4ec2787ad0b30545e17cdedaa833b7d\
                         6b8a702038b274eaea3f4e4be9d914eeb61f1702e696c203a126854&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;164b7a7bfcf819e2e395fbe73b56e0a387bd64222e831fd610270cd7ea2505549758bf75c\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;164b7a7bfcf819e2e395fbe73b56e0a387bd64222e831fd610270cd7ea2505549758bf75c\
                         05a994a6d034f65f8f0e6fdcaeab1a34d4a6b4b636e070a38bce737&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;fa73b0089d56a284efb0f0756c890be9b1b5dbdd8ee81a3655f83e33b2279d39bf3e84827\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;fa73b0089d56a284efb0f0756c890be9b1b5dbdd8ee81a3655f83e33b2279d39bf3e84827\
                         9a722c806b485a47e67c807b946a337bee8942674278859e13292fb&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;b0ba465637458c6990e5a8c5f61d4af7e576d97ff94b872de76f8050361ee3dba91ca5c11\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;b0ba465637458c6990e5a8c5f61d4af7e576d97ff94b872de76f8050361ee3dba91ca5c11\
                         aa25eb4d679275cc5788063a5f19741120c4f2de2adebeb10a298dd&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;80b24263c7c1a3ebb71493c1dd7be8b49b46d1f41b4aeec1121b013783f8f3526b56d037e\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;80b24263c7c1a3ebb71493c1dd7be8b49b46d1f41b4aeec1121b013783f8f3526b56d037e\
                         05f2598bd0fd2215d6a1e5295e64f73f63f0aec8b915a985d786598&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>(),
-                       <span class='string'>&quot;e37b6a775dc87dbaa4dfa9f96e5e3ffddebd71f8867289865df5a32d20cdc944b6022cac3\
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>(),
+                       <span class="string">&quot;e37b6a775dc87dbaa4dfa9f96e5e3ffddebd71f8867289865df5a32d20cdc944b6022cac3\
                         c4982b10d5eeb55c3e4de15134676fb6de0446065c97440fa8c6a58&quot;</span>
-                           .<span class='ident'>from_hex</span>()
-                           .<span class='ident'>unwrap</span>()];
-        <span class='ident'>test_sha2</span>(<span class='ident'>SHA512</span>, <span class='kw-2'>&amp;</span><span class='ident'>results</span>);
+                           .<span class="ident">from_hex</span>()
+                           .<span class="ident">unwrap</span>()];
+        <span class="ident">test_sha2</span>(<span class="ident">SHA512</span>, <span class="kw-2">&amp;</span><span class="ident">results</span>);
     }
 }
 </pre>
@@ -1091,18 +1103,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1135,7 +1151,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

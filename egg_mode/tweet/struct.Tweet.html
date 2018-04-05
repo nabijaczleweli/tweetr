@@ -9,14 +9,18 @@
 
     <title>egg_mode::tweet::Tweet - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>tweet</a></p><script>window.sidebarCurrent = {name: 'Tweet', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct Tweet</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#fields">Fields</a><div class="sidebar-links"><a href="#structfield.created_at">created_at</a><a href="#structfield.current_user_retweet">current_user_retweet</a><a href="#structfield.entities">entities</a><a href="#structfield.extended_entities">extended_entities</a><a href="#structfield.favorite_count">favorite_count</a><a href="#structfield.favorited">favorited</a><a href="#structfield.id">id</a><a href="#structfield.in_reply_to_user_id">in_reply_to_user_id</a><a href="#structfield.in_reply_to_screen_name">in_reply_to_screen_name</a><a href="#structfield.in_reply_to_status_id">in_reply_to_status_id</a><a href="#structfield.lang">lang</a><a href="#structfield.possibly_sensitive">possibly_sensitive</a><a href="#structfield.quoted_status_id">quoted_status_id</a><a href="#structfield.quoted_status">quoted_status</a><a href="#structfield.retweet_count">retweet_count</a><a href="#structfield.retweeted">retweeted</a><a href="#structfield.retweeted_status">retweeted_status</a><a href="#structfield.source">source</a><a href="#structfield.text">text</a><a href="#structfield.user">user</a><a href="#structfield.withheld_copyright">withheld_copyright</a><a href="#structfield.withheld_in_countries">withheld_in_countries</a><a href="#structfield.withheld_scope">withheld_scope</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-Debug">Debug</a></div></div><p class='location'><a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>tweet</a></p><script>window.sidebarCurrent = {name: 'Tweet', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,44 +54,41 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>tweet</a>::<wbr><a class='struct' href=''>Tweet</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>egg_mode</a>::<wbr><a href='index.html'>tweet</a>::<wbr><a class="struct" href=''>Tweet</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1969' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#80-160' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#80-160' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Tweet {
-    pub created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
-    pub current_user_retweet: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;,
-    pub entities: <a class='struct' href='../../egg_mode/tweet/struct.TweetEntities.html' title='egg_mode::tweet::TweetEntities'>TweetEntities</a>,
-    pub extended_entities: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.ExtendedTweetEntities.html' title='egg_mode::tweet::ExtendedTweetEntities'>ExtendedTweetEntities</a>&gt;,
-    pub favorite_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>,
-    pub favorited: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;,
-    pub id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>,
-    pub in_reply_to_user_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;,
-    pub in_reply_to_screen_name: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
-    pub in_reply_to_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;,
-    pub lang: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
-    pub possibly_sensitive: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;,
-    pub quoted_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;,
-    pub quoted_status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;,
-    pub retweet_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>,
-    pub retweeted: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;,
-    pub retweeted_status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;,
-    pub source: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
-    pub text: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
-    pub user: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a>&gt;,
-    pub withheld_copyright: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
-    pub withheld_in_countries: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;,
-    pub withheld_scope: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;,
+    pub created_at: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+    pub current_user_retweet: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;,
+    pub entities: <a class="struct" href="../../egg_mode/tweet/struct.TweetEntities.html" title="struct egg_mode::tweet::TweetEntities">TweetEntities</a>,
+    pub extended_entities: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.ExtendedTweetEntities.html" title="struct egg_mode::tweet::ExtendedTweetEntities">ExtendedTweetEntities</a>&gt;,
+    pub favorite_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
+    pub favorited: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;,
+    pub id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>,
+    pub in_reply_to_user_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;,
+    pub in_reply_to_screen_name: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    pub in_reply_to_status_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;,
+    pub lang: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+    pub possibly_sensitive: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;,
+    pub quoted_status_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;,
+    pub quoted_status: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.Tweet.html" title="struct egg_mode::tweet::Tweet">Tweet</a>&gt;&gt;,
+    pub retweet_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a>,
+    pub retweeted: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;,
+    pub retweeted_status: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.Tweet.html" title="struct egg_mode::tweet::Tweet">Tweet</a>&gt;&gt;,
+    pub source: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+    pub text: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+    pub user: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/user/struct.TwitterUser.html" title="struct egg_mode::user::TwitterUser">TwitterUser</a>&gt;,
+    pub withheld_copyright: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,
+    pub withheld_in_countries: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;&gt;,
+    pub withheld_scope: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
 }</pre><div class='docblock'><p>Represents a single status update.</p>
-
-<p>The fields present in this struct can be mainly split up based on the context they&#39;re present
+<p>The fields present in this struct can be mainly split up based on the context they're present
 for.</p>
-
-<h2 id='base-tweet-info' class='section-header'><a href='#base-tweet-info'>Base Tweet Info</a></h2>
+<h2 id="base-tweet-info" class="section-header"><a href="#base-tweet-info">Base Tweet Info</a></h2>
 <p>This information is the basic information inherent to all tweets, regardless of context.</p>
-
 <ul>
 <li><code>text</code></li>
 <li><code>id</code></li>
@@ -87,47 +96,39 @@ for.</p>
 <li><code>user</code></li>
 <li><code>source</code></li>
 <li><code>favorite_count</code>/<code>retweet_count</code></li>
-<li><code>lang</code>, though third-party clients usually don&#39;t surface this at a user-interface level.
+<li><code>lang</code>, though third-party clients usually don't surface this at a user-interface level.
 Twitter Web uses this to create machine-translations of the tweet.</li>
 </ul>
-
-<h2 id='perspective-based-data' class='section-header'><a href='#perspective-based-data'>Perspective-based data</a></h2>
+<h2 id="perspective-based-data" class="section-header"><a href="#perspective-based-data">Perspective-based data</a></h2>
 <p>This information depends on the authenticated user who called the data. These are left as
-Options because certain contexts where the information is pulled either don&#39;t have an
-authenticated user to compare with, or don&#39;t have to opportunity to poll the user&#39;s interactions
+Options because certain contexts where the information is pulled either don't have an
+authenticated user to compare with, or don't have to opportunity to poll the user's interactions
 with the tweet.</p>
-
 <ul>
 <li><code>favorited</code></li>
 <li><code>retweeted</code></li>
 <li><code>current_user_retweet</code></li>
 </ul>
-
-<h2 id='replies' class='section-header'><a href='#replies'>Replies</a></h2>
+<h2 id="replies" class="section-header"><a href="#replies">Replies</a></h2>
 <p>This information is only present when the tweet in question is marked as being a reply to
-another tweet, or when it&#39;s threaded into a chain from the same user.</p>
-
+another tweet, or when it's threaded into a chain from the same user.</p>
 <ul>
 <li><code>in_reply_to_user_id</code>/<code>in_reply_to_screen_name</code></li>
 <li><code>in_reply_to_status_id</code></li>
 </ul>
-
-<h2 id='retweets-and-quote-tweets' class='section-header'><a href='#retweets-and-quote-tweets'>Retweets and Quote Tweets</a></h2>
+<h2 id="retweets-and-quote-tweets" class="section-header"><a href="#retweets-and-quote-tweets">Retweets and Quote Tweets</a></h2>
 <p>This information is only present when the tweet in question is a native retweet or is a &quot;quote
 tweet&quot; that references another tweet by linking to it. These fields allow you to reference the
 parent tweet without having to make another call to <code>show</code>.</p>
-
 <ul>
 <li><code>retweeted_status</code></li>
 <li><code>quoted_status</code>/<code>quoted_status_id</code></li>
 </ul>
-
-<h2 id='media' class='section-header'><a href='#media'>Media</a></h2>
+<h2 id="media" class="section-header"><a href="#media">Media</a></h2>
 <p>As a tweet can attach an image, GIF, or video, these fields allow you to access information
 about the attached media. Note that polls are not surfaced to the Public API at the time of this
 writing (2016-09-01). For more information about how to use attached media, see the
 documentation for <a href="../entities/struct.MediaEntity.html"><code>MediaEntity</code></a>.</p>
-
 <ul>
 <li><code>entities</code> (note that this also contains information about hyperlinks, user mentions, and
 hashtags in addition to a picture/thumbnail)</li>
@@ -141,121 +142,145 @@ first photo, and this field will contain all of them.</li>
 <li><code>withheld_in_countries</code></li>
 <li><code>withheld_scope</code></li>
 </ul>
-</div><h2 class='fields'>Fields</h2><span id='structfield.created_at' class='structfield'>
-                           <span id='created_at.v' class='invisible'>
-                           <code>created_at: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>UTC timestamp showing when the tweet was posted, formatted like &quot;Wed Aug 27 13:08:45 +0000
+</div><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.created_at" class="structfield small-section-header">
+                           <a href="#structfield.created_at" class="anchor field"></a>
+                           <span id="created_at.v" class='invisible'>
+                           <code>created_at: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code>
+                           </span></span><div class='docblock'><p>UTC timestamp showing when the tweet was posted, formatted like &quot;Wed Aug 27 13:08:45 +0000
 2008&quot;.</p>
-</div><span id='structfield.current_user_retweet' class='structfield'>
-                           <span id='current_user_retweet.v' class='invisible'>
-                           <code>current_user_retweet: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If the authenticated user has retweeted this tweet, contains the ID of the retweet.</p>
-</div><span id='structfield.entities' class='structfield'>
-                           <span id='entities.v' class='invisible'>
-                           <code>entities: <a class='struct' href='../../egg_mode/tweet/struct.TweetEntities.html' title='egg_mode::tweet::TweetEntities'>TweetEntities</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Link, hashtag, and user mention information extracted from the tweet text.</p>
-</div><span id='structfield.extended_entities' class='structfield'>
-                           <span id='extended_entities.v' class='invisible'>
-                           <code>extended_entities: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.ExtendedTweetEntities.html' title='egg_mode::tweet::ExtendedTweetEntities'>ExtendedTweetEntities</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Extended media information attached to the tweet, if media is available.</p>
-
+</div><span id="structfield.current_user_retweet" class="structfield small-section-header">
+                           <a href="#structfield.current_user_retweet" class="anchor field"></a>
+                           <span id="current_user_retweet.v" class='invisible'>
+                           <code>current_user_retweet: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If the authenticated user has retweeted this tweet, contains the ID of the retweet.</p>
+</div><span id="structfield.entities" class="structfield small-section-header">
+                           <a href="#structfield.entities" class="anchor field"></a>
+                           <span id="entities.v" class='invisible'>
+                           <code>entities: <a class="struct" href="../../egg_mode/tweet/struct.TweetEntities.html" title="struct egg_mode::tweet::TweetEntities">TweetEntities</a></code>
+                           </span></span><div class='docblock'><p>Link, hashtag, and user mention information extracted from the tweet text.</p>
+</div><span id="structfield.extended_entities" class="structfield small-section-header">
+                           <a href="#structfield.extended_entities" class="anchor field"></a>
+                           <span id="extended_entities.v" class='invisible'>
+                           <code>extended_entities: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.ExtendedTweetEntities.html" title="struct egg_mode::tweet::ExtendedTweetEntities">ExtendedTweetEntities</a>&gt;</code>
+                           </span></span><div class='docblock'><p>Extended media information attached to the tweet, if media is available.</p>
 <p>If a tweet has a photo, set of photos, gif, or video attached to it, this field will be
 present and contain the real media information. The information available in the <code>media</code>
 field of <code>entities</code> will only contain the first photo of a set, or a thumbnail of a gif or
 video.</p>
-</div><span id='structfield.favorite_count' class='structfield'>
-                           <span id='favorite_count.v' class='invisible'>
-                           <code>favorite_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>&quot;Approximately&quot; how many times this tweet has been liked by users.</p>
-</div><span id='structfield.favorited' class='structfield'>
-                           <span id='favorited.v' class='invisible'>
-                           <code>favorited: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the authenticated user has liked this tweet.</p>
-</div><span id='structfield.id' class='structfield'>
-                           <span id='id.v' class='invisible'>
-                           <code>id: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Numeric ID for this tweet.</p>
-</div><span id='structfield.in_reply_to_user_id' class='structfield'>
-                           <span id='in_reply_to_user_id.v' class='invisible'>
-                           <code>in_reply_to_user_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If the tweet is a reply, contains the ID of the user that was replied to.</p>
-</div><span id='structfield.in_reply_to_screen_name' class='structfield'>
-                           <span id='in_reply_to_screen_name.v' class='invisible'>
-                           <code>in_reply_to_screen_name: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If the tweet is a reply, contains the screen name of the user that was replied to.</p>
-</div><span id='structfield.in_reply_to_status_id' class='structfield'>
-                           <span id='in_reply_to_status_id.v' class='invisible'>
-                           <code>in_reply_to_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If the tweet is a reply, contains the ID of the tweet that was replied to.</p>
-</div><span id='structfield.lang' class='structfield'>
-                           <span id='lang.v' class='invisible'>
-                           <code>lang: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Can contain a language ID indicating the machine-detected language of the text, or &quot;und&quot; if
+</div><span id="structfield.favorite_count" class="structfield small-section-header">
+                           <a href="#structfield.favorite_count" class="anchor field"></a>
+                           <span id="favorite_count.v" class='invisible'>
+                           <code>favorite_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
+                           </span></span><div class='docblock'><p>&quot;Approximately&quot; how many times this tweet has been liked by users.</p>
+</div><span id="structfield.favorited" class="structfield small-section-header">
+                           <a href="#structfield.favorited" class="anchor field"></a>
+                           <span id="favorited.v" class='invisible'>
+                           <code>favorited: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</code>
+                           </span></span><div class='docblock'><p>Indicates whether the authenticated user has liked this tweet.</p>
+</div><span id="structfield.id" class="structfield small-section-header">
+                           <a href="#structfield.id" class="anchor field"></a>
+                           <span id="id.v" class='invisible'>
+                           <code>id: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a></code>
+                           </span></span><div class='docblock'><p>Numeric ID for this tweet.</p>
+</div><span id="structfield.in_reply_to_user_id" class="structfield small-section-header">
+                           <a href="#structfield.in_reply_to_user_id" class="anchor field"></a>
+                           <span id="in_reply_to_user_id.v" class='invisible'>
+                           <code>in_reply_to_user_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If the tweet is a reply, contains the ID of the user that was replied to.</p>
+</div><span id="structfield.in_reply_to_screen_name" class="structfield small-section-header">
+                           <a href="#structfield.in_reply_to_screen_name" class="anchor field"></a>
+                           <span id="in_reply_to_screen_name.v" class='invisible'>
+                           <code>in_reply_to_screen_name: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If the tweet is a reply, contains the screen name of the user that was replied to.</p>
+</div><span id="structfield.in_reply_to_status_id" class="structfield small-section-header">
+                           <a href="#structfield.in_reply_to_status_id" class="anchor field"></a>
+                           <span id="in_reply_to_status_id.v" class='invisible'>
+                           <code>in_reply_to_status_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If the tweet is a reply, contains the ID of the tweet that was replied to.</p>
+</div><span id="structfield.lang" class="structfield small-section-header">
+                           <a href="#structfield.lang" class="anchor field"></a>
+                           <span id="lang.v" class='invisible'>
+                           <code>lang: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code>
+                           </span></span><div class='docblock'><p>Can contain a language ID indicating the machine-detected language of the text, or &quot;und&quot; if
 no language could be detected.</p>
-</div><span id='structfield.possibly_sensitive' class='structfield'>
-                           <span id='possibly_sensitive.v' class='invisible'>
-                           <code>possibly_sensitive: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If the tweet has a link, indicates whether the link may contain content that could be
+</div><span id="structfield.possibly_sensitive" class="structfield small-section-header">
+                           <a href="#structfield.possibly_sensitive" class="anchor field"></a>
+                           <span id="possibly_sensitive.v" class='invisible'>
+                           <code>possibly_sensitive: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If the tweet has a link, indicates whether the link may contain content that could be
 identified as sensitive.</p>
-</div><span id='structfield.quoted_status_id' class='structfield'>
-                           <span id='quoted_status_id.v' class='invisible'>
-                           <code>quoted_status_id: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If this tweet is quoting another by link, contains the ID of the quoted tweet.</p>
-</div><span id='structfield.quoted_status' class='structfield'>
-                           <span id='quoted_status.v' class='invisible'>
-                           <code>quoted_status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If this tweet is quoting another by link, contains the quoted tweet.</p>
-</div><span id='structfield.retweet_count' class='structfield'>
-                           <span id='retweet_count.v' class='invisible'>
-                           <code>retweet_count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>The number of times this tweet has been retweeted (with native retweets).</p>
-</div><span id='structfield.retweeted' class='structfield'>
-                           <span id='retweeted.v' class='invisible'>
-                           <code>retweeted: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>Indicates whether the authenticated user has retweeted this tweet.</p>
-</div><span id='structfield.retweeted_status' class='structfield'>
-                           <span id='retweeted_status.v' class='invisible'>
-                           <code>retweeted_status: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a>&gt;&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If this tweet is a retweet, then this field contains the original status information.</p>
-
+</div><span id="structfield.quoted_status_id" class="structfield small-section-header">
+                           <a href="#structfield.quoted_status_id" class="anchor field"></a>
+                           <span id="quoted_status_id.v" class='invisible'>
+                           <code>quoted_status_id: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i64.html">i64</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If this tweet is quoting another by link, contains the ID of the quoted tweet.</p>
+</div><span id="structfield.quoted_status" class="structfield small-section-header">
+                           <a href="#structfield.quoted_status" class="anchor field"></a>
+                           <span id="quoted_status.v" class='invisible'>
+                           <code>quoted_status: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.Tweet.html" title="struct egg_mode::tweet::Tweet">Tweet</a>&gt;&gt;</code>
+                           </span></span><div class='docblock'><p>If this tweet is quoting another by link, contains the quoted tweet.</p>
+</div><span id="structfield.retweet_count" class="structfield small-section-header">
+                           <a href="#structfield.retweet_count" class="anchor field"></a>
+                           <span id="retweet_count.v" class='invisible'>
+                           <code>retweet_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.i32.html">i32</a></code>
+                           </span></span><div class='docblock'><p>The number of times this tweet has been retweeted (with native retweets).</p>
+</div><span id="structfield.retweeted" class="structfield small-section-header">
+                           <a href="#structfield.retweeted" class="anchor field"></a>
+                           <span id="retweeted.v" class='invisible'>
+                           <code>retweeted: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</code>
+                           </span></span><div class='docblock'><p>Indicates whether the authenticated user has retweeted this tweet.</p>
+</div><span id="structfield.retweeted_status" class="structfield small-section-header">
+                           <a href="#structfield.retweeted_status" class="anchor field"></a>
+                           <span id="retweeted_status.v" class='invisible'>
+                           <code>retweeted_status: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/tweet/struct.Tweet.html" title="struct egg_mode::tweet::Tweet">Tweet</a>&gt;&gt;</code>
+                           </span></span><div class='docblock'><p>If this tweet is a retweet, then this field contains the original status information.</p>
 <p>The separation between retweet and original is so that retweets can be recalled by deleting
 the retweet, and so that liking a retweet results in an additional notification to the user
 who retweeted the status, as well as the original poster.</p>
-</div><span id='structfield.source' class='structfield'>
-                           <span id='source.v' class='invisible'>
-                           <code>source: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>The application used to post the tweet, as an HTML anchor tag containing the app&#39;s URL and
+</div><span id="structfield.source" class="structfield small-section-header">
+                           <a href="#structfield.source" class="anchor field"></a>
+                           <span id="source.v" class='invisible'>
+                           <code>source: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code>
+                           </span></span><div class='docblock'><p>The application used to post the tweet, as an HTML anchor tag containing the app's URL and
 name.</p>
-</div><span id='structfield.text' class='structfield'>
-                           <span id='text.v' class='invisible'>
-                           <code>text: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>The text of the tweet.</p>
-</div><span id='structfield.user' class='structfield'>
-                           <span id='user.v' class='invisible'>
-                           <code>user: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='struct' href='../../egg_mode/user/struct.TwitterUser.html' title='egg_mode::user::TwitterUser'>TwitterUser</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>The user who posted this tweet.</p>
-</div><span id='structfield.withheld_copyright' class='structfield'>
-                           <span id='withheld_copyright.v' class='invisible'>
-                           <code>withheld_copyright: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If present and <code>true</code>, indicates that this tweet has been withheld due to a DMCA complaint.</p>
-</div><span id='structfield.withheld_in_countries' class='structfield'>
-                           <span id='withheld_in_countries.v' class='invisible'>
-                           <code>withheld_in_countries: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If present, contains two-letter country codes indicating where this tweet is being withheld.</p>
-
+</div><span id="structfield.text" class="structfield small-section-header">
+                           <a href="#structfield.text" class="anchor field"></a>
+                           <span id="text.v" class='invisible'>
+                           <code>text: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a></code>
+                           </span></span><div class='docblock'><p>The text of the tweet.</p>
+</div><span id="structfield.user" class="structfield small-section-header">
+                           <a href="#structfield.user" class="anchor field"></a>
+                           <span id="user.v" class='invisible'>
+                           <code>user: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="struct" href="../../egg_mode/user/struct.TwitterUser.html" title="struct egg_mode::user::TwitterUser">TwitterUser</a>&gt;</code>
+                           </span></span><div class='docblock'><p>The user who posted this tweet.</p>
+</div><span id="structfield.withheld_copyright" class="structfield small-section-header">
+                           <a href="#structfield.withheld_copyright" class="anchor field"></a>
+                           <span id="withheld_copyright.v" class='invisible'>
+                           <code>withheld_copyright: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code>
+                           </span></span><div class='docblock'><p>If present and <code>true</code>, indicates that this tweet has been withheld due to a DMCA complaint.</p>
+</div><span id="structfield.withheld_in_countries" class="structfield small-section-header">
+                           <a href="#structfield.withheld_in_countries" class="anchor field"></a>
+                           <span id="withheld_in_countries.v" class='invisible'>
+                           <code>withheld_in_countries: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;&gt;</code>
+                           </span></span><div class='docblock'><p>If present, contains two-letter country codes indicating where this tweet is being withheld.</p>
 <p>The following special codes exist:</p>
-
 <ul>
 <li><code>XX</code>: Withheld in all countries</li>
 <li><code>XY</code>: Withheld due to DMCA complaint.</li>
 </ul>
-</div><span id='structfield.withheld_scope' class='structfield'>
-                           <span id='withheld_scope.v' class='invisible'>
-                           <code>withheld_scope: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>If present, indicates whether the content being withheld is the <code>status</code> or the <code>user</code>.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../egg_mode/tweet/struct.Tweet.html' title='egg_mode::tweet::Tweet'>Tweet</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1993' class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#79' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
-<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div><span id="structfield.withheld_scope" class="structfield small-section-header">
+                           <a href="#structfield.withheld_scope" class="anchor field"></a>
+                           <span id="withheld_scope.v" class='invisible'>
+                           <code>withheld_scope: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</code>
+                           </span></span><div class='docblock'><p>If present, indicates whether the content being withheld is the <code>status</code> or the <code>user</code>.</p>
+</div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../egg_mode/tweet/struct.Tweet.html" title="struct egg_mode::tweet::Tweet">Tweet</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#79' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/egg_mode/tweet/structs.rs.html#79' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 
@@ -269,18 +294,22 @@ name.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -313,7 +342,6 @@ name.</p>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

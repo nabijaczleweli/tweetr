@@ -9,14 +9,18 @@
 
     <title>lib.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -127,92 +139,92 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! A library for interacting with Twitter.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Please see [the repository][] and its enclosed examples for tips on working with this library</span>
-<span class='doccomment'>//! while it&#39;s still in progress.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! [the repository]: https://github.com/QuietMisdreavus/twitter-rs</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ## Getting Started</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The very first thing you&#39;ll need to do to get access to the Twitter API is to head to</span>
-<span class='doccomment'>//! [Twitter&#39;s Application Manager][twitter-apps] and create an app. Once you&#39;ve done that, there</span>
-<span class='doccomment'>//! are two sets of keys immediately available to you. First are the &quot;consumer key&quot; and &quot;consumer</span>
-<span class='doccomment'>//! secret&quot;, that are used to represent you as the application author when signing requests. These</span>
-<span class='doccomment'>//! keys are given to every single API call regardless of permission level. Related are an &quot;access</span>
-<span class='doccomment'>//! token&quot; and &quot;access token secret&quot;, that can be used to skip the authentication steps if you&#39;re</span>
-<span class='doccomment'>//! only interacting with your own account or with no account in particular. Generally, if you want</span>
-<span class='doccomment'>//! to read or write to a particular user&#39;s stream, you&#39;ll need to request authorization and get an</span>
-<span class='doccomment'>//! access token to work on their behalf.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! [twitter-apps]: https://apps.twitter.com/</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The process to get an access token for a specific user (with this library) has three basic</span>
-<span class='doccomment'>//! steps:</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! 1. Log your request with Twitter by getting a [request token][].</span>
-<span class='doccomment'>//! 2. Direct the user to grant permission to your application by sending them to an</span>
-<span class='doccomment'>//!    [authenticate][] or [authorize][] URL, depending on the nature of your app.</span>
-<span class='doccomment'>//! 3. Convert the verifier given by the permission request into an [access token][].</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! [request token]: fn.request_token.html</span>
-<span class='doccomment'>//! [authorize]: fn.authorize_url.html</span>
-<span class='doccomment'>//! [authenticate]: fn.authenticate_url.html</span>
-<span class='doccomment'>//! [access token]: fn.access_token.html</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The process changes some smaller details depending on whether your application is web- or</span>
-<span class='doccomment'>//! mobile-based, as opposed to desktop-based or in another situation where redirecting users to a</span>
-<span class='doccomment'>//! web browser and back automatically is difficult or impossible. In the former case where URLs</span>
-<span class='doccomment'>//! can be used to direct the user into and out of your app, give Twitter a &quot;callback URL&quot; when</span>
-<span class='doccomment'>//! setting up your request token, and redirect the user to an [authenticate][] URL to grant your</span>
-<span class='doccomment'>//! app permissions. When the user accepts the request, they will be redirected back to this URL to</span>
-<span class='doccomment'>//! get back to your app, with the original request token and a verifier given to your app to</span>
-<span class='doccomment'>//! signify their acceptance.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! On the other hand, if you can&#39;t use the callback URL in this fashion, you can instead use the</span>
-<span class='doccomment'>//! &quot;PIN-based Auth&quot; version of the flow. In this version, give a &quot;callback URL&quot; of &quot;oob&quot; when</span>
-<span class='doccomment'>//! setting up your request token, and use an [authorize][] URL. When the user grants the</span>
-<span class='doccomment'>//! permissions request in this fashion, they are given a numeric PIN that can be given back to</span>
-<span class='doccomment'>//! your app to use as a verifier.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Either way, when you have a &quot;verifier&quot; from either of these methods, you can use your Tokens</span>
-<span class='doccomment'>//! from earlier in the process with that verifier to request an [access token][]. This access</span>
-<span class='doccomment'>//! token can then be saved and cached for future use.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ## `Response&lt;T&gt;`</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Every method that calls Twitter and carries rate-limit information wraps its return value in a</span>
-<span class='doccomment'>//! [`Response`][] struct, that transmits this information to your app. From there, you can handle</span>
-<span class='doccomment'>//! the rate-limit information to hold off on that kind of request, or simply grab its `response`</span>
-<span class='doccomment'>//! field to get the output of whatever method you called.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! [`Response`]: struct.Response.html</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! A library for interacting with Twitter.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Please see [the repository][] and its enclosed examples for tips on working with this library</span>
+<span class="doccomment">//! while it&#39;s still in progress.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [the repository]: https://github.com/QuietMisdreavus/twitter-rs</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Getting Started</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The very first thing you&#39;ll need to do to get access to the Twitter API is to head to</span>
+<span class="doccomment">//! [Twitter&#39;s Application Manager][twitter-apps] and create an app. Once you&#39;ve done that, there</span>
+<span class="doccomment">//! are two sets of keys immediately available to you. First are the &quot;consumer key&quot; and &quot;consumer</span>
+<span class="doccomment">//! secret&quot;, that are used to represent you as the application author when signing requests. These</span>
+<span class="doccomment">//! keys are given to every single API call regardless of permission level. Related are an &quot;access</span>
+<span class="doccomment">//! token&quot; and &quot;access token secret&quot;, that can be used to skip the authentication steps if you&#39;re</span>
+<span class="doccomment">//! only interacting with your own account or with no account in particular. Generally, if you want</span>
+<span class="doccomment">//! to read or write to a particular user&#39;s stream, you&#39;ll need to request authorization and get an</span>
+<span class="doccomment">//! access token to work on their behalf.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [twitter-apps]: https://apps.twitter.com/</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The process to get an access token for a specific user (with this library) has three basic</span>
+<span class="doccomment">//! steps:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! 1. Log your request with Twitter by getting a [request token][].</span>
+<span class="doccomment">//! 2. Direct the user to grant permission to your application by sending them to an</span>
+<span class="doccomment">//!    [authenticate][] or [authorize][] URL, depending on the nature of your app.</span>
+<span class="doccomment">//! 3. Convert the verifier given by the permission request into an [access token][].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [request token]: fn.request_token.html</span>
+<span class="doccomment">//! [authorize]: fn.authorize_url.html</span>
+<span class="doccomment">//! [authenticate]: fn.authenticate_url.html</span>
+<span class="doccomment">//! [access token]: fn.access_token.html</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The process changes some smaller details depending on whether your application is web- or</span>
+<span class="doccomment">//! mobile-based, as opposed to desktop-based or in another situation where redirecting users to a</span>
+<span class="doccomment">//! web browser and back automatically is difficult or impossible. In the former case where URLs</span>
+<span class="doccomment">//! can be used to direct the user into and out of your app, give Twitter a &quot;callback URL&quot; when</span>
+<span class="doccomment">//! setting up your request token, and redirect the user to an [authenticate][] URL to grant your</span>
+<span class="doccomment">//! app permissions. When the user accepts the request, they will be redirected back to this URL to</span>
+<span class="doccomment">//! get back to your app, with the original request token and a verifier given to your app to</span>
+<span class="doccomment">//! signify their acceptance.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! On the other hand, if you can&#39;t use the callback URL in this fashion, you can instead use the</span>
+<span class="doccomment">//! &quot;PIN-based Auth&quot; version of the flow. In this version, give a &quot;callback URL&quot; of &quot;oob&quot; when</span>
+<span class="doccomment">//! setting up your request token, and use an [authorize][] URL. When the user grants the</span>
+<span class="doccomment">//! permissions request in this fashion, they are given a numeric PIN that can be given back to</span>
+<span class="doccomment">//! your app to use as a verifier.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Either way, when you have a &quot;verifier&quot; from either of these methods, you can use your Tokens</span>
+<span class="doccomment">//! from earlier in the process with that verifier to request an [access token][]. This access</span>
+<span class="doccomment">//! token can then be saved and cached for future use.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## `Response&lt;T&gt;`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Every method that calls Twitter and carries rate-limit information wraps its return value in a</span>
+<span class="doccomment">//! [`Response`][] struct, that transmits this information to your app. From there, you can handle</span>
+<span class="doccomment">//! the rate-limit information to hold off on that kind of request, or simply grab its `response`</span>
+<span class="doccomment">//! field to get the output of whatever method you called.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`Response`]: struct.Response.html</span>
 
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_docs</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>unused_extern_crates</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>unused_qualifications</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">unused_extern_crates</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">unused_qualifications</span>)]</span>
 
-<span class='attribute'>#[<span class='ident'>macro_use</span>]</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>hyper</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>crypto</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>mime</span>;
+<span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hyper</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">url</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rand</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">crypto</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rustc_serialize</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">mime</span>;
 
-<span class='kw'>mod</span> <span class='ident'>auth</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>error</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>user</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>entities</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cursor</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>tweet</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>search</span>;
-<span class='kw'>mod</span> <span class='ident'>links</span>;
-<span class='kw'>mod</span> <span class='ident'>common</span>;
+<span class="kw">mod</span> <span class="ident">auth</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">user</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">entities</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">cursor</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tweet</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">search</span>;
+<span class="kw">mod</span> <span class="ident">links</span>;
+<span class="kw">mod</span> <span class="ident">common</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>auth</span>::{<span class='ident'>Token</span>, <span class='ident'>request_token</span>, <span class='ident'>authorize_url</span>, <span class='ident'>authenticate_url</span>, <span class='ident'>access_token</span>, <span class='ident'>verify_tokens</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>common</span>::{<span class='ident'>Response</span>, <span class='ident'>WebResponse</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">auth</span>::{<span class="ident">Token</span>, <span class="ident">request_token</span>, <span class="ident">authorize_url</span>, <span class="ident">authenticate_url</span>, <span class="ident">access_token</span>, <span class="ident">verify_tokens</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">Response</span>, <span class="ident">WebResponse</span>};
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -227,18 +239,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -271,7 +287,6 @@
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

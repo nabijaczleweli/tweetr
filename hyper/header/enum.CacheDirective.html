@@ -9,14 +9,18 @@
 
     <title>hyper::header::CacheDirective - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc enum">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a></p><script>window.sidebarCurrent = {name: 'CacheDirective', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Enum CacheDirective</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#variants">Variants</a><div class="sidebar-links"><a href="#variant.NoCache">NoCache</a><a href="#variant.NoStore">NoStore</a><a href="#variant.NoTransform">NoTransform</a><a href="#variant.OnlyIfCached">OnlyIfCached</a><a href="#variant.MaxAge">MaxAge</a><a href="#variant.MaxStale">MaxStale</a><a href="#variant.MinFresh">MinFresh</a><a href="#variant.MustRevalidate">MustRevalidate</a><a href="#variant.Public">Public</a><a href="#variant.Private">Private</a><a href="#variant.ProxyRevalidate">ProxyRevalidate</a><a href="#variant.SMaxAge">SMaxAge</a><a href="#variant.Extension">Extension</a></div><a class="sidebar-title" href="#implementations">Trait Implementations</a><div class="sidebar-links"><a href="#impl-PartialEq">PartialEq</a><a href="#impl-Clone">Clone</a><a href="#impl-Debug">Debug</a><a href="#impl-Display">Display</a><a href="#impl-FromStr">FromStr</a></div></div><p class='location'><a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a></p><script>window.sidebarCurrent = {name: 'CacheDirective', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,42 +54,68 @@
         </form>
     </nav>
 
-    <section id='main' class="content enum">
-<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a>::<wbr><a class='enum' href=''>CacheDirective</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>hyper</a>::<wbr><a href='index.html'>header</a>::<wbr><a class="enum" href=''>CacheDirective</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-4761' class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#75-107' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#75-107' title='goto source code'>[src]</a></span></h1>
 <pre class='rust enum'>pub enum CacheDirective {
     NoCache,
     NoStore,
     NoTransform,
     OnlyIfCached,
-    MaxAge(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>),
-    MaxStale(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>),
-    MinFresh(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>),
+    MaxAge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
+    MaxStale(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
+    MinFresh(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
     MustRevalidate,
     Public,
     Private,
     ProxyRevalidate,
-    SMaxAge(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>),
-    Extension(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,&nbsp;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;),
+    SMaxAge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
+    Extension(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;),
 }</pre><div class='docblock'><p><code>CacheControl</code> contains a list of these directives.</p>
-</div><h2 class='variants'>Variants</h2>
-<span id='variant.NoCache' class='variant'><span id='NoCache.v' class='invisible'><code>NoCache</code></span></span><div class='docblock'><p>&quot;no-cache&quot;</p>
-</div><span id='variant.NoStore' class='variant'><span id='NoStore.v' class='invisible'><code>NoStore</code></span></span><div class='docblock'><p>&quot;no-store&quot;</p>
-</div><span id='variant.NoTransform' class='variant'><span id='NoTransform.v' class='invisible'><code>NoTransform</code></span></span><div class='docblock'><p>&quot;no-transform&quot;</p>
-</div><span id='variant.OnlyIfCached' class='variant'><span id='OnlyIfCached.v' class='invisible'><code>OnlyIfCached</code></span></span><div class='docblock'><p>&quot;only-if-cached&quot;</p>
-</div><span id='variant.MaxAge' class='variant'><span id='MaxAge.v' class='invisible'><code>MaxAge(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></span></span><div class='docblock'><p>&quot;max-age=delta&quot;</p>
-</div><span id='variant.MaxStale' class='variant'><span id='MaxStale.v' class='invisible'><code>MaxStale(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></span></span><div class='docblock'><p>&quot;max-stale=delta&quot;</p>
-</div><span id='variant.MinFresh' class='variant'><span id='MinFresh.v' class='invisible'><code>MinFresh(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></span></span><div class='docblock'><p>&quot;min-fresh=delta&quot;</p>
-</div><span id='variant.MustRevalidate' class='variant'><span id='MustRevalidate.v' class='invisible'><code>MustRevalidate</code></span></span><div class='docblock'><p>&quot;must-revalidate&quot;</p>
-</div><span id='variant.Public' class='variant'><span id='Public.v' class='invisible'><code>Public</code></span></span><div class='docblock'><p>&quot;public&quot;</p>
-</div><span id='variant.Private' class='variant'><span id='Private.v' class='invisible'><code>Private</code></span></span><div class='docblock'><p>&quot;private&quot;</p>
-</div><span id='variant.ProxyRevalidate' class='variant'><span id='ProxyRevalidate.v' class='invisible'><code>ProxyRevalidate</code></span></span><div class='docblock'><p>&quot;proxy-revalidate&quot;</p>
-</div><span id='variant.SMaxAge' class='variant'><span id='SMaxAge.v' class='invisible'><code>SMaxAge(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>)</code></span></span><div class='docblock'><p>&quot;s-maxage=delta&quot;</p>
-</div><span id='variant.Extension' class='variant'><span id='Extension.v' class='invisible'><code>Extension(<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,&nbsp;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;)</code></span></span><div class='docblock'><p>Extension directives. Optionally include an argument.</p>
-</div></section>
+</div><h2 id='variants' class='variants small-section-header'>
+                   Variants<a href='#variants' class='anchor'></a></h2>
+<span id="variant.NoCache" class="variant small-section-header"><a href="#variant.NoCache" class="anchor field"></a><span id='NoCache.v' class='invisible'><code>NoCache</code></span></span><div class='docblock'><p>&quot;no-cache&quot;</p>
+</div><span id="variant.NoStore" class="variant small-section-header"><a href="#variant.NoStore" class="anchor field"></a><span id='NoStore.v' class='invisible'><code>NoStore</code></span></span><div class='docblock'><p>&quot;no-store&quot;</p>
+</div><span id="variant.NoTransform" class="variant small-section-header"><a href="#variant.NoTransform" class="anchor field"></a><span id='NoTransform.v' class='invisible'><code>NoTransform</code></span></span><div class='docblock'><p>&quot;no-transform&quot;</p>
+</div><span id="variant.OnlyIfCached" class="variant small-section-header"><a href="#variant.OnlyIfCached" class="anchor field"></a><span id='OnlyIfCached.v' class='invisible'><code>OnlyIfCached</code></span></span><div class='docblock'><p>&quot;only-if-cached&quot;</p>
+</div><span id="variant.MaxAge" class="variant small-section-header"><a href="#variant.MaxAge" class="anchor field"></a><span id='MaxAge.v' class='invisible'><code>MaxAge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code></span></span><div class='docblock'><p>&quot;max-age=delta&quot;</p>
+</div><span id="variant.MaxStale" class="variant small-section-header"><a href="#variant.MaxStale" class="anchor field"></a><span id='MaxStale.v' class='invisible'><code>MaxStale(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code></span></span><div class='docblock'><p>&quot;max-stale=delta&quot;</p>
+</div><span id="variant.MinFresh" class="variant small-section-header"><a href="#variant.MinFresh" class="anchor field"></a><span id='MinFresh.v' class='invisible'><code>MinFresh(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code></span></span><div class='docblock'><p>&quot;min-fresh=delta&quot;</p>
+</div><span id="variant.MustRevalidate" class="variant small-section-header"><a href="#variant.MustRevalidate" class="anchor field"></a><span id='MustRevalidate.v' class='invisible'><code>MustRevalidate</code></span></span><div class='docblock'><p>&quot;must-revalidate&quot;</p>
+</div><span id="variant.Public" class="variant small-section-header"><a href="#variant.Public" class="anchor field"></a><span id='Public.v' class='invisible'><code>Public</code></span></span><div class='docblock'><p>&quot;public&quot;</p>
+</div><span id="variant.Private" class="variant small-section-header"><a href="#variant.Private" class="anchor field"></a><span id='Private.v' class='invisible'><code>Private</code></span></span><div class='docblock'><p>&quot;private&quot;</p>
+</div><span id="variant.ProxyRevalidate" class="variant small-section-header"><a href="#variant.ProxyRevalidate" class="anchor field"></a><span id='ProxyRevalidate.v' class='invisible'><code>ProxyRevalidate</code></span></span><div class='docblock'><p>&quot;proxy-revalidate&quot;</p>
+</div><span id="variant.SMaxAge" class="variant small-section-header"><a href="#variant.SMaxAge" class="anchor field"></a><span id='SMaxAge.v' class='invisible'><code>SMaxAge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code></span></span><div class='docblock'><p>&quot;s-maxage=delta&quot;</p>
+</div><span id="variant.Extension" class="variant small-section-header"><a href="#variant.Extension" class="anchor field"></a><span id='Extension.v' class='invisible'><code>Extension(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;)</code></span></span><div class='docblock'><p>Extension directives. Optionally include an argument.</p>
+</div>
+            <h2 id='implementations' class='small-section-header'>
+              Trait Implementations<a href='#implementations' class='anchor'></a>
+            </h2>
+        <h3 id='impl-PartialEq' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code><a href='#impl-PartialEq' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 id='impl-Clone' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code><a href='#impl-Clone' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;</a>Self)</code></span><span class='out-of-band'><div class='ghost'></div><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div><a class='srclink' href='https://doc.rust-lang.org/nightly/src/core/clone.rs.html#112-114' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 id='impl-Debug' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code><a href='#impl-Debug' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#74' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt">Read more</a></p>
+</div></div><h3 id='impl-Display' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> for <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code><a href='#impl-Display' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#109-133' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt-1' class="method"><span id='fmt.v-1' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#110-132' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter. <a href="https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#tymethod.fmt">Read more</a></p>
+</div></div><h3 id='impl-FromStr' class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a> for <a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a></code><a href='#impl-FromStr' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#135-162' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='associatedtype.Err' class="type"><span id='Err.t' class='invisible'><code>type <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err' class="type">Err</a> = <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a> as <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a>&gt;::<a class="type" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err" title="type core::str::FromStr::Err">Err</a>&gt;</code></span></h4>
+<div class='docblock'><p>The associated error which can be returned from parsing.</p>
+</div><h4 id='method.from_str' class="method"><span id='from_str.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str' class='fnname'>from_str</a>(s: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="enum" href="../../hyper/header/enum.CacheDirective.html" title="enum hyper::header::CacheDirective">CacheDirective</a>, <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a> as <a class="trait" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html" title="trait core::str::FromStr">FromStr</a>&gt;::<a class="type" href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#associatedtype.Err" title="type core::str::FromStr::Err">Err</a>&gt;&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/hyper/header/common/cache_control.rs.html#137-161' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Parses a string <code>s</code> to return a value of this type. <a href="https://doc.rust-lang.org/nightly/core/str/trait.FromStr.html#tymethod.from_str">Read more</a></p>
+</div></div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -90,18 +128,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -134,7 +176,6 @@
         window.rootPath = "../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

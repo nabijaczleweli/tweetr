@@ -9,14 +9,18 @@
 
     <title>headers.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -672,635 +684,635 @@
 <span id="628">628</span>
 <span id="629">629</span>
 <span id="630">630</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains the implementation of the `HEADERS` frame and associated flags.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains the implementation of the `HEADERS` frame and associated flags.</span>
 
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>StreamId</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::{
-    <span class='ident'>Flag</span>,
-    <span class='ident'>Frame</span>,
-    <span class='ident'>FrameHeader</span>,
-    <span class='ident'>RawFrame</span>,
-    <span class='ident'>pack_header</span>,
-    <span class='ident'>parse_padded_payload</span>,
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">StreamId</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::{
+    <span class="ident">Flag</span>,
+    <span class="ident">Frame</span>,
+    <span class="ident">FrameHeader</span>,
+    <span class="ident">RawFrame</span>,
+    <span class="ident">pack_header</span>,
+    <span class="ident">parse_padded_payload</span>,
 };
 
-<span class='doccomment'>/// An enum representing the flags that a `HeadersFrame` can have.</span>
-<span class='doccomment'>/// The integer representation associated to each variant is that flag&#39;s</span>
-<span class='doccomment'>/// bitmask.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// HTTP/2 spec, section 6.2.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>HeadersFlag</span> {
-    <span class='ident'>EndStream</span> <span class='op'>=</span> <span class='number'>0x1</span>,
-    <span class='ident'>EndHeaders</span> <span class='op'>=</span> <span class='number'>0x4</span>,
-    <span class='ident'>Padded</span> <span class='op'>=</span> <span class='number'>0x8</span>,
-    <span class='ident'>Priority</span> <span class='op'>=</span> <span class='number'>0x20</span>,
+<span class="doccomment">/// An enum representing the flags that a `HeadersFrame` can have.</span>
+<span class="doccomment">/// The integer representation associated to each variant is that flag&#39;s</span>
+<span class="doccomment">/// bitmask.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// HTTP/2 spec, section 6.2.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HeadersFlag</span> {
+    <span class="ident">EndStream</span> <span class="op">=</span> <span class="number">0x1</span>,
+    <span class="ident">EndHeaders</span> <span class="op">=</span> <span class="number">0x4</span>,
+    <span class="ident">Padded</span> <span class="op">=</span> <span class="number">0x8</span>,
+    <span class="ident">Priority</span> <span class="op">=</span> <span class="number">0x20</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Flag</span> <span class='kw'>for</span> <span class='ident'>HeadersFlag</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>bitmask</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u8</span> {
-        <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>u8</span>
+<span class="kw">impl</span> <span class="ident">Flag</span> <span class="kw">for</span> <span class="ident">HeadersFlag</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bitmask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
     }
 }
 
-<span class='doccomment'>/// The struct represents the dependency information that can be attached to</span>
-<span class='doccomment'>/// a stream and sent within a HEADERS frame (one with the Priority flag set).</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>StreamDependency</span> {
-    <span class='doccomment'>/// The ID of the stream that a particular stream depends on</span>
-    <span class='kw'>pub</span> <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>,
-    <span class='doccomment'>/// The weight for the stream. The value exposed (and set) here is always</span>
-    <span class='doccomment'>/// in the range [0, 255], instead of [1, 256] \(as defined in section 5.3.2.)</span>
-    <span class='doccomment'>/// so that the value fits into a `u8`.</span>
-    <span class='kw'>pub</span> <span class='ident'>weight</span>: <span class='ident'>u8</span>,
-    <span class='doccomment'>/// A flag indicating whether the stream dependency is exclusive.</span>
-    <span class='kw'>pub</span> <span class='ident'>is_exclusive</span>: <span class='ident'>bool</span>,
+<span class="doccomment">/// The struct represents the dependency information that can be attached to</span>
+<span class="doccomment">/// a stream and sent within a HEADERS frame (one with the Priority flag set).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamDependency</span> {
+    <span class="doccomment">/// The ID of the stream that a particular stream depends on</span>
+    <span class="kw">pub</span> <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// The weight for the stream. The value exposed (and set) here is always</span>
+    <span class="doccomment">/// in the range [0, 255], instead of [1, 256] \(as defined in section 5.3.2.)</span>
+    <span class="doccomment">/// so that the value fits into a `u8`.</span>
+    <span class="kw">pub</span> <span class="ident">weight</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// A flag indicating whether the stream dependency is exclusive.</span>
+    <span class="kw">pub</span> <span class="ident">is_exclusive</span>: <span class="ident">bool</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>StreamDependency</span> {
-    <span class='doccomment'>/// Creates a new `StreamDependency` with the given stream ID, weight, and</span>
-    <span class='doccomment'>/// exclusivity.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>, <span class='ident'>weight</span>: <span class='ident'>u8</span>, <span class='ident'>is_exclusive</span>: <span class='ident'>bool</span>)
-            <span class='op'>-&gt;</span> <span class='ident'>StreamDependency</span> {
-        <span class='ident'>StreamDependency</span> {
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>weight</span>: <span class='ident'>weight</span>,
-            <span class='ident'>is_exclusive</span>: <span class='ident'>is_exclusive</span>,
+<span class="kw">impl</span> <span class="ident">StreamDependency</span> {
+    <span class="doccomment">/// Creates a new `StreamDependency` with the given stream ID, weight, and</span>
+    <span class="doccomment">/// exclusivity.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream_id</span>: <span class="ident">StreamId</span>, <span class="ident">weight</span>: <span class="ident">u8</span>, <span class="ident">is_exclusive</span>: <span class="ident">bool</span>)
+            <span class="op">-&gt;</span> <span class="ident">StreamDependency</span> {
+        <span class="ident">StreamDependency</span> {
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">weight</span>: <span class="ident">weight</span>,
+            <span class="ident">is_exclusive</span>: <span class="ident">is_exclusive</span>,
         }
     }
 
-    <span class='doccomment'>/// Parses the first 5 bytes in the buffer as a `StreamDependency`.</span>
-    <span class='doccomment'>/// (Each 5-byte sequence is always decodable into a stream dependency</span>
-    <span class='doccomment'>/// structure).</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the given buffer has less than 5 elements, the method will panic.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='ident'>buf</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>StreamDependency</span> {
-        <span class='comment'>// The most significant bit of the first byte is the &quot;E&quot; bit indicating</span>
-        <span class='comment'>// whether the dependency is exclusive.</span>
-        <span class='kw'>let</span> <span class='ident'>is_exclusive</span> <span class='op'>=</span> <span class='ident'>buf</span>[<span class='number'>0</span>] <span class='kw-2'>&amp;</span> <span class='number'>0x80</span> <span class='op'>!=</span> <span class='number'>0</span>;
-        <span class='kw'>let</span> <span class='ident'>stream_id</span> <span class='op'>=</span> {
-            <span class='comment'>// Parse the first 4 bytes into a u32...</span>
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>id</span> <span class='op'>=</span> <span class='macro'>unpack_octets_4</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='number'>0</span>, <span class='ident'>u32</span>);
-            <span class='comment'>// ...clear the first bit since the stream id is only 31 bits.</span>
-            <span class='ident'>id</span> <span class='op'>&amp;=</span> <span class='op'>!</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>);
-            <span class='ident'>id</span>
+    <span class="doccomment">/// Parses the first 5 bytes in the buffer as a `StreamDependency`.</span>
+    <span class="doccomment">/// (Each 5-byte sequence is always decodable into a stream dependency</span>
+    <span class="doccomment">/// structure).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the given buffer has less than 5 elements, the method will panic.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">StreamDependency</span> {
+        <span class="comment">// The most significant bit of the first byte is the &quot;E&quot; bit indicating</span>
+        <span class="comment">// whether the dependency is exclusive.</span>
+        <span class="kw">let</span> <span class="ident">is_exclusive</span> <span class="op">=</span> <span class="ident">buf</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x80</span> <span class="op">!=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> {
+            <span class="comment">// Parse the first 4 bytes into a u32...</span>
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id</span> <span class="op">=</span> <span class="macro">unpack_octets_4</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="number">0</span>, <span class="ident">u32</span>);
+            <span class="comment">// ...clear the first bit since the stream id is only 31 bits.</span>
+            <span class="ident">id</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>);
+            <span class="ident">id</span>
         };
 
-        <span class='ident'>StreamDependency</span> {
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>weight</span>: <span class='ident'>buf</span>[<span class='number'>4</span>],
-            <span class='ident'>is_exclusive</span>: <span class='ident'>is_exclusive</span>,
+        <span class="ident">StreamDependency</span> {
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">weight</span>: <span class="ident">buf</span>[<span class="number">4</span>],
+            <span class="ident">is_exclusive</span>: <span class="ident">is_exclusive</span>,
         }
     }
 
-    <span class='doccomment'>/// Serializes the `StreamDependency` into a 5-byte buffer representing the</span>
-    <span class='doccomment'>/// dependency description, as described in section 6.2. of the HTTP/2</span>
-    <span class='doccomment'>/// spec:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```notest</span>
-    <span class='doccomment'>///  0                   1                   2                   3</span>
-    <span class='doccomment'>///  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-    <span class='doccomment'>/// +-+-------------+-----------------------------------------------+</span>
-    <span class='doccomment'>/// |E|                 Stream Dependency  (31)                     |</span>
-    <span class='doccomment'>/// +-+-------------+-----------------------------------------------+</span>
-    <span class='doccomment'>/// |  Weight  (8)  |</span>
-    <span class='doccomment'>/// +-+-------------+-----------------------------------------------+</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Where &quot;E&quot; is set if the dependency is exclusive.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> [<span class='ident'>u8</span>; <span class='number'>5</span>] {
-        <span class='kw'>let</span> <span class='ident'>e_bit</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_exclusive</span> {
-            <span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>7</span>
-        } <span class='kw'>else</span> {
-            <span class='number'>0</span>
+    <span class="doccomment">/// Serializes the `StreamDependency` into a 5-byte buffer representing the</span>
+    <span class="doccomment">/// dependency description, as described in section 6.2. of the HTTP/2</span>
+    <span class="doccomment">/// spec:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```notest</span>
+    <span class="doccomment">///  0                   1                   2                   3</span>
+    <span class="doccomment">///  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
+    <span class="doccomment">/// +-+-------------+-----------------------------------------------+</span>
+    <span class="doccomment">/// |E|                 Stream Dependency  (31)                     |</span>
+    <span class="doccomment">/// +-+-------------+-----------------------------------------------+</span>
+    <span class="doccomment">/// |  Weight  (8)  |</span>
+    <span class="doccomment">/// +-+-------------+-----------------------------------------------+</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Where &quot;E&quot; is set if the dependency is exclusive.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> [<span class="ident">u8</span>; <span class="number">5</span>] {
+        <span class="kw">let</span> <span class="ident">e_bit</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_exclusive</span> {
+            <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">7</span>
+        } <span class="kw">else</span> {
+            <span class="number">0</span>
         };
         [
-            (((<span class='self'>self</span>.<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span> <span class='number'>24</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>) <span class='op'>|</span> <span class='ident'>e_bit</span>,
-            (((<span class='self'>self</span>.<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span> <span class='number'>16</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            (((<span class='self'>self</span>.<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span>  <span class='number'>8</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            (((<span class='self'>self</span>.<span class='ident'>stream_id</span> <span class='op'>&gt;&gt;</span>  <span class='number'>0</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            <span class='self'>self</span>.<span class='ident'>weight</span>,
+            (((<span class="self">self</span>.<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">|</span> <span class="ident">e_bit</span>,
+            (((<span class="self">self</span>.<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            (((<span class="self">self</span>.<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span>  <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            (((<span class="self">self</span>.<span class="ident">stream_id</span> <span class="op">&gt;&gt;</span>  <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            <span class="self">self</span>.<span class="ident">weight</span>,
         ]
     }
 }
 
-<span class='doccomment'>/// A struct representing the HEADERS frames of HTTP/2, as defined in the</span>
-<span class='doccomment'>/// HTTP/2 spec, section 6.2.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HeadersFrame</span> {
-    <span class='doccomment'>/// The header fragment bytes stored within the frame.</span>
-    <span class='kw'>pub</span> <span class='ident'>header_fragment</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The ID of the stream with which this frame is associated</span>
-    <span class='kw'>pub</span> <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>,
-    <span class='doccomment'>/// The stream dependency information, if any.</span>
-    <span class='kw'>pub</span> <span class='ident'>stream_dep</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>StreamDependency</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The length of the padding, if any.</span>
-    <span class='kw'>pub</span> <span class='ident'>padding_len</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// The set of flags for the frame, packed into a single byte.</span>
-    <span class='ident'>flags</span>: <span class='ident'>u8</span>,
+<span class="doccomment">/// A struct representing the HEADERS frames of HTTP/2, as defined in the</span>
+<span class="doccomment">/// HTTP/2 spec, section 6.2.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HeadersFrame</span> {
+    <span class="doccomment">/// The header fragment bytes stored within the frame.</span>
+    <span class="kw">pub</span> <span class="ident">header_fragment</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The ID of the stream with which this frame is associated</span>
+    <span class="kw">pub</span> <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// The stream dependency information, if any.</span>
+    <span class="kw">pub</span> <span class="ident">stream_dep</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamDependency</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The length of the padding, if any.</span>
+    <span class="kw">pub</span> <span class="ident">padding_len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The set of flags for the frame, packed into a single byte.</span>
+    <span class="ident">flags</span>: <span class="ident">u8</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>HeadersFrame</span> {
-    <span class='doccomment'>/// Creates a new `HeadersFrame` with the given header fragment and stream</span>
-    <span class='doccomment'>/// ID. No padding, no stream dependency, and no flags are set.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>fragment</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>, <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>) <span class='op'>-&gt;</span> <span class='ident'>HeadersFrame</span> {
-        <span class='ident'>HeadersFrame</span> {
-            <span class='ident'>header_fragment</span>: <span class='ident'>fragment</span>,
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>stream_dep</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>padding_len</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>flags</span>: <span class='number'>0</span>,
+<span class="kw">impl</span> <span class="ident">HeadersFrame</span> {
+    <span class="doccomment">/// Creates a new `HeadersFrame` with the given header fragment and stream</span>
+    <span class="doccomment">/// ID. No padding, no stream dependency, and no flags are set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fragment</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">stream_id</span>: <span class="ident">StreamId</span>) <span class="op">-&gt;</span> <span class="ident">HeadersFrame</span> {
+        <span class="ident">HeadersFrame</span> {
+            <span class="ident">header_fragment</span>: <span class="ident">fragment</span>,
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">stream_dep</span>: <span class="prelude-val">None</span>,
+            <span class="ident">padding_len</span>: <span class="prelude-val">None</span>,
+            <span class="ident">flags</span>: <span class="number">0</span>,
         }
     }
 
-    <span class='doccomment'>/// Creates a new `HeadersFrame` with the given header fragment, stream ID</span>
-    <span class='doccomment'>/// and stream dependency information. No padding and no flags are set.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_dependency</span>(
-            <span class='ident'>fragment</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-            <span class='ident'>stream_id</span>: <span class='ident'>StreamId</span>,
-            <span class='ident'>stream_dep</span>: <span class='ident'>StreamDependency</span>) <span class='op'>-&gt;</span> <span class='ident'>HeadersFrame</span> {
-        <span class='ident'>HeadersFrame</span> {
-            <span class='ident'>header_fragment</span>: <span class='ident'>fragment</span>,
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>stream_dep</span>: <span class='prelude-val'>Some</span>(<span class='ident'>stream_dep</span>),
-            <span class='ident'>padding_len</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>flags</span>: <span class='ident'>HeadersFlag</span>::<span class='ident'>Priority</span>.<span class='ident'>bitmask</span>(),
+    <span class="doccomment">/// Creates a new `HeadersFrame` with the given header fragment, stream ID</span>
+    <span class="doccomment">/// and stream dependency information. No padding and no flags are set.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_dependency</span>(
+            <span class="ident">fragment</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+            <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+            <span class="ident">stream_dep</span>: <span class="ident">StreamDependency</span>) <span class="op">-&gt;</span> <span class="ident">HeadersFrame</span> {
+        <span class="ident">HeadersFrame</span> {
+            <span class="ident">header_fragment</span>: <span class="ident">fragment</span>,
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">stream_dep</span>: <span class="prelude-val">Some</span>(<span class="ident">stream_dep</span>),
+            <span class="ident">padding_len</span>: <span class="prelude-val">None</span>,
+            <span class="ident">flags</span>: <span class="ident">HeadersFlag</span>::<span class="ident">Priority</span>.<span class="ident">bitmask</span>(),
         }
     }
 
-    <span class='doccomment'>/// Returns whether this frame ends the headers. If not, there MUST be a</span>
-    <span class='doccomment'>/// number of follow up CONTINUATION frames that send the rest of the</span>
-    <span class='doccomment'>/// header data.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_headers_end</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>EndHeaders</span>)
+    <span class="doccomment">/// Returns whether this frame ends the headers. If not, there MUST be a</span>
+    <span class="doccomment">/// number of follow up CONTINUATION frames that send the rest of the</span>
+    <span class="doccomment">/// header data.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_headers_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">EndHeaders</span>)
     }
 
-    <span class='doccomment'>/// Returns whther this frame ends the stream it is associated with.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_end_of_stream</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>EndStream</span>)
+    <span class="doccomment">/// Returns whther this frame ends the stream it is associated with.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_end_of_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">EndStream</span>)
     }
 
-    <span class='doccomment'>/// Sets the padding length for the frame, as well as the corresponding</span>
-    <span class='doccomment'>/// Padded flag.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_padding</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>padding_len</span>: <span class='ident'>u8</span>) {
-        <span class='self'>self</span>.<span class='ident'>padding_len</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>padding_len</span>);
-        <span class='self'>self</span>.<span class='ident'>set_flag</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>Padded</span>);
+    <span class="doccomment">/// Sets the padding length for the frame, as well as the corresponding</span>
+    <span class="doccomment">/// Padded flag.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_padding</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">padding_len</span>: <span class="ident">u8</span>) {
+        <span class="self">self</span>.<span class="ident">padding_len</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">padding_len</span>);
+        <span class="self">self</span>.<span class="ident">set_flag</span>(<span class="ident">HeadersFlag</span>::<span class="ident">Padded</span>);
     }
 
-    <span class='doccomment'>/// Returns the length of the payload of the current frame, including any</span>
-    <span class='doccomment'>/// possible padding in the number of bytes.</span>
-    <span class='kw'>fn</span> <span class='ident'>payload_len</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u32</span> {
-        <span class='kw'>let</span> <span class='ident'>padding</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>Padded</span>) {
-            <span class='number'>1</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>padding_len</span>.<span class='ident'>unwrap_or</span>(<span class='number'>0</span>) <span class='kw'>as</span> <span class='ident'>u32</span>
-        } <span class='kw'>else</span> {
-            <span class='number'>0</span>
+    <span class="doccomment">/// Returns the length of the payload of the current frame, including any</span>
+    <span class="doccomment">/// possible padding in the number of bytes.</span>
+    <span class="kw">fn</span> <span class="ident">payload_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+        <span class="kw">let</span> <span class="ident">padding</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">Padded</span>) {
+            <span class="number">1</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">padding_len</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="kw">as</span> <span class="ident">u32</span>
+        } <span class="kw">else</span> {
+            <span class="number">0</span>
         };
-        <span class='kw'>let</span> <span class='ident'>priority</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>Priority</span>) {
-            <span class='number'>5</span>
-        } <span class='kw'>else</span> {
-            <span class='number'>0</span>
+        <span class="kw">let</span> <span class="ident">priority</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">Priority</span>) {
+            <span class="number">5</span>
+        } <span class="kw">else</span> {
+            <span class="number">0</span>
         };
 
-        <span class='self'>self</span>.<span class='ident'>header_fragment</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span> <span class='op'>+</span> <span class='ident'>priority</span> <span class='op'>+</span> <span class='ident'>padding</span>
+        <span class="self">self</span>.<span class="ident">header_fragment</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="ident">priority</span> <span class="op">+</span> <span class="ident">padding</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Frame</span> <span class='kw'>for</span> <span class='ident'>HeadersFrame</span> {
-    <span class='doccomment'>/// The type that represents the flags that the particular `Frame` can take.</span>
-    <span class='doccomment'>/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
-    <span class='kw'>type</span> <span class='ident'>FlagType</span> <span class='op'>=</span> <span class='ident'>HeadersFlag</span>;
+<span class="kw">impl</span> <span class="ident">Frame</span> <span class="kw">for</span> <span class="ident">HeadersFrame</span> {
+    <span class="doccomment">/// The type that represents the flags that the particular `Frame` can take.</span>
+    <span class="doccomment">/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
+    <span class="kw">type</span> <span class="ident">FlagType</span> <span class="op">=</span> <span class="ident">HeadersFlag</span>;
 
-    <span class='doccomment'>/// Creates a new `HeadersFrame` with the given `RawFrame` (i.e. header and</span>
-    <span class='doccomment'>/// payload), if possible.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// `None` if a valid `HeadersFrame` cannot be constructed from the given</span>
-    <span class='doccomment'>/// `RawFrame`. The stream ID *must not* be 0.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Otherwise, returns a newly constructed `HeadersFrame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>from_raw</span>(<span class='ident'>raw_frame</span>: <span class='ident'>RawFrame</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span> {
-        <span class='comment'>// Unpack the header</span>
-        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>frame_type</span>, <span class='ident'>flags</span>, <span class='ident'>stream_id</span>) <span class='op'>=</span> <span class='ident'>raw_frame</span>.<span class='ident'>header</span>();
-        <span class='comment'>// Check that the frame type is correct for this frame implementation</span>
-        <span class='kw'>if</span> <span class='ident'>frame_type</span> <span class='op'>!=</span> <span class='number'>0x1</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    <span class="doccomment">/// Creates a new `HeadersFrame` with the given `RawFrame` (i.e. header and</span>
+    <span class="doccomment">/// payload), if possible.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `None` if a valid `HeadersFrame` cannot be constructed from the given</span>
+    <span class="doccomment">/// `RawFrame`. The stream ID *must not* be 0.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Otherwise, returns a newly constructed `HeadersFrame`.</span>
+    <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">raw_frame</span>: <span class="ident">RawFrame</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span> {
+        <span class="comment">// Unpack the header</span>
+        <span class="kw">let</span> (<span class="ident">len</span>, <span class="ident">frame_type</span>, <span class="ident">flags</span>, <span class="ident">stream_id</span>) <span class="op">=</span> <span class="ident">raw_frame</span>.<span class="ident">header</span>();
+        <span class="comment">// Check that the frame type is correct for this frame implementation</span>
+        <span class="kw">if</span> <span class="ident">frame_type</span> <span class="op">!=</span> <span class="number">0x1</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class='comment'>// Check that the length given in the header matches the payload</span>
-        <span class='comment'>// length; if not, something went wrong and we do not consider this a</span>
-        <span class='comment'>// valid frame.</span>
-        <span class='kw'>if</span> (<span class='ident'>len</span> <span class='kw'>as</span> <span class='ident'>usize</span>) <span class='op'>!=</span> <span class='ident'>raw_frame</span>.<span class='ident'>payload</span>().<span class='ident'>len</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+        <span class="comment">// Check that the length given in the header matches the payload</span>
+        <span class="comment">// length; if not, something went wrong and we do not consider this a</span>
+        <span class="comment">// valid frame.</span>
+        <span class="kw">if</span> (<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">!=</span> <span class="ident">raw_frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class='comment'>// Check that the HEADERS frame is not associated to stream 0</span>
-        <span class='kw'>if</span> <span class='ident'>stream_id</span> <span class='op'>==</span> <span class='number'>0</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+        <span class="comment">// Check that the HEADERS frame is not associated to stream 0</span>
+        <span class="kw">if</span> <span class="ident">stream_id</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class='comment'>// First, we get a slice containing the actual payload, depending on if</span>
-        <span class='comment'>// the frame is padded.</span>
-        <span class='kw'>let</span> <span class='ident'>padded</span> <span class='op'>=</span> (<span class='ident'>flags</span> <span class='kw-2'>&amp;</span> <span class='ident'>HeadersFlag</span>::<span class='ident'>Padded</span>.<span class='ident'>bitmask</span>()) <span class='op'>!=</span> <span class='number'>0</span>;
-        <span class='kw'>let</span> (<span class='ident'>actual</span>, <span class='ident'>pad_len</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>padded</span> {
-            <span class='kw'>match</span> <span class='ident'>parse_padded_payload</span>(<span class='kw-2'>&amp;</span><span class='ident'>raw_frame</span>.<span class='ident'>payload</span>()) {
-                <span class='prelude-val'>Some</span>((<span class='ident'>data</span>, <span class='ident'>pad_len</span>)) <span class='op'>=&gt;</span> (<span class='ident'>data</span>, <span class='prelude-val'>Some</span>(<span class='ident'>pad_len</span>)),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+        <span class="comment">// First, we get a slice containing the actual payload, depending on if</span>
+        <span class="comment">// the frame is padded.</span>
+        <span class="kw">let</span> <span class="ident">padded</span> <span class="op">=</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">HeadersFlag</span>::<span class="ident">Padded</span>.<span class="ident">bitmask</span>()) <span class="op">!=</span> <span class="number">0</span>;
+        <span class="kw">let</span> (<span class="ident">actual</span>, <span class="ident">pad_len</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">padded</span> {
+            <span class="kw">match</span> <span class="ident">parse_padded_payload</span>(<span class="kw-2">&amp;</span><span class="ident">raw_frame</span>.<span class="ident">payload</span>()) {
+                <span class="prelude-val">Some</span>((<span class="ident">data</span>, <span class="ident">pad_len</span>)) <span class="op">=&gt;</span> (<span class="ident">data</span>, <span class="prelude-val">Some</span>(<span class="ident">pad_len</span>)),
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
             }
-        } <span class='kw'>else</span> {
-            (<span class='ident'>raw_frame</span>.<span class='ident'>payload</span>(), <span class='prelude-val'>None</span>)
+        } <span class="kw">else</span> {
+            (<span class="ident">raw_frame</span>.<span class="ident">payload</span>(), <span class="prelude-val">None</span>)
         };
 
-        <span class='comment'>// From the actual payload we extract the stream dependency info, if</span>
-        <span class='comment'>// the appropriate flag is set.</span>
-        <span class='kw'>let</span> <span class='ident'>priority</span> <span class='op'>=</span> (<span class='ident'>flags</span> <span class='kw-2'>&amp;</span> <span class='ident'>HeadersFlag</span>::<span class='ident'>Priority</span>.<span class='ident'>bitmask</span>()) <span class='op'>!=</span> <span class='number'>0</span>;
-        <span class='kw'>let</span> (<span class='ident'>data</span>, <span class='ident'>stream_dep</span>) <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>priority</span> {
-            (<span class='kw-2'>&amp;</span><span class='ident'>actual</span>[<span class='number'>5</span>..], <span class='prelude-val'>Some</span>(<span class='ident'>StreamDependency</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>actual</span>[..<span class='number'>5</span>])))
-        } <span class='kw'>else</span> {
-            (<span class='ident'>actual</span>, <span class='prelude-val'>None</span>)
+        <span class="comment">// From the actual payload we extract the stream dependency info, if</span>
+        <span class="comment">// the appropriate flag is set.</span>
+        <span class="kw">let</span> <span class="ident">priority</span> <span class="op">=</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">HeadersFlag</span>::<span class="ident">Priority</span>.<span class="ident">bitmask</span>()) <span class="op">!=</span> <span class="number">0</span>;
+        <span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">stream_dep</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">priority</span> {
+            (<span class="kw-2">&amp;</span><span class="ident">actual</span>[<span class="number">5</span>..], <span class="prelude-val">Some</span>(<span class="ident">StreamDependency</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>[..<span class="number">5</span>])))
+        } <span class="kw">else</span> {
+            (<span class="ident">actual</span>, <span class="prelude-val">None</span>)
         };
 
-        <span class='prelude-val'>Some</span>(<span class='ident'>HeadersFrame</span> {
-            <span class='ident'>header_fragment</span>: <span class='ident'>data</span>.<span class='ident'>to_vec</span>(),
-            <span class='ident'>stream_id</span>: <span class='ident'>stream_id</span>,
-            <span class='ident'>stream_dep</span>: <span class='ident'>stream_dep</span>,
-            <span class='ident'>padding_len</span>: <span class='ident'>pad_len</span>,
-            <span class='ident'>flags</span>: <span class='ident'>flags</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">HeadersFrame</span> {
+            <span class="ident">header_fragment</span>: <span class="ident">data</span>.<span class="ident">to_vec</span>(),
+            <span class="ident">stream_id</span>: <span class="ident">stream_id</span>,
+            <span class="ident">stream_dep</span>: <span class="ident">stream_dep</span>,
+            <span class="ident">padding_len</span>: <span class="ident">pad_len</span>,
+            <span class="ident">flags</span>: <span class="ident">flags</span>,
         })
     }
 
-    <span class='doccomment'>/// Tests if the given flag is set for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_set</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>flag</span>: <span class='ident'>HeadersFlag</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        (<span class='self'>self</span>.<span class='ident'>flags</span> <span class='kw-2'>&amp;</span> <span class='ident'>flag</span>.<span class='ident'>bitmask</span>()) <span class='op'>!=</span> <span class='number'>0</span>
+    <span class="doccomment">/// Tests if the given flag is set for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">HeadersFlag</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        (<span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">flag</span>.<span class="ident">bitmask</span>()) <span class="op">!=</span> <span class="number">0</span>
     }
 
-    <span class='doccomment'>/// Returns the `StreamId` of the stream to which the frame is associated.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `SettingsFrame` always has to be associated to stream `0`.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span> {
-        <span class='self'>self</span>.<span class='ident'>stream_id</span>
+    <span class="doccomment">/// Returns the `StreamId` of the stream to which the frame is associated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `SettingsFrame` always has to be associated to stream `0`.</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span> {
+        <span class="self">self</span>.<span class="ident">stream_id</span>
     }
 
-    <span class='doccomment'>/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeader</span> {
-        (<span class='self'>self</span>.<span class='ident'>payload_len</span>(), <span class='number'>0x1</span>, <span class='self'>self</span>.<span class='ident'>flags</span>, <span class='self'>self</span>.<span class='ident'>stream_id</span>)
+    <span class="doccomment">/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
+    <span class="kw">fn</span> <span class="ident">get_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeader</span> {
+        (<span class="self">self</span>.<span class="ident">payload_len</span>(), <span class="number">0x1</span>, <span class="self">self</span>.<span class="ident">flags</span>, <span class="self">self</span>.<span class="ident">stream_id</span>)
     }
 
-    <span class='doccomment'>/// Sets the given flag for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>set_flag</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>flag</span>: <span class='ident'>HeadersFlag</span>) {
-        <span class='self'>self</span>.<span class='ident'>flags</span> <span class='op'>|=</span> <span class='ident'>flag</span>.<span class='ident'>bitmask</span>();
+    <span class="doccomment">/// Sets the given flag for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">set_flag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">HeadersFlag</span>) {
+        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|=</span> <span class="ident">flag</span>.<span class="ident">bitmask</span>();
     }
 
-    <span class='doccomment'>/// Returns a `Vec` with the serialized representation of the frame.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the `HeadersFlag::Priority` flag was set, but no stream dependency</span>
-    <span class='doccomment'>/// information is given (i.e. `stream_dep` is `None`).</span>
-    <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>payload_len</span>() <span class='kw'>as</span> <span class='ident'>usize</span>);
-        <span class='comment'>// First the header...</span>
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>get_header</span>()).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-        <span class='comment'>// Now the length of the padding, if any.</span>
-        <span class='kw'>let</span> <span class='ident'>padded</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>Padded</span>);
-        <span class='kw'>if</span> <span class='ident'>padded</span> {
-            <span class='ident'>buf</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>padding_len</span>.<span class='ident'>unwrap_or</span>(<span class='number'>0</span>));
+    <span class="doccomment">/// Returns a `Vec` with the serialized representation of the frame.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `HeadersFlag::Priority` flag was set, but no stream dependency</span>
+    <span class="doccomment">/// information is given (i.e. `stream_dep` is `None`).</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">payload_len</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="comment">// First the header...</span>
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_header</span>()).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+        <span class="comment">// Now the length of the padding, if any.</span>
+        <span class="kw">let</span> <span class="ident">padded</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">Padded</span>);
+        <span class="kw">if</span> <span class="ident">padded</span> {
+            <span class="ident">buf</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">padding_len</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>));
         }
-        <span class='comment'>// The stream dependency fields follow, if the priority flag is set</span>
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>Priority</span>) {
-            <span class='kw'>let</span> <span class='ident'>dep_buf</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>stream_dep</span> {
-                <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>dep</span>) <span class='op'>=&gt;</span> <span class='ident'>dep</span>.<span class='ident'>serialize</span>(),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Priority flag set, but no dependency information given&quot;</span>),
+        <span class="comment">// The stream dependency fields follow, if the priority flag is set</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">HeadersFlag</span>::<span class="ident">Priority</span>) {
+            <span class="kw">let</span> <span class="ident">dep_buf</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stream_dep</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">dep</span>) <span class="op">=&gt;</span> <span class="ident">dep</span>.<span class="ident">serialize</span>(),
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Priority flag set, but no dependency information given&quot;</span>),
             };
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>dep_buf</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">dep_buf</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
         }
-        <span class='comment'>// Now the actual headers fragment</span>
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='self'>self</span>.<span class='ident'>header_fragment</span>.<span class='ident'>clone</span>().<span class='ident'>into_iter</span>());
-        <span class='comment'>// Finally, add the trailing padding, if required</span>
-        <span class='kw'>if</span> <span class='ident'>padded</span> {
-            <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>padding_len</span>.<span class='ident'>unwrap_or</span>(<span class='number'>0</span>) { <span class='ident'>buf</span>.<span class='ident'>push</span>(<span class='number'>0</span>); }
+        <span class="comment">// Now the actual headers fragment</span>
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">header_fragment</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>());
+        <span class="comment">// Finally, add the trailing padding, if required</span>
+        <span class="kw">if</span> <span class="ident">padded</span> {
+            <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">padding_len</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) { <span class="ident">buf</span>.<span class="ident">push</span>(<span class="number">0</span>); }
         }
 
-        <span class='ident'>buf</span>
+        <span class="ident">buf</span>
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>HeadersFrame</span>, <span class='ident'>HeadersFlag</span>, <span class='ident'>StreamDependency</span>};
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::<span class='ident'>tests</span>::{<span class='ident'>build_test_frame</span>, <span class='ident'>build_padded_frame_payload</span>};
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::{<span class='ident'>pack_header</span>, <span class='ident'>Frame</span>, <span class='ident'>RawFrame</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">HeadersFrame</span>, <span class="ident">HeadersFlag</span>, <span class="ident">StreamDependency</span>};
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::<span class="ident">tests</span>::{<span class="ident">build_test_frame</span>, <span class="ident">build_padded_frame_payload</span>};
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::{<span class="ident">pack_header</span>, <span class="ident">Frame</span>, <span class="ident">RawFrame</span>};
 
-    <span class='doccomment'>/// Tests that a stream dependency structure can be correctly parsed by the</span>
-    <span class='doccomment'>/// `StreamDependency::parse` method.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse_stream_dependency</span>() {
+    <span class="doccomment">/// Tests that a stream dependency structure can be correctly parsed by the</span>
+    <span class="doccomment">/// `StreamDependency::parse` method.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_stream_dependency</span>() {
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>5</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>];
 
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>stream_id</span>, <span class='number'>1</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>weight</span>, <span class='number'>5</span>);
-            <span class='comment'>// This one was not exclusive!</span>
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>dep</span>.<span class='ident'>is_exclusive</span>)
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">stream_id</span>, <span class="number">1</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">weight</span>, <span class="number">5</span>);
+            <span class="comment">// This one was not exclusive!</span>
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">dep</span>.<span class="ident">is_exclusive</span>)
         }
         {
-            <span class='comment'>// Most significant bit set =&gt; is exclusive!</span>
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>128</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>5</span>];
+            <span class="comment">// Most significant bit set =&gt; is exclusive!</span>
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">128</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>];
 
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>stream_id</span>, <span class='number'>1</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>weight</span>, <span class='number'>5</span>);
-            <span class='comment'>// This one was indeed exclusive!</span>
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>is_exclusive</span>)
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">stream_id</span>, <span class="number">1</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">weight</span>, <span class="number">5</span>);
+            <span class="comment">// This one was indeed exclusive!</span>
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">is_exclusive</span>)
         }
         {
-            <span class='comment'>// Most significant bit set =&gt; is exclusive!</span>
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>5</span>];
+            <span class="comment">// Most significant bit set =&gt; is exclusive!</span>
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">5</span>];
 
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>stream_id</span>, (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>) <span class='op'>-</span> <span class='number'>1</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>weight</span>, <span class='number'>5</span>);
-            <span class='comment'>// This one was indeed exclusive!</span>
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>is_exclusive</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">stream_id</span>, (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>) <span class="op">-</span> <span class="number">1</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">weight</span>, <span class="number">5</span>);
+            <span class="comment">// This one was indeed exclusive!</span>
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">is_exclusive</span>);
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>127</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>5</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">127</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">5</span>];
 
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>parse</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>stream_id</span>, (<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>) <span class='op'>-</span> <span class='number'>1</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>dep</span>.<span class='ident'>weight</span>, <span class='number'>5</span>);
-            <span class='comment'>// This one was not exclusive!</span>
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>dep</span>.<span class='ident'>is_exclusive</span>);
-        }
-    }
-
-    <span class='doccomment'>/// Tests that a stream dependency structure can be correctly serialized by</span>
-    <span class='doccomment'>/// the `StreamDependency::serialize` method.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_serialize_stream_dependency</span>() {
-        {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>5</span>];
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='number'>5</span>, <span class='bool-val'>false</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>dep</span>.<span class='ident'>serialize</span>());
-        }
-        {
-            <span class='comment'>// Most significant bit set =&gt; is exclusive!</span>
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>128</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>5</span>];
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>dep</span>.<span class='ident'>serialize</span>());
-        }
-        {
-            <span class='comment'>// Most significant bit set =&gt; is exclusive!</span>
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>5</span>];
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>dep</span>.<span class='ident'>serialize</span>());
-        }
-        {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>127</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>255</span>, <span class='number'>5</span>];
-            <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>31</span>) <span class='op'>-</span> <span class='number'>1</span>, <span class='number'>5</span>, <span class='bool-val'>false</span>);
-
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>dep</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">stream_id</span>, (<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>) <span class="op">-</span> <span class="number">1</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dep</span>.<span class="ident">weight</span>, <span class="number">5</span>);
+            <span class="comment">// This one was not exclusive!</span>
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">dep</span>.<span class="ident">is_exclusive</span>);
         }
     }
 
-    <span class='doccomment'>/// Tests that a simple HEADERS frame is correctly parsed. The frame does</span>
-    <span class='doccomment'>/// not contain any padding nor priority information.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_simple</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>to_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
+    <span class="doccomment">/// Tests that a stream dependency structure can be correctly serialized by</span>
+    <span class="doccomment">/// the `StreamDependency::serialize` method.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_serialize_stream_dependency</span>() {
+        {
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>];
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">5</span>, <span class="bool-val">false</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">dep</span>.<span class="ident">serialize</span>());
+        }
+        {
+            <span class="comment">// Most significant bit set =&gt; is exclusive!</span>
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">128</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">5</span>];
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>header_fragment</span>, <span class='ident'>data</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>flags</span>, <span class='number'>0</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_stream_id</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>stream_dep</span>.<span class='ident'>is_none</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>padding_len</span>.<span class='ident'>is_none</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">dep</span>.<span class="ident">serialize</span>());
+        }
+        {
+            <span class="comment">// Most significant bit set =&gt; is exclusive!</span>
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">5</span>];
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">dep</span>.<span class="ident">serialize</span>());
+        }
+        {
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">127</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">5</span>];
+            <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>) <span class="op">-</span> <span class="number">1</span>, <span class="number">5</span>, <span class="bool-val">false</span>);
+
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">dep</span>.<span class="ident">serialize</span>());
+        }
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with padding is correctly parsed.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_with_padding</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>build_padded_frame_payload</span>(<span class='ident'>data</span>, <span class='number'>6</span>);
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x08</span>, <span class='number'>1</span>);
+    <span class="doccomment">/// Tests that a simple HEADERS frame is correctly parsed. The frame does</span>
+    <span class="doccomment">/// not contain any padding nor priority information.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_simple</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>header_fragment</span>, <span class='ident'>data</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>flags</span>, <span class='number'>8</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_stream_id</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>stream_dep</span>.<span class='ident'>is_none</span>());
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>padding_len</span>.<span class='ident'>unwrap</span>(), <span class='number'>6</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">header_fragment</span>, <span class="ident">data</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">flags</span>, <span class="number">0</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_stream_id</span>(), <span class="number">1</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">stream_dep</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">padding_len</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with the priority flag (and necessary fields)</span>
-    <span class='doccomment'>/// is correctly parsed.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_with_priority</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>0</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>dep</span>.<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a HEADERS frame with padding is correctly parsed.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_with_padding</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">build_padded_frame_payload</span>(<span class="ident">data</span>, <span class="number">6</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x08</span>, <span class="number">1</span>);
 
-            <span class='ident'>buf</span>
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">header_fragment</span>, <span class="ident">data</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">flags</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_stream_id</span>(), <span class="number">1</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">stream_dep</span>.<span class="ident">is_none</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">padding_len</span>.<span class="ident">unwrap</span>(), <span class="number">6</span>);
+    }
+
+    <span class="doccomment">/// Tests that a HEADERS frame with the priority flag (and necessary fields)</span>
+    <span class="doccomment">/// is correctly parsed.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_with_priority</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">dep</span>.<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x20</span>, <span class='number'>1</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x20</span>, <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>header_fragment</span>, <span class='ident'>data</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>flags</span>, <span class='number'>0x20</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_stream_id</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>stream_dep</span>.<span class='ident'>unwrap</span>(), <span class='ident'>dep</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>padding_len</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">header_fragment</span>, <span class="ident">data</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">flags</span>, <span class="number">0x20</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_stream_id</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">stream_dep</span>.<span class="ident">unwrap</span>(), <span class="ident">dep</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">padding_len</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with both padding and priority gets</span>
-    <span class='doccomment'>/// correctly parsed.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_padding_and_priority</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>0</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-        <span class='kw'>let</span> <span class='ident'>full</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>dep</span>.<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a HEADERS frame with both padding and priority gets</span>
+    <span class="doccomment">/// correctly parsed.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_padding_and_priority</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">full</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">dep</span>.<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-            <span class='ident'>buf</span>
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>build_padded_frame_payload</span>(<span class='kw-2'>&amp;</span><span class='ident'>full</span>, <span class='number'>4</span>);
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x20</span> <span class='op'>|</span> <span class='number'>0x8</span>, <span class='number'>1</span>);
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">build_padded_frame_payload</span>(<span class="kw-2">&amp;</span><span class="ident">full</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x20</span> <span class="op">|</span> <span class="number">0x8</span>, <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>header_fragment</span>, <span class='ident'>data</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>flags</span>, <span class='number'>0x20</span> <span class='op'>|</span> <span class='number'>0x8</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_stream_id</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>stream_dep</span>.<span class='ident'>unwrap</span>(), <span class='ident'>dep</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>padding_len</span>.<span class='ident'>unwrap</span>(), <span class='number'>4</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">header_fragment</span>, <span class="ident">data</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">flags</span>, <span class="number">0x20</span> <span class="op">|</span> <span class="number">0x8</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_stream_id</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">stream_dep</span>.<span class="ident">unwrap</span>(), <span class="ident">dep</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">padding_len</span>.<span class="ident">unwrap</span>(), <span class="number">4</span>);
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS with stream ID 0 is considered invalid.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_invalid_stream_id</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>to_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+    <span class="doccomment">/// Tests that a HEADERS with stream ID 0 is considered invalid.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_invalid_stream_id</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(
-            <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>payload</span>));
+        <span class="kw">let</span> <span class="ident">frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Frame</span>::<span class="ident">from_raw</span>(
+            <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">payload</span>));
         
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that the `HeadersFrame::parse` method considers any frame with</span>
-    <span class='doccomment'>/// a frame ID other than 1 in the frame header invalid.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_parse_invalid_type</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>to_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x2</span>, <span class='number'>0</span>, <span class='number'>1</span>);
+    <span class="doccomment">/// Tests that the `HeadersFrame::parse` method considers any frame with</span>
+    <span class="doccomment">/// a frame ID other than 1 in the frame header invalid.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_parse_invalid_type</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x2</span>, <span class="number">0</span>, <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HeadersFrame</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(
-            <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>payload</span>));
+        <span class="kw">let</span> <span class="ident">frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeadersFrame</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Frame</span>::<span class="ident">from_raw</span>(
+            <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">payload</span>));
         
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a simple HEADERS frame (no padding, no priority) gets</span>
-    <span class='doccomment'>/// correctly serialized.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_serialize_simple</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>to_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>headers</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>payload</span>.<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a simple HEADERS frame (no padding, no priority) gets</span>
+    <span class="doccomment">/// correctly serialized.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_serialize_simple</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">headers</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">payload</span>.<span class="ident">into_iter</span>());
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>HeadersFrame</span>::<span class='ident'>new</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>(), <span class='number'>1</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">HeadersFrame</span>::<span class="ident">new</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>(), <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='ident'>actual</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with padding is correctly serialized.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_serialize_with_padding</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>build_padded_frame_payload</span>(<span class='ident'>data</span>, <span class='number'>6</span>);
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x08</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>headers</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>payload</span>.<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a HEADERS frame with padding is correctly serialized.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_serialize_with_padding</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">build_padded_frame_payload</span>(<span class="ident">data</span>, <span class="number">6</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x08</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">headers</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">payload</span>.<span class="ident">into_iter</span>());
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>HeadersFrame</span>::<span class='ident'>new</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>(), <span class='number'>1</span>);
-        <span class='ident'>frame</span>.<span class='ident'>set_padding</span>(<span class='number'>6</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">HeadersFrame</span>::<span class="ident">new</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>(), <span class="number">1</span>);
+        <span class="ident">frame</span>.<span class="ident">set_padding</span>(<span class="number">6</span>);
 
-        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='ident'>actual</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with priority gets correctly serialized.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_serialize_with_priority</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>0</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>dep</span>.<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a HEADERS frame with priority gets correctly serialized.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_serialize_with_priority</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">dep</span>.<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-            <span class='ident'>buf</span>
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x20</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>headers</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>payload</span>.<span class='ident'>into_iter</span>());
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x20</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">headers</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">payload</span>.<span class="ident">into_iter</span>());
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>HeadersFrame</span>::<span class='ident'>with_dependency</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>(), <span class='number'>1</span>, <span class='ident'>dep</span>.<span class='ident'>clone</span>());
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">HeadersFrame</span>::<span class="ident">with_dependency</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>(), <span class="number">1</span>, <span class="ident">dep</span>.<span class="ident">clone</span>());
 
-        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='ident'>actual</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
     }
 
-    <span class='doccomment'>/// Tests that a HEADERS frame with both padding and a priority gets correctly</span>
-    <span class='doccomment'>/// serialized.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_serialize_padding_and_priority</span>() {
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='string'>b&quot;123&quot;</span>;
-        <span class='kw'>let</span> <span class='ident'>dep</span> <span class='op'>=</span> <span class='ident'>StreamDependency</span>::<span class='ident'>new</span>(<span class='number'>0</span>, <span class='number'>5</span>, <span class='bool-val'>true</span>);
-        <span class='kw'>let</span> <span class='ident'>full</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>dep</span>.<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a HEADERS frame with both padding and a priority gets correctly</span>
+    <span class="doccomment">/// serialized.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_serialize_padding_and_priority</span>() {
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">b&quot;123&quot;</span>;
+        <span class="kw">let</span> <span class="ident">dep</span> <span class="op">=</span> <span class="ident">StreamDependency</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="ident">full</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">dep</span>.<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-            <span class='ident'>buf</span>
+            <span class="ident">buf</span>
         };
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='ident'>build_padded_frame_payload</span>(<span class='kw-2'>&amp;</span><span class='ident'>full</span>, <span class='number'>4</span>);
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>0x1</span>, <span class='number'>0x20</span> <span class='op'>|</span> <span class='number'>0x8</span>, <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='ident'>headers</span> <span class='op'>=</span> <span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>headers</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>payload</span>.<span class='ident'>into_iter</span>());
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">build_padded_frame_payload</span>(<span class="kw-2">&amp;</span><span class="ident">full</span>, <span class="number">4</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">0x1</span>, <span class="number">0x20</span> <span class="op">|</span> <span class="number">0x8</span>, <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">headers</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">payload</span>.<span class="ident">into_iter</span>());
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>HeadersFrame</span>::<span class='ident'>with_dependency</span>(<span class='ident'>data</span>.<span class='ident'>to_vec</span>(), <span class='number'>1</span>, <span class='ident'>dep</span>.<span class='ident'>clone</span>());
-        <span class='ident'>frame</span>.<span class='ident'>set_padding</span>(<span class='number'>4</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">HeadersFrame</span>::<span class="ident">with_dependency</span>(<span class="ident">data</span>.<span class="ident">to_vec</span>(), <span class="number">1</span>, <span class="ident">dep</span>.<span class="ident">clone</span>());
+        <span class="ident">frame</span>.<span class="ident">set_padding</span>(<span class="number">4</span>);
 
-        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expected</span>, <span class='ident'>actual</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">expected</span>, <span class="ident">actual</span>);
     }
 
-    <span class='doccomment'>/// Tests that the `HeadersFrame::is_headers_end` method returns the correct</span>
-    <span class='doccomment'>/// value depending on the `EndHeaders` flag being set or not.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_headers_frame_is_headers_end</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>HeadersFrame</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[], <span class='number'>1</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>frame</span>.<span class='ident'>is_headers_end</span>());
+    <span class="doccomment">/// Tests that the `HeadersFrame::is_headers_end` method returns the correct</span>
+    <span class="doccomment">/// value depending on the `EndHeaders` flag being set or not.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_headers_frame_is_headers_end</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">HeadersFrame</span>::<span class="ident">new</span>(<span class="macro">vec</span><span class="macro">!</span>[], <span class="number">1</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_headers_end</span>());
 
-        <span class='ident'>frame</span>.<span class='ident'>set_flag</span>(<span class='ident'>HeadersFlag</span>::<span class='ident'>EndHeaders</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_headers_end</span>());
+        <span class="ident">frame</span>.<span class="ident">set_flag</span>(<span class="ident">HeadersFlag</span>::<span class="ident">EndHeaders</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_headers_end</span>());
     }
 }
 </pre>
@@ -1317,18 +1329,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1361,7 +1377,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

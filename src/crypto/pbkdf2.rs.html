@@ -9,14 +9,18 @@
 
     <title>pbkdf2.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -399,78 +411,78 @@
 <span id="355">355</span>
 <span id="356">356</span>
 <span id="357">357</span>
-</pre><pre class='rust '>
-<span class='comment'>// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class='comment'>// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class='comment'>// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class='comment'>// option. This file may not be copied, modified, or distributed</span>
-<span class='comment'>// except according to those terms.</span>
+</pre><pre class="rust ">
+<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="comment">// option. This file may not be copied, modified, or distributed</span>
+<span class="comment">// except according to those terms.</span>
 
-<span class='doccomment'>/*!
+<span class="doccomment">/*!
  * This module implements the PBKDF2 Key Derivation Function as specified by
  * http://tools.ietf.org/html/rfc2898.
  */</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>cryptoutil</span>::<span class='ident'>copy_memory</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">cryptoutil</span>::<span class="ident">copy_memory</span>;
 
-<span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>OsRng</span>, <span class='ident'>Rng</span>};
-<span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>base64</span>;
-<span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>base64</span>::{<span class='ident'>FromBase64</span>, <span class='ident'>ToBase64</span>};
+<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">OsRng</span>, <span class="ident">Rng</span>};
+<span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">base64</span>;
+<span class="kw">use</span> <span class="ident">serialize</span>::<span class="ident">base64</span>::{<span class="ident">FromBase64</span>, <span class="ident">ToBase64</span>};
 
-<span class='kw'>use</span> <span class='ident'>cryptoutil</span>::{<span class='ident'>read_u32_be</span>, <span class='ident'>write_u32_be</span>};
-<span class='kw'>use</span> <span class='ident'>hmac</span>::<span class='ident'>Hmac</span>;
-<span class='kw'>use</span> <span class='ident'>mac</span>::<span class='ident'>Mac</span>;
-<span class='kw'>use</span> <span class='ident'>sha2</span>::<span class='ident'>Sha256</span>;
-<span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>fixed_time_eq</span>;
+<span class="kw">use</span> <span class="ident">cryptoutil</span>::{<span class="ident">read_u32_be</span>, <span class="ident">write_u32_be</span>};
+<span class="kw">use</span> <span class="ident">hmac</span>::<span class="ident">Hmac</span>;
+<span class="kw">use</span> <span class="ident">mac</span>::<span class="ident">Mac</span>;
+<span class="kw">use</span> <span class="ident">sha2</span>::<span class="ident">Sha256</span>;
+<span class="kw">use</span> <span class="ident">util</span>::<span class="ident">fixed_time_eq</span>;
 
-<span class='comment'>// Calculate a block of the output of size equal to the output_bytes of the underlying Mac function</span>
-<span class='comment'>// mac - The Mac function to use</span>
-<span class='comment'>// salt - the salt value to use</span>
-<span class='comment'>// c - the iteration count</span>
-<span class='comment'>// idx - the 1 based index of the block</span>
-<span class='comment'>// scratch - a temporary variable the same length as the block</span>
-<span class='comment'>// block - the block of the output to calculate</span>
-<span class='kw'>fn</span> <span class='ident'>calculate_block</span><span class='op'>&lt;</span><span class='ident'>M</span>: <span class='ident'>Mac</span><span class='op'>&gt;</span>(
-        <span class='ident'>mac</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>M</span>,
-        <span class='ident'>salt</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>],
-        <span class='ident'>c</span>: <span class='ident'>u32</span>,
-        <span class='ident'>idx</span>: <span class='ident'>u32</span>,
-        <span class='ident'>scratch</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>],
-        <span class='ident'>block</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) {
-    <span class='comment'>// Perform the 1st iteration. The output goes directly into block</span>
-    <span class='ident'>mac</span>.<span class='ident'>input</span>(<span class='ident'>salt</span>);
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx_buf</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>4</span>];
-    <span class='ident'>write_u32_be</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>idx_buf</span>, <span class='ident'>idx</span>);
-    <span class='ident'>mac</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>idx_buf</span>);
-    <span class='ident'>mac</span>.<span class='ident'>raw_result</span>(<span class='ident'>block</span>);
-    <span class='ident'>mac</span>.<span class='ident'>reset</span>();
+<span class="comment">// Calculate a block of the output of size equal to the output_bytes of the underlying Mac function</span>
+<span class="comment">// mac - The Mac function to use</span>
+<span class="comment">// salt - the salt value to use</span>
+<span class="comment">// c - the iteration count</span>
+<span class="comment">// idx - the 1 based index of the block</span>
+<span class="comment">// scratch - a temporary variable the same length as the block</span>
+<span class="comment">// block - the block of the output to calculate</span>
+<span class="kw">fn</span> <span class="ident">calculate_block</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span><span class="op">&gt;</span>(
+        <span class="ident">mac</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>,
+        <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+        <span class="ident">c</span>: <span class="ident">u32</span>,
+        <span class="ident">idx</span>: <span class="ident">u32</span>,
+        <span class="ident">scratch</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
+        <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+    <span class="comment">// Perform the 1st iteration. The output goes directly into block</span>
+    <span class="ident">mac</span>.<span class="ident">input</span>(<span class="ident">salt</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx_buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
+    <span class="ident">write_u32_be</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">idx_buf</span>, <span class="ident">idx</span>);
+    <span class="ident">mac</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">idx_buf</span>);
+    <span class="ident">mac</span>.<span class="ident">raw_result</span>(<span class="ident">block</span>);
+    <span class="ident">mac</span>.<span class="ident">reset</span>();
 
-    <span class='comment'>// Perform the 2nd iteration. The input comes from block and is output into scratch. scratch is</span>
-    <span class='comment'>// then exclusive-or added into block. After all this, the input to the next step is now in</span>
-    <span class='comment'>// scratch and block is left to just accumulate the exclusive-of sum of remaining iterations.</span>
-    <span class='kw'>if</span> <span class='ident'>c</span> <span class='op'>&gt;</span> <span class='number'>1</span> {
-        <span class='ident'>mac</span>.<span class='ident'>input</span>(<span class='ident'>block</span>);
-        <span class='ident'>mac</span>.<span class='ident'>raw_result</span>(<span class='ident'>scratch</span>);
-        <span class='ident'>mac</span>.<span class='ident'>reset</span>();
-        <span class='kw'>for</span> (<span class='ident'>output</span>, <span class='kw-2'>&amp;</span><span class='ident'>input</span>) <span class='kw'>in</span> <span class='ident'>block</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>scratch</span>.<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>output</span> <span class='op'>^=</span> <span class='ident'>input</span>;
+    <span class="comment">// Perform the 2nd iteration. The input comes from block and is output into scratch. scratch is</span>
+    <span class="comment">// then exclusive-or added into block. After all this, the input to the next step is now in</span>
+    <span class="comment">// scratch and block is left to just accumulate the exclusive-of sum of remaining iterations.</span>
+    <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span> <span class="number">1</span> {
+        <span class="ident">mac</span>.<span class="ident">input</span>(<span class="ident">block</span>);
+        <span class="ident">mac</span>.<span class="ident">raw_result</span>(<span class="ident">scratch</span>);
+        <span class="ident">mac</span>.<span class="ident">reset</span>();
+        <span class="kw">for</span> (<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>) <span class="kw">in</span> <span class="ident">block</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">scratch</span>.<span class="ident">iter</span>()) {
+            <span class="kw-2">*</span><span class="ident">output</span> <span class="op">^=</span> <span class="ident">input</span>;
         }
     }
 
-    <span class='comment'>// Perform all remaining iterations</span>
-    <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>2</span>..<span class='ident'>c</span> {
-        <span class='ident'>mac</span>.<span class='ident'>input</span>(<span class='ident'>scratch</span>);
-        <span class='ident'>mac</span>.<span class='ident'>raw_result</span>(<span class='ident'>scratch</span>);
-        <span class='ident'>mac</span>.<span class='ident'>reset</span>();
-        <span class='kw'>for</span> (<span class='ident'>output</span>, <span class='kw-2'>&amp;</span><span class='ident'>input</span>) <span class='kw'>in</span> <span class='ident'>block</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>scratch</span>.<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>output</span> <span class='op'>^=</span> <span class='ident'>input</span>;
+    <span class="comment">// Perform all remaining iterations</span>
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="number">2</span>..<span class="ident">c</span> {
+        <span class="ident">mac</span>.<span class="ident">input</span>(<span class="ident">scratch</span>);
+        <span class="ident">mac</span>.<span class="ident">raw_result</span>(<span class="ident">scratch</span>);
+        <span class="ident">mac</span>.<span class="ident">reset</span>();
+        <span class="kw">for</span> (<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>) <span class="kw">in</span> <span class="ident">block</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">scratch</span>.<span class="ident">iter</span>()) {
+            <span class="kw-2">*</span><span class="ident">output</span> <span class="op">^=</span> <span class="ident">input</span>;
         }
     }
 }
 
-<span class='doccomment'>/**
+<span class="doccomment">/**
  * Execute the PBKDF2 Key Derivation Function. The Scrypt Key Derivation Function generally provides
  * better security, so, applications that do not have a requirement to use PBKDF2 specifically
  * should consider using that function instead.
@@ -483,35 +495,35 @@
  * * output - The output buffer to fill with the derived key value.
  *
  */</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pbkdf2</span><span class='op'>&lt;</span><span class='ident'>M</span>: <span class='ident'>Mac</span><span class='op'>&gt;</span>(<span class='ident'>mac</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>M</span>, <span class='ident'>salt</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>c</span>: <span class='ident'>u32</span>, <span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) {
-    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>c</span> <span class='op'>&gt;</span> <span class='number'>0</span>);
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pbkdf2</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span><span class="op">&gt;</span>(<span class="ident">mac</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">c</span> <span class="op">&gt;</span> <span class="number">0</span>);
 
-    <span class='kw'>let</span> <span class='ident'>os</span> <span class='op'>=</span> <span class='ident'>mac</span>.<span class='ident'>output_bytes</span>();
+    <span class="kw">let</span> <span class="ident">os</span> <span class="op">=</span> <span class="ident">mac</span>.<span class="ident">output_bytes</span>();
 
-    <span class='comment'>// A temporary storage array needed by calculate_block. This is really only necessary if c &gt; 1.</span>
-    <span class='comment'>// Most users of pbkdf2 should use a value much larger than 1, so, this allocation should almost</span>
-    <span class='comment'>// always be necessary. A big exception is Scrypt. However, this allocation is unlikely to be</span>
-    <span class='comment'>// the bottleneck in Scrypt performance.</span>
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>scratch</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='ident'>os</span>).<span class='ident'>collect</span>();
+    <span class="comment">// A temporary storage array needed by calculate_block. This is really only necessary if c &gt; 1.</span>
+    <span class="comment">// Most users of pbkdf2 should use a value much larger than 1, so, this allocation should almost</span>
+    <span class="comment">// always be necessary. A big exception is Scrypt. However, this allocation is unlikely to be</span>
+    <span class="comment">// the bottleneck in Scrypt performance.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scratch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="ident">os</span>).<span class="ident">collect</span>();
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx</span>: <span class='ident'>u32</span> <span class='op'>=</span> <span class='number'>0</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
 
-    <span class='kw'>for</span> <span class='ident'>chunk</span> <span class='kw'>in</span> <span class='ident'>output</span>.<span class='ident'>chunks_mut</span>(<span class='ident'>os</span>) {
-        <span class='comment'>// The block index starts at 1. So, this is supposed to run on the first execution.</span>
-        <span class='ident'>idx</span> <span class='op'>=</span> <span class='ident'>idx</span>.<span class='ident'>checked_add</span>(<span class='number'>1</span>).<span class='ident'>expect</span>(<span class='string'>&quot;PBKDF2 size limit exceeded.&quot;</span>);
+    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">output</span>.<span class="ident">chunks_mut</span>(<span class="ident">os</span>) {
+        <span class="comment">// The block index starts at 1. So, this is supposed to run on the first execution.</span>
+        <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;PBKDF2 size limit exceeded.&quot;</span>);
 
-        <span class='kw'>if</span> <span class='ident'>chunk</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='ident'>os</span> {
-            <span class='ident'>calculate_block</span>(<span class='ident'>mac</span>, <span class='ident'>salt</span>, <span class='ident'>c</span>, <span class='ident'>idx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>scratch</span>, <span class='ident'>chunk</span>);
-        } <span class='kw'>else</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tmp</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='ident'>os</span>).<span class='ident'>collect</span>();
-            <span class='ident'>calculate_block</span>(<span class='ident'>mac</span>, <span class='ident'>salt</span>, <span class='ident'>c</span>, <span class='ident'>idx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>scratch</span>[..], <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tmp</span>[..]);
-            <span class='kw'>let</span> <span class='ident'>chunk_len</span> <span class='op'>=</span> <span class='ident'>chunk</span>.<span class='ident'>len</span>();
-            <span class='ident'>copy_memory</span>(<span class='kw-2'>&amp;</span><span class='ident'>tmp</span>[..<span class='ident'>chunk_len</span>], <span class='ident'>chunk</span>);
+        <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">os</span> {
+            <span class="ident">calculate_block</span>(<span class="ident">mac</span>, <span class="ident">salt</span>, <span class="ident">c</span>, <span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">scratch</span>, <span class="ident">chunk</span>);
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="ident">os</span>).<span class="ident">collect</span>();
+            <span class="ident">calculate_block</span>(<span class="ident">mac</span>, <span class="ident">salt</span>, <span class="ident">c</span>, <span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">scratch</span>[..], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[..]);
+            <span class="kw">let</span> <span class="ident">chunk_len</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">len</span>();
+            <span class="ident">copy_memory</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>[..<span class="ident">chunk_len</span>], <span class="ident">chunk</span>);
         }
     }
 }
 
-<span class='doccomment'>/**
+<span class="doccomment">/**
  * pbkdf2_simple is a helper function that should be sufficient for the majority of cases where
  * an application needs to use PBKDF2 to hash a password for storage. The result is a String that
  * contains the parameters used as part of its encoding. The pbkdf2_check function may be used on
@@ -531,33 +543,33 @@
  * * c - The iteration count
  *
  */</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pbkdf2_simple</span>(<span class='ident'>password</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>c</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>OsRng</span>::<span class='ident'>new</span>());
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pbkdf2_simple</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">c</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">OsRng</span>::<span class="ident">new</span>());
 
-    <span class='comment'>// 128-bit salt</span>
-    <span class='kw'>let</span> <span class='ident'>salt</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_iter</span>::<span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>().<span class='ident'>take</span>(<span class='number'>16</span>).<span class='ident'>collect</span>();
+    <span class="comment">// 128-bit salt</span>
+    <span class="kw">let</span> <span class="ident">salt</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rng</span>.<span class="ident">gen_iter</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>().<span class="ident">take</span>(<span class="number">16</span>).<span class="ident">collect</span>();
 
-    <span class='comment'>// 256-bit derived key</span>
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>dk</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>32</span>];
+    <span class="comment">// 256-bit derived key</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dk</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mac</span> <span class='op'>=</span> <span class='ident'>Hmac</span>::<span class='ident'>new</span>(<span class='ident'>Sha256</span>::<span class='ident'>new</span>(), <span class='ident'>password</span>.<span class='ident'>as_bytes</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="ident">new</span>(<span class="ident">Sha256</span>::<span class="ident">new</span>(), <span class="ident">password</span>.<span class="ident">as_bytes</span>());
 
-    <span class='ident'>pbkdf2</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>mac</span>, <span class='kw-2'>&amp;</span><span class='ident'>salt</span>[..], <span class='ident'>c</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>dk</span>);
+    <span class="ident">pbkdf2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mac</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>[..], <span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dk</span>);
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='string'>&quot;$rpbkdf2$0$&quot;</span>.<span class='ident'>to_string</span>();
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tmp</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>4</span>];
-    <span class='ident'>write_u32_be</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tmp</span>, <span class='ident'>c</span>);
-    <span class='ident'>result</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>tmp</span>.<span class='ident'>to_base64</span>(<span class='ident'>base64</span>::<span class='ident'>STANDARD</span>)[..]);
-    <span class='ident'>result</span>.<span class='ident'>push</span>(<span class='string'>&#39;$&#39;</span>);
-    <span class='ident'>result</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>salt</span>.<span class='ident'>to_base64</span>(<span class='ident'>base64</span>::<span class='ident'>STANDARD</span>)[..]);
-    <span class='ident'>result</span>.<span class='ident'>push</span>(<span class='string'>&#39;$&#39;</span>);
-    <span class='ident'>result</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>dk</span>.<span class='ident'>to_base64</span>(<span class='ident'>base64</span>::<span class='ident'>STANDARD</span>)[..]);
-    <span class='ident'>result</span>.<span class='ident'>push</span>(<span class='string'>&#39;$&#39;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="string">&quot;$rpbkdf2$0$&quot;</span>.<span class="ident">to_string</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
+    <span class="ident">write_u32_be</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>, <span class="ident">c</span>);
+    <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>.<span class="ident">to_base64</span>(<span class="ident">base64</span>::<span class="ident">STANDARD</span>)[..]);
+    <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;$&#39;</span>);
+    <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">salt</span>.<span class="ident">to_base64</span>(<span class="ident">base64</span>::<span class="ident">STANDARD</span>)[..]);
+    <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;$&#39;</span>);
+    <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">dk</span>.<span class="ident">to_base64</span>(<span class="ident">base64</span>::<span class="ident">STANDARD</span>)[..]);
+    <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;$&#39;</span>);
 
-    <span class='prelude-val'>Ok</span>(<span class='ident'>result</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
 }
 
-<span class='doccomment'>/**
+<span class="doccomment">/**
  * pbkdf2_check compares a password against the result of a previous call to pbkdf2_simple and
  * returns true if the passed in password hashes to the same value.
  *
@@ -567,193 +579,193 @@
  * * hashed_value - A string representing a hashed password returned by pbkdf2_simple()
  *
  */</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pbkdf2_check</span>(<span class='ident'>password</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>hashed_value</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>bool</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-    <span class='kw'>static</span> <span class='ident'>ERR_STR</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> <span class='op'>=</span> <span class='string'>&quot;Hash is not in Rust PBKDF2 format.&quot;</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pbkdf2_check</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">hashed_value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">static</span> <span class="ident">ERR_STR</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Hash is not in Rust PBKDF2 format.&quot;</span>;
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>iter</span> <span class='op'>=</span> <span class='ident'>hashed_value</span>.<span class='ident'>split</span>(<span class='string'>&#39;$&#39;</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">hashed_value</span>.<span class="ident">split</span>(<span class="string">&#39;$&#39;</span>);
 
-    <span class='comment'>// Check that there are no characters before the first &quot;$&quot;</span>
-    <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>x</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>x</span> <span class='op'>!=</span> <span class='string'>&quot;&quot;</span> { <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>); },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Check that there are no characters before the first &quot;$&quot;</span>
+    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">!=</span> <span class="string">&quot;&quot;</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>); },
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     }
 
-    <span class='comment'>// Check the name</span>
-    <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>t</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>t</span> <span class='op'>!=</span> <span class='string'>&quot;rpbkdf2&quot;</span> { <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>); },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Check the name</span>
+    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">!=</span> <span class="string">&quot;rpbkdf2&quot;</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>); },
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     }
 
-    <span class='comment'>// Parse format - currenlty only version 0 is supported</span>
-    <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>fstr</span>) <span class='op'>=&gt;</span> {
-            <span class='kw'>match</span> <span class='ident'>fstr</span> {
-                <span class='string'>&quot;0&quot;</span> <span class='op'>=&gt;</span> { }
-                _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Parse format - currenlty only version 0 is supported</span>
+    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">fstr</span>) <span class="op">=&gt;</span> {
+            <span class="kw">match</span> <span class="ident">fstr</span> {
+                <span class="string">&quot;0&quot;</span> <span class="op">=&gt;</span> { }
+                _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
             }
         }
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     }
 
-    <span class='comment'>// Parse the iteration count</span>
-    <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>pstr</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>pstr</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>pvec</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>if</span> <span class='ident'>pvec</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='number'>4</span> { <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>); }
-                <span class='ident'>read_u32_be</span>(<span class='kw-2'>&amp;</span><span class='ident'>pvec</span>[..])
+    <span class="comment">// Parse the iteration count</span>
+    <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">pstr</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">pstr</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">pvec</span>) <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">pvec</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="number">4</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>); }
+                <span class="ident">read_u32_be</span>(<span class="kw-2">&amp;</span><span class="ident">pvec</span>[..])
             }
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
         },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     };
 
-    <span class='comment'>// Salt</span>
-    <span class='kw'>let</span> <span class='ident'>salt</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>sstr</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>sstr</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>salt</span>) <span class='op'>=&gt;</span> <span class='ident'>salt</span>,
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Salt</span>
+    <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">sstr</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">sstr</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">salt</span>) <span class="op">=&gt;</span> <span class="ident">salt</span>,
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
         },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     };
 
-    <span class='comment'>// Hashed value</span>
-    <span class='kw'>let</span> <span class='ident'>hash</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>hstr</span>) <span class='op'>=&gt;</span> <span class='kw'>match</span> <span class='ident'>hstr</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>hash</span>) <span class='op'>=&gt;</span> <span class='ident'>hash</span>,
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Hashed value</span>
+    <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">hstr</span>) <span class="op">=&gt;</span> <span class="kw">match</span> <span class="ident">hstr</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">hash</span>) <span class="op">=&gt;</span> <span class="ident">hash</span>,
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
         },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     };
 
-    <span class='comment'>// Make sure that the input ends with a &quot;$&quot;</span>
-    <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(<span class='ident'>x</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>x</span> <span class='op'>!=</span> <span class='string'>&quot;&quot;</span> { <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>); },
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>)
+    <span class="comment">// Make sure that the input ends with a &quot;$&quot;</span>
+    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">!=</span> <span class="string">&quot;&quot;</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>); },
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>)
     }
 
-    <span class='comment'>// Make sure there is no trailing data after the final &quot;$&quot;</span>
-    <span class='kw'>match</span> <span class='ident'>iter</span>.<span class='ident'>next</span>() {
-        <span class='prelude-val'>Some</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>ERR_STR</span>),
-        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> { }
+    <span class="comment">// Make sure there is no trailing data after the final &quot;$&quot;</span>
+    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ERR_STR</span>),
+        <span class="prelude-val">None</span> <span class="op">=&gt;</span> { }
     }
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mac</span> <span class='op'>=</span> <span class='ident'>Hmac</span>::<span class='ident'>new</span>(<span class='ident'>Sha256</span>::<span class='ident'>new</span>(), <span class='ident'>password</span>.<span class='ident'>as_bytes</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="ident">new</span>(<span class="ident">Sha256</span>::<span class="ident">new</span>(), <span class="ident">password</span>.<span class="ident">as_bytes</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>output</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='ident'>hash</span>.<span class='ident'>len</span>()).<span class='ident'>collect</span>();
-    <span class='ident'>pbkdf2</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>mac</span>, <span class='kw-2'>&amp;</span><span class='ident'>salt</span>[..], <span class='ident'>c</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>output</span>[..]);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="ident">hash</span>.<span class="ident">len</span>()).<span class="ident">collect</span>();
+    <span class="ident">pbkdf2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mac</span>, <span class="kw-2">&amp;</span><span class="ident">salt</span>[..], <span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>[..]);
 
-    <span class='comment'>// Be careful here - its important that the comparison be done using a fixed time equality</span>
-    <span class='comment'>// check. Otherwise an adversary that can measure how long this step takes can learn about the</span>
-    <span class='comment'>// hashed value which would allow them to mount an offline brute force attack against the</span>
-    <span class='comment'>// hashed password.</span>
-    <span class='prelude-val'>Ok</span>(<span class='ident'>fixed_time_eq</span>(<span class='kw-2'>&amp;</span><span class='ident'>output</span>[..], <span class='kw-2'>&amp;</span><span class='ident'>hash</span>[..]))
+    <span class="comment">// Be careful here - its important that the comparison be done using a fixed time equality</span>
+    <span class="comment">// check. Otherwise an adversary that can measure how long this step takes can learn about the</span>
+    <span class="comment">// hashed value which would allow them to mount an offline brute force attack against the</span>
+    <span class="comment">// hashed password.</span>
+    <span class="prelude-val">Ok</span>(<span class="ident">fixed_time_eq</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..], <span class="kw-2">&amp;</span><span class="ident">hash</span>[..]))
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>;
 
-    <span class='kw'>use</span> <span class='ident'>pbkdf2</span>::{<span class='ident'>pbkdf2</span>, <span class='ident'>pbkdf2_simple</span>, <span class='ident'>pbkdf2_check</span>};
-    <span class='kw'>use</span> <span class='ident'>hmac</span>::<span class='ident'>Hmac</span>;
-    <span class='kw'>use</span> <span class='ident'>sha1</span>::<span class='ident'>Sha1</span>;
+    <span class="kw">use</span> <span class="ident">pbkdf2</span>::{<span class="ident">pbkdf2</span>, <span class="ident">pbkdf2_simple</span>, <span class="ident">pbkdf2_check</span>};
+    <span class="kw">use</span> <span class="ident">hmac</span>::<span class="ident">Hmac</span>;
+    <span class="kw">use</span> <span class="ident">sha1</span>::<span class="ident">Sha1</span>;
 
-    <span class='kw'>struct</span> <span class='ident'>Test</span> {
-        <span class='ident'>password</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-        <span class='ident'>salt</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-        <span class='ident'>c</span>: <span class='ident'>u32</span>,
-        <span class='ident'>expected</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>
+    <span class="kw">struct</span> <span class="ident">Test</span> {
+        <span class="ident">password</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">salt</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">c</span>: <span class="ident">u32</span>,
+        <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>
     }
 
-    <span class='comment'>// Test vectors from http://tools.ietf.org/html/rfc6070. The 4th test vector is omitted because</span>
-    <span class='comment'>// it takes too long to run.</span>
+    <span class="comment">// Test vectors from http://tools.ietf.org/html/rfc6070. The 4th test vector is omitted because</span>
+    <span class="comment">// it takes too long to run.</span>
 
-    <span class='kw'>fn</span> <span class='ident'>tests</span>() <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Test</span><span class='op'>&gt;</span> {
-        <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='ident'>Test</span> {
-                <span class='ident'>password</span>: <span class='string'>b&quot;password&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>salt</span>: <span class='string'>b&quot;salt&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>c</span>: <span class='number'>1</span>,
-                <span class='ident'>expected</span>: <span class='macro'>vec</span><span class='macro'>!</span>[
-                    <span class='number'>0x0c</span>, <span class='number'>0x60</span>, <span class='number'>0xc8</span>, <span class='number'>0x0f</span>, <span class='number'>0x96</span>, <span class='number'>0x1f</span>, <span class='number'>0x0e</span>, <span class='number'>0x71</span>,
-                    <span class='number'>0xf3</span>, <span class='number'>0xa9</span>, <span class='number'>0xb5</span>, <span class='number'>0x24</span>, <span class='number'>0xaf</span>, <span class='number'>0x60</span>, <span class='number'>0x12</span>, <span class='number'>0x06</span>,
-                    <span class='number'>0x2f</span>, <span class='number'>0xe0</span>, <span class='number'>0x37</span>, <span class='number'>0xa6</span> ]
+    <span class="kw">fn</span> <span class="ident">tests</span>() <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span> {
+        <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">Test</span> {
+                <span class="ident">password</span>: <span class="string">b&quot;password&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">salt</span>: <span class="string">b&quot;salt&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">c</span>: <span class="number">1</span>,
+                <span class="ident">expected</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                    <span class="number">0x0c</span>, <span class="number">0x60</span>, <span class="number">0xc8</span>, <span class="number">0x0f</span>, <span class="number">0x96</span>, <span class="number">0x1f</span>, <span class="number">0x0e</span>, <span class="number">0x71</span>,
+                    <span class="number">0xf3</span>, <span class="number">0xa9</span>, <span class="number">0xb5</span>, <span class="number">0x24</span>, <span class="number">0xaf</span>, <span class="number">0x60</span>, <span class="number">0x12</span>, <span class="number">0x06</span>,
+                    <span class="number">0x2f</span>, <span class="number">0xe0</span>, <span class="number">0x37</span>, <span class="number">0xa6</span> ]
             },
-            <span class='ident'>Test</span> {
-                <span class='ident'>password</span>: <span class='string'>b&quot;password&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>salt</span>: <span class='string'>b&quot;salt&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>c</span>: <span class='number'>2</span>,
-                <span class='ident'>expected</span>: <span class='macro'>vec</span><span class='macro'>!</span>[
-                    <span class='number'>0xea</span>, <span class='number'>0x6c</span>, <span class='number'>0x01</span>, <span class='number'>0x4d</span>, <span class='number'>0xc7</span>, <span class='number'>0x2d</span>, <span class='number'>0x6f</span>, <span class='number'>0x8c</span>,
-                    <span class='number'>0xcd</span>, <span class='number'>0x1e</span>, <span class='number'>0xd9</span>, <span class='number'>0x2a</span>, <span class='number'>0xce</span>, <span class='number'>0x1d</span>, <span class='number'>0x41</span>, <span class='number'>0xf0</span>,
-                    <span class='number'>0xd8</span>, <span class='number'>0xde</span>, <span class='number'>0x89</span>, <span class='number'>0x57</span> ]
+            <span class="ident">Test</span> {
+                <span class="ident">password</span>: <span class="string">b&quot;password&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">salt</span>: <span class="string">b&quot;salt&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">c</span>: <span class="number">2</span>,
+                <span class="ident">expected</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                    <span class="number">0xea</span>, <span class="number">0x6c</span>, <span class="number">0x01</span>, <span class="number">0x4d</span>, <span class="number">0xc7</span>, <span class="number">0x2d</span>, <span class="number">0x6f</span>, <span class="number">0x8c</span>,
+                    <span class="number">0xcd</span>, <span class="number">0x1e</span>, <span class="number">0xd9</span>, <span class="number">0x2a</span>, <span class="number">0xce</span>, <span class="number">0x1d</span>, <span class="number">0x41</span>, <span class="number">0xf0</span>,
+                    <span class="number">0xd8</span>, <span class="number">0xde</span>, <span class="number">0x89</span>, <span class="number">0x57</span> ]
             },
-            <span class='ident'>Test</span> {
-                <span class='ident'>password</span>: <span class='string'>b&quot;password&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>salt</span>: <span class='string'>b&quot;salt&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>c</span>: <span class='number'>4096</span>,
-                <span class='ident'>expected</span>: <span class='macro'>vec</span><span class='macro'>!</span>[
-                    <span class='number'>0x4b</span>, <span class='number'>0x00</span>, <span class='number'>0x79</span>, <span class='number'>0x01</span>, <span class='number'>0xb7</span>, <span class='number'>0x65</span>, <span class='number'>0x48</span>, <span class='number'>0x9a</span>,
-                    <span class='number'>0xbe</span>, <span class='number'>0xad</span>, <span class='number'>0x49</span>, <span class='number'>0xd9</span>, <span class='number'>0x26</span>, <span class='number'>0xf7</span>, <span class='number'>0x21</span>, <span class='number'>0xd0</span>,
-                    <span class='number'>0x65</span>, <span class='number'>0xa4</span>, <span class='number'>0x29</span>, <span class='number'>0xc1</span> ]
+            <span class="ident">Test</span> {
+                <span class="ident">password</span>: <span class="string">b&quot;password&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">salt</span>: <span class="string">b&quot;salt&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">c</span>: <span class="number">4096</span>,
+                <span class="ident">expected</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                    <span class="number">0x4b</span>, <span class="number">0x00</span>, <span class="number">0x79</span>, <span class="number">0x01</span>, <span class="number">0xb7</span>, <span class="number">0x65</span>, <span class="number">0x48</span>, <span class="number">0x9a</span>,
+                    <span class="number">0xbe</span>, <span class="number">0xad</span>, <span class="number">0x49</span>, <span class="number">0xd9</span>, <span class="number">0x26</span>, <span class="number">0xf7</span>, <span class="number">0x21</span>, <span class="number">0xd0</span>,
+                    <span class="number">0x65</span>, <span class="number">0xa4</span>, <span class="number">0x29</span>, <span class="number">0xc1</span> ]
             },
-            <span class='ident'>Test</span> {
-                <span class='ident'>password</span>: <span class='string'>b&quot;passwordPASSWORDpassword&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>salt</span>: <span class='string'>b&quot;saltSALTsaltSALTsaltSALTsaltSALTsalt&quot;</span>.<span class='ident'>to_vec</span>(),
-                <span class='ident'>c</span>: <span class='number'>4096</span>,
-                <span class='ident'>expected</span>: <span class='macro'>vec</span><span class='macro'>!</span>[
-                    <span class='number'>0x3d</span>, <span class='number'>0x2e</span>, <span class='number'>0xec</span>, <span class='number'>0x4f</span>, <span class='number'>0xe4</span>, <span class='number'>0x1c</span>, <span class='number'>0x84</span>, <span class='number'>0x9b</span>,
-                    <span class='number'>0x80</span>, <span class='number'>0xc8</span>, <span class='number'>0xd8</span>, <span class='number'>0x36</span>, <span class='number'>0x62</span>, <span class='number'>0xc0</span>, <span class='number'>0xe4</span>, <span class='number'>0x4a</span>,
-                    <span class='number'>0x8b</span>, <span class='number'>0x29</span>, <span class='number'>0x1a</span>, <span class='number'>0x96</span>, <span class='number'>0x4c</span>, <span class='number'>0xf2</span>, <span class='number'>0xf0</span>, <span class='number'>0x70</span>, <span class='number'>0x38</span> ]
+            <span class="ident">Test</span> {
+                <span class="ident">password</span>: <span class="string">b&quot;passwordPASSWORDpassword&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">salt</span>: <span class="string">b&quot;saltSALTsaltSALTsaltSALTsaltSALTsalt&quot;</span>.<span class="ident">to_vec</span>(),
+                <span class="ident">c</span>: <span class="number">4096</span>,
+                <span class="ident">expected</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                    <span class="number">0x3d</span>, <span class="number">0x2e</span>, <span class="number">0xec</span>, <span class="number">0x4f</span>, <span class="number">0xe4</span>, <span class="number">0x1c</span>, <span class="number">0x84</span>, <span class="number">0x9b</span>,
+                    <span class="number">0x80</span>, <span class="number">0xc8</span>, <span class="number">0xd8</span>, <span class="number">0x36</span>, <span class="number">0x62</span>, <span class="number">0xc0</span>, <span class="number">0xe4</span>, <span class="number">0x4a</span>,
+                    <span class="number">0x8b</span>, <span class="number">0x29</span>, <span class="number">0x1a</span>, <span class="number">0x96</span>, <span class="number">0x4c</span>, <span class="number">0xf2</span>, <span class="number">0xf0</span>, <span class="number">0x70</span>, <span class="number">0x38</span> ]
             },
-            <span class='ident'>Test</span> {
-                <span class='ident'>password</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>112</span>, <span class='number'>97</span>, <span class='number'>115</span>, <span class='number'>115</span>, <span class='number'>0</span>, <span class='number'>119</span>, <span class='number'>111</span>, <span class='number'>114</span>, <span class='number'>100</span>],
-                <span class='ident'>salt</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>115</span>, <span class='number'>97</span>, <span class='number'>0</span>, <span class='number'>108</span>, <span class='number'>116</span>],
-                <span class='ident'>c</span>: <span class='number'>4096</span>,
-                <span class='ident'>expected</span>: <span class='macro'>vec</span><span class='macro'>!</span>[
-                    <span class='number'>0x56</span>, <span class='number'>0xfa</span>, <span class='number'>0x6a</span>, <span class='number'>0xa7</span>, <span class='number'>0x55</span>, <span class='number'>0x48</span>, <span class='number'>0x09</span>, <span class='number'>0x9d</span>,
-                    <span class='number'>0xcc</span>, <span class='number'>0x37</span>, <span class='number'>0xd7</span>, <span class='number'>0xf0</span>, <span class='number'>0x34</span>, <span class='number'>0x25</span>, <span class='number'>0xe0</span>, <span class='number'>0xc3</span> ]
+            <span class="ident">Test</span> {
+                <span class="ident">password</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="number">112</span>, <span class="number">97</span>, <span class="number">115</span>, <span class="number">115</span>, <span class="number">0</span>, <span class="number">119</span>, <span class="number">111</span>, <span class="number">114</span>, <span class="number">100</span>],
+                <span class="ident">salt</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="number">115</span>, <span class="number">97</span>, <span class="number">0</span>, <span class="number">108</span>, <span class="number">116</span>],
+                <span class="ident">c</span>: <span class="number">4096</span>,
+                <span class="ident">expected</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                    <span class="number">0x56</span>, <span class="number">0xfa</span>, <span class="number">0x6a</span>, <span class="number">0xa7</span>, <span class="number">0x55</span>, <span class="number">0x48</span>, <span class="number">0x09</span>, <span class="number">0x9d</span>,
+                    <span class="number">0xcc</span>, <span class="number">0x37</span>, <span class="number">0xd7</span>, <span class="number">0xf0</span>, <span class="number">0x34</span>, <span class="number">0x25</span>, <span class="number">0xe0</span>, <span class="number">0xc3</span> ]
             }
         ]
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_pbkdf2</span>() {
-        <span class='kw'>let</span> <span class='ident'>tests</span> <span class='op'>=</span> <span class='ident'>tests</span>();
-        <span class='kw'>for</span> <span class='ident'>t</span> <span class='kw'>in</span> <span class='ident'>tests</span>.<span class='ident'>iter</span>() {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mac</span> <span class='op'>=</span> <span class='ident'>Hmac</span>::<span class='ident'>new</span>(<span class='ident'>Sha1</span>::<span class='ident'>new</span>(), <span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>password</span>[..]);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>result</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='ident'>t</span>.<span class='ident'>expected</span>.<span class='ident'>len</span>()).<span class='ident'>collect</span>();
-            <span class='ident'>pbkdf2</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>mac</span>, <span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>salt</span>[..], <span class='ident'>t</span>.<span class='ident'>c</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>result</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>result</span> <span class='op'>==</span> <span class='ident'>t</span>.<span class='ident'>expected</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_pbkdf2</span>() {
+        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="ident">tests</span>();
+        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">tests</span>.<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">Hmac</span>::<span class="ident">new</span>(<span class="ident">Sha1</span>::<span class="ident">new</span>(), <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">password</span>[..]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="ident">t</span>.<span class="ident">expected</span>.<span class="ident">len</span>()).<span class="ident">collect</span>();
+            <span class="ident">pbkdf2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mac</span>, <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">salt</span>[..], <span class="ident">t</span>.<span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">result</span> <span class="op">==</span> <span class="ident">t</span>.<span class="ident">expected</span>);
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_pbkdf2_simple</span>() {
-        <span class='kw'>let</span> <span class='ident'>password</span> <span class='op'>=</span> <span class='string'>&quot;password&quot;</span>;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_pbkdf2_simple</span>() {
+        <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="string">&quot;password&quot;</span>;
 
-        <span class='kw'>let</span> <span class='ident'>out1</span> <span class='op'>=</span> <span class='ident'>pbkdf2_simple</span>(<span class='ident'>password</span>, <span class='number'>1024</span>).<span class='ident'>unwrap</span>();
-        <span class='kw'>let</span> <span class='ident'>out2</span> <span class='op'>=</span> <span class='ident'>pbkdf2_simple</span>(<span class='ident'>password</span>, <span class='number'>1024</span>).<span class='ident'>unwrap</span>();
+        <span class="kw">let</span> <span class="ident">out1</span> <span class="op">=</span> <span class="ident">pbkdf2_simple</span>(<span class="ident">password</span>, <span class="number">1024</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">out2</span> <span class="op">=</span> <span class="ident">pbkdf2_simple</span>(<span class="ident">password</span>, <span class="number">1024</span>).<span class="ident">unwrap</span>();
 
-        <span class='comment'>// This just makes sure that a salt is being applied. It doesn&#39;t verify that that salt is</span>
-        <span class='comment'>// cryptographically strong, however.</span>
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>out1</span> <span class='op'>!=</span> <span class='ident'>out2</span>);
+        <span class="comment">// This just makes sure that a salt is being applied. It doesn&#39;t verify that that salt is</span>
+        <span class="comment">// cryptographically strong, however.</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">out1</span> <span class="op">!=</span> <span class="ident">out2</span>);
 
-        <span class='kw'>match</span> <span class='ident'>pbkdf2_check</span>(<span class='ident'>password</span>, <span class='kw-2'>&amp;</span><span class='ident'>out1</span>[..]) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>r</span>),
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>()
+        <span class="kw">match</span> <span class="ident">pbkdf2_check</span>(<span class="ident">password</span>, <span class="kw-2">&amp;</span><span class="ident">out1</span>[..]) {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">r</span>),
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>()
         }
-        <span class='kw'>match</span> <span class='ident'>pbkdf2_check</span>(<span class='ident'>password</span>, <span class='kw-2'>&amp;</span><span class='ident'>out2</span>[..]) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>r</span>),
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>()
+        <span class="kw">match</span> <span class="ident">pbkdf2_check</span>(<span class="ident">password</span>, <span class="kw-2">&amp;</span><span class="ident">out2</span>[..]) {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">r</span>),
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>()
         }
 
-        <span class='kw'>match</span> <span class='ident'>pbkdf2_check</span>(<span class='string'>&quot;wrong&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>out1</span>[..]) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>r</span>),
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>()
+        <span class="kw">match</span> <span class="ident">pbkdf2_check</span>(<span class="string">&quot;wrong&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">out1</span>[..]) {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">r</span>),
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>()
         }
-        <span class='kw'>match</span> <span class='ident'>pbkdf2_check</span>(<span class='string'>&quot;wrong&quot;</span>, <span class='kw-2'>&amp;</span><span class='ident'>out2</span>[..]) {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>r</span>) <span class='op'>=&gt;</span> <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>r</span>),
-            <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>()
+        <span class="kw">match</span> <span class="ident">pbkdf2_check</span>(<span class="string">&quot;wrong&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">out2</span>[..]) {
+            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=&gt;</span> <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">r</span>),
+            <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>()
         }
     }
 }
@@ -771,18 +783,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -815,7 +831,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

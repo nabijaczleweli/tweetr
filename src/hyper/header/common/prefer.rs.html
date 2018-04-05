@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/prefer.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/prefer.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>prefer.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -245,210 +257,210 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>FromStr</span>;
-<span class='kw'>use</span> <span class='ident'>header</span>::{<span class='ident'>Header</span>, <span class='ident'>HeaderFormat</span>};
-<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>parsing</span>::{<span class='ident'>from_comma_delimited</span>, <span class='ident'>fmt_comma_delimited</span>};
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">header</span>::{<span class="ident">Header</span>, <span class="ident">HeaderFormat</span>};
+<span class="kw">use</span> <span class="ident">header</span>::<span class="ident">parsing</span>::{<span class="ident">from_comma_delimited</span>, <span class="ident">fmt_comma_delimited</span>};
 
-<span class='doccomment'>/// `Prefer` header, defined in [RFC7240](http://tools.ietf.org/html/rfc7240)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The `Prefer` header field is HTTP header field that can be used by a</span>
-<span class='doccomment'>/// client to request that certain behaviors be employed by a server</span>
-<span class='doccomment'>/// while processing a request.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # ABNF</span>
-<span class='doccomment'>/// ```plain</span>
-<span class='doccomment'>/// Prefer     = &quot;Prefer&quot; &quot;:&quot; 1#preference</span>
-<span class='doccomment'>/// preference = token [ BWS &quot;=&quot; BWS word ]</span>
-<span class='doccomment'>///              *( OWS &quot;;&quot; [ OWS parameter ] )</span>
-<span class='doccomment'>/// parameter  = token [ BWS &quot;=&quot; BWS word ]</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example values</span>
-<span class='doccomment'>/// * `respond-async`</span>
-<span class='doccomment'>/// * `return=minimal`</span>
-<span class='doccomment'>/// * `wait=30`</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Examples</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Prefer, Preference};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///     Prefer(vec![Preference::RespondAsync])</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// use hyper::header::{Headers, Prefer, Preference};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let mut headers = Headers::new();</span>
-<span class='doccomment'>/// headers.set(</span>
-<span class='doccomment'>///     Prefer(vec![</span>
-<span class='doccomment'>///         Preference::RespondAsync,</span>
-<span class='doccomment'>///         Preference::ReturnRepresentation,</span>
-<span class='doccomment'>///         Preference::Wait(10u32),</span>
-<span class='doccomment'>///         Preference::Extension(&quot;foo&quot;.to_owned(),</span>
-<span class='doccomment'>///                               &quot;bar&quot;.to_owned(),</span>
-<span class='doccomment'>///                               vec![]),</span>
-<span class='doccomment'>///     ])</span>
-<span class='doccomment'>/// );</span>
-<span class='doccomment'>/// ```</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Prefer</span>(<span class='kw'>pub</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Preference</span><span class='op'>&gt;</span>);
+<span class="doccomment">/// `Prefer` header, defined in [RFC7240](http://tools.ietf.org/html/rfc7240)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The `Prefer` header field is HTTP header field that can be used by a</span>
+<span class="doccomment">/// client to request that certain behaviors be employed by a server</span>
+<span class="doccomment">/// while processing a request.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # ABNF</span>
+<span class="doccomment">/// ```plain</span>
+<span class="doccomment">/// Prefer     = &quot;Prefer&quot; &quot;:&quot; 1#preference</span>
+<span class="doccomment">/// preference = token [ BWS &quot;=&quot; BWS word ]</span>
+<span class="doccomment">///              *( OWS &quot;;&quot; [ OWS parameter ] )</span>
+<span class="doccomment">/// parameter  = token [ BWS &quot;=&quot; BWS word ]</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example values</span>
+<span class="doccomment">/// * `respond-async`</span>
+<span class="doccomment">/// * `return=minimal`</span>
+<span class="doccomment">/// * `wait=30`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Prefer, Preference};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///     Prefer(vec![Preference::RespondAsync])</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use hyper::header::{Headers, Prefer, Preference};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let mut headers = Headers::new();</span>
+<span class="doccomment">/// headers.set(</span>
+<span class="doccomment">///     Prefer(vec![</span>
+<span class="doccomment">///         Preference::RespondAsync,</span>
+<span class="doccomment">///         Preference::ReturnRepresentation,</span>
+<span class="doccomment">///         Preference::Wait(10u32),</span>
+<span class="doccomment">///         Preference::Extension(&quot;foo&quot;.to_owned(),</span>
+<span class="doccomment">///                               &quot;bar&quot;.to_owned(),</span>
+<span class="doccomment">///                               vec![]),</span>
+<span class="doccomment">///     ])</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Prefer</span>(<span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Preference</span><span class="op">&gt;</span>);
 
-<span class='macro'>__hyper__deref</span><span class='macro'>!</span>(<span class='ident'>Prefer</span> <span class='op'>=&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Preference</span><span class='op'>&gt;</span>);
+<span class="macro">__hyper__deref</span><span class="macro">!</span>(<span class="ident">Prefer</span> <span class="op">=&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Preference</span><span class="op">&gt;</span>);
 
-<span class='kw'>impl</span> <span class='ident'>Header</span> <span class='kw'>for</span> <span class='ident'>Prefer</span> {
-    <span class='kw'>fn</span> <span class='ident'>header_name</span>() <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span> {
-        <span class='string'>&quot;Prefer&quot;</span>
+<span class="kw">impl</span> <span class="ident">Header</span> <span class="kw">for</span> <span class="ident">Prefer</span> {
+    <span class="kw">fn</span> <span class="ident">header_name</span>() <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;Prefer&quot;</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>parse_header</span>(<span class='ident'>raw</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>]) <span class='op'>-&gt;</span> ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>preferences</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>from_comma_delimited</span>(<span class='ident'>raw</span>));
-        <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>preferences</span>.<span class='ident'>is_empty</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>Prefer</span>(<span class='ident'>preferences</span>))
-        } <span class='kw'>else</span> {
-            <span class='prelude-val'>Err</span>(::<span class='ident'>Error</span>::<span class='ident'>Header</span>)
+    <span class="kw">fn</span> <span class="ident">parse_header</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) <span class="op">-&gt;</span> ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Prefer</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">preferences</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">from_comma_delimited</span>(<span class="ident">raw</span>));
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">preferences</span>.<span class="ident">is_empty</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">Prefer</span>(<span class="ident">preferences</span>))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(::<span class="ident">Error</span>::<span class="ident">Header</span>)
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>HeaderFormat</span> <span class='kw'>for</span> <span class='ident'>Prefer</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='ident'>fmt_comma_delimited</span>(<span class='ident'>f</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>[..])
+<span class="kw">impl</span> <span class="ident">HeaderFormat</span> <span class="kw">for</span> <span class="ident">Prefer</span> {
+    <span class="kw">fn</span> <span class="ident">fmt_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">fmt_comma_delimited</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span><span class="self">self</span>[..])
     }
 }
 
-<span class='doccomment'>/// Prefer contains a list of these preferences.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>, <span class='ident'>Clone</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Preference</span> {
-    <span class='doccomment'>/// &quot;respond-async&quot;</span>
-    <span class='ident'>RespondAsync</span>,
-    <span class='doccomment'>/// &quot;return=representation&quot;</span>
-    <span class='ident'>ReturnRepresentation</span>,
-    <span class='doccomment'>/// &quot;return=minimal&quot;</span>
-    <span class='ident'>ReturnMinimal</span>,
-    <span class='doccomment'>/// &quot;handling=strict&quot;</span>
-    <span class='ident'>HandlingStrict</span>,
-    <span class='doccomment'>/// &quot;handling=leniant&quot;</span>
-    <span class='ident'>HandlingLeniant</span>,
-    <span class='doccomment'>/// &quot;wait=delta&quot;</span>
-    <span class='ident'>Wait</span>(<span class='ident'>u32</span>),
+<span class="doccomment">/// Prefer contains a list of these preferences.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Preference</span> {
+    <span class="doccomment">/// &quot;respond-async&quot;</span>
+    <span class="ident">RespondAsync</span>,
+    <span class="doccomment">/// &quot;return=representation&quot;</span>
+    <span class="ident">ReturnRepresentation</span>,
+    <span class="doccomment">/// &quot;return=minimal&quot;</span>
+    <span class="ident">ReturnMinimal</span>,
+    <span class="doccomment">/// &quot;handling=strict&quot;</span>
+    <span class="ident">HandlingStrict</span>,
+    <span class="doccomment">/// &quot;handling=leniant&quot;</span>
+    <span class="ident">HandlingLeniant</span>,
+    <span class="doccomment">/// &quot;wait=delta&quot;</span>
+    <span class="ident">Wait</span>(<span class="ident">u32</span>),
 
-    <span class='doccomment'>/// Extension preferences. Always has a value, if none is specified it is</span>
-    <span class='doccomment'>/// just &quot;&quot;. A preference can also have a list of parameters.</span>
-    <span class='ident'>Extension</span>(<span class='ident'>String</span>, <span class='ident'>String</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>String</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>)
+    <span class="doccomment">/// Extension preferences. Always has a value, if none is specified it is</span>
+    <span class="doccomment">/// just &quot;&quot;. A preference can also have a list of parameters.</span>
+    <span class="ident">Extension</span>(<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span>)
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>Preference</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>Preference</span>::<span class='op'>*</span>;
-        <span class='ident'>fmt</span>::<span class='ident'>Display</span>::<span class='ident'>fmt</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>RespondAsync</span> <span class='op'>=&gt;</span> <span class='string'>&quot;respond-async&quot;</span>,
-            <span class='ident'>ReturnRepresentation</span> <span class='op'>=&gt;</span> <span class='string'>&quot;return=representation&quot;</span>,
-            <span class='ident'>ReturnMinimal</span> <span class='op'>=&gt;</span> <span class='string'>&quot;return=minimal&quot;</span>,
-            <span class='ident'>HandlingStrict</span> <span class='op'>=&gt;</span> <span class='string'>&quot;handling=strict&quot;</span>,
-            <span class='ident'>HandlingLeniant</span> <span class='op'>=&gt;</span> <span class='string'>&quot;handling=leniant&quot;</span>,
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Preference</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Preference</span>::<span class="kw-2">*</span>;
+        <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">RespondAsync</span> <span class="op">=&gt;</span> <span class="string">&quot;respond-async&quot;</span>,
+            <span class="ident">ReturnRepresentation</span> <span class="op">=&gt;</span> <span class="string">&quot;return=representation&quot;</span>,
+            <span class="ident">ReturnMinimal</span> <span class="op">=&gt;</span> <span class="string">&quot;return=minimal&quot;</span>,
+            <span class="ident">HandlingStrict</span> <span class="op">=&gt;</span> <span class="string">&quot;handling=strict&quot;</span>,
+            <span class="ident">HandlingLeniant</span> <span class="op">=&gt;</span> <span class="string">&quot;handling=leniant&quot;</span>,
 
-            <span class='ident'>Wait</span>(<span class='ident'>secs</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;wait={}&quot;</span>, <span class='ident'>secs</span>),
+            <span class="ident">Wait</span>(<span class="ident">secs</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;wait={}&quot;</span>, <span class="ident">secs</span>),
 
-            <span class='ident'>Extension</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, <span class='kw-2'>ref</span> <span class='ident'>value</span>, <span class='kw-2'>ref</span> <span class='ident'>params</span>) <span class='op'>=&gt;</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>name</span>));
-                <span class='kw'>if</span> <span class='ident'>value</span> <span class='op'>!=</span> <span class='string'>&quot;&quot;</span> { <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;={}&quot;</span>, <span class='ident'>value</span>)); }
-                <span class='kw'>if</span> <span class='ident'>params</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-                    <span class='kw'>for</span> <span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, <span class='kw-2'>ref</span> <span class='ident'>value</span>) <span class='kw'>in</span> <span class='ident'>params</span> {
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;; {}&quot;</span>, <span class='ident'>name</span>));
-                        <span class='kw'>if</span> <span class='ident'>value</span> <span class='op'>!=</span> <span class='string'>&quot;&quot;</span> { <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;={}&quot;</span>, <span class='ident'>value</span>)); }
+            <span class="ident">Extension</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">value</span>, <span class="kw-2">ref</span> <span class="ident">params</span>) <span class="op">=&gt;</span> {
+                <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>));
+                <span class="kw">if</span> <span class="ident">value</span> <span class="op">!=</span> <span class="string">&quot;&quot;</span> { <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;={}&quot;</span>, <span class="ident">value</span>)); }
+                <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+                    <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">params</span> {
+                        <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;; {}&quot;</span>, <span class="ident">name</span>));
+                        <span class="kw">if</span> <span class="ident">value</span> <span class="op">!=</span> <span class="string">&quot;&quot;</span> { <span class="macro">try</span><span class="macro">!</span>(<span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;={}&quot;</span>, <span class="ident">value</span>)); }
                     }
                 }
-                <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(());
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-        }, <span class='ident'>f</span>)
+        }, <span class="ident">f</span>)
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Preference</span> {
-    <span class='kw'>type</span> <span class='prelude-val'>Err</span> <span class='op'>=</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;&lt;</span><span class='ident'>u32</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span><span class='op'>&gt;</span>;
-    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Preference</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;&lt;</span><span class='ident'>u32</span> <span class='kw'>as</span> <span class='ident'>FromStr</span><span class='op'>&gt;</span>::<span class='prelude-val'>Err</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>Preference</span>::<span class='op'>*</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>split</span>(<span class='string'>&#39;;&#39;</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>p</span><span class='op'>|</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>param</span> <span class='op'>=</span> <span class='ident'>p</span>.<span class='ident'>splitn</span>(<span class='number'>2</span>, <span class='string'>&#39;=&#39;</span>);
-            <span class='kw'>match</span> (<span class='ident'>param</span>.<span class='ident'>next</span>(), <span class='ident'>param</span>.<span class='ident'>next</span>()) {
-                (<span class='prelude-val'>Some</span>(<span class='ident'>name</span>), <span class='prelude-val'>Some</span>(<span class='ident'>value</span>)) <span class='op'>=&gt;</span> (<span class='ident'>name</span>.<span class='ident'>trim</span>(), <span class='ident'>value</span>.<span class='ident'>trim</span>().<span class='ident'>trim_matches</span>(<span class='string'>&#39;&quot;&#39;</span>)),
-                (<span class='prelude-val'>Some</span>(<span class='ident'>name</span>), <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> (<span class='ident'>name</span>.<span class='ident'>trim</span>(), <span class='string'>&quot;&quot;</span>),
-                <span class='comment'>// This can safely be unreachable because the [`splitn`][1]</span>
-                <span class='comment'>// function (used above) will always have at least one value.</span>
-                <span class='comment'>//</span>
-                <span class='comment'>// [1]: http://doc.rust-lang.org/std/primitive.str.html#method.splitn</span>
-                _ <span class='op'>=&gt;</span> { <span class='macro'>unreachable</span><span class='macro'>!</span>(); }
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Preference</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;&lt;</span><span class="ident">u32</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Preference</span>, <span class="prelude-ty">Option</span><span class="op">&lt;&lt;</span><span class="ident">u32</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span>::<span class="prelude-val">Err</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">use</span> <span class="self">self</span>::<span class="ident">Preference</span>::<span class="kw-2">*</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split</span>(<span class="string">&#39;;&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;=&#39;</span>);
+            <span class="kw">match</span> (<span class="ident">param</span>.<span class="ident">next</span>(), <span class="ident">param</span>.<span class="ident">next</span>()) {
+                (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">Some</span>(<span class="ident">value</span>)) <span class="op">=&gt;</span> (<span class="ident">name</span>.<span class="ident">trim</span>(), <span class="ident">value</span>.<span class="ident">trim</span>().<span class="ident">trim_matches</span>(<span class="string">&#39;&quot;&#39;</span>)),
+                (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">None</span>) <span class="op">=&gt;</span> (<span class="ident">name</span>.<span class="ident">trim</span>(), <span class="string">&quot;&quot;</span>),
+                <span class="comment">// This can safely be unreachable because the [`splitn`][1]</span>
+                <span class="comment">// function (used above) will always have at least one value.</span>
+                <span class="comment">//</span>
+                <span class="comment">// [1]: http://doc.rust-lang.org/std/primitive.str.html#method.splitn</span>
+                _ <span class="op">=&gt;</span> { <span class="macro">unreachable</span><span class="macro">!</span>(); }
             }
         });
-        <span class='kw'>match</span> <span class='ident'>params</span>.<span class='ident'>nth</span>(<span class='number'>0</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>param</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='ident'>rest</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>String</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>params</span>.<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>l</span>, <span class='ident'>r</span>)<span class='op'>|</span> (<span class='ident'>l</span>.<span class='ident'>to_owned</span>(), <span class='ident'>r</span>.<span class='ident'>to_owned</span>())).<span class='ident'>collect</span>();
-                <span class='kw'>match</span> <span class='ident'>param</span> {
-                    (<span class='string'>&quot;respond-async&quot;</span>, <span class='string'>&quot;&quot;</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='prelude-val'>Ok</span>(<span class='ident'>RespondAsync</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='string'>&quot;return&quot;</span>, <span class='string'>&quot;representation&quot;</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='prelude-val'>Ok</span>(<span class='ident'>ReturnRepresentation</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='string'>&quot;return&quot;</span>, <span class='string'>&quot;minimal&quot;</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='prelude-val'>Ok</span>(<span class='ident'>ReturnMinimal</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='string'>&quot;handling&quot;</span>, <span class='string'>&quot;strict&quot;</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='prelude-val'>Ok</span>(<span class='ident'>HandlingStrict</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='string'>&quot;handling&quot;</span>, <span class='string'>&quot;leniant&quot;</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='prelude-val'>Ok</span>(<span class='ident'>HandlingLeniant</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='string'>&quot;wait&quot;</span>, <span class='ident'>secs</span>) <span class='op'>=&gt;</span> <span class='kw'>if</span> <span class='ident'>rest</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> { <span class='ident'>secs</span>.<span class='ident'>parse</span>().<span class='ident'>map</span>(<span class='ident'>Wait</span>).<span class='ident'>map_err</span>(<span class='prelude-val'>Some</span>) } <span class='kw'>else</span> { <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>) },
-                    (<span class='ident'>left</span>, <span class='ident'>right</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='ident'>Extension</span>(<span class='ident'>left</span>.<span class='ident'>to_owned</span>(), <span class='ident'>right</span>.<span class='ident'>to_owned</span>(), <span class='ident'>rest</span>))
+        <span class="kw">match</span> <span class="ident">params</span>.<span class="ident">nth</span>(<span class="number">0</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">param</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">rest</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">r</span>)<span class="op">|</span> (<span class="ident">l</span>.<span class="ident">to_owned</span>(), <span class="ident">r</span>.<span class="ident">to_owned</span>())).<span class="ident">collect</span>();
+                <span class="kw">match</span> <span class="ident">param</span> {
+                    (<span class="string">&quot;respond-async&quot;</span>, <span class="string">&quot;&quot;</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="prelude-val">Ok</span>(<span class="ident">RespondAsync</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="string">&quot;return&quot;</span>, <span class="string">&quot;representation&quot;</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="prelude-val">Ok</span>(<span class="ident">ReturnRepresentation</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="string">&quot;return&quot;</span>, <span class="string">&quot;minimal&quot;</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="prelude-val">Ok</span>(<span class="ident">ReturnMinimal</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="string">&quot;handling&quot;</span>, <span class="string">&quot;strict&quot;</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="prelude-val">Ok</span>(<span class="ident">HandlingStrict</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="string">&quot;handling&quot;</span>, <span class="string">&quot;leniant&quot;</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="prelude-val">Ok</span>(<span class="ident">HandlingLeniant</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="string">&quot;wait&quot;</span>, <span class="ident">secs</span>) <span class="op">=&gt;</span> <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> { <span class="ident">secs</span>.<span class="ident">parse</span>().<span class="ident">map</span>(<span class="ident">Wait</span>).<span class="ident">map_err</span>(<span class="prelude-val">Some</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>) },
+                    (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">Extension</span>(<span class="ident">left</span>.<span class="ident">to_owned</span>(), <span class="ident">right</span>.<span class="ident">to_owned</span>(), <span class="ident">rest</span>))
                 }
             },
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='prelude-val'>None</span>)
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="prelude-val">None</span>)
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>Header</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">header</span>::<span class="ident">Header</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse_multiple_headers</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;respond-async, return=representation&quot;</span>.<span class='ident'>to_vec</span>()]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>RespondAsync</span>,
-                                           <span class='ident'>Preference</span>::<span class='ident'>ReturnRepresentation</span>])))
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_multiple_headers</span>() {
+        <span class="kw">let</span> <span class="ident">prefer</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">b&quot;respond-async, return=representation&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">prefer</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Prefer</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Preference</span>::<span class="ident">RespondAsync</span>,
+                                           <span class="ident">Preference</span>::<span class="ident">ReturnRepresentation</span>])))
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse_argument</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;wait=100, handling=leniant, respond-async&quot;</span>.<span class='ident'>to_vec</span>()]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>Wait</span>(<span class='number'>100</span>),
-                                           <span class='ident'>Preference</span>::<span class='ident'>HandlingLeniant</span>,
-                                           <span class='ident'>Preference</span>::<span class='ident'>RespondAsync</span>])))
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_argument</span>() {
+        <span class="kw">let</span> <span class="ident">prefer</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">b&quot;wait=100, handling=leniant, respond-async&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">prefer</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Prefer</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Preference</span>::<span class="ident">Wait</span>(<span class="number">100</span>),
+                                           <span class="ident">Preference</span>::<span class="ident">HandlingLeniant</span>,
+                                           <span class="ident">Preference</span>::<span class="ident">RespondAsync</span>])))
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse_quote_form</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;wait=\&quot;200\&quot;, handling=\&quot;strict\&quot;&quot;</span>.<span class='ident'>to_vec</span>()]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Preference</span>::<span class='ident'>Wait</span>(<span class='number'>200</span>),
-                                           <span class='ident'>Preference</span>::<span class='ident'>HandlingStrict</span>])))
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_quote_form</span>() {
+        <span class="kw">let</span> <span class="ident">prefer</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">b&quot;wait=\&quot;200\&quot;, handling=\&quot;strict\&quot;&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">prefer</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Prefer</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">Preference</span>::<span class="ident">Wait</span>(<span class="number">200</span>),
+                                           <span class="ident">Preference</span>::<span class="ident">HandlingStrict</span>])))
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_parse_extension</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;foo, bar=baz, baz; foo; bar=baz, bux=\&quot;\&quot;; foo=\&quot;\&quot;, buz=\&quot;some parameter\&quot;&quot;</span>.<span class='ident'>to_vec</span>()]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>Some</span>(<span class='ident'>Prefer</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;foo&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[]),
-            <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;bar&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;baz&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[]),
-            <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;baz&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='string'>&quot;foo&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>()), (<span class='string'>&quot;bar&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;baz&quot;</span>.<span class='ident'>to_owned</span>())]),
-            <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;bux&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='string'>&quot;foo&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_owned</span>())]),
-            <span class='ident'>Preference</span>::<span class='ident'>Extension</span>(<span class='string'>&quot;buz&quot;</span>.<span class='ident'>to_owned</span>(), <span class='string'>&quot;some parameter&quot;</span>.<span class='ident'>to_owned</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[])])))
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_extension</span>() {
+        <span class="kw">let</span> <span class="ident">prefer</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">b&quot;foo, bar=baz, baz; foo; bar=baz, bux=\&quot;\&quot;; foo=\&quot;\&quot;, buz=\&quot;some parameter\&quot;&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">prefer</span>.<span class="ident">ok</span>(), <span class="prelude-val">Some</span>(<span class="ident">Prefer</span>(<span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">Preference</span>::<span class="ident">Extension</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec</span><span class="macro">!</span>[]),
+            <span class="ident">Preference</span>::<span class="ident">Extension</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;baz&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec</span><span class="macro">!</span>[]),
+            <span class="ident">Preference</span>::<span class="ident">Extension</span>(<span class="string">&quot;baz&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">&quot;foo&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>()), (<span class="string">&quot;bar&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;baz&quot;</span>.<span class="ident">to_owned</span>())]),
+            <span class="ident">Preference</span>::<span class="ident">Extension</span>(<span class="string">&quot;bux&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec</span><span class="macro">!</span>[(<span class="string">&quot;foo&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_owned</span>())]),
+            <span class="ident">Preference</span>::<span class="ident">Extension</span>(<span class="string">&quot;buz&quot;</span>.<span class="ident">to_owned</span>(), <span class="string">&quot;some parameter&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec</span><span class="macro">!</span>[])])))
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_fail_with_args</span>() {
-        <span class='kw'>let</span> <span class='ident'>prefer</span>: ::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Prefer</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Header</span>::<span class='ident'>parse_header</span>(<span class='kw-2'>&amp;</span>[<span class='string'>b&quot;respond-async; foo=bar&quot;</span>.<span class='ident'>to_vec</span>()]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>prefer</span>.<span class='ident'>ok</span>(), <span class='prelude-val'>None</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_fail_with_args</span>() {
+        <span class="kw">let</span> <span class="ident">prefer</span>: ::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Prefer</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Header</span>::<span class="ident">parse_header</span>(<span class="kw-2">&amp;</span>[<span class="string">b&quot;respond-async; foo=bar&quot;</span>.<span class="ident">to_vec</span>()]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">prefer</span>.<span class="ident">ok</span>(), <span class="prelude-val">None</span>);
     }
 }
 
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>normal</span>,
-    <span class='ident'>Prefer</span>, { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;respond-async, return=representation&quot;</span>.<span class='ident'>to_vec</span>(), <span class='string'>b&quot;wait=100&quot;</span>.<span class='ident'>to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">normal</span>,
+    <span class="ident">Prefer</span>, { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;respond-async, return=representation&quot;</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;wait=100&quot;</span>.<span class="ident">to_vec</span>()] });
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -463,18 +475,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -507,7 +523,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

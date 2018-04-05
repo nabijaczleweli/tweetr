@@ -9,14 +9,18 @@
 
     <title>crypto::util - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>crypto</a></p><script>window.sidebarCurrent = {name: 'util', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module util</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../index.html'>crypto</a></p><script>window.sidebarCurrent = {name: 'util', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,53 +54,54 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>crypto</a>::<wbr><a class='mod' href=''>util</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>crypto</a>::<wbr><a class="mod" href=''>util</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-5091' class='srclink' href='../../src/crypto/util.rs.html#7-80' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/crypto/util.rs.html#7-80' title='goto source code'>[src]</a></span></h1>
 <h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.fixed_time_eq.html'
-                                  title='crypto::util::fixed_time_eq'>fixed_time_eq</a></td>
+                           <td><a class="fn" href="fn.fixed_time_eq.html"
+                                  title='fn crypto::util::fixed_time_eq'>fixed_time_eq</a></td>
                            <td class='docblock-short'>
                                 <p>Compare two vectors using a fixed number of operations. If the two vectors are not of equal
 length, the function returns false immediately.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.rust_crypto_util_fixed_time_eq_asm.html'
-                                  title='crypto::util::rust_crypto_util_fixed_time_eq_asm'>rust_crypto_util_fixed_time_eq_asm</a></td>
+                           <td><a class="fn" href="fn.rust_crypto_util_fixed_time_eq_asm.html"
+                                  title='fn crypto::util::rust_crypto_util_fixed_time_eq_asm'>rust_crypto_util_fixed_time_eq_asm</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.rust_crypto_util_secure_memset.html'
-                                  title='crypto::util::rust_crypto_util_secure_memset'>rust_crypto_util_secure_memset</a></td>
+                           <td><a class="fn" href="fn.rust_crypto_util_secure_memset.html"
+                                  title='fn crypto::util::rust_crypto_util_secure_memset'>rust_crypto_util_secure_memset</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.rust_crypto_util_supports_aesni.html'
-                                  title='crypto::util::rust_crypto_util_supports_aesni'>rust_crypto_util_supports_aesni</a></td>
+                           <td><a class="fn" href="fn.rust_crypto_util_supports_aesni.html"
+                                  title='fn crypto::util::rust_crypto_util_supports_aesni'>rust_crypto_util_supports_aesni</a><a title='unsafe function' href='#'><sup>⚠</sup></a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.secure_memset.html'
-                                  title='crypto::util::secure_memset'>secure_memset</a></td>
+                           <td><a class="fn" href="fn.secure_memset.html"
+                                  title='fn crypto::util::secure_memset'>secure_memset</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='fn' href='fn.supports_aesni.html'
-                                  title='crypto::util::supports_aesni'>supports_aesni</a></td>
+                           <td><a class="fn" href="fn.supports_aesni.html"
+                                  title='fn crypto::util::supports_aesni'>supports_aesni</a></td>
                            <td class='docblock-short'>
                                 
                            </td>
@@ -105,18 +118,22 @@ length, the function returns false immediately.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -149,7 +166,6 @@ length, the function returns false immediately.</p>
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

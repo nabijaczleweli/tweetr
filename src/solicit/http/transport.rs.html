@@ -9,14 +9,18 @@
 
     <title>transport.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -132,95 +144,95 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains implementations of the transport layer functionality</span>
-<span class='doccomment'>//! that HTTP/2 requires. It exposes APIs that allow the HTTP/2 connection to</span>
-<span class='doccomment'>//! use the transport layer without requiring it to know which exact</span>
-<span class='doccomment'>//! implementation they are using (e.g. a clear-text TCP connection, a TLS</span>
-<span class='doccomment'>//! protected connection, or even a mock implementation).</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! The types provided here are purely for convenience in being able to easily</span>
-<span class='doccomment'>//! plug in the native Rust socket IO primitives into the HTTP/2 connection API</span>
-<span class='doccomment'>//! without having to write too much boilerplate around them.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains implementations of the transport layer functionality</span>
+<span class="doccomment">//! that HTTP/2 requires. It exposes APIs that allow the HTTP/2 connection to</span>
+<span class="doccomment">//! use the transport layer without requiring it to know which exact</span>
+<span class="doccomment">//! implementation they are using (e.g. a clear-text TCP connection, a TLS</span>
+<span class="doccomment">//! protected connection, or even a mock implementation).</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The types provided here are purely for convenience in being able to easily</span>
+<span class="doccomment">//! plug in the native Rust socket IO primitives into the HTTP/2 connection API</span>
+<span class="doccomment">//! without having to write too much boilerplate around them.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>Read</span>, <span class='ident'>Write</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::<span class='ident'>TcpStream</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>net</span>::<span class='ident'>Shutdown</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Read</span>, <span class="ident">Write</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">TcpStream</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">Shutdown</span>;
 
-<span class='doccomment'>/// A trait that any struct that wants to provide the transport layer for</span>
-<span class='doccomment'>/// HTTP/2 needs to implement.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// It provides default implementations for some convenience methods, backed</span>
-<span class='doccomment'>/// by the `Read` and `Write` implementations.</span>
-<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>TransportStream</span>: <span class='ident'>Read</span> <span class='op'>+</span> <span class='ident'>Write</span> <span class='op'>+</span> <span class='ident'>Sized</span> {
-    <span class='doccomment'>/// A convenience method that performs as many `read` calls on the</span>
-    <span class='doccomment'>/// underlying `Read` implementation as it takes to fill the given buffer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The implementation simply calls the `read` in a loop until the</span>
-    <span class='doccomment'>/// buffer is filled or an aparent end of file is reached, upon which</span>
-    <span class='doccomment'>/// an error is returned.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// However, no particular care is taken to limit the number of loop</span>
-    <span class='doccomment'>/// iterations and it could theoretically be possible to end up reading</span>
-    <span class='doccomment'>/// a single byte at a time into a large buffer, taking a long time to</span>
-    <span class='doccomment'>/// return.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any errors raised by the underlying `Read` implementations are</span>
-    <span class='doccomment'>/// propagated.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// When an error is raised, the given buffer is only partially filled,</span>
-    <span class='doccomment'>/// but there is no way to know how many bytes were actually written to</span>
-    <span class='doccomment'>/// the underlying buffer, which means that, effectively, all read bytes</span>
-    <span class='doccomment'>/// are lost on any error.</span>
-    <span class='kw'>fn</span> <span class='ident'>read_exact</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>buf</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>io</span>::<span class='prelude-ty'>Result</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>total</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='kw'>while</span> <span class='ident'>total</span> <span class='op'>&lt;</span> <span class='ident'>buf</span>.<span class='ident'>len</span>() {
-            <span class='kw'>let</span> <span class='ident'>read</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>read</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>buf</span>[<span class='ident'>total</span>..]));
-            <span class='kw'>if</span> <span class='ident'>read</span> <span class='op'>==</span> <span class='number'>0</span> {
-                <span class='comment'>// We consider this an unexpected end of file and return an</span>
-                <span class='comment'>// error since we were unable to read the minimum amount of</span>
-                <span class='comment'>// bytes.</span>
-                <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>io</span>::<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>io</span>::<span class='ident'>ErrorKind</span>::<span class='ident'>Other</span>,
-                                          <span class='string'>&quot;Not enough bytes&quot;</span>));
+<span class="doccomment">/// A trait that any struct that wants to provide the transport layer for</span>
+<span class="doccomment">/// HTTP/2 needs to implement.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It provides default implementations for some convenience methods, backed</span>
+<span class="doccomment">/// by the `Read` and `Write` implementations.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TransportStream</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span> <span class="op">+</span> <span class="ident">Sized</span> {
+    <span class="doccomment">/// A convenience method that performs as many `read` calls on the</span>
+    <span class="doccomment">/// underlying `Read` implementation as it takes to fill the given buffer.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The implementation simply calls the `read` in a loop until the</span>
+    <span class="doccomment">/// buffer is filled or an aparent end of file is reached, upon which</span>
+    <span class="doccomment">/// an error is returned.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// However, no particular care is taken to limit the number of loop</span>
+    <span class="doccomment">/// iterations and it could theoretically be possible to end up reading</span>
+    <span class="doccomment">/// a single byte at a time into a large buffer, taking a long time to</span>
+    <span class="doccomment">/// return.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any errors raised by the underlying `Read` implementations are</span>
+    <span class="doccomment">/// propagated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// When an error is raised, the given buffer is only partially filled,</span>
+    <span class="doccomment">/// but there is no way to know how many bytes were actually written to</span>
+    <span class="doccomment">/// the underlying buffer, which means that, effectively, all read bytes</span>
+    <span class="doccomment">/// are lost on any error.</span>
+    <span class="kw">fn</span> <span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">while</span> <span class="ident">total</span> <span class="op">&lt;</span> <span class="ident">buf</span>.<span class="ident">len</span>() {
+            <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">total</span>..]));
+            <span class="kw">if</span> <span class="ident">read</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="comment">// We consider this an unexpected end of file and return an</span>
+                <span class="comment">// error since we were unable to read the minimum amount of</span>
+                <span class="comment">// bytes.</span>
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io</span>::<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">io</span>::<span class="ident">ErrorKind</span>::<span class="ident">Other</span>,
+                                          <span class="string">&quot;Not enough bytes&quot;</span>));
             }
-            <span class='ident'>total</span> <span class='op'>+=</span> <span class='ident'>read</span>;
+            <span class="ident">total</span> <span class="op">+=</span> <span class="ident">read</span>;
         }
 
-        <span class='prelude-val'>Ok</span>(())
+        <span class="prelude-val">Ok</span>(())
     }
 
-    <span class='doccomment'>/// Attempts to split the `TransportStream` instance into a new independently</span>
-    <span class='doccomment'>/// owned handle to the same underlying stream.</span>
-    <span class='kw'>fn</span> <span class='ident'>try_split</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='self'>Self</span>, <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
+    <span class="doccomment">/// Attempts to split the `TransportStream` instance into a new independently</span>
+    <span class="doccomment">/// owned handle to the same underlying stream.</span>
+    <span class="kw">fn</span> <span class="ident">try_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>;
 
-    <span class='doccomment'>/// Attempts to shutdown both ends of the transport stream.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If successful, all handles to the stream created by the `try_split` operation will start</span>
-    <span class='doccomment'>/// receiving an error for any IO operations.</span>
-    <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
+    <span class="doccomment">/// Attempts to shutdown both ends of the transport stream.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If successful, all handles to the stream created by the `try_split` operation will start</span>
+    <span class="doccomment">/// receiving an error for any IO operations.</span>
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span>;
 }
 
-<span class='kw'>impl</span> <span class='ident'>TransportStream</span> <span class='kw'>for</span> <span class='ident'>TcpStream</span> {
-    <span class='kw'>fn</span> <span class='ident'>try_split</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span>, <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>try_clone</span>()
+<span class="kw">impl</span> <span class="ident">TransportStream</span> <span class="kw">for</span> <span class="ident">TcpStream</span> {
+    <span class="kw">fn</span> <span class="ident">try_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">try_clone</span>()
     }
 
-    <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>shutdown</span>(<span class='ident'>Shutdown</span>::<span class='ident'>Both</span>)
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">Shutdown</span>::<span class="ident">Both</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;tls&quot;</span>)]</span>
-<span class='kw'>use</span> <span class='ident'>openssl</span>::<span class='ident'>ssl</span>::<span class='ident'>SslStream</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;tls&quot;</span>)]</span>
-<span class='kw'>impl</span> <span class='ident'>TransportStream</span> <span class='kw'>for</span> <span class='ident'>SslStream</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>try_split</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>SslStream</span><span class='op'>&lt;</span><span class='ident'>TcpStream</span><span class='op'>&gt;</span>, <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>try_clone</span>()
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;tls&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">openssl</span>::<span class="ident">ssl</span>::<span class="ident">SslStream</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span><span class="op">=</span><span class="string">&quot;tls&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">TransportStream</span> <span class="kw">for</span> <span class="ident">SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">try_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SslStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">try_clone</span>()
     }
 
-    <span class='kw'>fn</span> <span class='ident'>close</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>io</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>get_ref</span>().<span class='ident'>shutdown</span>(<span class='ident'>Shutdown</span>::<span class='ident'>Both</span>)
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">get_ref</span>().<span class="ident">shutdown</span>(<span class="ident">Shutdown</span>::<span class="ident">Both</span>)
     }
 }
 </pre>
@@ -237,18 +249,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -281,7 +297,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

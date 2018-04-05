@@ -9,14 +9,18 @@
 
     <title>settings.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -685,647 +697,647 @@
 <span id="641">641</span>
 <span id="642">642</span>
 <span id="643">643</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! The module contains the implementation of the `SETTINGS` frame and associated flags.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! The module contains the implementation of the `SETTINGS` frame and associated flags.</span>
 
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>StreamId</span>;
-<span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::{
-    <span class='ident'>Flag</span>,
-    <span class='ident'>Frame</span>,
-    <span class='ident'>FrameHeader</span>,
-    <span class='ident'>RawFrame</span>,
-    <span class='ident'>pack_header</span>,
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">StreamId</span>;
+<span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::{
+    <span class="ident">Flag</span>,
+    <span class="ident">Frame</span>,
+    <span class="ident">FrameHeader</span>,
+    <span class="ident">RawFrame</span>,
+    <span class="ident">pack_header</span>,
 };
 
-<span class='doccomment'>/// An enum that lists all valid settings that can be sent in a SETTINGS</span>
-<span class='doccomment'>/// frame.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Each setting has a value that is a 32 bit unsigned integer (6.5.1.).</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>HttpSetting</span> {
-    <span class='ident'>HeaderTableSize</span>(<span class='ident'>u32</span>),
-    <span class='ident'>EnablePush</span>(<span class='ident'>u32</span>),
-    <span class='ident'>MaxConcurrentStreams</span>(<span class='ident'>u32</span>),
-    <span class='ident'>InitialWindowSize</span>(<span class='ident'>u32</span>),
-    <span class='ident'>MaxFrameSize</span>(<span class='ident'>u32</span>),
-    <span class='ident'>MaxHeaderListSize</span>(<span class='ident'>u32</span>),
+<span class="doccomment">/// An enum that lists all valid settings that can be sent in a SETTINGS</span>
+<span class="doccomment">/// frame.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Each setting has a value that is a 32 bit unsigned integer (6.5.1.).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HttpSetting</span> {
+    <span class="ident">HeaderTableSize</span>(<span class="ident">u32</span>),
+    <span class="ident">EnablePush</span>(<span class="ident">u32</span>),
+    <span class="ident">MaxConcurrentStreams</span>(<span class="ident">u32</span>),
+    <span class="ident">InitialWindowSize</span>(<span class="ident">u32</span>),
+    <span class="ident">MaxFrameSize</span>(<span class="ident">u32</span>),
+    <span class="ident">MaxHeaderListSize</span>(<span class="ident">u32</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>HttpSetting</span> {
-    <span class='doccomment'>/// Creates a new `HttpSetting` with the correct variant corresponding to</span>
-    <span class='doccomment'>/// the given setting id, based on the settings IDs defined in section</span>
-    <span class='doccomment'>/// 6.5.2.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_id</span>(<span class='ident'>id</span>: <span class='ident'>u16</span>, <span class='ident'>val</span>: <span class='ident'>u32</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HttpSetting</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='ident'>id</span> {
-            <span class='number'>1</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='ident'>val</span>)),
-            <span class='number'>2</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='ident'>val</span>)),
-            <span class='number'>3</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>MaxConcurrentStreams</span>(<span class='ident'>val</span>)),
-            <span class='number'>4</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>InitialWindowSize</span>(<span class='ident'>val</span>)),
-            <span class='number'>5</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>MaxFrameSize</span>(<span class='ident'>val</span>)),
-            <span class='number'>6</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='ident'>val</span>)),
-            _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+<span class="kw">impl</span> <span class="ident">HttpSetting</span> {
+    <span class="doccomment">/// Creates a new `HttpSetting` with the correct variant corresponding to</span>
+    <span class="doccomment">/// the given setting id, based on the settings IDs defined in section</span>
+    <span class="doccomment">/// 6.5.2.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_id</span>(<span class="ident">id</span>: <span class="ident">u16</span>, <span class="ident">val</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HttpSetting</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">id</span> {
+            <span class="number">1</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="ident">val</span>)),
+            <span class="number">2</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="ident">val</span>)),
+            <span class="number">3</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">MaxConcurrentStreams</span>(<span class="ident">val</span>)),
+            <span class="number">4</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">InitialWindowSize</span>(<span class="ident">val</span>)),
+            <span class="number">5</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">MaxFrameSize</span>(<span class="ident">val</span>)),
+            <span class="number">6</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="ident">val</span>)),
+            _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='doccomment'>/// Creates a new `HttpSetting` by parsing the given buffer of 6 bytes,</span>
-    <span class='doccomment'>/// which contains the raw byte representation of the setting, according</span>
-    <span class='doccomment'>/// to the &quot;SETTINGS format&quot; defined in section 6.5.1.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `raw_setting` parameter should have length at least 6 bytes, since</span>
-    <span class='doccomment'>/// the length of the raw setting is exactly 6 bytes.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If given a buffer shorter than 6 bytes, the function will panic.</span>
-    <span class='kw'>fn</span> <span class='ident'>parse_setting</span>(<span class='ident'>raw_setting</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>HttpSetting</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>id</span>: <span class='ident'>u16</span> <span class='op'>=</span> ((<span class='ident'>raw_setting</span>[<span class='number'>0</span>] <span class='kw'>as</span> <span class='ident'>u16</span>) <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>|</span> (<span class='ident'>raw_setting</span>[<span class='number'>1</span>] <span class='kw'>as</span> <span class='ident'>u16</span>);
-        <span class='kw'>let</span> <span class='ident'>val</span>: <span class='ident'>u32</span> <span class='op'>=</span> <span class='macro'>unpack_octets_4</span><span class='macro'>!</span>(<span class='ident'>raw_setting</span>, <span class='number'>2</span>, <span class='ident'>u32</span>);
+    <span class="doccomment">/// Creates a new `HttpSetting` by parsing the given buffer of 6 bytes,</span>
+    <span class="doccomment">/// which contains the raw byte representation of the setting, according</span>
+    <span class="doccomment">/// to the &quot;SETTINGS format&quot; defined in section 6.5.1.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `raw_setting` parameter should have length at least 6 bytes, since</span>
+    <span class="doccomment">/// the length of the raw setting is exactly 6 bytes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Panics</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If given a buffer shorter than 6 bytes, the function will panic.</span>
+    <span class="kw">fn</span> <span class="ident">parse_setting</span>(<span class="ident">raw_setting</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HttpSetting</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u16</span> <span class="op">=</span> ((<span class="ident">raw_setting</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">raw_setting</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>);
+        <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="macro">unpack_octets_4</span><span class="macro">!</span>(<span class="ident">raw_setting</span>, <span class="number">2</span>, <span class="ident">u32</span>);
 
-        <span class='ident'>HttpSetting</span>::<span class='ident'>from_id</span>(<span class='ident'>id</span>, <span class='ident'>val</span>)
+        <span class="ident">HttpSetting</span>::<span class="ident">from_id</span>(<span class="ident">id</span>, <span class="ident">val</span>)
     }
 
-    <span class='doccomment'>/// Returns the setting ID as an unsigned 16 bit integer, as defined in</span>
-    <span class='doccomment'>/// section 6.5.2.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u16</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(_) <span class='op'>=&gt;</span> <span class='number'>1</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(_) <span class='op'>=&gt;</span> <span class='number'>2</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxConcurrentStreams</span>(_) <span class='op'>=&gt;</span> <span class='number'>3</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>InitialWindowSize</span>(_) <span class='op'>=&gt;</span> <span class='number'>4</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxFrameSize</span>(_) <span class='op'>=&gt;</span> <span class='number'>5</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(_) <span class='op'>=&gt;</span> <span class='number'>6</span>,
+    <span class="doccomment">/// Returns the setting ID as an unsigned 16 bit integer, as defined in</span>
+    <span class="doccomment">/// section 6.5.2.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(_) <span class="op">=&gt;</span> <span class="number">1</span>,
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(_) <span class="op">=&gt;</span> <span class="number">2</span>,
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxConcurrentStreams</span>(_) <span class="op">=&gt;</span> <span class="number">3</span>,
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">InitialWindowSize</span>(_) <span class="op">=&gt;</span> <span class="number">4</span>,
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxFrameSize</span>(_) <span class="op">=&gt;</span> <span class="number">5</span>,
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(_) <span class="op">=&gt;</span> <span class="number">6</span>,
         }
     }
 
-    <span class='doccomment'>/// Gets the setting value by unpacking it from the wrapped `u32`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_val</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u32</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxConcurrentStreams</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>InitialWindowSize</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxFrameSize</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='ident'>val</span>.<span class='ident'>clone</span>(),
+    <span class="doccomment">/// Gets the setting value by unpacking it from the wrapped `u32`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_val</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxConcurrentStreams</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">InitialWindowSize</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxFrameSize</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=&gt;</span> <span class="ident">val</span>.<span class="ident">clone</span>(),
         }
     }
 
-    <span class='doccomment'>/// Serializes a setting into its &quot;on-the-wire&quot; representation of 6 octets,</span>
-    <span class='doccomment'>/// according to section 6.5.1.</span>
-    <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> [<span class='ident'>u8</span>; <span class='number'>6</span>] {
-        <span class='kw'>let</span> (<span class='ident'>id</span>, <span class='ident'>val</span>) <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>get_id</span>(), <span class='self'>self</span>.<span class='ident'>get_val</span>());
+    <span class="doccomment">/// Serializes a setting into its &quot;on-the-wire&quot; representation of 6 octets,</span>
+    <span class="doccomment">/// according to section 6.5.1.</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> [<span class="ident">u8</span>; <span class="number">6</span>] {
+        <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">val</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">get_id</span>(), <span class="self">self</span>.<span class="ident">get_val</span>());
         [
-            ((<span class='ident'>id</span> <span class='op'>&gt;&gt;</span> <span class='number'>8</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x00FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>,
-            ((<span class='ident'>id</span> <span class='op'>&gt;&gt;</span> <span class='number'>0</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x00FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>,
-            (((<span class='ident'>val</span> <span class='op'>&gt;&gt;</span> <span class='number'>24</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            (((<span class='ident'>val</span> <span class='op'>&gt;&gt;</span> <span class='number'>16</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            (((<span class='ident'>val</span> <span class='op'>&gt;&gt;</span>  <span class='number'>8</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
-            (((<span class='ident'>val</span> <span class='op'>&gt;&gt;</span>  <span class='number'>0</span>) <span class='kw-2'>&amp;</span> <span class='number'>0x000000FF</span>) <span class='kw'>as</span> <span class='ident'>u8</span>),
+            ((<span class="ident">id</span> <span class="op">&gt;&gt;</span> <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0x00FF</span>) <span class="kw">as</span> <span class="ident">u8</span>,
+            ((<span class="ident">id</span> <span class="op">&gt;&gt;</span> <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x00FF</span>) <span class="kw">as</span> <span class="ident">u8</span>,
+            (((<span class="ident">val</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            (((<span class="ident">val</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            (((<span class="ident">val</span> <span class="op">&gt;&gt;</span>  <span class="number">8</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
+            (((<span class="ident">val</span> <span class="op">&gt;&gt;</span>  <span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x000000FF</span>) <span class="kw">as</span> <span class="ident">u8</span>),
         ]
     }
 }
 
-<span class='doccomment'>/// An enum representing the flags that a `SettingsFrame` can have.</span>
-<span class='doccomment'>/// The integer representation associated to each variant is that flag&#39;s</span>
-<span class='doccomment'>/// bitmask.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// HTTP/2 spec, section 6.5.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>SettingsFlag</span> {
-    <span class='ident'>Ack</span> <span class='op'>=</span> <span class='number'>0x1</span>,
+<span class="doccomment">/// An enum representing the flags that a `SettingsFrame` can have.</span>
+<span class="doccomment">/// The integer representation associated to each variant is that flag&#39;s</span>
+<span class="doccomment">/// bitmask.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// HTTP/2 spec, section 6.5.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SettingsFlag</span> {
+    <span class="ident">Ack</span> <span class="op">=</span> <span class="number">0x1</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>Flag</span> <span class='kw'>for</span> <span class='ident'>SettingsFlag</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>bitmask</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u8</span> {
-        <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>u8</span>
-    }
-}
-
-<span class='doccomment'>/// A struct representing the SETTINGS frames of HTTP/2, as defined in the</span>
-<span class='doccomment'>/// HTTP/2 spec, section 6.5.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// The struct does not try to prevent the client from creating malformed</span>
-<span class='doccomment'>/// SETTINGS frames, such as ones that have the ACK flag set along with some</span>
-<span class='doccomment'>/// settings values. The users are responsible to follow the prescribed rules</span>
-<span class='doccomment'>/// before sending the frame to the peer.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// On parsing received frames, it treats the following as errors:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// - ACK flag and a number of settings both set</span>
-<span class='doccomment'>/// - Payload length not a multiple of 6</span>
-<span class='doccomment'>/// - Stream ID not zero (SETTINGS frames MUST be associated to stream 0)</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// What is *not* treated as an error (for now) are settings values out of</span>
-<span class='doccomment'>/// allowed bounds such as a EnablePush being set to something other than 0 or</span>
-<span class='doccomment'>/// 1.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SettingsFrame</span> {
-    <span class='doccomment'>/// Contains all the settings that are currently set in the frame. It is</span>
-    <span class='doccomment'>/// safe to access this field (to read, add, or remove settings), even</span>
-    <span class='doccomment'>/// though a helper method `add_setting` exists.</span>
-    <span class='kw'>pub</span> <span class='ident'>settings</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpSetting</span><span class='op'>&gt;</span>,
-    <span class='doccomment'>/// Represents the flags currently set on the `SettingsFrame`, packed into</span>
-    <span class='doccomment'>/// a single byte.</span>
-    <span class='ident'>flags</span>: <span class='ident'>u8</span>,
-}
-
-<span class='kw'>impl</span> <span class='ident'>SettingsFrame</span> {
-    <span class='doccomment'>/// Creates a new `SettingsFrame`</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>SettingsFrame</span> {
-        <span class='ident'>SettingsFrame</span> {
-            <span class='ident'>settings</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-            <span class='comment'>// By default, no flags are set</span>
-            <span class='ident'>flags</span>: <span class='number'>0</span>,
-        }
-    }
-
-    <span class='doccomment'>/// A convenience constructor that returns a `SettingsFrame` with the ACK</span>
-    <span class='doccomment'>/// flag already set and no settings.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_ack</span>() <span class='op'>-&gt;</span> <span class='ident'>SettingsFrame</span> {
-        <span class='ident'>SettingsFrame</span> {
-            <span class='ident'>settings</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-            <span class='ident'>flags</span>: <span class='ident'>SettingsFlag</span>::<span class='ident'>Ack</span>.<span class='ident'>bitmask</span>(),
-        }
-    }
-
-    <span class='doccomment'>/// Adds the given setting to the frame.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_setting</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>setting</span>: <span class='ident'>HttpSetting</span>) {
-        <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>push</span>(<span class='ident'>setting</span>);
-    }
-
-    <span class='doccomment'>/// Sets the ACK flag for the frame. This method is just a convenience</span>
-    <span class='doccomment'>/// method for calling `frame.set_flag(SettingsFlag::Ack)`.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_ack</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>set_flag</span>(<span class='ident'>SettingsFlag</span>::<span class='ident'>Ack</span>)
-    }
-
-    <span class='doccomment'>/// Checks whether the `SettingsFrame` has an ACK attached to it.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_ack</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>is_set</span>(<span class='ident'>SettingsFlag</span>::<span class='ident'>Ack</span>)
-    }
-
-    <span class='doccomment'>/// Returns the total length of the payload in bytes.</span>
-    <span class='kw'>fn</span> <span class='ident'>payload_len</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u32</span> {
-        <span class='comment'>// Each setting is represented with 6 bytes =&gt;</span>
-        <span class='number'>6</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>
-    }
-
-    <span class='doccomment'>/// Parses the given buffer, considering it a representation of a settings</span>
-    <span class='doccomment'>/// frame payload.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `Vec` of settings that are set by the given payload.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Any unknown setting is ignored, as per the HTTP/2 spec requirement.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If the frame is invalid (i.e. the length of the payload is not a</span>
-    <span class='doccomment'>/// multiple of 6) it returns `None`.</span>
-    <span class='kw'>fn</span> <span class='ident'>parse_payload</span>(<span class='ident'>payload</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>HttpSetting</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>if</span> <span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='op'>%</span> <span class='number'>6</span> <span class='op'>!=</span> <span class='number'>0</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
-        }
-
-        <span class='comment'>// Iterates through chunks of the raw payload of size 6 bytes and</span>
-        <span class='comment'>// parses each of them into an `HttpSetting`</span>
-        <span class='prelude-val'>Some</span>(<span class='ident'>payload</span>.<span class='ident'>chunks</span>(<span class='number'>6</span>).<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>chunk</span><span class='op'>|</span> {
-            <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='ident'>chunk</span>)
-        }).<span class='ident'>collect</span>())
+<span class="kw">impl</span> <span class="ident">Flag</span> <span class="kw">for</span> <span class="ident">SettingsFlag</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">bitmask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Frame</span> <span class='kw'>for</span> <span class='ident'>SettingsFrame</span> {
-    <span class='doccomment'>/// The type that represents the flags that the particular `Frame` can take.</span>
-    <span class='doccomment'>/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
-    <span class='kw'>type</span> <span class='ident'>FlagType</span> <span class='op'>=</span> <span class='ident'>SettingsFlag</span>;
+<span class="doccomment">/// A struct representing the SETTINGS frames of HTTP/2, as defined in the</span>
+<span class="doccomment">/// HTTP/2 spec, section 6.5.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The struct does not try to prevent the client from creating malformed</span>
+<span class="doccomment">/// SETTINGS frames, such as ones that have the ACK flag set along with some</span>
+<span class="doccomment">/// settings values. The users are responsible to follow the prescribed rules</span>
+<span class="doccomment">/// before sending the frame to the peer.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// On parsing received frames, it treats the following as errors:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - ACK flag and a number of settings both set</span>
+<span class="doccomment">/// - Payload length not a multiple of 6</span>
+<span class="doccomment">/// - Stream ID not zero (SETTINGS frames MUST be associated to stream 0)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// What is *not* treated as an error (for now) are settings values out of</span>
+<span class="doccomment">/// allowed bounds such as a EnablePush being set to something other than 0 or</span>
+<span class="doccomment">/// 1.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SettingsFrame</span> {
+    <span class="doccomment">/// Contains all the settings that are currently set in the frame. It is</span>
+    <span class="doccomment">/// safe to access this field (to read, add, or remove settings), even</span>
+    <span class="doccomment">/// though a helper method `add_setting` exists.</span>
+    <span class="kw">pub</span> <span class="ident">settings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HttpSetting</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Represents the flags currently set on the `SettingsFrame`, packed into</span>
+    <span class="doccomment">/// a single byte.</span>
+    <span class="ident">flags</span>: <span class="ident">u8</span>,
+}
 
-    <span class='doccomment'>/// Creates a new `SettingsFrame` with the given `RawFrame` (i.e. header and</span>
-    <span class='doccomment'>/// payload), if possible.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Returns</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// `None` if a valid `SettingsFrame` cannot be constructed from the given</span>
-    <span class='doccomment'>/// `RawFrame`. The stream ID *must* be 0 in order for the frame to be</span>
-    <span class='doccomment'>/// valid. If the `ACK` flag is set, there MUST not be a payload. The</span>
-    <span class='doccomment'>/// total payload length must be multiple of 6.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Otherwise, returns a newly constructed `SettingsFrame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>from_raw</span>(<span class='ident'>raw_frame</span>: <span class='ident'>RawFrame</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span> {
-        <span class='comment'>// Unpack the header</span>
-        <span class='kw'>let</span> (<span class='ident'>len</span>, <span class='ident'>frame_type</span>, <span class='ident'>flags</span>, <span class='ident'>stream_id</span>) <span class='op'>=</span> <span class='ident'>raw_frame</span>.<span class='ident'>header</span>();
-        <span class='comment'>// Check that the frame type is correct for this frame implementation</span>
-        <span class='kw'>if</span> <span class='ident'>frame_type</span> <span class='op'>!=</span> <span class='number'>0x4</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+<span class="kw">impl</span> <span class="ident">SettingsFrame</span> {
+    <span class="doccomment">/// Creates a new `SettingsFrame`</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-&gt;</span> <span class="ident">SettingsFrame</span> {
+        <span class="ident">SettingsFrame</span> {
+            <span class="ident">settings</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="comment">// By default, no flags are set</span>
+            <span class="ident">flags</span>: <span class="number">0</span>,
         }
-        <span class='comment'>// Check that the length given in the header matches the payload</span>
-        <span class='comment'>// length; if not, something went wrong and we do not consider this a</span>
-        <span class='comment'>// valid frame.</span>
-        <span class='kw'>if</span> (<span class='ident'>len</span> <span class='kw'>as</span> <span class='ident'>usize</span>) <span class='op'>!=</span> <span class='ident'>raw_frame</span>.<span class='ident'>payload</span>().<span class='ident'>len</span>() {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    }
+
+    <span class="doccomment">/// A convenience constructor that returns a `SettingsFrame` with the ACK</span>
+    <span class="doccomment">/// flag already set and no settings.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_ack</span>() <span class="op">-&gt;</span> <span class="ident">SettingsFrame</span> {
+        <span class="ident">SettingsFrame</span> {
+            <span class="ident">settings</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">flags</span>: <span class="ident">SettingsFlag</span>::<span class="ident">Ack</span>.<span class="ident">bitmask</span>(),
         }
-        <span class='comment'>// Check that the SETTINGS frame is associated to stream 0</span>
-        <span class='kw'>if</span> <span class='ident'>stream_id</span> <span class='op'>!=</span> <span class='number'>0</span> {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>;
+    }
+
+    <span class="doccomment">/// Adds the given setting to the frame.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_setting</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">setting</span>: <span class="ident">HttpSetting</span>) {
+        <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">push</span>(<span class="ident">setting</span>);
+    }
+
+    <span class="doccomment">/// Sets the ACK flag for the frame. This method is just a convenience</span>
+    <span class="doccomment">/// method for calling `frame.set_flag(SettingsFlag::Ack)`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ack</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">set_flag</span>(<span class="ident">SettingsFlag</span>::<span class="ident">Ack</span>)
+    }
+
+    <span class="doccomment">/// Checks whether the `SettingsFrame` has an ACK attached to it.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">is_set</span>(<span class="ident">SettingsFlag</span>::<span class="ident">Ack</span>)
+    }
+
+    <span class="doccomment">/// Returns the total length of the payload in bytes.</span>
+    <span class="kw">fn</span> <span class="ident">payload_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+        <span class="comment">// Each setting is represented with 6 bytes =&gt;</span>
+        <span class="number">6</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>
+    }
+
+    <span class="doccomment">/// Parses the given buffer, considering it a representation of a settings</span>
+    <span class="doccomment">/// frame payload.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `Vec` of settings that are set by the given payload.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Any unknown setting is ignored, as per the HTTP/2 spec requirement.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the frame is invalid (i.e. the length of the payload is not a</span>
+    <span class="doccomment">/// multiple of 6) it returns `None`.</span>
+    <span class="kw">fn</span> <span class="ident">parse_payload</span>(<span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">HttpSetting</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">6</span> <span class="op">!=</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
-        <span class='kw'>if</span> (<span class='ident'>flags</span> <span class='kw-2'>&amp;</span> <span class='ident'>SettingsFlag</span>::<span class='ident'>Ack</span>.<span class='ident'>bitmask</span>()) <span class='op'>!=</span> <span class='number'>0</span> {
-            <span class='kw'>if</span> <span class='ident'>len</span> <span class='op'>!=</span> <span class='number'>0</span> {
-                <span class='comment'>// The SETTINGS flag MUST not have a payload if Ack is set</span>
-                <span class='kw'>return</span> <span class='prelude-val'>None</span>;
-            } <span class='kw'>else</span> {
-                <span class='comment'>// Ack is set and there&#39;s no payload =&gt; just an Ack frame</span>
-                <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>SettingsFrame</span> {
-                    <span class='ident'>settings</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-                    <span class='ident'>flags</span>: <span class='ident'>flags</span>,
+
+        <span class="comment">// Iterates through chunks of the raw payload of size 6 bytes and</span>
+        <span class="comment">// parses each of them into an `HttpSetting`</span>
+        <span class="prelude-val">Some</span>(<span class="ident">payload</span>.<span class="ident">chunks</span>(<span class="number">6</span>).<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> {
+            <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="ident">chunk</span>)
+        }).<span class="ident">collect</span>())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Frame</span> <span class="kw">for</span> <span class="ident">SettingsFrame</span> {
+    <span class="doccomment">/// The type that represents the flags that the particular `Frame` can take.</span>
+    <span class="doccomment">/// This makes sure that only valid `Flag`s are used with each `Frame`.</span>
+    <span class="kw">type</span> <span class="ident">FlagType</span> <span class="op">=</span> <span class="ident">SettingsFlag</span>;
+
+    <span class="doccomment">/// Creates a new `SettingsFrame` with the given `RawFrame` (i.e. header and</span>
+    <span class="doccomment">/// payload), if possible.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `None` if a valid `SettingsFrame` cannot be constructed from the given</span>
+    <span class="doccomment">/// `RawFrame`. The stream ID *must* be 0 in order for the frame to be</span>
+    <span class="doccomment">/// valid. If the `ACK` flag is set, there MUST not be a payload. The</span>
+    <span class="doccomment">/// total payload length must be multiple of 6.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Otherwise, returns a newly constructed `SettingsFrame`.</span>
+    <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">raw_frame</span>: <span class="ident">RawFrame</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span> {
+        <span class="comment">// Unpack the header</span>
+        <span class="kw">let</span> (<span class="ident">len</span>, <span class="ident">frame_type</span>, <span class="ident">flags</span>, <span class="ident">stream_id</span>) <span class="op">=</span> <span class="ident">raw_frame</span>.<span class="ident">header</span>();
+        <span class="comment">// Check that the frame type is correct for this frame implementation</span>
+        <span class="kw">if</span> <span class="ident">frame_type</span> <span class="op">!=</span> <span class="number">0x4</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+        <span class="comment">// Check that the length given in the header matches the payload</span>
+        <span class="comment">// length; if not, something went wrong and we do not consider this a</span>
+        <span class="comment">// valid frame.</span>
+        <span class="kw">if</span> (<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">!=</span> <span class="ident">raw_frame</span>.<span class="ident">payload</span>().<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+        <span class="comment">// Check that the SETTINGS frame is associated to stream 0</span>
+        <span class="kw">if</span> <span class="ident">stream_id</span> <span class="op">!=</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+        <span class="kw">if</span> (<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">SettingsFlag</span>::<span class="ident">Ack</span>.<span class="ident">bitmask</span>()) <span class="op">!=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">len</span> <span class="op">!=</span> <span class="number">0</span> {
+                <span class="comment">// The SETTINGS flag MUST not have a payload if Ack is set</span>
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            } <span class="kw">else</span> {
+                <span class="comment">// Ack is set and there&#39;s no payload =&gt; just an Ack frame</span>
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">SettingsFrame</span> {
+                    <span class="ident">settings</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+                    <span class="ident">flags</span>: <span class="ident">flags</span>,
                 });
             }
         }
 
-        <span class='kw'>match</span> <span class='ident'>SettingsFrame</span>::<span class='ident'>parse_payload</span>(<span class='kw-2'>&amp;</span><span class='ident'>raw_frame</span>.<span class='ident'>payload</span>()) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>settings</span>) <span class='op'>=&gt;</span> {
-                <span class='prelude-val'>Some</span>(<span class='ident'>SettingsFrame</span> {
-                    <span class='ident'>settings</span>: <span class='ident'>settings</span>,
-                    <span class='ident'>flags</span>: <span class='ident'>flags</span>,
+        <span class="kw">match</span> <span class="ident">SettingsFrame</span>::<span class="ident">parse_payload</span>(<span class="kw-2">&amp;</span><span class="ident">raw_frame</span>.<span class="ident">payload</span>()) {
+            <span class="prelude-val">Some</span>(<span class="ident">settings</span>) <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">SettingsFrame</span> {
+                    <span class="ident">settings</span>: <span class="ident">settings</span>,
+                    <span class="ident">flags</span>: <span class="ident">flags</span>,
                 })
             },
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='doccomment'>/// Tests if the given flag is set for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>is_set</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>flag</span>: <span class='ident'>SettingsFlag</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        (<span class='self'>self</span>.<span class='ident'>flags</span> <span class='kw-2'>&amp;</span> <span class='ident'>flag</span>.<span class='ident'>bitmask</span>()) <span class='op'>!=</span> <span class='number'>0</span>
+    <span class="doccomment">/// Tests if the given flag is set for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">is_set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">SettingsFlag</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        (<span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">flag</span>.<span class="ident">bitmask</span>()) <span class="op">!=</span> <span class="number">0</span>
     }
 
-    <span class='doccomment'>/// Returns the `StreamId` of the stream to which the frame is associated.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// A `SettingsFrame` always has to be associated to stream `0`.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_stream_id</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StreamId</span> {
-        <span class='number'>0</span>
+    <span class="doccomment">/// Returns the `StreamId` of the stream to which the frame is associated.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// A `SettingsFrame` always has to be associated to stream `0`.</span>
+    <span class="kw">fn</span> <span class="ident">get_stream_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StreamId</span> {
+        <span class="number">0</span>
     }
 
-    <span class='doccomment'>/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>FrameHeader</span> {
-        (<span class='self'>self</span>.<span class='ident'>payload_len</span>(), <span class='number'>0x4</span>, <span class='self'>self</span>.<span class='ident'>flags</span>, <span class='number'>0</span>)
+    <span class="doccomment">/// Returns a `FrameHeader` based on the current state of the `Frame`.</span>
+    <span class="kw">fn</span> <span class="ident">get_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">FrameHeader</span> {
+        (<span class="self">self</span>.<span class="ident">payload_len</span>(), <span class="number">0x4</span>, <span class="self">self</span>.<span class="ident">flags</span>, <span class="number">0</span>)
     }
 
-    <span class='doccomment'>/// Sets the given flag for the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>set_flag</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>flag</span>: <span class='ident'>SettingsFlag</span>) {
-        <span class='self'>self</span>.<span class='ident'>flags</span> <span class='op'>|=</span> <span class='ident'>flag</span>.<span class='ident'>bitmask</span>();
+    <span class="doccomment">/// Sets the given flag for the frame.</span>
+    <span class="kw">fn</span> <span class="ident">set_flag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">SettingsFlag</span>) {
+        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">|=</span> <span class="ident">flag</span>.<span class="ident">bitmask</span>();
     }
 
-    <span class='doccomment'>/// Returns a `Vec` with the serialized representation of the frame.</span>
-    <span class='kw'>fn</span> <span class='ident'>serialize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>payload_len</span>() <span class='kw'>as</span> <span class='ident'>usize</span>);
-        <span class='comment'>// First the header...</span>
-        <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>get_header</span>()).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-        <span class='comment'>// ...now the settings</span>
-        <span class='kw'>for</span> <span class='ident'>setting</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>settings</span>.<span class='ident'>iter</span>() {
-            <span class='ident'>buf</span>.<span class='ident'>extend</span>(<span class='ident'>setting</span>.<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Returns a `Vec` with the serialized representation of the frame.</span>
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">payload_len</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="comment">// First the header...</span>
+        <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_header</span>()).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+        <span class="comment">// ...now the settings</span>
+        <span class="kw">for</span> <span class="ident">setting</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">settings</span>.<span class="ident">iter</span>() {
+            <span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">setting</span>.<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
         }
 
-        <span class='ident'>buf</span>
+        <span class="ident">buf</span>
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>HttpSetting</span>, <span class='ident'>SettingsFrame</span>};
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::<span class='ident'>tests</span>::{<span class='ident'>build_test_frame</span>};
-    <span class='kw'>use</span> <span class='ident'>http</span>::<span class='ident'>frame</span>::{<span class='ident'>pack_header</span>, <span class='ident'>Frame</span>, <span class='ident'>RawFrame</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">HttpSetting</span>, <span class="ident">SettingsFrame</span>};
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::<span class="ident">tests</span>::{<span class="ident">build_test_frame</span>};
+    <span class="kw">use</span> <span class="ident">http</span>::<span class="ident">frame</span>::{<span class="ident">pack_header</span>, <span class="ident">Frame</span>, <span class="ident">RawFrame</span>};
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
-    <span class='doccomment'>/// no ACK flag and only a single setting.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_no_ack_one_setting</span>() {
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
-        <span class='comment'>// A header with the flag indicating no padding</span>
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
+    <span class="doccomment">/// no ACK flag and only a single setting.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_no_ack_one_setting</span>() {
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
+        <span class="comment">// A header with the flag indicating no padding</span>
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='comment'>// The frame correctly interprets the settings?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>settings</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span>)]);
-        <span class='comment'>// ...and the headers?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_header</span>(), <span class='ident'>header</span>);
+        <span class="comment">// The frame correctly interprets the settings?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">settings</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span>)]);
+        <span class="comment">// ...and the headers?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_header</span>(), <span class="ident">header</span>);
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
-    <span class='doccomment'>/// no ACK flag and multiple settings within the frame.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_no_ack_multiple_settings</span>() {
-        <span class='kw'>let</span> <span class='ident'>settings</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='number'>5</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>),
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
+    <span class="doccomment">/// no ACK flag and multiple settings within the frame.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_no_ack_multiple_settings</span>() {
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="number">5</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>),
         ];
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>settings</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>serialize</span>()) { <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>s</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>()); }
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">settings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">serialize</span>()) { <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">s</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>()); }
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='comment'>// The frame correctly interprets the settings?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>settings</span>, <span class='ident'>settings</span>);
-        <span class='comment'>// ...and the headers?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_header</span>(), <span class='ident'>header</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>frame</span>.<span class='ident'>is_ack</span>());
+        <span class="comment">// The frame correctly interprets the settings?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">settings</span>, <span class="ident">settings</span>);
+        <span class="comment">// ...and the headers?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_header</span>(), <span class="ident">header</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_ack</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
-    <span class='doccomment'>/// no ACK and multiple *duplicate* settings within the frame.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_no_ack_duplicate_settings</span>() {
-        <span class='kw'>let</span> <span class='ident'>settings</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='number'>5</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>2</span>),
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with</span>
+    <span class="doccomment">/// no ACK and multiple *duplicate* settings within the frame.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_no_ack_duplicate_settings</span>() {
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="number">5</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">2</span>),
         ];
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>settings</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>serialize</span>()) { <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>s</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>()); }
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">settings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">serialize</span>()) { <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">s</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>()); }
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='comment'>// All the settings are returned, even the duplicates</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>settings</span>, <span class='ident'>settings</span>);
-        <span class='comment'>// ...and the headers?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_header</span>(), <span class='ident'>header</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>frame</span>.<span class='ident'>is_ack</span>());
+        <span class="comment">// All the settings are returned, even the duplicates</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">settings</span>, <span class="ident">settings</span>);
+        <span class="comment">// ...and the headers?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_header</span>(), <span class="ident">header</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_ack</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTING frame with no</span>
-    <span class='doccomment'>/// ACK and an unknown setting within the frame. The unknown setting is</span>
-    <span class='doccomment'>/// simply ignored.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_no_ack_unknown_setting</span>() {
-        <span class='kw'>let</span> <span class='ident'>settings</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span>),
-            <span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='number'>5</span>),
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTING frame with no</span>
+    <span class="doccomment">/// ACK and an unknown setting within the frame. The unknown setting is</span>
+    <span class="doccomment">/// simply ignored.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_no_ack_unknown_setting</span>() {
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span>),
+            <span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="number">5</span>),
         ];
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>settings</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>serialize</span>()) { <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>s</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>()); }
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>, <span class='number'>10</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>].<span class='ident'>into_iter</span>());
-            <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>settings</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>serialize</span>()) { <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>s</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>()); }
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">settings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">serialize</span>()) { <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">s</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>()); }
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>, <span class="number">10</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>].<span class="ident">into_iter</span>());
+            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">settings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">serialize</span>()) { <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">s</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>()); }
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='comment'>// All the settings are returned twice, but the unkown isn&#39;t found in</span>
-        <span class='comment'>// the returned Vec. For now, we ignore the unknown setting fully, not</span>
-        <span class='comment'>// exposing it in any way to any other higher-level clients.</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>settings</span>.<span class='ident'>len</span>(), <span class='number'>4</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>frame</span>.<span class='ident'>settings</span>[<span class='number'>0</span>..<span class='number'>2</span>], <span class='kw-2'>&amp;</span><span class='ident'>settings</span>[..]);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>frame</span>.<span class='ident'>settings</span>[<span class='number'>2</span>..], <span class='kw-2'>&amp;</span><span class='ident'>settings</span>[..]);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>frame</span>.<span class='ident'>is_ack</span>());
+        <span class="comment">// All the settings are returned twice, but the unkown isn&#39;t found in</span>
+        <span class="comment">// the returned Vec. For now, we ignore the unknown setting fully, not</span>
+        <span class="comment">// exposing it in any way to any other higher-level clients.</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">settings</span>.<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">frame</span>.<span class="ident">settings</span>[<span class="number">0</span>..<span class="number">2</span>], <span class="kw-2">&amp;</span><span class="ident">settings</span>[..]);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">frame</span>.<span class="ident">settings</span>[<span class="number">2</span>..], <span class="kw-2">&amp;</span><span class="ident">settings</span>[..]);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_ack</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with an</span>
-    <span class='doccomment'>/// ACK flag and no settings.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_ack_no_settings</span>() {
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> [];
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>1</span>, <span class='number'>0</span>);
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with an</span>
+    <span class="doccomment">/// ACK flag and no settings.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_ack_no_settings</span>() {
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> [];
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>build_test_frame</span>::<span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>header</span>, <span class='kw-2'>&amp;</span><span class='ident'>payload</span>);
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">build_test_frame</span>::<span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>, <span class="kw-2">&amp;</span><span class="ident">payload</span>);
 
-        <span class='comment'>// No settings there?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>settings</span>, <span class='macro'>vec</span><span class='macro'>!</span>[]);
-        <span class='comment'>// ...and the headers?</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>get_header</span>(), <span class='ident'>header</span>);
-        <span class='comment'>// ...and the frame indicates it&#39;s an ACK</span>
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_ack</span>());
+        <span class="comment">// No settings there?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">settings</span>, <span class="macro">vec</span><span class="macro">!</span>[]);
+        <span class="comment">// ...and the headers?</span>
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">get_header</span>(), <span class="ident">header</span>);
+        <span class="comment">// ...and the frame indicates it&#39;s an ACK</span>
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_ack</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with an</span>
-    <span class='doccomment'>/// ACK flag, along with settings. In this case, the frame needs to be</span>
-    <span class='doccomment'>/// considered invalid.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_ack_with_settings</span>() {
-        <span class='kw'>let</span> <span class='ident'>settings</span> <span class='op'>=</span> [
-            <span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>),
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame with an</span>
+    <span class="doccomment">/// ACK flag, along with settings. In this case, the frame needs to be</span>
+    <span class="doccomment">/// considered invalid.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_ack_with_settings</span>() {
+        <span class="kw">let</span> <span class="ident">settings</span> <span class="op">=</span> [
+            <span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>),
         ];
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='kw'>for</span> <span class='ident'>s</span> <span class='kw'>in</span> <span class='ident'>settings</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>s</span><span class='op'>|</span> <span class='ident'>s</span>.<span class='ident'>serialize</span>()) { <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>s</span>.<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>()); }
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">settings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">serialize</span>()) { <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">s</span>.<span class="ident">to_vec</span>().<span class="ident">into_iter</span>()); }
 
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>1</span>, <span class='number'>0</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(
-            <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>payload</span>));
+        <span class="kw">let</span> <span class="ident">frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Frame</span>::<span class="ident">from_raw</span>(
+            <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">payload</span>));
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame which</span>
-    <span class='doccomment'>/// was not associated to stream 0 by returning an error.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_not_stream_zero</span>() {
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[];
-        <span class='comment'>// Header indicates that it is associated to stream 1</span>
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>1</span>, <span class='number'>1</span>);
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame which</span>
+    <span class="doccomment">/// was not associated to stream 0 by returning an error.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_not_stream_zero</span>() {
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+        <span class="comment">// Header indicates that it is associated to stream 1</span>
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">1</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(
-            <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>payload</span>));
+        <span class="kw">let</span> <span class="ident">frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Frame</span>::<span class="ident">from_raw</span>(
+            <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">payload</span>));
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame which</span>
-    <span class='doccomment'>/// does not have a payload with a number of bytes that&#39;s a multiple of 6.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_parse_not_multiple_of_six</span>() {
-        <span class='kw'>let</span> <span class='ident'>payload</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>];
+    <span class="doccomment">/// Tests that a `SettingsFrame` correctly handles a SETTINGS frame which</span>
+    <span class="doccomment">/// does not have a payload with a number of bytes that&#39;s a multiple of 6.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_parse_not_multiple_of_six</span>() {
+        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
 
-        <span class='kw'>let</span> <span class='ident'>header</span> <span class='op'>=</span> (<span class='ident'>payload</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u32</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>);
+        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> (<span class="ident">payload</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class='kw'>let</span> <span class='ident'>frame</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>SettingsFrame</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Frame</span>::<span class='ident'>from_raw</span>(
-            <span class='ident'>RawFrame</span>::<span class='ident'>with_payload</span>(<span class='ident'>header</span>, <span class='ident'>payload</span>));
+        <span class="kw">let</span> <span class="ident">frame</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SettingsFrame</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Frame</span>::<span class="ident">from_raw</span>(
+            <span class="ident">RawFrame</span>::<span class="ident">with_payload</span>(<span class="ident">header</span>, <span class="ident">payload</span>));
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>frame</span>.<span class='ident'>is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">frame</span>.<span class="ident">is_none</span>());
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
-    <span class='doccomment'>/// only settings and no ACK.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_serialize_no_ack_settings</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>SettingsFrame</span>::<span class='ident'>new</span>();
-        <span class='ident'>frame</span>.<span class='ident'>add_setting</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>));
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>6</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>)).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>).<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
+    <span class="doccomment">/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
+    <span class="doccomment">/// only settings and no ACK.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_serialize_no_ack_settings</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">SettingsFrame</span>::<span class="ident">new</span>();
+        <span class="ident">frame</span>.<span class="ident">add_setting</span>(<span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">6</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>)).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>).<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-            <span class='ident'>res</span>
-        };
-
-        <span class='kw'>let</span> <span class='ident'>serialized</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
-
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>serialized</span>, <span class='ident'>expected</span>);
-    }
-
-    <span class='doccomment'>/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
-    <span class='doccomment'>/// multiple settings and no ACK.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_serialize_no_ack_multiple_settings</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>SettingsFrame</span>::<span class='ident'>new</span>();
-        <span class='ident'>frame</span>.<span class='ident'>add_setting</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>));
-        <span class='ident'>frame</span>.<span class='ident'>add_setting</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='number'>0</span>));
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>6</span> <span class='op'>*</span> <span class='number'>2</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>)).<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>0</span>).<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-            <span class='ident'>res</span>.<span class='ident'>extend</span>(<span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>(<span class='number'>0</span>).<span class='ident'>serialize</span>().<span class='ident'>to_vec</span>().<span class='ident'>into_iter</span>());
-
-            <span class='ident'>res</span>
+            <span class="ident">res</span>
         };
 
-        <span class='kw'>let</span> <span class='ident'>serialized</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>serialized</span>, <span class='ident'>expected</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">serialized</span>, <span class="ident">expected</span>);
     }
 
-    <span class='doccomment'>/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
-    <span class='doccomment'>/// multiple settings and no ACK.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_settings_frame_serialize_ack</span>() {
-        <span class='kw'>let</span> <span class='ident'>frame</span> <span class='op'>=</span> <span class='ident'>SettingsFrame</span>::<span class='ident'>new_ack</span>();
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='ident'>pack_header</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>, <span class='number'>4</span>, <span class='number'>1</span>, <span class='number'>0</span>)).<span class='ident'>to_vec</span>();
+    <span class="doccomment">/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
+    <span class="doccomment">/// multiple settings and no ACK.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_serialize_no_ack_multiple_settings</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">SettingsFrame</span>::<span class="ident">new</span>();
+        <span class="ident">frame</span>.<span class="ident">add_setting</span>(<span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>));
+        <span class="ident">frame</span>.<span class="ident">add_setting</span>(<span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">6</span> <span class="op">*</span> <span class="number">2</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>)).<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">0</span>).<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
+            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>(<span class="number">0</span>).<span class="ident">serialize</span>().<span class="ident">to_vec</span>().<span class="ident">into_iter</span>());
 
-        <span class='kw'>let</span> <span class='ident'>serialized</span> <span class='op'>=</span> <span class='ident'>frame</span>.<span class='ident'>serialize</span>();
+            <span class="ident">res</span>
+        };
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>serialized</span>, <span class='ident'>expected</span>);
+        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">serialized</span>, <span class="ident">expected</span>);
     }
 
-    <span class='doccomment'>/// Tests that the `HttpSetting::parse_setting` method correctly creates</span>
-    <span class='doccomment'>/// settings from raw bytes.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_setting_deserialize</span>() {
+    <span class="doccomment">/// Tests that a `SettingsFrame` gets correctly serialized when it contains</span>
+    <span class="doccomment">/// multiple settings and no ACK.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_settings_frame_serialize_ack</span>() {
+        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">SettingsFrame</span>::<span class="ident">new_ack</span>();
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">pack_header</span>(<span class="kw-2">&amp;</span>(<span class="number">0</span>, <span class="number">4</span>, <span class="number">1</span>, <span class="number">0</span>)).<span class="ident">to_vec</span>();
+
+        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">serialize</span>();
+
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">serialized</span>, <span class="ident">expected</span>);
+    }
+
+    <span class="doccomment">/// Tests that the `HttpSetting::parse_setting` method correctly creates</span>
+    <span class="doccomment">/// settings from raw bytes.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_setting_deserialize</span>() {
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>2</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">1</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>3</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>MaxConcurrentStreams</span>(<span class='number'>0</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">MaxConcurrentStreams</span>(<span class="number">0</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>InitialWindowSize</span>(<span class='number'>1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">InitialWindowSize</span>(<span class="number">1</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>5</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>MaxFrameSize</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>-</span> <span class='number'>1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">MaxFrameSize</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">-</span> <span class="number">1</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>6</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>setting</span>, <span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>-</span> <span class='number'>1</span>));
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">setting</span>, <span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">-</span> <span class="number">1</span>));
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>7</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>setting</span>.<span class='ident'>is_none</span>());
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">setting</span>.<span class="ident">is_none</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>parse_setting</span>(<span class='kw-2'>&amp;</span><span class='ident'>buf</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">parse_setting</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>);
 
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>setting</span>.<span class='ident'>is_none</span>());
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">setting</span>.<span class="ident">is_none</span>());
         }
     }
 
-    <span class='doccomment'>/// Tests that the `HttpSetting::serialize` method correctly creates</span>
-    <span class='doccomment'>/// a 6 byte buffer based on the given setting.</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_setting_serialize</span>() {
+    <span class="doccomment">/// Tests that the `HttpSetting::serialize` method correctly creates</span>
+    <span class="doccomment">/// a 6 byte buffer based on the given setting.</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_setting_serialize</span>() {
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>0</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>HeaderTableSize</span>(<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">HeaderTableSize</span>(<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>2</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>EnablePush</span>(<span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">EnablePush</span>(<span class="number">1</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>3</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>MaxConcurrentStreams</span>(<span class='number'>0</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">MaxConcurrentStreams</span>(<span class="number">0</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>4</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>1</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>InitialWindowSize</span>(<span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">InitialWindowSize</span>(<span class="number">1</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>5</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>MaxFrameSize</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>-</span> <span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">MaxFrameSize</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">-</span> <span class="number">1</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
         {
-            <span class='kw'>let</span> <span class='ident'>buf</span> <span class='op'>=</span> [<span class='number'>0</span>, <span class='number'>6</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>0</span>, <span class='number'>255</span>];
+            <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>];
 
-            <span class='kw'>let</span> <span class='ident'>setting</span> <span class='op'>=</span> <span class='ident'>HttpSetting</span>::<span class='ident'>MaxHeaderListSize</span>((<span class='number'>1</span> <span class='op'>&lt;&lt;</span> <span class='number'>8</span>) <span class='op'>-</span> <span class='number'>1</span>);
+            <span class="kw">let</span> <span class="ident">setting</span> <span class="op">=</span> <span class="ident">HttpSetting</span>::<span class="ident">MaxHeaderListSize</span>((<span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">-</span> <span class="number">1</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>buf</span>, <span class='ident'>setting</span>.<span class='ident'>serialize</span>());
+            <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">buf</span>, <span class="ident">setting</span>.<span class="ident">serialize</span>());
         }
     }
 }
@@ -1343,18 +1355,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1387,7 +1403,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

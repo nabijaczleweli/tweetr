@@ -9,14 +9,18 @@
 
     <title>solicit::http::server::ServerConnection - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../../index.html'>solicit</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>server</a></p><script>window.sidebarCurrent = {name: 'ServerConnection', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct ServerConnection</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#fields">Fields</a><div class="sidebar-links"><a href="#structfield.state">state</a></div><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.with_connection">with_connection</a><a href="#method.scheme">scheme</a><a href="#method.init">init</a><a href="#method.handle_next_frame">handle_next_frame</a><a href="#method.start_response">start_response</a><a href="#method.send_next_data">send_next_data</a></div></div><p class='location'><a href='../../index.html'>solicit</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>server</a></p><script>window.sidebarCurrent = {name: 'ServerConnection', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,47 +54,50 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>solicit</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>server</a>::<wbr><a class='struct' href=''>ServerConnection</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>solicit</a>::<wbr><a href='../index.html'>http</a>::<wbr><a href='index.html'>server</a>::<wbr><a class="struct" href=''>ServerConnection</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-817' class='srclink' href='../../../src/solicit/http/server.rs.html#83-91' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct ServerConnection&lt;S, R, State&nbsp;=&nbsp;<a class='struct' href='../../../solicit/http/session/struct.DefaultSessionState.html' title='solicit::http::session::DefaultSessionState'>DefaultSessionState</a>&lt;<a class='struct' href='../../../solicit/http/session/struct.DefaultStream.html' title='solicit::http::session::DefaultStream'>DefaultStream</a>&gt;&gt; <span class='where'>where S: <a class='trait' href='../../../solicit/http/connection/trait.SendFrame.html' title='solicit::http::connection::SendFrame'>SendFrame</a>, R: <a class='trait' href='../../../solicit/http/connection/trait.ReceiveFrame.html' title='solicit::http::connection::ReceiveFrame'>ReceiveFrame</a>, State: <a class='trait' href='../../../solicit/http/session/trait.SessionState.html' title='solicit::http::session::SessionState'>SessionState</a></span> {
+               </span><a class='srclink' href='../../../src/solicit/http/server.rs.html#83-91' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ServerConnection&lt;S, R, State&nbsp;=&nbsp;<a class="struct" href="../../../solicit/http/session/struct.DefaultSessionState.html" title="struct solicit::http::session::DefaultSessionState">DefaultSessionState</a>&lt;<a class="struct" href="../../../solicit/http/session/struct.DefaultStream.html" title="struct solicit::http::session::DefaultStream">DefaultStream</a>&gt;&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href="../../../solicit/http/connection/trait.SendFrame.html" title="trait solicit::http::connection::SendFrame">SendFrame</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../../../solicit/http/connection/trait.ReceiveFrame.html" title="trait solicit::http::connection::ReceiveFrame">ReceiveFrame</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;State: <a class="trait" href="../../../solicit/http/session/trait.SessionState.html" title="trait solicit::http::session::SessionState">SessionState</a>,&nbsp;</span> {
     pub state: State,
     // some fields omitted
 }</pre><div class='docblock'><p>The struct provides a more convenient API for server-related functionality of an HTTP/2
 connection, such as sending a response back to the client.</p>
-</div><h2 class='fields'>Fields</h2><span id='structfield.state' class='structfield'>
-                           <span id='state.v' class='invisible'>
+</div><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.state" class="structfield small-section-header">
+                           <a href="#structfield.state" class="anchor field"></a>
+                           <span id="state.v" class='invisible'>
                            <code>state: State</code>
-                           </span></span><span class='stab '></span><div class='docblock'><p>The state of the session associated to this client connection. Maintains the status of the
+                           </span></span><div class='docblock'><p>The state of the session associated to this client connection. Maintains the status of the
 connection streams.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl&lt;S, R, State&gt; <a class='struct' href='../../../solicit/http/server/struct.ServerConnection.html' title='solicit::http::server::ServerConnection'>ServerConnection</a>&lt;S, R, State&gt; <span class='where'>where S: <a class='trait' href='../../../solicit/http/connection/trait.SendFrame.html' title='solicit::http::connection::SendFrame'>SendFrame</a>, R: <a class='trait' href='../../../solicit/http/connection/trait.ReceiveFrame.html' title='solicit::http::connection::ReceiveFrame'>ReceiveFrame</a>, State: <a class='trait' href='../../../solicit/http/session/trait.SessionState.html' title='solicit::http::session::SessionState'>SessionState</a></span></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-823' class='srclink' href='../../../src/solicit/http/server.rs.html#93-166' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.with_connection' class='method'><span id='with_connection.v' class='invisible'><code>fn <a href='#method.with_connection' class='fnname'>with_connection</a>(conn: <a class='struct' href='../../../solicit/http/connection/struct.HttpConnection.html' title='solicit::http::connection::HttpConnection'>HttpConnection</a>&lt;S, R&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; state: State)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='struct' href='../../../solicit/http/server/struct.ServerConnection.html' title='solicit::http::server::ServerConnection'>ServerConnection</a>&lt;S, R, State&gt;</code></span></h4>
+</div>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl&lt;S, R, State&gt; <a class="struct" href="../../../solicit/http/server/struct.ServerConnection.html" title="struct solicit::http::server::ServerConnection">ServerConnection</a>&lt;S, R, State&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;S: <a class="trait" href="../../../solicit/http/connection/trait.SendFrame.html" title="trait solicit::http::connection::SendFrame">SendFrame</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;R: <a class="trait" href="../../../solicit/http/connection/trait.ReceiveFrame.html" title="trait solicit::http::connection::ReceiveFrame">ReceiveFrame</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;State: <a class="trait" href="../../../solicit/http/session/trait.SessionState.html" title="trait solicit::http::session::SessionState">SessionState</a>,&nbsp;</span></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#93-166' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.with_connection' class="method"><span id='with_connection.v' class='invisible'><code>pub fn <a href='#method.with_connection' class='fnname'>with_connection</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;conn: <a class="struct" href="../../../solicit/http/connection/struct.HttpConnection.html" title="struct solicit::http::connection::HttpConnection">HttpConnection</a>&lt;S, R&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;state: State<br>) -&gt; <a class="struct" href="../../../solicit/http/server/struct.ServerConnection.html" title="struct solicit::http::server::ServerConnection">ServerConnection</a>&lt;S, R, State&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#97-103' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Creates a new <code>ServerConnection</code> that will use the given <code>HttpConnection</code> for its
 underlying HTTP/2 communication.</p>
-</div><h4 id='method.scheme' class='method'><span id='scheme.v' class='invisible'><code>fn <a href='#method.scheme' class='fnname'>scheme</a>(&amp;self) -&gt; <a class='enum' href='../../../solicit/http/enum.HttpScheme.html' title='solicit::http::HttpScheme'>HttpScheme</a></code></span></h4>
+</div><h4 id='method.scheme' class="method"><span id='scheme.v' class='invisible'><code>pub fn <a href='#method.scheme' class='fnname'>scheme</a>(&amp;self) -&gt; <a class="enum" href="../../../solicit/http/enum.HttpScheme.html" title="enum solicit::http::HttpScheme">HttpScheme</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#107-109' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Returns the scheme of the underlying <code>HttpConnection</code>.</p>
-</div><h4 id='method.init' class='method'><span id='init.v' class='invisible'><code>fn <a href='#method.init' class='fnname'>init</a>(&amp;mut self) -&gt; <a class='type' href='../../../solicit/http/type.HttpResult.html' title='solicit::http::HttpResult'>HttpResult</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></span></h4>
-<div class='docblock'><p>Initializes the <code>ServerConnection</code> by sending the server&#39;s settings and processing the
-client&#39;s.
+</div><h4 id='method.init' class="method"><span id='init.v' class='invisible'><code>pub fn <a href='#method.init' class='fnname'>init</a>(&amp;mut self) -&gt; <a class="type" href="../../../solicit/http/type.HttpResult.html" title="type solicit::http::HttpResult">HttpResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#116-121' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Initializes the <code>ServerConnection</code> by sending the server's settings and processing the
+client's.
 If the client does not provide a settings frame, returns an error.</p>
-
 <p>TODO This method should eventually be split into two.</p>
-</div><h4 id='method.handle_next_frame' class='method'><span id='handle_next_frame.v' class='invisible'><code>fn <a href='#method.handle_next_frame' class='fnname'>handle_next_frame</a>(&amp;mut self) -&gt; <a class='type' href='../../../solicit/http/type.HttpResult.html' title='solicit::http::HttpResult'>HttpResult</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></span></h4>
+</div><h4 id='method.handle_next_frame' class="method"><span id='handle_next_frame.v' class='invisible'><code>pub fn <a href='#method.handle_next_frame' class='fnname'>handle_next_frame</a>(&amp;mut self) -&gt; <a class="type" href="../../../solicit/http/type.HttpResult.html" title="type solicit::http::HttpResult">HttpResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#133-136' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Fully handles the next incoming frame. Events are passed on to the internal <code>session</code>
 instance.</p>
-</div><h4 id='method.start_response' class='method'><span id='start_response.v' class='invisible'><code>fn <a href='#method.start_response' class='fnname'>start_response</a>(&amp;mut self,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; headers: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../../solicit/http/type.Header.html' title='solicit::http::Header'>Header</a>&gt;,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; stream_id: <a class='type' href='../../../solicit/http/type.StreamId.html' title='solicit::http::StreamId'>StreamId</a>,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; end_stream: <a class='enum' href='../../../solicit/http/connection/enum.EndStream.html' title='solicit::http::connection::EndStream'>EndStream</a>)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -&gt; <a class='type' href='../../../solicit/http/type.HttpResult.html' title='solicit::http::HttpResult'>HttpResult</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>&gt;</code></span></h4>
+</div><h4 id='method.start_response' class="method"><span id='start_response.v' class='invisible'><code>pub fn <a href='#method.start_response' class='fnname'>start_response</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self, <br>&nbsp;&nbsp;&nbsp;&nbsp;headers: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="type" href="../../../solicit/http/type.Header.html" title="type solicit::http::Header">Header</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;stream_id: <a class="type" href="../../../solicit/http/type.StreamId.html" title="type solicit::http::StreamId">StreamId</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;end_stream: <a class="enum" href="../../../solicit/http/connection/enum.EndStream.html" title="enum solicit::http::connection::EndStream">EndStream</a><br>) -&gt; <a class="type" href="../../../solicit/http/type.HttpResult.html" title="type solicit::http::HttpResult">HttpResult</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#144-149' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Starts a response on the stream with the given ID by sending the given headers.</p>
-
 <p>The body of the response is assumed to be provided by the <code>Stream</code> instance stored within
-the connection&#39;s state. (The body does not have to be ready when this method is called, as
+the connection's state. (The body does not have to be ready when this method is called, as
 long as the <code>Stream</code> instance knows how to provide it to the connection later on.)</p>
-</div><h4 id='method.send_next_data' class='method'><span id='send_next_data.v' class='invisible'><code>fn <a href='#method.send_next_data' class='fnname'>send_next_data</a>(&amp;mut self) -&gt; <a class='type' href='../../../solicit/http/type.HttpResult.html' title='solicit::http::HttpResult'>HttpResult</a>&lt;<a class='enum' href='../../../solicit/http/connection/enum.SendStatus.html' title='solicit::http::connection::SendStatus'>SendStatus</a>&gt;</code></span></h4>
+</div><h4 id='method.send_next_data' class="method"><span id='send_next_data.v' class='invisible'><code>pub fn <a href='#method.send_next_data' class='fnname'>send_next_data</a>(&amp;mut self) -&gt; <a class="type" href="../../../solicit/http/type.HttpResult.html" title="type solicit::http::HttpResult">HttpResult</a>&lt;<a class="enum" href="../../../solicit/http/connection/enum.SendStatus.html" title="enum solicit::http::connection::SendStatus">SendStatus</a>&gt;</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/solicit/http/server.rs.html#155-165' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Queues a new DATA frame onto the underlying <code>SendFrame</code>.</p>
-
-<p>Currently, no prioritization of streams is taken into account and which stream&#39;s data is
+<p>Currently, no prioritization of streams is taken into account and which stream's data is
 queued cannot be relied on.</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
@@ -97,18 +112,22 @@ queued cannot be relied on.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -141,7 +160,6 @@ queued cannot be relied on.</p>
         window.rootPath = "../../../";
         window.currentCrate = "solicit";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

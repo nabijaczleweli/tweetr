@@ -9,14 +9,18 @@
 
     <title>jar.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -620,583 +632,583 @@
 <span id="576">576</span>
 <span id="577">577</span>
 <span id="578">578</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! A cookie jar implementation for storing a set of cookies.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! This CookieJar type can be used to manage a session of cookies by keeping</span>
-<span class='doccomment'>//! track of cookies that are added and deleted over time. It provides a method,</span>
-<span class='doccomment'>//! `delta`, which will calculate the number of `Set-Cookie` headers that need</span>
-<span class='doccomment'>//! to be sent back to a client which tracks the changes in the lifetime of the</span>
-<span class='doccomment'>//! jar itself.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! A cookie jar can also be borrowed to a child cookie jar with new</span>
-<span class='doccomment'>//! functionality such as automatically signing cookies, storing permanent</span>
-<span class='doccomment'>//! cookies, etc. This functionality can also be chained together.</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! A cookie jar implementation for storing a set of cookies.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This CookieJar type can be used to manage a session of cookies by keeping</span>
+<span class="doccomment">//! track of cookies that are added and deleted over time. It provides a method,</span>
+<span class="doccomment">//! `delta`, which will calculate the number of `Set-Cookie` headers that need</span>
+<span class="doccomment">//! to be sent back to a client which tracks the changes in the lifetime of the</span>
+<span class="doccomment">//! jar itself.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A cookie jar can also be borrowed to a child cookie jar with new</span>
+<span class="doccomment">//! functionality such as automatically signing cookies, storing permanent</span>
+<span class="doccomment">//! cookies, etc. This functionality can also be chained together.</span>
 
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::{<span class='ident'>HashMap</span>, <span class='ident'>HashSet</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>RefCell</span>;
-<span class='kw'>use</span> <span class='ident'>time</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cell</span>::<span class="ident">RefCell</span>;
+<span class="kw">use</span> <span class="ident">time</span>;
 
-<span class='kw'>use</span> <span class='ident'>Cookie</span>;
+<span class="kw">use</span> <span class="ident">Cookie</span>;
 
-<span class='doccomment'>/// A jar of cookies for managing a session</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// # Example</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>/// # #![allow(unstable)]</span>
-<span class='doccomment'>/// use cookie::{Cookie, CookieJar};</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Add a cookie to this jar</span>
-<span class='doccomment'>/// c.add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// // Remove the added cookie</span>
-<span class='doccomment'>/// c.remove(&quot;key&quot;);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>flavor</span>: <span class='ident'>Flavor</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// A jar of cookies for managing a session</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// # #![allow(unstable)]</span>
+<span class="doccomment">/// use cookie::{Cookie, CookieJar};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Add a cookie to this jar</span>
+<span class="doccomment">/// c.add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // Remove the added cookie</span>
+<span class="doccomment">/// c.remove(&quot;key&quot;);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">flavor</span>: <span class="ident">Flavor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 
-<span class='kw'>enum</span> <span class='ident'>Flavor</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>Child</span>(<span class='ident'>Child</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>),
-    <span class='ident'>Root</span>(<span class='ident'>Root</span>),
+<span class="kw">enum</span> <span class="ident">Flavor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">Child</span>(<span class="ident">Child</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+    <span class="ident">Root</span>(<span class="ident">Root</span>),
 }
 
-<span class='kw'>struct</span> <span class='ident'>Child</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>parent</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='ident'>read</span>: <span class='ident'>Read</span>,
-    <span class='ident'>write</span>: <span class='ident'>Write</span>,
+<span class="kw">struct</span> <span class="ident">Child</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">read</span>: <span class="ident">Read</span>,
+    <span class="ident">write</span>: <span class="ident">Write</span>,
 }
 
-<span class='kw'>type</span> <span class='ident'>Read</span> <span class='op'>=</span> <span class='kw'>fn</span>(<span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span>;
-<span class='kw'>type</span> <span class='ident'>Write</span> <span class='op'>=</span> <span class='kw'>fn</span>(<span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span>;
+<span class="kw">type</span> <span class="ident">Read</span> <span class="op">=</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">Write</span> <span class="op">=</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span>;
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-<span class='kw'>type</span> <span class='ident'>SigningKey</span> <span class='op'>=</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>))]</span>
-<span class='kw'>type</span> <span class='ident'>SigningKey</span> <span class='op'>=</span> ();
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+<span class="kw">type</span> <span class="ident">SigningKey</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>))]</span>
+<span class="kw">type</span> <span class="ident">SigningKey</span> <span class="op">=</span> ();
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-<span class='kw'>fn</span> <span class='ident'>prepare_key</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-    <span class='kw'>if</span> <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='ident'>secure</span>::<span class='ident'>MIN_KEY_LEN</span> {
-        <span class='ident'>key</span>.<span class='ident'>to_vec</span>()
-    } <span class='kw'>else</span> {
-        <span class='comment'>// Using a SHA-256 hash to normalize key as Rails suggests.</span>
-        <span class='comment'>// See https://github.com/rails/rails/blob/master/activesupport/lib/active_support/message_encryptor.rb</span>
-        <span class='ident'>secure</span>::<span class='ident'>prepare_key</span>(<span class='ident'>key</span>)
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">prepare_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">secure</span>::<span class="ident">MIN_KEY_LEN</span> {
+        <span class="ident">key</span>.<span class="ident">to_vec</span>()
+    } <span class="kw">else</span> {
+        <span class="comment">// Using a SHA-256 hash to normalize key as Rails suggests.</span>
+        <span class="comment">// See https://github.com/rails/rails/blob/master/activesupport/lib/active_support/message_encryptor.rb</span>
+        <span class="ident">secure</span>::<span class="ident">prepare_key</span>(<span class="ident">key</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>not</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>))]</span>
-<span class='kw'>fn</span> <span class='ident'>prepare_key</span>(<span class='ident'>_key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> () {
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>))]</span>
+<span class="kw">fn</span> <span class="ident">prepare_key</span>(<span class="ident">_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> () {
     ()
 }
 
-<span class='kw'>struct</span> <span class='ident'>Root</span> {
-    <span class='ident'>map</span>: <span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>HashMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Cookie</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>new_cookies</span>: <span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>HashSet</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>removed_cookies</span>: <span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>HashSet</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>,
-    <span class='ident'>_key</span>: <span class='ident'>SigningKey</span>,
+<span class="kw">struct</span> <span class="ident">Root</span> {
+    <span class="ident">map</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Cookie</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">new_cookies</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">removed_cookies</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">_key</span>: <span class="ident">SigningKey</span>,
 }
 
-<span class='doccomment'>/// Iterator over the cookies in a cookie jar</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='ident'>jar</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>,
-    <span class='ident'>keys</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>,
+<span class="doccomment">/// Iterator over the cookies in a cookie jar</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">jar</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Creates a new empty cookie jar with the given signing key.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The given key is used to sign cookies in the signed cookie jar.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;static</span><span class='op'>&gt;</span> {
-        <span class='ident'>CookieJar</span> {
-            <span class='ident'>flavor</span>: <span class='ident'>Flavor</span>::<span class='ident'>Root</span>(<span class='ident'>Root</span> {
-                <span class='ident'>map</span>: <span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>HashMap</span>::<span class='ident'>new</span>()),
-                <span class='ident'>new_cookies</span>: <span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>HashSet</span>::<span class='ident'>new</span>()),
-                <span class='ident'>removed_cookies</span>: <span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>HashSet</span>::<span class='ident'>new</span>()),
-                <span class='ident'>_key</span>: <span class='ident'>prepare_key</span>(<span class='ident'>key</span>),
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new empty cookie jar with the given signing key.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The given key is used to sign cookies in the signed cookie jar.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="ident">CookieJar</span> {
+            <span class="ident">flavor</span>: <span class="ident">Flavor</span>::<span class="ident">Root</span>(<span class="ident">Root</span> {
+                <span class="ident">map</span>: <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>()),
+                <span class="ident">new_cookies</span>: <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">HashSet</span>::<span class="ident">new</span>()),
+                <span class="ident">removed_cookies</span>: <span class="ident">RefCell</span>::<span class="ident">new</span>(<span class="ident">HashSet</span>::<span class="ident">new</span>()),
+                <span class="ident">_key</span>: <span class="ident">prepare_key</span>(<span class="ident">key</span>),
             })
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>root</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>Root</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='kw'>loop</span> {
-            <span class='kw'>match</span> <span class='ident'>cur</span>.<span class='ident'>flavor</span> {
-                <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='kw-2'>ref</span> <span class='ident'>child</span>) <span class='op'>=&gt;</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='ident'>child</span>.<span class='ident'>parent</span>,
-                <span class='ident'>Flavor</span>::<span class='ident'>Root</span>(<span class='kw-2'>ref</span> <span class='ident'>me</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='ident'>me</span>,
+    <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Root</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">cur</span>.<span class="ident">flavor</span> {
+                <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="kw-2">ref</span> <span class="ident">child</span>) <span class="op">=&gt;</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">parent</span>,
+                <span class="ident">Flavor</span>::<span class="ident">Root</span>(<span class="kw-2">ref</span> <span class="ident">me</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="ident">me</span>,
             }
         }
     }
 
-    <span class='doccomment'>/// Adds an original cookie from a request.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This method only works on the root cookie jar and is not intended for</span>
-    <span class='doccomment'>/// use during the lifetime of a request, it is intended to initialize a</span>
-    <span class='doccomment'>/// cookie jar from an incoming request.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add_original</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>flavor</span> {
-            <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(..) <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;can&#39;t add an original cookie to a child jar!&quot;</span>),
-            <span class='ident'>Flavor</span>::<span class='ident'>Root</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>root</span>) <span class='op'>=&gt;</span> {
-                <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>cookie</span>.<span class='ident'>name</span>.<span class='ident'>clone</span>();
-                <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>insert</span>(<span class='ident'>name</span>, <span class='ident'>cookie</span>);
+    <span class="doccomment">/// Adds an original cookie from a request.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This method only works on the root cookie jar and is not intended for</span>
+    <span class="doccomment">/// use during the lifetime of a request, it is intended to initialize a</span>
+    <span class="doccomment">/// cookie jar from an incoming request.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_original</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">flavor</span> {
+            <span class="ident">Flavor</span>::<span class="ident">Child</span>(..) <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;can&#39;t add an original cookie to a child jar!&quot;</span>),
+            <span class="ident">Flavor</span>::<span class="ident">Root</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">root</span>) <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">cookie</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+                <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow_mut</span>().<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">cookie</span>);
             }
         }
     }
 
-    <span class='doccomment'>/// Adds a new cookie to this cookie jar.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// If this jar is a child cookie jar, this will walk up the chain of</span>
-    <span class='doccomment'>/// borrowed jars, modifying the cookie as it goes along.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cur</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root</span>();
-        <span class='kw'>loop</span> {
-            <span class='kw'>match</span> <span class='ident'>cur</span>.<span class='ident'>flavor</span> {
-                <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='kw-2'>ref</span> <span class='ident'>child</span>) <span class='op'>=&gt;</span> {
-                    <span class='ident'>cookie</span> <span class='op'>=</span> (<span class='ident'>child</span>.<span class='ident'>write</span>)(<span class='ident'>root</span>, <span class='ident'>cookie</span>);
-                    <span class='ident'>cur</span> <span class='op'>=</span> <span class='ident'>child</span>.<span class='ident'>parent</span>;
+    <span class="doccomment">/// Adds a new cookie to this cookie jar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If this jar is a child cookie jar, this will walk up the chain of</span>
+    <span class="doccomment">/// borrowed jars, modifying the cookie as it goes along.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>();
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">cur</span>.<span class="ident">flavor</span> {
+                <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="kw-2">ref</span> <span class="ident">child</span>) <span class="op">=&gt;</span> {
+                    <span class="ident">cookie</span> <span class="op">=</span> (<span class="ident">child</span>.<span class="ident">write</span>)(<span class="ident">root</span>, <span class="ident">cookie</span>);
+                    <span class="ident">cur</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">parent</span>;
                 }
-                <span class='ident'>Flavor</span>::<span class='ident'>Root</span>(..) <span class='op'>=&gt;</span> <span class='kw'>break</span>,
+                <span class="ident">Flavor</span>::<span class="ident">Root</span>(..) <span class="op">=&gt;</span> <span class="kw">break</span>,
             }
         }
-        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>cookie</span>.<span class='ident'>name</span>.<span class='ident'>clone</span>();
-        <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>insert</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='ident'>cookie</span>);
-        <span class='ident'>root</span>.<span class='ident'>removed_cookies</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>name</span>);
-        <span class='ident'>root</span>.<span class='ident'>new_cookies</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>insert</span>(<span class='ident'>name</span>);
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">cookie</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+        <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow_mut</span>().<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">cookie</span>);
+        <span class="ident">root</span>.<span class="ident">removed_cookies</span>.<span class="ident">borrow_mut</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>);
+        <span class="ident">root</span>.<span class="ident">new_cookies</span>.<span class="ident">borrow_mut</span>().<span class="ident">insert</span>(<span class="ident">name</span>);
     }
 
-    <span class='doccomment'>/// Removes a cookie from this cookie jar.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>cookie</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) {
-        <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root</span>();
-        <span class='kw'>let</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='ident'>cookie</span>.<span class='ident'>to_string</span>();
-        <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>cookie</span>);
-        <span class='ident'>root</span>.<span class='ident'>new_cookies</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>cookie</span>);
-        <span class='ident'>root</span>.<span class='ident'>removed_cookies</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>insert</span>(<span class='ident'>cookie</span>);
+    <span class="doccomment">/// Removes a cookie from this cookie jar.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cookie</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>();
+        <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="ident">cookie</span>.<span class="ident">to_string</span>();
+        <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow_mut</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">cookie</span>);
+        <span class="ident">root</span>.<span class="ident">new_cookies</span>.<span class="ident">borrow_mut</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">cookie</span>);
+        <span class="ident">root</span>.<span class="ident">removed_cookies</span>.<span class="ident">borrow_mut</span>().<span class="ident">insert</span>(<span class="ident">cookie</span>);
     }
 
-    <span class='doccomment'>/// Finds a cookie inside of this cookie jar.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The cookie is subject to modification by any of the child cookie jars</span>
-    <span class='doccomment'>/// that are currently borrowed. A copy of the cookie is returned.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>find</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>name</span>.<span class='ident'>to_string</span>();
-        <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root</span>();
-        <span class='kw'>if</span> <span class='ident'>root</span>.<span class='ident'>removed_cookies</span>.<span class='ident'>borrow</span>().<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>name</span>) {
-            <span class='kw'>return</span> <span class='prelude-val'>None</span>
+    <span class="doccomment">/// Finds a cookie inside of this cookie jar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The cookie is subject to modification by any of the child cookie jars</span>
+    <span class="doccomment">/// that are currently borrowed. A copy of the cookie is returned.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>();
+        <span class="kw">if</span> <span class="ident">root</span>.<span class="ident">removed_cookies</span>.<span class="ident">borrow</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
+            <span class="kw">return</span> <span class="prelude-val">None</span>
         }
-        <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow</span>().<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>name</span>).<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>try_read</span>(<span class='ident'>root</span>, <span class='ident'>c</span>.<span class='ident'>clone</span>()))
+        <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow</span>().<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">try_read</span>(<span class="ident">root</span>, <span class="ident">c</span>.<span class="ident">clone</span>()))
     }
 
-    <span class='doccomment'>/// Creates a child signed cookie jar.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// All cookies read from the child jar will require a valid signature and</span>
-    <span class='doccomment'>/// all cookies written will be signed automatically.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Example</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```rust</span>
-    <span class='doccomment'>/// # use cookie::{Cookie, CookieJar};</span>
-    <span class='doccomment'>/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // Add a signed cookie to the jar</span>
-    <span class='doccomment'>/// c.signed().add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // Add a permanently signed cookie to the jar</span>
-    <span class='doccomment'>/// c.permanent().signed()</span>
-    <span class='doccomment'>///  .add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>signed</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span> {
-        <span class='kw'>return</span> <span class='ident'>CookieJar</span> {
-            <span class='ident'>flavor</span>: <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='ident'>Child</span> {
-                <span class='ident'>parent</span>: <span class='self'>self</span>,
-                <span class='ident'>read</span>: <span class='ident'>design</span>,
-                <span class='ident'>write</span>: <span class='ident'>sign</span>,
+    <span class="doccomment">/// Creates a child signed cookie jar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// All cookies read from the child jar will require a valid signature and</span>
+    <span class="doccomment">/// all cookies written will be signed automatically.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use cookie::{Cookie, CookieJar};</span>
+    <span class="doccomment">/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Add a signed cookie to the jar</span>
+    <span class="doccomment">/// c.signed().add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Add a permanently signed cookie to the jar</span>
+    <span class="doccomment">/// c.permanent().signed()</span>
+    <span class="doccomment">///  .add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+        <span class="kw">return</span> <span class="ident">CookieJar</span> {
+            <span class="ident">flavor</span>: <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="ident">Child</span> {
+                <span class="ident">parent</span>: <span class="self">self</span>,
+                <span class="ident">read</span>: <span class="ident">design</span>,
+                <span class="ident">write</span>: <span class="ident">sign</span>,
             })
         };
 
-        <span class='kw'>fn</span> <span class='ident'>design</span>(<span class='ident'>root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-            <span class='ident'>secure</span>::<span class='ident'>design</span>(<span class='kw-2'>&amp;</span><span class='ident'>root</span>.<span class='ident'>_key</span>, <span class='ident'>cookie</span>)
+        <span class="kw">fn</span> <span class="ident">design</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+            <span class="ident">secure</span>::<span class="ident">design</span>(<span class="kw-2">&amp;</span><span class="ident">root</span>.<span class="ident">_key</span>, <span class="ident">cookie</span>)
         }
-        <span class='kw'>fn</span> <span class='ident'>sign</span>(<span class='ident'>root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span> {
-            <span class='ident'>secure</span>::<span class='ident'>sign</span>(<span class='kw-2'>&amp;</span><span class='ident'>root</span>.<span class='ident'>_key</span>, <span class='ident'>cookie</span>)
+        <span class="kw">fn</span> <span class="ident">sign</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span> {
+            <span class="ident">secure</span>::<span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="ident">root</span>.<span class="ident">_key</span>, <span class="ident">cookie</span>)
         }
     }
 
-    <span class='doccomment'>/// Creates a child encrypted cookie jar.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// All cookies read from the child jar must be encrypted and signed by a</span>
-    <span class='doccomment'>/// valid key and all cookies written will be encrypted and signed</span>
-    <span class='doccomment'>/// automatically.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Example</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```rust</span>
-    <span class='doccomment'>/// # use cookie::{Cookie, CookieJar};</span>
-    <span class='doccomment'>/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // Add a signed and encrypted cookie to the jar</span>
-    <span class='doccomment'>/// c.encrypted().add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
-    <span class='doccomment'>///</span>
+    <span class="doccomment">/// Creates a child encrypted cookie jar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// All cookies read from the child jar must be encrypted and signed by a</span>
+    <span class="doccomment">/// valid key and all cookies written will be encrypted and signed</span>
+    <span class="doccomment">/// automatically.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use cookie::{Cookie, CookieJar};</span>
+    <span class="doccomment">/// let c = CookieJar::new(b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Add a signed and encrypted cookie to the jar</span>
+    <span class="doccomment">/// c.encrypted().add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
+    <span class="doccomment">///</span>
 
-    <span class='doccomment'>/// // Add a permanently signed and encrypted cookie to the jar</span>
-    <span class='doccomment'>/// c.permanent().encrypted()</span>
-    <span class='doccomment'>///  .add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encrypted</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span> {
-        <span class='kw'>return</span> <span class='ident'>CookieJar</span> {
-            <span class='ident'>flavor</span>: <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='ident'>Child</span> {
-                <span class='ident'>parent</span>: <span class='self'>self</span>,
-                <span class='ident'>read</span>: <span class='ident'>read</span>,
-                <span class='ident'>write</span>: <span class='ident'>write</span>,
+    <span class="doccomment">/// // Add a permanently signed and encrypted cookie to the jar</span>
+    <span class="doccomment">/// c.permanent().encrypted()</span>
+    <span class="doccomment">///  .add(Cookie::new(&quot;key&quot;.to_string(), &quot;value&quot;.to_string()));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypted</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+        <span class="kw">return</span> <span class="ident">CookieJar</span> {
+            <span class="ident">flavor</span>: <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="ident">Child</span> {
+                <span class="ident">parent</span>: <span class="self">self</span>,
+                <span class="ident">read</span>: <span class="ident">read</span>,
+                <span class="ident">write</span>: <span class="ident">write</span>,
             })
         };
-        <span class='kw'>fn</span> <span class='ident'>read</span>(<span class='ident'>root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-            <span class='ident'>secure</span>::<span class='ident'>design_and_decrypt</span>(<span class='kw-2'>&amp;</span><span class='ident'>root</span>.<span class='ident'>_key</span>, <span class='ident'>cookie</span>)
+        <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+            <span class="ident">secure</span>::<span class="ident">design_and_decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">root</span>.<span class="ident">_key</span>, <span class="ident">cookie</span>)
         }
-        <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='ident'>root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span> {
-            <span class='ident'>secure</span>::<span class='ident'>encrypt_and_sign</span>(<span class='kw-2'>&amp;</span><span class='ident'>root</span>.<span class='ident'>_key</span>, <span class='ident'>cookie</span>)
+        <span class="kw">fn</span> <span class="ident">write</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span> {
+            <span class="ident">secure</span>::<span class="ident">encrypt_and_sign</span>(<span class="kw-2">&amp;</span><span class="ident">root</span>.<span class="ident">_key</span>, <span class="ident">cookie</span>)
         }
     }
 
-    <span class='doccomment'>/// Creates a child jar for permanent cookie storage.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// All cookies written to the child jar will have an expiration date 20</span>
-    <span class='doccomment'>/// years into the future to ensure they stick around for a long time.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>permanent</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>CookieJar</span><span class='op'>&lt;</span><span class='lifetime'>&#39;b</span><span class='op'>&gt;</span> {
-        <span class='kw'>return</span> <span class='ident'>CookieJar</span> {
-            <span class='ident'>flavor</span>: <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='ident'>Child</span> {
-                <span class='ident'>parent</span>: <span class='self'>self</span>,
-                <span class='ident'>read</span>: <span class='ident'>read</span>,
-                <span class='ident'>write</span>: <span class='ident'>write</span>,
+    <span class="doccomment">/// Creates a child jar for permanent cookie storage.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// All cookies written to the child jar will have an expiration date 20</span>
+    <span class="doccomment">/// years into the future to ensure they stick around for a long time.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permanent</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">CookieJar</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
+        <span class="kw">return</span> <span class="ident">CookieJar</span> {
+            <span class="ident">flavor</span>: <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="ident">Child</span> {
+                <span class="ident">parent</span>: <span class="self">self</span>,
+                <span class="ident">read</span>: <span class="ident">read</span>,
+                <span class="ident">write</span>: <span class="ident">write</span>,
             })
         };
 
-        <span class='kw'>fn</span> <span class='ident'>read</span>(<span class='ident'>_root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>)
+        <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">_root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">cookie</span>)
         }
 
-        <span class='kw'>fn</span> <span class='ident'>write</span>(<span class='ident'>_root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span> {
-            <span class='comment'>// Expire 20 years in the future</span>
-            <span class='ident'>cookie</span>.<span class='ident'>max_age</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='number'>3600</span> <span class='op'>*</span> <span class='number'>24</span> <span class='op'>*</span> <span class='number'>365</span> <span class='op'>*</span> <span class='number'>20</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>now</span> <span class='op'>=</span> <span class='ident'>time</span>::<span class='ident'>now</span>();
-            <span class='ident'>now</span>.<span class='ident'>tm_year</span> <span class='op'>+=</span> <span class='number'>20</span>;
-            <span class='ident'>cookie</span>.<span class='ident'>expires</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>now</span>);
-            <span class='ident'>cookie</span>
+        <span class="kw">fn</span> <span class="ident">write</span>(<span class="ident">_root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span> {
+            <span class="comment">// Expire 20 years in the future</span>
+            <span class="ident">cookie</span>.<span class="ident">max_age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">3600</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">365</span> <span class="op">*</span> <span class="number">20</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">now</span>();
+            <span class="ident">now</span>.<span class="ident">tm_year</span> <span class="op">+=</span> <span class="number">20</span>;
+            <span class="ident">cookie</span>.<span class="ident">expires</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
+            <span class="ident">cookie</span>
         }
     }
 
-    <span class='doccomment'>/// Calculates the changes that have occurred to this cookie jar over time,</span>
-    <span class='doccomment'>/// returning a vector of `Set-Cookie` headers.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>delta</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-        <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root</span>();
-        <span class='kw'>for</span> <span class='ident'>cookie</span> <span class='kw'>in</span> <span class='ident'>root</span>.<span class='ident'>removed_cookies</span>.<span class='ident'>borrow</span>().<span class='ident'>iter</span>() {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='ident'>cookie</span>.<span class='ident'>clone</span>(), <span class='ident'>String</span>::<span class='ident'>new</span>());
-            <span class='ident'>c</span>.<span class='ident'>max_age</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='number'>0</span>);
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>now</span> <span class='op'>=</span> <span class='ident'>time</span>::<span class='ident'>now</span>();
-            <span class='ident'>now</span>.<span class='ident'>tm_year</span> <span class='op'>-=</span> <span class='number'>1</span>;
-            <span class='ident'>c</span>.<span class='ident'>expires</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>now</span>);
-            <span class='ident'>ret</span>.<span class='ident'>push</span>(<span class='ident'>c</span>);
+    <span class="doccomment">/// Calculates the changes that have occurred to this cookie jar over time,</span>
+    <span class="doccomment">/// returning a vector of `Set-Cookie` headers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delta</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>();
+        <span class="kw">for</span> <span class="ident">cookie</span> <span class="kw">in</span> <span class="ident">root</span>.<span class="ident">removed_cookies</span>.<span class="ident">borrow</span>().<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="ident">cookie</span>.<span class="ident">clone</span>(), <span class="ident">String</span>::<span class="ident">new</span>());
+            <span class="ident">c</span>.<span class="ident">max_age</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">time</span>::<span class="ident">now</span>();
+            <span class="ident">now</span>.<span class="ident">tm_year</span> <span class="op">-=</span> <span class="number">1</span>;
+            <span class="ident">c</span>.<span class="ident">expires</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
+            <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">c</span>);
         }
-        <span class='kw'>let</span> <span class='ident'>map</span> <span class='op'>=</span> <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow</span>();
-        <span class='kw'>for</span> <span class='ident'>cookie</span> <span class='kw'>in</span> <span class='ident'>root</span>.<span class='ident'>new_cookies</span>.<span class='ident'>borrow</span>().<span class='ident'>iter</span>() {
-            <span class='ident'>ret</span>.<span class='ident'>push</span>(<span class='ident'>map</span>.<span class='ident'>get</span>(<span class='ident'>cookie</span>).<span class='ident'>unwrap</span>().<span class='ident'>clone</span>());
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow</span>();
+        <span class="kw">for</span> <span class="ident">cookie</span> <span class="kw">in</span> <span class="ident">root</span>.<span class="ident">new_cookies</span>.<span class="ident">borrow</span>().<span class="ident">iter</span>() {
+            <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">map</span>.<span class="ident">get</span>(<span class="ident">cookie</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>());
         }
-        <span class='kw'>return</span> <span class='ident'>ret</span>;
+        <span class="kw">return</span> <span class="ident">ret</span>;
     }
 
-    <span class='kw'>fn</span> <span class='ident'>try_read</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>root</span>: <span class='kw-2'>&amp;</span><span class='ident'>Root</span>, <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>jar</span> <span class='op'>=</span> <span class='self'>self</span>;
-        <span class='kw'>loop</span> {
-            <span class='kw'>match</span> <span class='ident'>jar</span>.<span class='ident'>flavor</span> {
-                <span class='ident'>Flavor</span>::<span class='ident'>Child</span>(<span class='ident'>Child</span> { <span class='ident'>read</span>, <span class='ident'>parent</span>, .. }) <span class='op'>=&gt;</span> {
-                    <span class='ident'>cookie</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>read</span>(<span class='ident'>root</span>, <span class='ident'>cookie</span>) {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>c</span>) <span class='op'>=&gt;</span> <span class='ident'>c</span>, <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">fn</span> <span class="ident">try_read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">Root</span>, <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jar</span> <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">jar</span>.<span class="ident">flavor</span> {
+                <span class="ident">Flavor</span>::<span class="ident">Child</span>(<span class="ident">Child</span> { <span class="ident">read</span>, <span class="ident">parent</span>, .. }) <span class="op">=&gt;</span> {
+                    <span class="ident">cookie</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">read</span>(<span class="ident">root</span>, <span class="ident">cookie</span>) {
+                        <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="ident">c</span>, <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
                     };
-                    <span class='ident'>jar</span> <span class='op'>=</span> <span class='ident'>parent</span>;
+                    <span class="ident">jar</span> <span class="op">=</span> <span class="ident">parent</span>;
                 }
-                <span class='ident'>Flavor</span>::<span class='ident'>Root</span>(..) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>),
+                <span class="ident">Flavor</span>::<span class="ident">Root</span>(..) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cookie</span>),
             }
         }
     }
 
-    <span class='doccomment'>/// Return an iterator over the cookies in this jar.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This iterator will only yield valid cookies for this jar. For example if</span>
-    <span class='doccomment'>/// this is an encrypted child jar then only valid encrypted cookies will be</span>
-    <span class='doccomment'>/// yielded. If the root cookie jar is iterated over then all cookies will</span>
-    <span class='doccomment'>/// be yielded.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Iter</span> {
-        <span class='kw'>let</span> <span class='ident'>map</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>root</span>().<span class='ident'>map</span>.<span class='ident'>borrow</span>();
-        <span class='ident'>Iter</span> { <span class='ident'>jar</span>: <span class='self'>self</span>, <span class='ident'>keys</span>: <span class='ident'>map</span>.<span class='ident'>keys</span>().<span class='ident'>cloned</span>().<span class='ident'>collect</span>() }
+    <span class="doccomment">/// Return an iterator over the cookies in this jar.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This iterator will only yield valid cookies for this jar. For example if</span>
+    <span class="doccomment">/// this is an encrypted child jar then only valid encrypted cookies will be</span>
+    <span class="doccomment">/// yielded. If the root cookie jar is iterated over then all cookies will</span>
+    <span class="doccomment">/// be yielded.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Iter</span> {
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>().<span class="ident">map</span>.<span class="ident">borrow</span>();
+        <span class="ident">Iter</span> { <span class="ident">jar</span>: <span class="self">self</span>, <span class="ident">keys</span>: <span class="ident">map</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>() }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span> <span class='kw'>for</span> <span class='ident'>Iter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-    <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>Cookie</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Cookie</span>;
 
-    <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>loop</span> {
-            <span class='kw'>let</span> <span class='ident'>key</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>keys</span>.<span class='ident'>pop</span>() {
-                <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">loop</span> {
+            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">keys</span>.<span class="ident">pop</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=&gt;</span> <span class="ident">v</span>,
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
             };
-            <span class='kw'>let</span> <span class='ident'>root</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>jar</span>.<span class='ident'>root</span>();
-            <span class='kw'>let</span> <span class='ident'>map</span> <span class='op'>=</span> <span class='ident'>root</span>.<span class='ident'>map</span>.<span class='ident'>borrow</span>();
-            <span class='kw'>let</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>map</span>.<span class='ident'>get</span>(<span class='kw-2'>&amp;</span><span class='ident'>key</span>) {
-                <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>) <span class='op'>=&gt;</span> <span class='ident'>cookie</span>.<span class='ident'>clone</span>(),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>continue</span>,
+            <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">jar</span>.<span class="ident">root</span>();
+            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">map</span>.<span class="ident">borrow</span>();
+            <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">cookie</span>) <span class="op">=&gt;</span> <span class="ident">cookie</span>.<span class="ident">clone</span>(),
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">continue</span>,
             };
-            <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>jar</span>.<span class='ident'>try_read</span>(<span class='ident'>root</span>, <span class='ident'>cookie</span>) {
-                <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {}
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">jar</span>.<span class="ident">try_read</span>(<span class="ident">root</span>, <span class="ident">cookie</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">cookie</span>) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cookie</span>),
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> {}
             }
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>secure</span> {
-    <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>openssl</span>;
-    <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">secure</span> {
+    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">openssl</span>;
+    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rustc_serialize</span>;
+    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
-    <span class='kw'>use</span> <span class='ident'>Cookie</span>;
-    <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>openssl</span>::<span class='ident'>crypto</span>::{<span class='ident'>hmac</span>, <span class='ident'>hash</span>, <span class='ident'>memcmp</span>, <span class='ident'>symm</span>};
-    <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>rustc_serialize</span>::<span class='ident'>base64</span>::{<span class='ident'>ToBase64</span>, <span class='ident'>FromBase64</span>, <span class='ident'>STANDARD</span>};
+    <span class="kw">use</span> <span class="ident">Cookie</span>;
+    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">openssl</span>::<span class="ident">crypto</span>::{<span class="ident">hmac</span>, <span class="ident">hash</span>, <span class="ident">memcmp</span>, <span class="ident">symm</span>};
+    <span class="kw">use</span> <span class="self">self</span>::<span class="ident">rustc_serialize</span>::<span class="ident">base64</span>::{<span class="ident">ToBase64</span>, <span class="ident">FromBase64</span>, <span class="ident">STANDARD</span>};
 
-    <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MIN_KEY_LEN</span>: <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>32</span>;
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_KEY_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
-    <span class='comment'>// If a SHA1 HMAC is good enough for rails, it&#39;s probably good enough</span>
-    <span class='comment'>// for us as well:</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// https://github.com/rails/rails/blob/master/activesupport/lib</span>
-    <span class='comment'>//                   /active_support/message_verifier.rb#L70</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sign</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span> {
-        <span class='kw'>let</span> <span class='ident'>signature</span> <span class='op'>=</span> <span class='ident'>dosign</span>(<span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>cookie</span>.<span class='ident'>value</span>);
-        <span class='ident'>cookie</span>.<span class='ident'>value</span>.<span class='ident'>push_str</span>(<span class='string'>&quot;--&quot;</span>);
-        <span class='ident'>cookie</span>.<span class='ident'>value</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>signature</span>.<span class='ident'>to_base64</span>(<span class='ident'>STANDARD</span>));
-        <span class='ident'>cookie</span>
+    <span class="comment">// If a SHA1 HMAC is good enough for rails, it&#39;s probably good enough</span>
+    <span class="comment">// for us as well:</span>
+    <span class="comment">//</span>
+    <span class="comment">// https://github.com/rails/rails/blob/master/activesupport/lib</span>
+    <span class="comment">//                   /active_support/message_verifier.rb#L70</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span> {
+        <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">dosign</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">cookie</span>.<span class="ident">value</span>);
+        <span class="ident">cookie</span>.<span class="ident">value</span>.<span class="ident">push_str</span>(<span class="string">&quot;--&quot;</span>);
+        <span class="ident">cookie</span>.<span class="ident">value</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">signature</span>.<span class="ident">to_base64</span>(<span class="ident">STANDARD</span>));
+        <span class="ident">cookie</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>split_value</span>(<span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span>(<span class='kw-2'>&amp;</span><span class='ident'>str</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>parts</span> <span class='op'>=</span> <span class='ident'>val</span>.<span class='ident'>split</span>(<span class='string'>&quot;--&quot;</span>);
-        <span class='kw'>let</span> <span class='ident'>ext</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>parts</span>.<span class='ident'>last</span>() {
-            <span class='prelude-val'>Some</span>(<span class='ident'>ext</span>) <span class='op'>=&gt;</span> <span class='ident'>ext</span>,
-            _ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+    <span class="kw">fn</span> <span class="ident">split_value</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">split</span>(<span class="string">&quot;--&quot;</span>);
+        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parts</span>.<span class="ident">last</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=&gt;</span> <span class="ident">ext</span>,
+            _ <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
-        <span class='kw'>let</span> <span class='ident'>val_len</span> <span class='op'>=</span> <span class='ident'>val</span>.<span class='ident'>len</span>();
-        <span class='kw'>if</span> <span class='ident'>ext</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='ident'>val_len</span> { <span class='kw'>return</span> <span class='prelude-val'>None</span> }
-        <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>val</span>[..<span class='ident'>val_len</span> <span class='op'>-</span> <span class='ident'>ext</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span>];
-        <span class='kw'>let</span> <span class='ident'>ext</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>ext</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>sig</span>) <span class='op'>=&gt;</span> <span class='ident'>sig</span>, <span class='prelude-val'>Err</span>(..) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>,
+        <span class="kw">let</span> <span class="ident">val_len</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">len</span>();
+        <span class="kw">if</span> <span class="ident">ext</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">val_len</span> { <span class="kw">return</span> <span class="prelude-val">None</span> }
+        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">val</span>[..<span class="ident">val_len</span> <span class="op">-</span> <span class="ident">ext</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
+        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">sig</span>) <span class="op">=&gt;</span> <span class="ident">sig</span>, <span class="prelude-val">Err</span>(..) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>,
         };
 
-        <span class='prelude-val'>Some</span>((<span class='ident'>text</span>, <span class='ident'>ext</span>))
+        <span class="prelude-val">Some</span>((<span class="ident">text</span>, <span class="ident">ext</span>))
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>design</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> {
-            <span class='kw'>let</span> (<span class='ident'>text</span>, <span class='ident'>signature</span>) <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>split_value</span>(<span class='kw-2'>&amp;</span><span class='ident'>cookie</span>.<span class='ident'>value</span>) {
-                <span class='prelude-val'>Some</span>(<span class='ident'>pair</span>) <span class='op'>=&gt;</span> <span class='ident'>pair</span>, <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">design</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> {
+            <span class="kw">let</span> (<span class="ident">text</span>, <span class="ident">signature</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">split_value</span>(<span class="kw-2">&amp;</span><span class="ident">cookie</span>.<span class="ident">value</span>) {
+                <span class="prelude-val">Some</span>(<span class="ident">pair</span>) <span class="op">=&gt;</span> <span class="ident">pair</span>, <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
             };
-            <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='ident'>dosign</span>(<span class='ident'>key</span>, <span class='ident'>text</span>);
-            <span class='kw'>if</span> <span class='ident'>expected</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='ident'>signature</span>.<span class='ident'>len</span>() <span class='op'>||</span>
-               <span class='op'>!</span><span class='ident'>memcmp</span>::<span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='ident'>expected</span>, <span class='kw-2'>&amp;</span><span class='ident'>signature</span>) {
-                <span class='kw'>return</span> <span class='prelude-val'>None</span>
+            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">dosign</span>(<span class="ident">key</span>, <span class="ident">text</span>);
+            <span class="kw">if</span> <span class="ident">expected</span>.<span class="ident">len</span>() <span class="op">!=</span> <span class="ident">signature</span>.<span class="ident">len</span>() <span class="op">||</span>
+               <span class="op">!</span><span class="ident">memcmp</span>::<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">signature</span>) {
+                <span class="kw">return</span> <span class="prelude-val">None</span>
             }
-            <span class='ident'>text</span>.<span class='ident'>len</span>()
+            <span class="ident">text</span>.<span class="ident">len</span>()
         };
-        <span class='ident'>cookie</span>.<span class='ident'>value</span>.<span class='ident'>truncate</span>(<span class='ident'>len</span>);
-        <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>)
+        <span class="ident">cookie</span>.<span class="ident">value</span>.<span class="ident">truncate</span>(<span class="ident">len</span>);
+        <span class="prelude-val">Some</span>(<span class="ident">cookie</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>dosign</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>hmac</span> <span class='op'>=</span> <span class='ident'>hmac</span>::<span class='ident'>HMAC</span>::<span class='ident'>new</span>(<span class='ident'>hash</span>::<span class='ident'>Type</span>::<span class='ident'>SHA1</span>, <span class='ident'>key</span>);
-        <span class='ident'>hmac</span>.<span class='ident'>write_all</span>(<span class='ident'>val</span>.<span class='ident'>as_bytes</span>()).<span class='ident'>unwrap</span>();
-        <span class='ident'>hmac</span>.<span class='ident'>finish</span>()
+    <span class="kw">fn</span> <span class="ident">dosign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac</span> <span class="op">=</span> <span class="ident">hmac</span>::<span class="ident">HMAC</span>::<span class="ident">new</span>(<span class="ident">hash</span>::<span class="ident">Type</span>::<span class="ident">SHA1</span>, <span class="ident">key</span>);
+        <span class="ident">hmac</span>.<span class="ident">write_all</span>(<span class="ident">val</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+        <span class="ident">hmac</span>.<span class="ident">finish</span>()
     }
 
-    <span class='comment'>// Implementation details were taken from Rails. See</span>
-    <span class='comment'>// https://github.com/rails/rails/blob/master/activesupport/lib/active_support/message_encryptor.rb#L57</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encrypt_and_sign</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='kw-2'>mut</span> <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='ident'>Cookie</span> {
-        <span class='kw'>let</span> <span class='ident'>encrypted_data</span> <span class='op'>=</span> <span class='ident'>encrypt_data</span>(<span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>cookie</span>.<span class='ident'>value</span>);
-        <span class='ident'>cookie</span>.<span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>encrypted_data</span>;
-        <span class='ident'>sign</span>(<span class='ident'>key</span>, <span class='ident'>cookie</span>)
+    <span class="comment">// Implementation details were taken from Rails. See</span>
+    <span class="comment">// https://github.com/rails/rails/blob/master/activesupport/lib/active_support/message_encryptor.rb#L57</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_and_sign</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">mut</span> <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="ident">Cookie</span> {
+        <span class="kw">let</span> <span class="ident">encrypted_data</span> <span class="op">=</span> <span class="ident">encrypt_data</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">cookie</span>.<span class="ident">value</span>);
+        <span class="ident">cookie</span>.<span class="ident">value</span> <span class="op">=</span> <span class="ident">encrypted_data</span>;
+        <span class="ident">sign</span>(<span class="ident">key</span>, <span class="ident">cookie</span>)
     }
 
-    <span class='kw'>fn</span> <span class='ident'>encrypt_data</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
-        <span class='kw'>let</span> <span class='ident'>iv</span> <span class='op'>=</span> <span class='ident'>random_iv</span>();
-        <span class='kw'>let</span> <span class='ident'>iv_str</span> <span class='op'>=</span> <span class='ident'>iv</span>.<span class='ident'>to_base64</span>(<span class='ident'>STANDARD</span>);
+    <span class="kw">fn</span> <span class="ident">encrypt_data</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">iv</span> <span class="op">=</span> <span class="ident">random_iv</span>();
+        <span class="kw">let</span> <span class="ident">iv_str</span> <span class="op">=</span> <span class="ident">iv</span>.<span class="ident">to_base64</span>(<span class="ident">STANDARD</span>);
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>encrypted_data</span> <span class='op'>=</span> <span class='ident'>symm</span>::<span class='ident'>encrypt</span>(<span class='ident'>symm</span>::<span class='ident'>Type</span>::<span class='ident'>AES_256_CBC</span>,
-                                               <span class='kw-2'>&amp;</span><span class='ident'>key</span>[..<span class='ident'>MIN_KEY_LEN</span>], <span class='kw-2'>&amp;</span><span class='ident'>iv</span>,
-                                               <span class='ident'>val</span>.<span class='ident'>as_bytes</span>()).<span class='ident'>to_base64</span>(<span class='ident'>STANDARD</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encrypted_data</span> <span class="op">=</span> <span class="ident">symm</span>::<span class="ident">encrypt</span>(<span class="ident">symm</span>::<span class="ident">Type</span>::<span class="ident">AES_256_CBC</span>,
+                                               <span class="kw-2">&amp;</span><span class="ident">key</span>[..<span class="ident">MIN_KEY_LEN</span>], <span class="kw-2">&amp;</span><span class="ident">iv</span>,
+                                               <span class="ident">val</span>.<span class="ident">as_bytes</span>()).<span class="ident">to_base64</span>(<span class="ident">STANDARD</span>);
 
-        <span class='ident'>encrypted_data</span>.<span class='ident'>push_str</span>(<span class='string'>&quot;--&quot;</span>);
-        <span class='ident'>encrypted_data</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>iv_str</span>);
-        <span class='ident'>encrypted_data</span>
+        <span class="ident">encrypted_data</span>.<span class="ident">push_str</span>(<span class="string">&quot;--&quot;</span>);
+        <span class="ident">encrypted_data</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">iv_str</span>);
+        <span class="ident">encrypted_data</span>
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>design_and_decrypt</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>cookie</span>: <span class='ident'>Cookie</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Cookie</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>design</span>(<span class='ident'>key</span>, <span class='ident'>cookie</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>) <span class='op'>=&gt;</span> <span class='ident'>cookie</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">design_and_decrypt</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cookie</span>: <span class="ident">Cookie</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cookie</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">design</span>(<span class="ident">key</span>, <span class="ident">cookie</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">cookie</span>) <span class="op">=&gt;</span> <span class="ident">cookie</span>,
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
         };
 
-        <span class='kw'>let</span> <span class='ident'>decrypted_data</span> <span class='op'>=</span> <span class='ident'>decrypt_data</span>(<span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='ident'>cookie</span>.<span class='ident'>value</span>)
-                                .<span class='ident'>and_then</span>(<span class='op'>|</span><span class='ident'>data</span><span class='op'>|</span> <span class='ident'>String</span>::<span class='ident'>from_utf8</span>(<span class='ident'>data</span>).<span class='ident'>ok</span>());
-        <span class='kw'>match</span> <span class='ident'>decrypted_data</span> {
-            <span class='prelude-val'>Some</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> { <span class='ident'>cookie</span>.<span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>val</span>; <span class='prelude-val'>Some</span>(<span class='ident'>cookie</span>) }
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+        <span class="kw">let</span> <span class="ident">decrypted_data</span> <span class="op">=</span> <span class="ident">decrypt_data</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">cookie</span>.<span class="ident">value</span>)
+                                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">data</span>).<span class="ident">ok</span>());
+        <span class="kw">match</span> <span class="ident">decrypted_data</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=&gt;</span> { <span class="ident">cookie</span>.<span class="ident">value</span> <span class="op">=</span> <span class="ident">val</span>; <span class="prelude-val">Some</span>(<span class="ident">cookie</span>) }
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>decrypt_data</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>val</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw'>let</span> (<span class='ident'>val</span>, <span class='ident'>iv</span>) <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>split_value</span>(<span class='ident'>val</span>) {
-            <span class='prelude-val'>Some</span>(<span class='ident'>pair</span>) <span class='op'>=&gt;</span> <span class='ident'>pair</span>, <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+    <span class="kw">fn</span> <span class="ident">decrypt_data</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span> {
+        <span class="kw">let</span> (<span class="ident">val</span>, <span class="ident">iv</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">split_value</span>(<span class="ident">val</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">pair</span>) <span class="op">=&gt;</span> <span class="ident">pair</span>, <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
         };
 
-        <span class='kw'>let</span> <span class='ident'>actual</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>val</span>.<span class='ident'>from_base64</span>() {
-            <span class='prelude-val'>Ok</span>(<span class='ident'>actual</span>) <span class='op'>=&gt;</span> <span class='ident'>actual</span>, <span class='prelude-val'>Err</span>(_) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>None</span>
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span>.<span class="ident">from_base64</span>() {
+            <span class="prelude-val">Ok</span>(<span class="ident">actual</span>) <span class="op">=&gt;</span> <span class="ident">actual</span>, <span class="prelude-val">Err</span>(_) <span class="op">=&gt;</span> <span class="kw">return</span> <span class="prelude-val">None</span>
         };
 
-        <span class='prelude-val'>Some</span>(<span class='ident'>symm</span>::<span class='ident'>decrypt</span>(<span class='ident'>symm</span>::<span class='ident'>Type</span>::<span class='ident'>AES_256_CBC</span>, <span class='kw-2'>&amp;</span><span class='ident'>key</span>[..<span class='ident'>MIN_KEY_LEN</span>],
-                           <span class='kw-2'>&amp;</span><span class='ident'>iv</span>, <span class='kw-2'>&amp;</span><span class='ident'>actual</span>))
+        <span class="prelude-val">Some</span>(<span class="ident">symm</span>::<span class="ident">decrypt</span>(<span class="ident">symm</span>::<span class="ident">Type</span>::<span class="ident">AES_256_CBC</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>[..<span class="ident">MIN_KEY_LEN</span>],
+                           <span class="kw-2">&amp;</span><span class="ident">iv</span>, <span class="kw-2">&amp;</span><span class="ident">actual</span>))
     }
 
-    <span class='kw'>fn</span> <span class='ident'>random_iv</span>() <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='ident'>openssl</span>::<span class='ident'>crypto</span>::<span class='ident'>rand</span>::<span class='ident'>rand_bytes</span>(<span class='number'>16</span>)
+    <span class="kw">fn</span> <span class="ident">random_iv</span>() <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="ident">openssl</span>::<span class="ident">crypto</span>::<span class="ident">rand</span>::<span class="ident">rand_bytes</span>(<span class="number">16</span>)
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>prepare_key</span>(<span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> {
-        <span class='ident'>hash</span>::<span class='ident'>hash</span>(<span class='ident'>hash</span>::<span class='ident'>Type</span>::<span class='ident'>SHA256</span>, <span class='ident'>key</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="ident">hash</span>::<span class="ident">hash</span>(<span class="ident">hash</span>::<span class="ident">Type</span>::<span class="ident">SHA256</span>, <span class="ident">key</span>)
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>test</span> {
-    <span class='kw'>use</span> {<span class='ident'>Cookie</span>, <span class='ident'>CookieJar</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> {<span class="ident">Cookie</span>, <span class="ident">CookieJar</span>};
 
-    <span class='kw'>const</span> <span class='ident'>KEY</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> [<span class='ident'>u8</span>] <span class='op'>=</span> <span class='string'>b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;</span>;
+    <span class="kw">const</span> <span class="ident">KEY</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;f8f9eaf1ecdedff5e5b749c58115441e&quot;</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>short_key</span>() {
-        <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='string'>b&quot;foo&quot;</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">short_key</span>() {
+        <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="string">b&quot;foo&quot;</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>simple</span>() {
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">simple</span>() {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
 
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_string</span>()));
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test2&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;&quot;</span>.<span class='ident'>to_string</span>()));
-        <span class='ident'>c</span>.<span class='ident'>remove</span>(<span class='string'>&quot;test&quot;</span>);
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test2&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">remove</span>(<span class="string">&quot;test&quot;</span>);
 
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>is_none</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test2&quot;</span>).<span class='ident'>is_some</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">is_none</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">find</span>(<span class="string">&quot;test2&quot;</span>).<span class="ident">is_some</span>());
     }
 
-    <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>secure_behaviour</span> {
-        (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>secure</span>:<span class='ident'>ident</span>) <span class='op'>=&gt;</span> ({
-            <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>secure</span>().<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>()));
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>value</span> <span class='op'>!=</span> <span class='string'>&quot;test&quot;</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>secure</span>().<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>value</span> <span class='op'>==</span> <span class='string'>&quot;test&quot;</span>);
+    <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">secure_behaviour</span> {
+        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>:<span class="ident">ident</span>) <span class="op">=&gt;</span> ({
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>().<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()));
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span> <span class="op">!=</span> <span class="string">&quot;test&quot;</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>().<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;test&quot;</span>);
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>cookie</span>.<span class='ident'>value</span>.<span class='ident'>push</span>(<span class='string'>&#39;l&#39;</span>);
-            <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>add</span>(<span class='ident'>cookie</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>secure</span>().<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>is_none</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="ident">cookie</span>.<span class="ident">value</span>.<span class="ident">push</span>(<span class="string">&#39;l&#39;</span>);
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">add</span>(<span class="ident">cookie</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>().<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">is_none</span>());
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>cookie</span>.<span class='ident'>value</span> <span class='op'>=</span> <span class='string'>&quot;foobar&quot;</span>.<span class='ident'>to_string</span>();
-            <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>add</span>(<span class='ident'>cookie</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>secure</span>().<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>is_none</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+            <span class="ident">cookie</span>.<span class="ident">value</span> <span class="op">=</span> <span class="string">&quot;foobar&quot;</span>.<span class="ident">to_string</span>();
+            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">add</span>(<span class="ident">cookie</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">secure</span>().<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">is_none</span>());
         })
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>features</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>signed</span>() {
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
-        <span class='macro'>secure_behaviour</span><span class='macro'>!</span>(<span class='ident'>c</span>, <span class='ident'>signed</span>)
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">features</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">signed</span>() {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
+        <span class="macro">secure_behaviour</span><span class="macro">!</span>(<span class="ident">c</span>, <span class="ident">signed</span>)
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>features</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>encrypted</span>() {
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
-        <span class='macro'>secure_behaviour</span><span class='macro'>!</span>(<span class='ident'>c</span>, <span class='ident'>encrypted</span>)
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">features</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">encrypted</span>() {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
+        <span class="macro">secure_behaviour</span><span class="macro">!</span>(<span class="ident">c</span>, <span class="ident">encrypted</span>)
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>permanent</span>() {
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">permanent</span>() {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
 
-        <span class='ident'>c</span>.<span class='ident'>permanent</span>().<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">permanent</span>().<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='kw'>let</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='ident'>c</span>.<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>value</span>, <span class='string'>&quot;test&quot;</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>permanent</span>().<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>().<span class='ident'>value</span>, <span class='string'>&quot;test&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>expires</span>.<span class='ident'>is_some</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>max_age</span>.<span class='ident'>is_some</span>());
+        <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">value</span>, <span class="string">&quot;test&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span>.<span class="ident">permanent</span>().<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">value</span>, <span class="string">&quot;test&quot;</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">expires</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">max_age</span>.<span class="ident">is_some</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>features</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>chained</span>() {
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">features</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">chained</span>() {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
 
-        <span class='ident'>c</span>.<span class='ident'>permanent</span>().<span class='ident'>signed</span>()
-         .<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">permanent</span>().<span class="ident">signed</span>()
+         .<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='kw'>let</span> <span class='ident'>cookie</span> <span class='op'>=</span> <span class='ident'>c</span>.<span class='ident'>signed</span>().<span class='ident'>find</span>(<span class='string'>&quot;test&quot;</span>).<span class='ident'>unwrap</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>value</span>, <span class='string'>&quot;test&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>expires</span>.<span class='ident'>is_some</span>());
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>cookie</span>.<span class='ident'>max_age</span>.<span class='ident'>is_some</span>());
+        <span class="kw">let</span> <span class="ident">cookie</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">signed</span>().<span class="ident">find</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">value</span>, <span class="string">&quot;test&quot;</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">expires</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cookie</span>.<span class="ident">max_age</span>.<span class="ident">is_some</span>());
     }
 
-    <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>features</span> <span class='op'>=</span> <span class='string'>&quot;secure&quot;</span>)]</span>
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>iter</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>CookieJar</span>::<span class='ident'>new</span>(<span class='ident'>KEY</span>);
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">features</span> <span class="op">=</span> <span class="string">&quot;secure&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">iter</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">CookieJar</span>::<span class="ident">new</span>(<span class="ident">KEY</span>);
 
-        <span class='ident'>c</span>.<span class='ident'>add_original</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;original&quot;</span>.<span class='ident'>to_string</span>(),
-                                   <span class='string'>&quot;original&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add_original</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;original&quot;</span>.<span class="ident">to_string</span>(),
+                                   <span class="string">&quot;original&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test&quot;</span>.<span class='ident'>to_string</span>()));
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test2&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test2&quot;</span>.<span class='ident'>to_string</span>()));
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test3&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test3&quot;</span>.<span class='ident'>to_string</span>()));
-        <span class='ident'>c</span>.<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;test4&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;test4&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test2&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test2&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test3&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test3&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;test4&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;test4&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='ident'>c</span>.<span class='ident'>signed</span>()
-         .<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;signed&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;signed&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">signed</span>()
+         .<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;signed&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;signed&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='ident'>c</span>.<span class='ident'>encrypted</span>()
-         .<span class='ident'>add</span>(<span class='ident'>Cookie</span>::<span class='ident'>new</span>(<span class='string'>&quot;encrypted&quot;</span>.<span class='ident'>to_string</span>(), <span class='string'>&quot;encrypted&quot;</span>.<span class='ident'>to_string</span>()));
+        <span class="ident">c</span>.<span class="ident">encrypted</span>()
+         .<span class="ident">add</span>(<span class="ident">Cookie</span>::<span class="ident">new</span>(<span class="string">&quot;encrypted&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;encrypted&quot;</span>.<span class="ident">to_string</span>()));
 
-        <span class='ident'>c</span>.<span class='ident'>remove</span>(<span class='string'>&quot;test&quot;</span>);
+        <span class="ident">c</span>.<span class="ident">remove</span>(<span class="string">&quot;test&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>cookies</span> <span class='op'>=</span> <span class='ident'>c</span>.<span class='ident'>iter</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>cookies</span>.<span class='ident'>len</span>(), <span class='number'>6</span>);
+        <span class="kw">let</span> <span class="ident">cookies</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">cookies</span>.<span class="ident">len</span>(), <span class="number">6</span>);
 
-        <span class='kw'>let</span> <span class='ident'>encrypted_cookies</span> <span class='op'>=</span> <span class='ident'>c</span>.<span class='ident'>encrypted</span>().<span class='ident'>iter</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encrypted_cookies</span>.<span class='ident'>len</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>encrypted_cookies</span>[<span class='number'>0</span>].<span class='ident'>name</span>, <span class='string'>&quot;encrypted&quot;</span>);
+        <span class="kw">let</span> <span class="ident">encrypted_cookies</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">encrypted</span>().<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encrypted_cookies</span>.<span class="ident">len</span>(), <span class="number">1</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">encrypted_cookies</span>[<span class="number">0</span>].<span class="ident">name</span>, <span class="string">&quot;encrypted&quot;</span>);
 
-        <span class='kw'>let</span> <span class='ident'>signed_cookies</span> <span class='op'>=</span> <span class='ident'>c</span>.<span class='ident'>signed</span>().<span class='ident'>iter</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>signed_cookies</span>.<span class='ident'>len</span>(), <span class='number'>2</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>signed_cookies</span>[<span class='number'>0</span>].<span class='ident'>name</span> <span class='op'>==</span> <span class='string'>&quot;signed&quot;</span> <span class='op'>||</span>
-                <span class='ident'>signed_cookies</span>[<span class='number'>1</span>].<span class='ident'>name</span> <span class='op'>==</span> <span class='string'>&quot;signed&quot;</span>);
+        <span class="kw">let</span> <span class="ident">signed_cookies</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">signed</span>().<span class="ident">iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>();
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">signed_cookies</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">signed_cookies</span>[<span class="number">0</span>].<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;signed&quot;</span> <span class="op">||</span>
+                <span class="ident">signed_cookies</span>[<span class="number">1</span>].<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;signed&quot;</span>);
     }
 }
 </pre>
@@ -1213,18 +1225,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1257,7 +1273,6 @@
         window.rootPath = "../../";
         window.currentCrate = "cookie";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

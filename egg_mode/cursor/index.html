@@ -9,14 +9,18 @@
 
     <title>egg_mode::cursor - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc mod">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'cursor', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'>Module cursor</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></div><p class='location'><a href='../index.html'>egg_mode</a></p><script>window.sidebarCurrent = {name: 'cursor', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,14 +54,13 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>egg_mode</a>::<wbr><a class='mod' href=''>cursor</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>egg_mode</a>::<wbr><a class="mod" href=''>cursor</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-582' class='srclink' href='../../src/egg_mode/cursor.rs.html#1-328' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/egg_mode/cursor.rs.html#1-328' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Types and traits to navigate cursored collections.</p>
-
 <p>Much of this module can be considered an implementation detail; the main intended entry point
 to this code is <code>CursorIter</code>, and that can just be used as an iterator to ignore the rest of
 this module. The rest of it is available to make sure consumers of the API can understand
@@ -57,33 +68,37 @@ precisely what types come out of functions that return <code>CursorIter</code>.<
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.CursorIter.html'
-                                  title='egg_mode::cursor::CursorIter'>CursorIter</a></td>
+                           <td><a class="struct" href="struct.CursorIter.html"
+                                  title='struct egg_mode::cursor::CursorIter'>CursorIter</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a paginated list of results, such as the users who follow a specific user or the
 lists owned by that user.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.IDCursor.html'
-                                  title='egg_mode::cursor::IDCursor'>IDCursor</a></td>
+                           <td><a class="struct" href="struct.IDCursor.html"
+                                  title='struct egg_mode::cursor::IDCursor'>IDCursor</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a single-page view into a list of user IDs.</p>
+
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class='struct' href='struct.UserCursor.html'
-                                  title='egg_mode::cursor::UserCursor'>UserCursor</a></td>
+                           <td><a class="struct" href="struct.UserCursor.html"
+                                  title='struct egg_mode::cursor::UserCursor'>UserCursor</a></td>
                            <td class='docblock-short'>
                                 <p>Represents a single-page view into a list of users.</p>
+
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
-                           <td><a class='trait' href='trait.Cursor.html'
-                                  title='egg_mode::cursor::Cursor'>Cursor</a></td>
+                           <td><a class="trait" href="trait.Cursor.html"
+                                  title='trait egg_mode::cursor::Cursor'>Cursor</a></td>
                            <td class='docblock-short'>
                                 <p>Trait to generalize over paginated views of API results.</p>
+
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
@@ -98,18 +113,22 @@ lists owned by that user.</p>
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -142,7 +161,6 @@ lists owned by that user.</p>
         window.rootPath = "../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

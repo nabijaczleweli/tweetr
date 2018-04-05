@@ -9,14 +9,18 @@
 
     <title>extension.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -263,225 +275,225 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 
-<span class='kw'>use</span> <span class='ident'>nid</span>::<span class='ident'>Nid</span>;
+<span class="kw">use</span> <span class="ident">nid</span>::<span class="ident">Nid</span>;
 
-<span class='doccomment'>/// Type-only version of the `Extension` enum.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// See the `Extension` documentation for more information on the different</span>
-<span class='doccomment'>/// variants.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>,<span class='ident'>Hash</span>,<span class='ident'>PartialEq</span>,<span class='ident'>Eq</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ExtensionType</span> {
-    <span class='ident'>KeyUsage</span>,
-    <span class='ident'>ExtKeyUsage</span>,
-    <span class='ident'>SubjectAltName</span>,
-    <span class='ident'>IssuerAltName</span>,
-    <span class='ident'>OtherNid</span>(<span class='ident'>Nid</span>),
-    <span class='ident'>OtherStr</span>(<span class='ident'>String</span>),
+<span class="doccomment">/// Type-only version of the `Extension` enum.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// See the `Extension` documentation for more information on the different</span>
+<span class="doccomment">/// variants.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>,<span class="ident">Hash</span>,<span class="ident">PartialEq</span>,<span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExtensionType</span> {
+    <span class="ident">KeyUsage</span>,
+    <span class="ident">ExtKeyUsage</span>,
+    <span class="ident">SubjectAltName</span>,
+    <span class="ident">IssuerAltName</span>,
+    <span class="ident">OtherNid</span>(<span class="ident">Nid</span>),
+    <span class="ident">OtherStr</span>(<span class="ident">String</span>),
 }
 
-<span class='doccomment'>/// A X.509 v3 certificate extension.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// Only one extension of each type is allow in a certificate.</span>
-<span class='doccomment'>/// See RFC 3280 for more information about extensions.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Extension</span> {
-    <span class='doccomment'>/// The purposes of the key contained in the certificate</span>
-    <span class='ident'>KeyUsage</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>KeyUsageOption</span><span class='op'>&gt;</span>),
-    <span class='doccomment'>/// The extended purposes of the key contained in the certificate</span>
-    <span class='ident'>ExtKeyUsage</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>ExtKeyUsageOption</span><span class='op'>&gt;</span>),
-    <span class='doccomment'>/// Subject Alternative Names</span>
-    <span class='ident'>SubjectAltName</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>AltNameOption</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>),
-    <span class='doccomment'>/// Issuer Alternative Names</span>
-    <span class='ident'>IssuerAltName</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>AltNameOption</span>, <span class='ident'>String</span>)<span class='op'>&gt;</span>),
-    <span class='doccomment'>/// Arbitrary extensions by NID. See `man x509v3_config` for value syntax.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// You must not use this to add extensions which this enum can express directly.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use openssl::x509::extension::Extension::*;</span>
-    <span class='doccomment'>/// use openssl::nid::Nid;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # let generator = openssl::x509::X509Generator::new();</span>
-    <span class='doccomment'>/// generator.add_extension(OtherNid(Nid::BasicConstraints,&quot;critical,CA:TRUE&quot;.to_owned()));</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='ident'>OtherNid</span>(<span class='ident'>Nid</span>, <span class='ident'>String</span>),
-    <span class='doccomment'>/// Arbitrary extensions by OID string. See `man ASN1_generate_nconf` for value syntax.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// You must not use this to add extensions which this enum can express directly.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use openssl::x509::extension::Extension::*;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # let generator = openssl::x509::X509Generator::new();</span>
-    <span class='doccomment'>/// generator.add_extension(OtherStr(&quot;2.999.2&quot;.to_owned(),&quot;ASN1:UTF8:example value&quot;.to_owned()));</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='ident'>OtherStr</span>(<span class='ident'>String</span>, <span class='ident'>String</span>),
+<span class="doccomment">/// A X.509 v3 certificate extension.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Only one extension of each type is allow in a certificate.</span>
+<span class="doccomment">/// See RFC 3280 for more information about extensions.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Extension</span> {
+    <span class="doccomment">/// The purposes of the key contained in the certificate</span>
+    <span class="ident">KeyUsage</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyUsageOption</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// The extended purposes of the key contained in the certificate</span>
+    <span class="ident">ExtKeyUsage</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExtKeyUsageOption</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Subject Alternative Names</span>
+    <span class="ident">SubjectAltName</span>(<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">AltNameOption</span>, <span class="ident">String</span>)<span class="op">&gt;</span>),
+    <span class="doccomment">/// Issuer Alternative Names</span>
+    <span class="ident">IssuerAltName</span>(<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">AltNameOption</span>, <span class="ident">String</span>)<span class="op">&gt;</span>),
+    <span class="doccomment">/// Arbitrary extensions by NID. See `man x509v3_config` for value syntax.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// You must not use this to add extensions which this enum can express directly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use openssl::x509::extension::Extension::*;</span>
+    <span class="doccomment">/// use openssl::nid::Nid;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # let generator = openssl::x509::X509Generator::new();</span>
+    <span class="doccomment">/// generator.add_extension(OtherNid(Nid::BasicConstraints,&quot;critical,CA:TRUE&quot;.to_owned()));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="ident">OtherNid</span>(<span class="ident">Nid</span>, <span class="ident">String</span>),
+    <span class="doccomment">/// Arbitrary extensions by OID string. See `man ASN1_generate_nconf` for value syntax.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// You must not use this to add extensions which this enum can express directly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use openssl::x509::extension::Extension::*;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # let generator = openssl::x509::X509Generator::new();</span>
+    <span class="doccomment">/// generator.add_extension(OtherStr(&quot;2.999.2&quot;.to_owned(),&quot;ASN1:UTF8:example value&quot;.to_owned()));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="ident">OtherStr</span>(<span class="ident">String</span>, <span class="ident">String</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>Extension</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>ExtensionType</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>KeyUsage</span>(_) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>KeyUsage</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>ExtKeyUsage</span>(_) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>ExtKeyUsage</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>SubjectAltName</span>(_) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>SubjectAltName</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>IssuerAltName</span>(_) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>IssuerAltName</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>OtherNid</span>(<span class='ident'>nid</span>, _) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>OtherNid</span>(<span class='ident'>nid</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>OtherStr</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>, _) <span class='op'>=&gt;</span> <span class='ident'>ExtensionType</span>::<span class='ident'>OtherStr</span>(<span class='ident'>s</span>.<span class='ident'>clone</span>()),
+<span class="kw">impl</span> <span class="ident">Extension</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">ExtensionType</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">KeyUsage</span>(_) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">KeyUsage</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">ExtKeyUsage</span>(_) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">ExtKeyUsage</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">SubjectAltName</span>(_) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">SubjectAltName</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">IssuerAltName</span>(_) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">IssuerAltName</span>,
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">OtherNid</span>(<span class="ident">nid</span>, _) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">OtherNid</span>(<span class="ident">nid</span>),
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">OtherStr</span>(<span class="kw-2">ref</span> <span class="ident">s</span>, _) <span class="op">=&gt;</span> <span class="ident">ExtensionType</span>::<span class="ident">OtherStr</span>(<span class="ident">s</span>.<span class="ident">clone</span>()),
         }
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>ExtensionType</span> {
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_nid</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Nid</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>KeyUsage</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>Nid</span>::<span class='ident'>KeyUsage</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>ExtKeyUsage</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>Nid</span>::<span class='ident'>ExtendedKeyUsage</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>SubjectAltName</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>Nid</span>::<span class='ident'>SubjectAltName</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>IssuerAltName</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>Nid</span>::<span class='ident'>IssuerAltName</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>OtherNid</span>(<span class='ident'>nid</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>nid</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>OtherStr</span>(_) <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+<span class="kw">impl</span> <span class="ident">ExtensionType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_nid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nid</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">KeyUsage</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Nid</span>::<span class="ident">KeyUsage</span>),
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">ExtKeyUsage</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Nid</span>::<span class="ident">ExtendedKeyUsage</span>),
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">SubjectAltName</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Nid</span>::<span class="ident">SubjectAltName</span>),
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">IssuerAltName</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Nid</span>::<span class="ident">IssuerAltName</span>),
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">OtherNid</span>(<span class="ident">nid</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">nid</span>),
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">OtherStr</span>(_) <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_name</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtensionType</span>::<span class='ident'>OtherStr</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>s</span>),
-            _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ExtensionType</span>::<span class="ident">OtherStr</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>),
+            _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class='comment'>// FIXME: This would be nicer as a method on Iterator&lt;Item=ToString&gt;. This can</span>
-<span class='comment'>// eventually be replaced by the successor to std::slice::SliceConcatExt.connect</span>
-<span class='kw'>fn</span> <span class='ident'>join</span><span class='op'>&lt;</span><span class='ident'>I</span>: <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>Item</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>T</span>: <span class='ident'>ToString</span><span class='op'>&gt;</span>(<span class='ident'>iter</span>: <span class='ident'>I</span>, <span class='ident'>sep</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
-    <span class='ident'>iter</span>.<span class='ident'>enumerate</span>().<span class='ident'>fold</span>(<span class='ident'>String</span>::<span class='ident'>new</span>(), <span class='op'>|</span><span class='kw-2'>mut</span> <span class='ident'>acc</span>, (<span class='ident'>idx</span>, <span class='ident'>v</span>)<span class='op'>|</span> {
-        <span class='kw'>if</span> <span class='ident'>idx</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-            <span class='ident'>acc</span>.<span class='ident'>push_str</span>(<span class='ident'>sep</span>)
+<span class="comment">// FIXME: This would be nicer as a method on Iterator&lt;Item=ToString&gt;. This can</span>
+<span class="comment">// eventually be replaced by the successor to std::slice::SliceConcatExt.connect</span>
+<span class="kw">fn</span> <span class="ident">join</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">T</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>, <span class="ident">sep</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+    <span class="ident">iter</span>.<span class="ident">enumerate</span>().<span class="ident">fold</span>(<span class="ident">String</span>::<span class="ident">new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, (<span class="ident">idx</span>, <span class="ident">v</span>)<span class="op">|</span> {
+        <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">acc</span>.<span class="ident">push_str</span>(<span class="ident">sep</span>)
         };
-        <span class='ident'>acc</span>.<span class='ident'>push_str</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>to_string</span>());
-        <span class='ident'>acc</span>
+        <span class="ident">acc</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">to_string</span>());
+        <span class="ident">acc</span>
     })
 }
 
-<span class='kw'>impl</span> <span class='ident'>ToString</span> <span class='kw'>for</span> <span class='ident'>Extension</span> {
-    <span class='kw'>fn</span> <span class='ident'>to_string</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>String</span> {
-        <span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>KeyUsage</span>(<span class='kw-2'>ref</span> <span class='ident'>purposes</span>) <span class='op'>=&gt;</span> <span class='ident'>join</span>(<span class='ident'>purposes</span>.<span class='ident'>iter</span>(), <span class='string'>&quot;,&quot;</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>ExtKeyUsage</span>(<span class='kw-2'>ref</span> <span class='ident'>purposes</span>) <span class='op'>=&gt;</span> <span class='ident'>join</span>(<span class='ident'>purposes</span>.<span class='ident'>iter</span>(), <span class='string'>&quot;,&quot;</span>),
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>SubjectAltName</span>(<span class='kw-2'>ref</span> <span class='ident'>names</span>) <span class='op'>=&gt;</span> {
-                <span class='ident'>join</span>(<span class='ident'>names</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>opt</span>, <span class='kw-2'>ref</span> <span class='ident'>val</span>)<span class='op'>|</span> <span class='ident'>opt</span>.<span class='ident'>to_string</span>() <span class='op'>+</span> <span class='string'>&quot;:&quot;</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>val</span>),
-                     <span class='string'>&quot;,&quot;</span>)
+<span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">Extension</span> {
+    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">String</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">KeyUsage</span>(<span class="kw-2">ref</span> <span class="ident">purposes</span>) <span class="op">=&gt;</span> <span class="ident">join</span>(<span class="ident">purposes</span>.<span class="ident">iter</span>(), <span class="string">&quot;,&quot;</span>),
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">ExtKeyUsage</span>(<span class="kw-2">ref</span> <span class="ident">purposes</span>) <span class="op">=&gt;</span> <span class="ident">join</span>(<span class="ident">purposes</span>.<span class="ident">iter</span>(), <span class="string">&quot;,&quot;</span>),
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">SubjectAltName</span>(<span class="kw-2">ref</span> <span class="ident">names</span>) <span class="op">=&gt;</span> {
+                <span class="ident">join</span>(<span class="ident">names</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">opt</span>, <span class="kw-2">ref</span> <span class="ident">val</span>)<span class="op">|</span> <span class="ident">opt</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="string">&quot;:&quot;</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">val</span>),
+                     <span class="string">&quot;,&quot;</span>)
             }
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>IssuerAltName</span>(<span class='kw-2'>ref</span> <span class='ident'>names</span>) <span class='op'>=&gt;</span> {
-                <span class='ident'>join</span>(<span class='ident'>names</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>opt</span>, <span class='kw-2'>ref</span> <span class='ident'>val</span>)<span class='op'>|</span> <span class='ident'>opt</span>.<span class='ident'>to_string</span>() <span class='op'>+</span> <span class='string'>&quot;:&quot;</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>val</span>),
-                     <span class='string'>&quot;,&quot;</span>)
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">IssuerAltName</span>(<span class="kw-2">ref</span> <span class="ident">names</span>) <span class="op">=&gt;</span> {
+                <span class="ident">join</span>(<span class="ident">names</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">opt</span>, <span class="kw-2">ref</span> <span class="ident">val</span>)<span class="op">|</span> <span class="ident">opt</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="string">&quot;:&quot;</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">val</span>),
+                     <span class="string">&quot;,&quot;</span>)
             }
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>OtherNid</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value</span>) <span class='op'>=&gt;</span> <span class='ident'>value</span>.<span class='ident'>clone</span>(),
-            <span class='kw-2'>&amp;</span><span class='ident'>Extension</span>::<span class='ident'>OtherStr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>value</span>) <span class='op'>=&gt;</span> <span class='ident'>value</span>.<span class='ident'>clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">OtherNid</span>(_, <span class="kw-2">ref</span> <span class="ident">value</span>) <span class="op">=&gt;</span> <span class="ident">value</span>.<span class="ident">clone</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">Extension</span>::<span class="ident">OtherStr</span>(_, <span class="kw-2">ref</span> <span class="ident">value</span>) <span class="op">=&gt;</span> <span class="ident">value</span>.<span class="ident">clone</span>(),
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>,<span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>KeyUsageOption</span> {
-    <span class='ident'>DigitalSignature</span>,
-    <span class='ident'>NonRepudiation</span>,
-    <span class='ident'>KeyEncipherment</span>,
-    <span class='ident'>DataEncipherment</span>,
-    <span class='ident'>KeyAgreement</span>,
-    <span class='ident'>KeyCertSign</span>,
-    <span class='ident'>CRLSign</span>,
-    <span class='ident'>EncipherOnly</span>,
-    <span class='ident'>DecipherOnly</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>,<span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KeyUsageOption</span> {
+    <span class="ident">DigitalSignature</span>,
+    <span class="ident">NonRepudiation</span>,
+    <span class="ident">KeyEncipherment</span>,
+    <span class="ident">DataEncipherment</span>,
+    <span class="ident">KeyAgreement</span>,
+    <span class="ident">KeyCertSign</span>,
+    <span class="ident">CRLSign</span>,
+    <span class="ident">EncipherOnly</span>,
+    <span class="ident">DecipherOnly</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>KeyUsageOption</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>fmt</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='ident'>f</span>.<span class='ident'>pad</span>(<span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>DigitalSignature</span> <span class='op'>=&gt;</span> <span class='string'>&quot;digitalSignature&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>NonRepudiation</span> <span class='op'>=&gt;</span> <span class='string'>&quot;nonRepudiation&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>KeyEncipherment</span> <span class='op'>=&gt;</span> <span class='string'>&quot;keyEncipherment&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>DataEncipherment</span> <span class='op'>=&gt;</span> <span class='string'>&quot;dataEncipherment&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>KeyAgreement</span> <span class='op'>=&gt;</span> <span class='string'>&quot;keyAgreement&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>KeyCertSign</span> <span class='op'>=&gt;</span> <span class='string'>&quot;keyCertSign&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>CRLSign</span> <span class='op'>=&gt;</span> <span class='string'>&quot;cRLSign&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>EncipherOnly</span> <span class='op'>=&gt;</span> <span class='string'>&quot;encipherOnly&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>KeyUsageOption</span>::<span class='ident'>DecipherOnly</span> <span class='op'>=&gt;</span> <span class='string'>&quot;decipherOnly&quot;</span>,
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">KeyUsageOption</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">DigitalSignature</span> <span class="op">=&gt;</span> <span class="string">&quot;digitalSignature&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">NonRepudiation</span> <span class="op">=&gt;</span> <span class="string">&quot;nonRepudiation&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">KeyEncipherment</span> <span class="op">=&gt;</span> <span class="string">&quot;keyEncipherment&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">DataEncipherment</span> <span class="op">=&gt;</span> <span class="string">&quot;dataEncipherment&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">KeyAgreement</span> <span class="op">=&gt;</span> <span class="string">&quot;keyAgreement&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">KeyCertSign</span> <span class="op">=&gt;</span> <span class="string">&quot;keyCertSign&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">CRLSign</span> <span class="op">=&gt;</span> <span class="string">&quot;cRLSign&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">EncipherOnly</span> <span class="op">=&gt;</span> <span class="string">&quot;encipherOnly&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">KeyUsageOption</span>::<span class="ident">DecipherOnly</span> <span class="op">=&gt;</span> <span class="string">&quot;decipherOnly&quot;</span>,
         })
     }
 }
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ExtKeyUsageOption</span> {
-    <span class='ident'>ServerAuth</span>,
-    <span class='ident'>ClientAuth</span>,
-    <span class='ident'>CodeSigning</span>,
-    <span class='ident'>EmailProtection</span>,
-    <span class='ident'>TimeStamping</span>,
-    <span class='ident'>MsCodeInd</span>,
-    <span class='ident'>MsCodeCom</span>,
-    <span class='ident'>MsCtlSign</span>,
-    <span class='ident'>MsSgc</span>,
-    <span class='ident'>MsEfs</span>,
-    <span class='ident'>NsSgc</span>,
-    <span class='doccomment'>/// An arbitrary key usage by OID.</span>
-    <span class='ident'>Other</span>(<span class='ident'>String</span>),
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExtKeyUsageOption</span> {
+    <span class="ident">ServerAuth</span>,
+    <span class="ident">ClientAuth</span>,
+    <span class="ident">CodeSigning</span>,
+    <span class="ident">EmailProtection</span>,
+    <span class="ident">TimeStamping</span>,
+    <span class="ident">MsCodeInd</span>,
+    <span class="ident">MsCodeCom</span>,
+    <span class="ident">MsCtlSign</span>,
+    <span class="ident">MsSgc</span>,
+    <span class="ident">MsEfs</span>,
+    <span class="ident">NsSgc</span>,
+    <span class="doccomment">/// An arbitrary key usage by OID.</span>
+    <span class="ident">Other</span>(<span class="ident">String</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>ExtKeyUsageOption</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>fmt</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='ident'>f</span>.<span class='ident'>pad</span>(<span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>ServerAuth</span> <span class='op'>=&gt;</span> <span class='string'>&quot;serverAuth&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>ClientAuth</span> <span class='op'>=&gt;</span> <span class='string'>&quot;clientAuth&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>CodeSigning</span> <span class='op'>=&gt;</span> <span class='string'>&quot;codeSigning&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>EmailProtection</span> <span class='op'>=&gt;</span> <span class='string'>&quot;emailProtection&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>TimeStamping</span> <span class='op'>=&gt;</span> <span class='string'>&quot;timeStamping&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>MsCodeInd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;msCodeInd&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>MsCodeCom</span> <span class='op'>=&gt;</span> <span class='string'>&quot;msCodeCom&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>MsCtlSign</span> <span class='op'>=&gt;</span> <span class='string'>&quot;msCTLSign&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>MsSgc</span> <span class='op'>=&gt;</span> <span class='string'>&quot;msSGC&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>MsEfs</span> <span class='op'>=&gt;</span> <span class='string'>&quot;msEFS&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>NsSgc</span> <span class='op'>=&gt;</span> <span class='string'>&quot;nsSGC&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>ExtKeyUsageOption</span>::<span class='ident'>Other</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span>[..],
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ExtKeyUsageOption</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">ServerAuth</span> <span class="op">=&gt;</span> <span class="string">&quot;serverAuth&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">ClientAuth</span> <span class="op">=&gt;</span> <span class="string">&quot;clientAuth&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">CodeSigning</span> <span class="op">=&gt;</span> <span class="string">&quot;codeSigning&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">EmailProtection</span> <span class="op">=&gt;</span> <span class="string">&quot;emailProtection&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">TimeStamping</span> <span class="op">=&gt;</span> <span class="string">&quot;timeStamping&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">MsCodeInd</span> <span class="op">=&gt;</span> <span class="string">&quot;msCodeInd&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">MsCodeCom</span> <span class="op">=&gt;</span> <span class="string">&quot;msCodeCom&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">MsCtlSign</span> <span class="op">=&gt;</span> <span class="string">&quot;msCTLSign&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">MsSgc</span> <span class="op">=&gt;</span> <span class="string">&quot;msSGC&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">MsEfs</span> <span class="op">=&gt;</span> <span class="string">&quot;msEFS&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">NsSgc</span> <span class="op">=&gt;</span> <span class="string">&quot;nsSGC&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ExtKeyUsageOption</span>::<span class="ident">Other</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[..],
         })
     }
 }
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>AltNameOption</span> {
-    <span class='doccomment'>/// The value is specified as OID;content. See `man ASN1_generate_nconf` for more information on the content syntax.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use openssl::x509::extension::Extension::*;</span>
-    <span class='doccomment'>/// use openssl::x509::extension::AltNameOption::Other as OtherName;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # let generator = openssl::x509::X509Generator::new();</span>
-    <span class='doccomment'>/// generator.add_extension(SubjectAltName(vec![(OtherName,&quot;2.999.3;ASN1:UTF8:some other name&quot;.to_owned())]));</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='ident'>Other</span>,
-    <span class='ident'>Email</span>,
-    <span class='ident'>DNS</span>,
-    <span class='comment'>// X400, // Not supported by OpenSSL</span>
-    <span class='ident'>Directory</span>,
-    <span class='comment'>// EDIParty, // Not supported by OpenSSL</span>
-    <span class='ident'>URI</span>,
-    <span class='ident'>IPAddress</span>,
-    <span class='ident'>RegisteredID</span>,
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AltNameOption</span> {
+    <span class="doccomment">/// The value is specified as OID;content. See `man ASN1_generate_nconf` for more information on the content syntax.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use openssl::x509::extension::Extension::*;</span>
+    <span class="doccomment">/// use openssl::x509::extension::AltNameOption::Other as OtherName;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # let generator = openssl::x509::X509Generator::new();</span>
+    <span class="doccomment">/// generator.add_extension(SubjectAltName(vec![(OtherName,&quot;2.999.3;ASN1:UTF8:some other name&quot;.to_owned())]));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="ident">Other</span>,
+    <span class="ident">Email</span>,
+    <span class="ident">DNS</span>,
+    <span class="comment">// X400, // Not supported by OpenSSL</span>
+    <span class="ident">Directory</span>,
+    <span class="comment">// EDIParty, // Not supported by OpenSSL</span>
+    <span class="ident">URI</span>,
+    <span class="ident">IPAddress</span>,
+    <span class="ident">RegisteredID</span>,
 }
 
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>AltNameOption</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>fmt</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-        <span class='ident'>f</span>.<span class='ident'>pad</span>(<span class='kw'>match</span> <span class='self'>self</span> {
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>Other</span> <span class='op'>=&gt;</span> <span class='string'>&quot;otherName&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>Email</span> <span class='op'>=&gt;</span> <span class='string'>&quot;email&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>DNS</span> <span class='op'>=&gt;</span> <span class='string'>&quot;DNS&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>Directory</span> <span class='op'>=&gt;</span> <span class='string'>&quot;dirName&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>URI</span> <span class='op'>=&gt;</span> <span class='string'>&quot;URI&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>IPAddress</span> <span class='op'>=&gt;</span> <span class='string'>&quot;IP&quot;</span>,
-            <span class='kw-2'>&amp;</span><span class='ident'>AltNameOption</span>::<span class='ident'>RegisteredID</span> <span class='op'>=&gt;</span> <span class='string'>&quot;RID&quot;</span>,
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">AltNameOption</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="kw">match</span> <span class="self">self</span> {
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">Other</span> <span class="op">=&gt;</span> <span class="string">&quot;otherName&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">Email</span> <span class="op">=&gt;</span> <span class="string">&quot;email&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">DNS</span> <span class="op">=&gt;</span> <span class="string">&quot;DNS&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">Directory</span> <span class="op">=&gt;</span> <span class="string">&quot;dirName&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">URI</span> <span class="op">=&gt;</span> <span class="string">&quot;URI&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">IPAddress</span> <span class="op">=&gt;</span> <span class="string">&quot;IP&quot;</span>,
+            <span class="kw-2">&amp;</span><span class="ident">AltNameOption</span>::<span class="ident">RegisteredID</span> <span class="op">=&gt;</span> <span class="string">&quot;RID&quot;</span>,
         })
     }
 }
@@ -499,18 +511,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -543,7 +559,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "openssl";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

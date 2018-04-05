@@ -9,14 +9,18 @@
 
     <title>openssl_sys::DSA - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../main.css">
+    <link rel="stylesheet" type="text/css" href="../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../dark.css">
+    <link rel="stylesheet" type="text/css" href="../main.css" id="themeStyle">
+    <script src="../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc struct">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='index.html'>openssl_sys</a></p><script>window.sidebarCurrent = {name: 'DSA', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Struct DSA</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#fields">Fields</a><div class="sidebar-links"><a href="#structfield.pad">pad</a><a href="#structfield.version">version</a><a href="#structfield.write_params">write_params</a><a href="#structfield.p">p</a><a href="#structfield.q">q</a><a href="#structfield.g">g</a><a href="#structfield.pub_key">pub_key</a><a href="#structfield.priv_key">priv_key</a><a href="#structfield.kinv">kinv</a><a href="#structfield.r">r</a><a href="#structfield.flags">flags</a><a href="#structfield._method_mont_p">_method_mont_p</a><a href="#structfield.references">references</a><a href="#structfield.ex_data">ex_data</a><a href="#structfield.meth">meth</a><a href="#structfield.engine">engine</a></div></div><p class='location'><a href='index.html'>openssl_sys</a></p><script>window.sidebarCurrent = {name: 'DSA', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,78 +54,96 @@
         </form>
     </nav>
 
-    <section id='main' class="content struct">
-<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>openssl_sys</a>::<wbr><a class='struct' href=''>DSA</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='index.html'>openssl_sys</a>::<wbr><a class="struct" href=''>DSA</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-83' class='srclink' href='../src/openssl_sys/lib.rs.html#127-146' title='goto source code'>[src]</a></span></h1>
-<pre class='rust struct'>pub struct DSA {
-    pub pad: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
-    pub version: <a class='type' href='../libc/unix/notbsd/linux/other/b64/type.c_long.html' title='libc::unix::notbsd::linux::other::b64::c_long'>c_long</a>,
-    pub write_params: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
-    pub p: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub q: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub g: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub pub_key: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub priv_key: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub kinv: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub r: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a>,
-    pub flags: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
-    pub _method_mont_p: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-    pub references: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a>,
-    pub ex_data: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-    pub meth: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-    pub engine: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a>,
-}</pre><h2 class='fields'>Fields</h2><span id='structfield.pad' class='structfield'>
-                           <span id='pad.v' class='invisible'>
-                           <code>pad: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.version' class='structfield'>
-                           <span id='version.v' class='invisible'>
-                           <code>version: <a class='type' href='../libc/unix/notbsd/linux/other/b64/type.c_long.html' title='libc::unix::notbsd::linux::other::b64::c_long'>c_long</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.write_params' class='structfield'>
-                           <span id='write_params.v' class='invisible'>
-                           <code>write_params: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.p' class='structfield'>
-                           <span id='p.v' class='invisible'>
-                           <code>p: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.q' class='structfield'>
-                           <span id='q.v' class='invisible'>
-                           <code>q: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.g' class='structfield'>
-                           <span id='g.v' class='invisible'>
-                           <code>g: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.pub_key' class='structfield'>
-                           <span id='pub_key.v' class='invisible'>
-                           <code>pub_key: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.priv_key' class='structfield'>
-                           <span id='priv_key.v' class='invisible'>
-                           <code>priv_key: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.kinv' class='structfield'>
-                           <span id='kinv.v' class='invisible'>
-                           <code>kinv: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.r' class='structfield'>
-                           <span id='r.v' class='invisible'>
-                           <code>r: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='struct' href='../openssl_sys/struct.BIGNUM.html' title='openssl_sys::BIGNUM'>BIGNUM</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.flags' class='structfield'>
-                           <span id='flags.v' class='invisible'>
-                           <code>flags: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
-                           </span></span><span class='stab '></span><span id='structfield._method_mont_p' class='structfield'>
-                           <span id='_method_mont_p.v' class='invisible'>
-                           <code>_method_mont_p: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.references' class='structfield'>
-                           <span id='references.v' class='invisible'>
-                           <code>references: <a class='type' href='../libc/type.c_int.html' title='libc::c_int'>c_int</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.ex_data' class='structfield'>
-                           <span id='ex_data.v' class='invisible'>
-                           <code>ex_data: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.meth' class='structfield'>
-                           <span id='meth.v' class='invisible'>
-                           <code>meth: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
-                           </span></span><span class='stab '></span><span id='structfield.engine' class='structfield'>
-                           <span id='engine.v' class='invisible'>
-                           <code>engine: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='enum' href='../libc/enum.c_void.html' title='libc::c_void'>c_void</a></code>
-                           </span></span><span class='stab '></span></section>
+               </span><a class='srclink' href='../src/openssl_sys/lib.rs.html#127-146' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'><div class="docblock attributes">#[repr(C)]
+</div>pub struct DSA {
+    pub pad: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub version: <a class="type" href="../libc/unix/notbsd/linux/other/b64/not_x32/type.c_long.html" title="type libc::unix::notbsd::linux::other::b64::not_x32::c_long">c_long</a>,
+    pub write_params: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub p: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub q: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub g: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub pub_key: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub priv_key: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub kinv: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub r: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a>,
+    pub flags: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub _method_mont_p: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>,
+    pub references: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a>,
+    pub ex_data: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>,
+    pub meth: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>,
+    pub engine: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>,
+}</pre><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.pad" class="structfield small-section-header">
+                           <a href="#structfield.pad" class="anchor field"></a>
+                           <span id="pad.v" class='invisible'>
+                           <code>pad: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id="structfield.version" class="structfield small-section-header">
+                           <a href="#structfield.version" class="anchor field"></a>
+                           <span id="version.v" class='invisible'>
+                           <code>version: <a class="type" href="../libc/unix/notbsd/linux/other/b64/not_x32/type.c_long.html" title="type libc::unix::notbsd::linux::other::b64::not_x32::c_long">c_long</a></code>
+                           </span></span><span id="structfield.write_params" class="structfield small-section-header">
+                           <a href="#structfield.write_params" class="anchor field"></a>
+                           <span id="write_params.v" class='invisible'>
+                           <code>write_params: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id="structfield.p" class="structfield small-section-header">
+                           <a href="#structfield.p" class="anchor field"></a>
+                           <span id="p.v" class='invisible'>
+                           <code>p: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.q" class="structfield small-section-header">
+                           <a href="#structfield.q" class="anchor field"></a>
+                           <span id="q.v" class='invisible'>
+                           <code>q: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.g" class="structfield small-section-header">
+                           <a href="#structfield.g" class="anchor field"></a>
+                           <span id="g.v" class='invisible'>
+                           <code>g: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.pub_key" class="structfield small-section-header">
+                           <a href="#structfield.pub_key" class="anchor field"></a>
+                           <span id="pub_key.v" class='invisible'>
+                           <code>pub_key: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.priv_key" class="structfield small-section-header">
+                           <a href="#structfield.priv_key" class="anchor field"></a>
+                           <span id="priv_key.v" class='invisible'>
+                           <code>priv_key: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.kinv" class="structfield small-section-header">
+                           <a href="#structfield.kinv" class="anchor field"></a>
+                           <span id="kinv.v" class='invisible'>
+                           <code>kinv: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.r" class="structfield small-section-header">
+                           <a href="#structfield.r" class="anchor field"></a>
+                           <span id="r.v" class='invisible'>
+                           <code>r: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../openssl_sys/struct.BIGNUM.html" title="struct openssl_sys::BIGNUM">BIGNUM</a></code>
+                           </span></span><span id="structfield.flags" class="structfield small-section-header">
+                           <a href="#structfield.flags" class="anchor field"></a>
+                           <span id="flags.v" class='invisible'>
+                           <code>flags: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id="structfield._method_mont_p" class="structfield small-section-header">
+                           <a href="#structfield._method_mont_p" class="anchor field"></a>
+                           <span id="_method_mont_p.v" class='invisible'>
+                           <code>_method_mont_p: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a></code>
+                           </span></span><span id="structfield.references" class="structfield small-section-header">
+                           <a href="#structfield.references" class="anchor field"></a>
+                           <span id="references.v" class='invisible'>
+                           <code>references: <a class="type" href="../libc/type.c_int.html" title="type libc::c_int">c_int</a></code>
+                           </span></span><span id="structfield.ex_data" class="structfield small-section-header">
+                           <a href="#structfield.ex_data" class="anchor field"></a>
+                           <span id="ex_data.v" class='invisible'>
+                           <code>ex_data: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a></code>
+                           </span></span><span id="structfield.meth" class="structfield small-section-header">
+                           <a href="#structfield.meth" class="anchor field"></a>
+                           <span id="meth.v" class='invisible'>
+                           <code>meth: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a></code>
+                           </span></span><span id="structfield.engine" class="structfield small-section-header">
+                           <a href="#structfield.engine" class="anchor field"></a>
+                           <span id="engine.v" class='invisible'>
+                           <code>engine: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="enum" href="../libc/enum.c_void.html" title="enum libc::c_void">c_void</a></code>
+                           </span></span></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -126,18 +156,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -170,7 +204,6 @@
         window.rootPath = "../";
         window.currentCrate = "openssl_sys";
     </script>
-    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>
 </body>

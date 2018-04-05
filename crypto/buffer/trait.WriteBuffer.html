@@ -9,14 +9,18 @@
 
     <title>crypto::buffer::WriteBuffer - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc trait">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
-        <p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>buffer</a></p><script>window.sidebarCurrent = {name: 'WriteBuffer', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'>Trait WriteBuffer</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#required-methods">Required Methods</a><div class="sidebar-links"><a href="#tymethod.is_empty">is_empty</a><a href="#tymethod.is_full">is_full</a><a href="#tymethod.remaining">remaining</a><a href="#tymethod.capacity">capacity</a><a href="#tymethod.rewind">rewind</a><a href="#tymethod.reset">reset</a><a href="#tymethod.peek_read_buffer">peek_read_buffer</a><a href="#tymethod.take_next">take_next</a><a href="#tymethod.take_read_buffer">take_read_buffer</a></div><a class="sidebar-title" href="#provided-methods">Provided Methods</a><div class="sidebar-links"><a href="#method.position">position</a><a href="#method.take_remaining">take_remaining</a></div><a class="sidebar-title" href="#implementors">Implementors</a></div><p class='location'><a href='../index.html'>crypto</a>::<wbr><a href='index.html'>buffer</a></p><script>window.sidebarCurrent = {name: 'WriteBuffer', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,37 +54,43 @@
         </form>
     </nav>
 
-    <section id='main' class="content trait">
-<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>buffer</a>::<wbr><a class='trait' href=''>WriteBuffer</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>crypto</a>::<wbr><a href='index.html'>buffer</a>::<wbr><a class="trait" href=''>WriteBuffer</a></span><span class='out-of-band'><span id='render-detail'>
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1588' class='srclink' href='../../src/crypto/buffer.rs.html#45-64' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/crypto/buffer.rs.html#45-64' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait WriteBuffer {
-    fn <a href='#tymethod.is_empty' class='fnname'>is_empty</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_full' class='fnname'>is_full</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.remaining' class='fnname'>remaining</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
-    fn <a href='#tymethod.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
-    fn <a href='#tymethod.rewind' class='fnname'>rewind</a>(&amp;mut self, distance: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>);
-    fn <a href='#tymethod.reset' class='fnname'>reset</a>(&amp;mut self);
-    fn <a href='#tymethod.peek_read_buffer' class='fnname'>peek_read_buffer</a>(&amp;mut self) -&gt; <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a>;
-    fn <a href='#tymethod.take_next' class='fnname'>take_next</a>(&amp;mut self, count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>;
-    fn <a href='#tymethod.take_read_buffer' class='fnname'>take_read_buffer</a>(&amp;mut self) -&gt; <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a>;
+    fn <a href='#tymethod.is_empty' class='fnname'>is_empty</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.is_full' class='fnname'>is_full</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.remaining' class='fnname'>remaining</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.rewind' class='fnname'>rewind</a>(&amp;mut self, distance: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>);
+<div class='item-spacer'></div>    fn <a href='#tymethod.reset' class='fnname'>reset</a>(&amp;mut self);
+<div class='item-spacer'></div>    fn <a href='#tymethod.peek_read_buffer' class='fnname'>peek_read_buffer</a>(&amp;mut self) -&gt; <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.take_next' class='fnname'>take_next</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a>;
+<div class='item-spacer'></div>    fn <a href='#tymethod.take_read_buffer' class='fnname'>take_read_buffer</a>(&amp;mut self) -&gt; <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a>;
 
-    fn <a href='#method.position' class='fnname'>position</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a> { ... }
-    fn <a href='#method.take_remaining' class='fnname'>take_remaining</a>(&amp;mut self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a> { ... }
+    fn <a href='#method.position' class='fnname'>position</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a> { ... }
+<div class='item-spacer'></div>    fn <a href='#method.take_remaining' class='fnname'>take_remaining</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a> { ... }
 }</pre>
-            <h2 id='required-methods'>Required Methods</h2>
+            <h2 id='required-methods' class='small-section-header'>
+              Required Methods<a href='#required-methods' class='anchor'></a>
+            </h2>
             <div class='methods'>
-        <h3 id='tymethod.is_empty' class='method stab '><span id='is_empty.v' class='invisible'><code>fn <a href='#tymethod.is_empty' class='fnname'>is_empty</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h3><h3 id='tymethod.is_full' class='method stab '><span id='is_full.v' class='invisible'><code>fn <a href='#tymethod.is_full' class='fnname'>is_full</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></span></h3><h3 id='tymethod.remaining' class='method stab '><span id='remaining.v' class='invisible'><code>fn <a href='#tymethod.remaining' class='fnname'>remaining</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h3><h3 id='tymethod.capacity' class='method stab '><span id='capacity.v' class='invisible'><code>fn <a href='#tymethod.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h3><h3 id='tymethod.rewind' class='method stab '><span id='rewind.v' class='invisible'><code>fn <a href='#tymethod.rewind' class='fnname'>rewind</a>(&amp;mut self, distance: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</code></span></h3><h3 id='tymethod.reset' class='method stab '><span id='reset.v' class='invisible'><code>fn <a href='#tymethod.reset' class='fnname'>reset</a>(&amp;mut self)</code></span></h3><h3 id='tymethod.peek_read_buffer' class='method stab '><span id='peek_read_buffer.v' class='invisible'><code>fn <a href='#tymethod.peek_read_buffer' class='fnname'>peek_read_buffer</a>(&amp;mut self) -&gt; <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a></code></span></h3><h3 id='tymethod.take_next' class='method stab '><span id='take_next.v' class='invisible'><code>fn <a href='#tymethod.take_next' class='fnname'>take_next</a>(&amp;mut self, count: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></span></h3><h3 id='tymethod.take_read_buffer' class='method stab '><span id='take_read_buffer.v' class='invisible'><code>fn <a href='#tymethod.take_read_buffer' class='fnname'>take_read_buffer</a>(&amp;mut self) -&gt; <a class='struct' href='../../crypto/buffer/struct.RefReadBuffer.html' title='crypto::buffer::RefReadBuffer'>RefReadBuffer</a></code></span></h3></div>
-            <h2 id='provided-methods'>Provided Methods</h2>
+        <h3 id='tymethod.is_empty' class='method'><span id='is_empty.v' class='invisible'><code>fn <a href='#tymethod.is_empty' class='fnname'>is_empty</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h3><h3 id='tymethod.is_full' class='method'><span id='is_full.v' class='invisible'><code>fn <a href='#tymethod.is_full' class='fnname'>is_full</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h3><h3 id='tymethod.remaining' class='method'><span id='remaining.v' class='invisible'><code>fn <a href='#tymethod.remaining' class='fnname'>remaining</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h3><h3 id='tymethod.capacity' class='method'><span id='capacity.v' class='invisible'><code>fn <a href='#tymethod.capacity' class='fnname'>capacity</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h3><h3 id='tymethod.rewind' class='method'><span id='rewind.v' class='invisible'><code>fn <a href='#tymethod.rewind' class='fnname'>rewind</a>(&amp;mut self, distance: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></span></h3><h3 id='tymethod.reset' class='method'><span id='reset.v' class='invisible'><code>fn <a href='#tymethod.reset' class='fnname'>reset</a>(&amp;mut self)</code></span></h3><h3 id='tymethod.peek_read_buffer' class='method'><span id='peek_read_buffer.v' class='invisible'><code>fn <a href='#tymethod.peek_read_buffer' class='fnname'>peek_read_buffer</a>(&amp;mut self) -&gt; <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a></code></span></h3><h3 id='tymethod.take_next' class='method'><span id='take_next.v' class='invisible'><code>fn <a href='#tymethod.take_next' class='fnname'>take_next</a>(&amp;mut self, count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span></h3><h3 id='tymethod.take_read_buffer' class='method'><span id='take_read_buffer.v' class='invisible'><code>fn <a href='#tymethod.take_read_buffer' class='fnname'>take_read_buffer</a>(&amp;mut self) -&gt; <a class="struct" href="../../crypto/buffer/struct.RefReadBuffer.html" title="struct crypto::buffer::RefReadBuffer">RefReadBuffer</a></code></span></h3></div>
+            <h2 id='provided-methods' class='small-section-header'>
+              Provided Methods<a href='#provided-methods' class='anchor'></a>
+            </h2>
             <div class='methods'>
-        <h3 id='method.position' class='method stab '><span id='position.v' class='invisible'><code>fn <a href='#method.position' class='fnname'>position</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></span></h3><h3 id='method.take_remaining' class='method stab '><span id='take_remaining.v' class='invisible'><code>fn <a href='#method.take_remaining' class='fnname'>take_remaining</a>(&amp;mut self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></span></h3></div>
-        <h2 id='implementors'>Implementors</h2>
+        <h3 id='method.position' class='method'><span id='position.v' class='invisible'><code>fn <a href='#method.position' class='fnname'>position</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code></span></h3><h3 id='method.take_remaining' class='method'><span id='take_remaining.v' class='invisible'><code>fn <a href='#method.take_remaining' class='fnname'>take_remaining</a>(&amp;mut self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">&amp;mut [</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.slice.html">]</a></code></span></h3></div>
+        <h2 id='implementors' class='small-section-header'>
+          Implementors<a href='#implementors' class='anchor'></a>
+        </h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;'a&gt; WriteBuffer for <a class='struct' href='../../crypto/buffer/struct.RefWriteBuffer.html' title='crypto::buffer::RefWriteBuffer'>RefWriteBuffer</a>&lt;'a&gt;</code></li>
-<li><code>impl&lt;'a&gt; WriteBuffer for <a class='struct' href='../../crypto/buffer/struct.BorrowedWriteBuffer.html' title='crypto::buffer::BorrowedWriteBuffer'>BorrowedWriteBuffer</a>&lt;'a&gt;</code></li>
-<li><code>impl WriteBuffer for <a class='struct' href='../../crypto/buffer/struct.OwnedWriteBuffer.html' title='crypto::buffer::OwnedWriteBuffer'>OwnedWriteBuffer</a></code></li>
+    <li><div class='out-of-band'><a class='srclink' href='../../src/crypto/buffer.rs.html#169-192' title='goto source code'>[src]</a></div><code>impl&lt;'a&gt; WriteBuffer for <a class="struct" href="../../crypto/buffer/struct.RefWriteBuffer.html" title="struct crypto::buffer::RefWriteBuffer">RefWriteBuffer</a>&lt;'a&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/buffer.rs.html#211-242' title='goto source code'>[src]</a></div><code>impl&lt;'a&gt; WriteBuffer for <a class="struct" href="../../crypto/buffer/struct.BorrowedWriteBuffer.html" title="struct crypto::buffer::BorrowedWriteBuffer">BorrowedWriteBuffer</a>&lt;'a&gt;</code></li>
+<li><div class='out-of-band'><a class='srclink' href='../../src/crypto/buffer.rs.html#265-288' title='goto source code'>[src]</a></div><code>impl WriteBuffer for <a class="struct" href="../../crypto/buffer/struct.OwnedWriteBuffer.html" title="struct crypto::buffer::OwnedWriteBuffer">OwnedWriteBuffer</a></code></li>
 </ul><script type="text/javascript" async
                          src="../../implementors/crypto/buffer/trait.WriteBuffer.js">
                  </script></section>
@@ -88,18 +106,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -132,7 +154,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

@@ -9,14 +9,18 @@
 
     <title>mod.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css" id="themeStyle">
+    <script src="../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -548,512 +560,512 @@
 <span id="504">504</span>
 <span id="505">505</span>
 <span id="506">506</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! Structs and methods for pulling user information from Twitter.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! Everything in here acts on users in some way, whether looking up user information, finding the</span>
-<span class='doccomment'>//! relations between two users, or actions like following or blocking a user.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ## Types</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! - `UserID`: used as a generic input to many functions, this enum allows you to refer to a user</span>
-<span class='doccomment'>//!   by a numeric ID or by their screen name.</span>
-<span class='doccomment'>//! - `Relationship`/`RelationSource`/`RelationTarget`: returned by `relation`, these types</span>
-<span class='doccomment'>//!   (`Relationship` contains the other two) show the ways two accounts relate to each other.</span>
-<span class='doccomment'>//! - `RelationLookup`/`Connection`: returned as part of a collection by `relation_lookup`, these</span>
-<span class='doccomment'>//!   types (`RelationLookup` contains a `Vec&lt;Connection&gt;`) shows the ways the authenticated user</span>
-<span class='doccomment'>//!   relates to a specific account.</span>
-<span class='doccomment'>//! - `TwitterUser`/`UserEntities`/`UserEntityDetail`: returned by many functions in this module,</span>
-<span class='doccomment'>//!   these types (`TwitterUser` contains the other two) describe the content of a user&#39;s profile,</span>
-<span class='doccomment'>//!   and a handful of settings relating to how their profile is displayed.</span>
-<span class='doccomment'>//! - `UserSearch`: returned by `search`, this is an iterator over search results.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ## Functions</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ### User actions</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! These functions perform actions to the user&#39;s account. Their use requires that your application</span>
-<span class='doccomment'>//! request write access to authenticated accounts.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! - `block`/`report_spam`/`unblock`</span>
-<span class='doccomment'>//! - `follow`/`unfollow`/`update_follow`</span>
-<span class='doccomment'>//! - `mute`/`unmute`</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ### Direct lookup</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! These functions return single users, or groups of users without having to iterate over the</span>
-<span class='doccomment'>//! results.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! - `show`</span>
-<span class='doccomment'>//! - `lookup`/`lookup_ids`/`lookup_names`</span>
-<span class='doccomment'>//! - `friends_no_retweets`</span>
-<span class='doccomment'>//! - `relation`/`relation_lookup`</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! ### Cursored lookup</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! These functions imply that they can return more entries than Twitter is willing to return at</span>
-<span class='doccomment'>//! once, so they&#39;re delivered in pages. This library takes those paginated results and wraps an</span>
-<span class='doccomment'>//! iterator around them that loads the pages as-needed.</span>
-<span class='doccomment'>//!</span>
-<span class='doccomment'>//! - `search`</span>
-<span class='doccomment'>//! - `friends_of`/`friends_ids`</span>
-<span class='doccomment'>//! - `followers_of`/`followers_ids`</span>
-<span class='doccomment'>//! - `blocks`/`blocks_ids`</span>
-<span class='doccomment'>//! - `mutes`/`mutes_ids`</span>
-<span class='doccomment'>//! - `incoming_requests`/`outgoing_requests`</span>
+</pre><pre class="rust ">
+<span class="doccomment">//! Structs and methods for pulling user information from Twitter.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Everything in here acts on users in some way, whether looking up user information, finding the</span>
+<span class="doccomment">//! relations between two users, or actions like following or blocking a user.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Types</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `UserID`: used as a generic input to many functions, this enum allows you to refer to a user</span>
+<span class="doccomment">//!   by a numeric ID or by their screen name.</span>
+<span class="doccomment">//! - `Relationship`/`RelationSource`/`RelationTarget`: returned by `relation`, these types</span>
+<span class="doccomment">//!   (`Relationship` contains the other two) show the ways two accounts relate to each other.</span>
+<span class="doccomment">//! - `RelationLookup`/`Connection`: returned as part of a collection by `relation_lookup`, these</span>
+<span class="doccomment">//!   types (`RelationLookup` contains a `Vec&lt;Connection&gt;`) shows the ways the authenticated user</span>
+<span class="doccomment">//!   relates to a specific account.</span>
+<span class="doccomment">//! - `TwitterUser`/`UserEntities`/`UserEntityDetail`: returned by many functions in this module,</span>
+<span class="doccomment">//!   these types (`TwitterUser` contains the other two) describe the content of a user&#39;s profile,</span>
+<span class="doccomment">//!   and a handful of settings relating to how their profile is displayed.</span>
+<span class="doccomment">//! - `UserSearch`: returned by `search`, this is an iterator over search results.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Functions</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### User actions</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These functions perform actions to the user&#39;s account. Their use requires that your application</span>
+<span class="doccomment">//! request write access to authenticated accounts.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `block`/`report_spam`/`unblock`</span>
+<span class="doccomment">//! - `follow`/`unfollow`/`update_follow`</span>
+<span class="doccomment">//! - `mute`/`unmute`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Direct lookup</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These functions return single users, or groups of users without having to iterate over the</span>
+<span class="doccomment">//! results.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `show`</span>
+<span class="doccomment">//! - `lookup`/`lookup_ids`/`lookup_names`</span>
+<span class="doccomment">//! - `friends_no_retweets`</span>
+<span class="doccomment">//! - `relation`/`relation_lookup`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Cursored lookup</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These functions imply that they can return more entries than Twitter is willing to return at</span>
+<span class="doccomment">//! once, so they&#39;re delivered in pages. This library takes those paginated results and wraps an</span>
+<span class="doccomment">//! iterator around them that loads the pages as-needed.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `search`</span>
+<span class="doccomment">//! - `friends_of`/`friends_ids`</span>
+<span class="doccomment">//! - `followers_of`/`followers_ids`</span>
+<span class="doccomment">//! - `blocks`/`blocks_ids`</span>
+<span class="doccomment">//! - `mutes`/`mutes_ids`</span>
+<span class="doccomment">//! - `incoming_requests`/`outgoing_requests`</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>borrow</span>::<span class='ident'>Borrow</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>collections</span>::<span class='ident'>HashMap</span>;
-<span class='kw'>use</span> <span class='ident'>common</span>::<span class='op'>*</span>;
-<span class='kw'>use</span> <span class='ident'>auth</span>;
-<span class='kw'>use</span> <span class='ident'>links</span>;
-<span class='kw'>use</span> <span class='ident'>cursor</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Borrow</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">common</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">auth</span>;
+<span class="kw">use</span> <span class="ident">links</span>;
+<span class="kw">use</span> <span class="ident">cursor</span>;
 
-<span class='kw'>mod</span> <span class='ident'>structs</span>;
+<span class="kw">mod</span> <span class="ident">structs</span>;
 
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>user</span>::<span class='ident'>structs</span>::<span class='op'>*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">user</span>::<span class="ident">structs</span>::<span class="kw-2">*</span>;
 
-<span class='comment'>//---Groups of users---</span>
+<span class="comment">//---Groups of users---</span>
 
-<span class='doccomment'>///Lookup a set of Twitter users by their numerical ID.</span>
-<span class='attribute'>#[<span class='ident'>deprecated</span>(<span class='ident'>note</span> <span class='op'>=</span> <span class='string'>&quot;you can call lookup with &amp;[i64] now&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lookup_ids</span>(<span class='ident'>ids</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>i64</span>], <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup a set of Twitter users by their numerical ID.</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;you can call lookup with &amp;[i64] now&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_ids</span>(<span class="ident">ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">i64</span>], <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>id_param</span> <span class='op'>=</span> <span class='ident'>ids</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>to_string</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;&gt;</span>().<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;user_id&quot;</span>, <span class='ident'>id_param</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="ident">id_param</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;user_id&quot;</span>, <span class="ident">id_param</span>);
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>LOOKUP</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">LOOKUP</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup a set of Twitter users by their screen name.</span>
-<span class='attribute'>#[<span class='ident'>deprecated</span>(<span class='ident'>note</span> <span class='op'>=</span> <span class='string'>&quot;you can call lookup with &amp;[&amp;str] and &amp;[String] now&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lookup_names</span><span class='op'>&lt;</span><span class='ident'>S</span>: <span class='ident'>Borrow</span><span class='op'>&lt;</span><span class='ident'>str</span><span class='op'>&gt;&gt;</span>(<span class='ident'>names</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>S</span>], <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup a set of Twitter users by their screen name.</span>
+<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;you can call lookup with &amp;[&amp;str] and &amp;[String] now&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_names</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;&gt;</span>(<span class="ident">names</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>], <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>id_param</span> <span class='op'>=</span> <span class='ident'>names</span>.<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;screen_name&quot;</span>, <span class='ident'>id_param</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="ident">id_param</span> <span class="op">=</span> <span class="ident">names</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;screen_name&quot;</span>, <span class="ident">id_param</span>);
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>LOOKUP</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">LOOKUP</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup a set of Twitter users by either ID and screen name, as applicable.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function is set up so it can be called with any number of slice types; whether just IDs,</span>
-<span class='doccomment'>///just screen names, or even a mix of both (by using `&amp;[UserID]` directly).</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///## Examples</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///let mut list: Vec&lt;i64&gt; = Vec::new();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///list.push(1234);</span>
-<span class='doccomment'>///list.push(2345);</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>///```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///let mut list: Vec&lt;String&gt; = Vec::new();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///list.push(&quot;rustlang&quot;.into());</span>
-<span class='doccomment'>///list.push(&quot;ThisWeekInRust&quot;.into());</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>///```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///```rust,no_run</span>
-<span class='doccomment'>///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
-<span class='doccomment'>///let mut list: Vec&lt;egg_mode::user::UserID&gt; = Vec::new();</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///list.push(1234.into());</span>
-<span class='doccomment'>///list.push(&quot;rustlang&quot;.into());</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
-<span class='doccomment'>///```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lookup</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>accts</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>T</span>], <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;&gt;</span>
-    <span class='kw'>where</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup a set of Twitter users by either ID and screen name, as applicable.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function is set up so it can be called with any number of slice types; whether just IDs,</span>
+<span class="doccomment">///just screen names, or even a mix of both (by using `&amp;[UserID]` directly).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///## Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///let mut list: Vec&lt;i64&gt; = Vec::new();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///list.push(1234);</span>
+<span class="doccomment">///list.push(2345);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">///```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///let mut list: Vec&lt;String&gt; = Vec::new();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///list.push(&quot;rustlang&quot;.into());</span>
+<span class="doccomment">///list.push(&quot;ThisWeekInRust&quot;.into());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">///```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///```rust,no_run</span>
+<span class="doccomment">///# let con_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///# let access_token = egg_mode::Token::new(&quot;&quot;, &quot;&quot;);</span>
+<span class="doccomment">///let mut list: Vec&lt;egg_mode::user::UserID&gt; = Vec::new();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///list.push(1234.into());</span>
+<span class="doccomment">///list.push(&quot;rustlang&quot;.into());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///let users = egg_mode::user::lookup(&amp;list, &amp;con_token, &amp;access_token).unwrap();</span>
+<span class="doccomment">///```</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">accts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;&gt;</span>
+    <span class="kw">where</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>id_param</span> <span class='op'>=</span> <span class='ident'>accts</span>.<span class='ident'>iter</span>()
-                        .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>x</span>.<span class='ident'>into</span>() {
-                            <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='ident'>id</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>id</span>.<span class='ident'>to_string</span>()),
-                            _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="ident">id_param</span> <span class="op">=</span> <span class="ident">accts</span>.<span class="ident">iter</span>()
+                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">into</span>() {
+                            <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()),
+                            _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                         })
-                        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
-                        .<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
-    <span class='kw'>let</span> <span class='ident'>name_param</span> <span class='op'>=</span> <span class='ident'>accts</span>.<span class='ident'>iter</span>()
-                          .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>x</span>.<span class='ident'>into</span>() {
-                              <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>name</span>),
-                              _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>()
+                        .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
+    <span class="kw">let</span> <span class="ident">name_param</span> <span class="op">=</span> <span class="ident">accts</span>.<span class="ident">iter</span>()
+                          .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">into</span>() {
+                              <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
+                              _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                           })
-                          .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
-                          .<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
+                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>()
+                          .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
 
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;user_id&quot;</span>, <span class='ident'>id_param</span>);
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;screen_name&quot;</span>, <span class='ident'>name_param</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;user_id&quot;</span>, <span class="ident">id_param</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;screen_name&quot;</span>, <span class="ident">name_param</span>);
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>LOOKUP</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">LOOKUP</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup user information for a single user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>show</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup user information for a single user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">show</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>SHOW</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">SHOW</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup the user IDs that the authenticating user has disabled retweets from.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Use `update_follow` to enable/disable viewing retweets from a specific user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>friends_no_retweets</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>i64</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup the user IDs that the authenticating user has disabled retweets from.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Use `update_follow` to enable/disable viewing retweets from a specific user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">friends_no_retweets</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDS_NO_RETWEETS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDS_NO_RETWEETS</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup relationship settings between two arbitrary users.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>relation</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>F</span>, <span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>from</span>: <span class='ident'>F</span>, <span class='ident'>to</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Relationship</span><span class='op'>&gt;</span>
-    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>,
-          <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup relationship settings between two arbitrary users.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">from</span>: <span class="ident">F</span>, <span class="ident">to</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Relationship</span><span class="op">&gt;</span>
+    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>,
+          <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='kw'>match</span> <span class='ident'>from</span>.<span class='ident'>into</span>() {
-        <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='ident'>id</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;source_id&quot;</span>, <span class='ident'>id</span>.<span class='ident'>to_string</span>()),
-        <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;source_screen_name&quot;</span>, <span class='ident'>name</span>),
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="kw">match</span> <span class="ident">from</span>.<span class="ident">into</span>() {
+        <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;source_id&quot;</span>, <span class="ident">id</span>.<span class="ident">to_string</span>()),
+        <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;source_screen_name&quot;</span>, <span class="ident">name</span>),
     };
-    <span class='kw'>match</span> <span class='ident'>to</span>.<span class='ident'>into</span>() {
-        <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='ident'>id</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;target_id&quot;</span>, <span class='ident'>id</span>.<span class='ident'>to_string</span>()),
-        <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>) <span class='op'>=&gt;</span> <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;target_screen_name&quot;</span>, <span class='ident'>name</span>),
+    <span class="kw">match</span> <span class="ident">to</span>.<span class="ident">into</span>() {
+        <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;target_id&quot;</span>, <span class="ident">id</span>.<span class="ident">to_string</span>()),
+        <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>) <span class="op">=&gt;</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;target_screen_name&quot;</span>, <span class="ident">name</span>),
     };
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDSHIP_SHOW</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDSHIP_SHOW</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Lookup the relations between the authenticated user and the given accounts.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>relation_lookup</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>accts</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>T</span>], <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>RelationLookup</span><span class='op'>&gt;&gt;</span>
-    <span class='kw'>where</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Lookup the relations between the authenticated user and the given accounts.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_lookup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">accts</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>], <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationLookup</span><span class="op">&gt;&gt;</span>
+    <span class="kw">where</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='kw'>let</span> <span class='ident'>id_param</span> <span class='op'>=</span> <span class='ident'>accts</span>.<span class='ident'>iter</span>()
-                        .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>x</span>.<span class='ident'>into</span>() {
-                            <span class='ident'>UserID</span>::<span class='ident'>ID</span>(<span class='ident'>id</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>id</span>.<span class='ident'>to_string</span>()),
-                            _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="kw">let</span> <span class="ident">id_param</span> <span class="op">=</span> <span class="ident">accts</span>.<span class="ident">iter</span>()
+                        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">into</span>() {
+                            <span class="ident">UserID</span>::<span class="ident">ID</span>(<span class="ident">id</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>.<span class="ident">to_string</span>()),
+                            _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                         })
-                        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
-                        .<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
-    <span class='kw'>let</span> <span class='ident'>name_param</span> <span class='op'>=</span> <span class='ident'>accts</span>.<span class='ident'>iter</span>()
-                          .<span class='ident'>filter_map</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='kw'>match</span> <span class='ident'>x</span>.<span class='ident'>into</span>() {
-                              <span class='ident'>UserID</span>::<span class='ident'>ScreenName</span>(<span class='ident'>name</span>) <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>name</span>),
-                              _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>,
+                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>()
+                        .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
+    <span class="kw">let</span> <span class="ident">name_param</span> <span class="op">=</span> <span class="ident">accts</span>.<span class="ident">iter</span>()
+                          .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">into</span>() {
+                              <span class="ident">UserID</span>::<span class="ident">ScreenName</span>(<span class="ident">name</span>) <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
+                              _ <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
                           })
-                          .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
-                          .<span class='ident'>join</span>(<span class='string'>&quot;,&quot;</span>);
+                          .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>_<span class="op">&gt;&gt;</span>()
+                          .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>);
 
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;user_id&quot;</span>, <span class='ident'>id_param</span>);
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;screen_name&quot;</span>, <span class='ident'>name_param</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;user_id&quot;</span>, <span class="ident">id_param</span>);
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;screen_name&quot;</span>, <span class="ident">name_param</span>);
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>get</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDSHIP_LOOKUP</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">get</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDSHIP_LOOKUP</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='comment'>//---Cursored collections---</span>
+<span class="comment">//---Cursored collections---</span>
 
-<span class='doccomment'>///Lookup users based on the given search term.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function returns an iterator over the `TwitterUser` objects returned by Twitter. Due to a</span>
-<span class='doccomment'>///limitation in the API, you can only obtain the first 1000 search results. This method defaults</span>
-<span class='doccomment'>///to returning 10 users in a single network call; the maximum is 20. See the [`UserSearch`][] page</span>
-<span class='doccomment'>///for details.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///[`UserSearch`]: struct.UserSearch.html</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>search</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>query</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>UserSearch</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup users based on the given search term.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function returns an iterator over the `TwitterUser` objects returned by Twitter. Due to a</span>
+<span class="doccomment">///limitation in the API, you can only obtain the first 1000 search results. This method defaults</span>
+<span class="doccomment">///to returning 10 users in a single network call; the maximum is 20. See the [`UserSearch`][] page</span>
+<span class="doccomment">///for details.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///[`UserSearch`]: struct.UserSearch.html</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">search</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">UserSearch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
 {
-    <span class='ident'>UserSearch</span>::<span class='ident'>new</span>(<span class='ident'>query</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>)
+    <span class="ident">UserSearch</span>::<span class="ident">new</span>(<span class="ident">query</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>)
 }
 
-<span class='doccomment'>///Lookup the users a given account follows, also called their &quot;friends&quot; within the API.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function returns an iterator over the `TwitterUser` objects returned by Twitter. This</span>
-<span class='doccomment'>///method defaults to returning 20 users in a single network call; the maximum is 200.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>friends_of</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>UserCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the users a given account follows, also called their &quot;friends&quot; within the API.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function returns an iterator over the `TwitterUser` objects returned by Twitter. This</span>
+<span class="doccomment">///method defaults to returning 20 users in a single network call; the maximum is 200.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">friends_of</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">UserCursor</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDS_LIST</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='ident'>params</span>), <span class='prelude-val'>Some</span>(<span class='number'>20</span>))
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDS_LIST</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="ident">params</span>), <span class="prelude-val">Some</span>(<span class="number">20</span>))
 }
 
-<span class='doccomment'>///Lookup the users a given account follows, also called their &quot;friends&quot; within the API, but only</span>
-<span class='doccomment'>///return their user IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function returns an iterator over the User IDs returned by Twitter. This method defaults to</span>
-<span class='doccomment'>///returning 500 IDs in a single network call; the maximum is 5000.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Choosing only to load the user IDs instead of the full user information results in a call that</span>
-<span class='doccomment'>///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
-<span class='doccomment'>///several results and don&#39;t need all the user information.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>friends_ids</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the users a given account follows, also called their &quot;friends&quot; within the API, but only</span>
+<span class="doccomment">///return their user IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function returns an iterator over the User IDs returned by Twitter. This method defaults to</span>
+<span class="doccomment">///returning 500 IDs in a single network call; the maximum is 5000.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Choosing only to load the user IDs instead of the full user information results in a call that</span>
+<span class="doccomment">///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
+<span class="doccomment">///several results and don&#39;t need all the user information.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">friends_ids</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDS_IDS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='ident'>params</span>), <span class='prelude-val'>Some</span>(<span class='number'>500</span>))
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDS_IDS</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="ident">params</span>), <span class="prelude-val">Some</span>(<span class="number">500</span>))
 }
 
-<span class='doccomment'>///Lookup the users that follow a given account.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function returns an iterator over the `TwitterUser` objects returned by Twitter. This</span>
-<span class='doccomment'>///method defaults to returning 20 users in a single network call; the maximum is 200.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>followers_of</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>UserCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the users that follow a given account.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function returns an iterator over the `TwitterUser` objects returned by Twitter. This</span>
+<span class="doccomment">///method defaults to returning 20 users in a single network call; the maximum is 200.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">followers_of</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">UserCursor</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FOLLOWERS_LIST</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='ident'>params</span>), <span class='prelude-val'>Some</span>(<span class='number'>20</span>))
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FOLLOWERS_LIST</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="ident">params</span>), <span class="prelude-val">Some</span>(<span class="number">20</span>))
 }
 
-<span class='doccomment'>///Lookup the users that follow a given account, but only return their user IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///This function returns an iterator over the User IDs returned by Twitter. This method defaults to</span>
-<span class='doccomment'>///returning 500 IDs in a single network call; the maximum is 5000.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Choosing only to load the user IDs instead of the full user information results in a call that</span>
-<span class='doccomment'>///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
-<span class='doccomment'>///several results and don&#39;t need all the user information.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>followers_ids</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the users that follow a given account, but only return their user IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///This function returns an iterator over the User IDs returned by Twitter. This method defaults to</span>
+<span class="doccomment">///returning 500 IDs in a single network call; the maximum is 5000.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Choosing only to load the user IDs instead of the full user information results in a call that</span>
+<span class="doccomment">///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
+<span class="doccomment">///several results and don&#39;t need all the user information.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">followers_ids</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FOLLOWERS_IDS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='ident'>params</span>), <span class='prelude-val'>Some</span>(<span class='number'>500</span>))
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FOLLOWERS_IDS</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="ident">params</span>), <span class="prelude-val">Some</span>(<span class="number">500</span>))
 }
 
-<span class='doccomment'>///Lookup the users that have been blocked by the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Note that while loading a user&#39;s blocks list is a cursored search, it does not allow you to set</span>
-<span class='doccomment'>///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
-<span class='doccomment'>///change the page size used by the network call. Setting `page_size` manually may result in an</span>
-<span class='doccomment'>///error from Twitter.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blocks</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>UserCursor</span><span class='op'>&gt;</span> {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>BLOCKS_LIST</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+<span class="doccomment">///Lookup the users that have been blocked by the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Note that while loading a user&#39;s blocks list is a cursored search, it does not allow you to set</span>
+<span class="doccomment">///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
+<span class="doccomment">///change the page size used by the network call. Setting `page_size` manually may result in an</span>
+<span class="doccomment">///error from Twitter.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocks</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">UserCursor</span><span class="op">&gt;</span> {
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">BLOCKS_LIST</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='doccomment'>///Lookup the users that have been blocked by the authenticated user, but only return their user</span>
-<span class='doccomment'>///IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Choosing only to load the user IDs instead of the full user information results in a call that</span>
-<span class='doccomment'>///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
-<span class='doccomment'>///several results and don&#39;t need all the user information.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Note that while loading a user&#39;s blocks list is a cursored search, it does not allow you to set</span>
-<span class='doccomment'>///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
-<span class='doccomment'>///change the page size used by the network call. Setting `page_size` manually may result in an</span>
-<span class='doccomment'>///error from Twitter.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blocks_ids</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span> {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>BLOCKS_IDS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+<span class="doccomment">///Lookup the users that have been blocked by the authenticated user, but only return their user</span>
+<span class="doccomment">///IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Choosing only to load the user IDs instead of the full user information results in a call that</span>
+<span class="doccomment">///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
+<span class="doccomment">///several results and don&#39;t need all the user information.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Note that while loading a user&#39;s blocks list is a cursored search, it does not allow you to set</span>
+<span class="doccomment">///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
+<span class="doccomment">///change the page size used by the network call. Setting `page_size` manually may result in an</span>
+<span class="doccomment">///error from Twitter.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blocks_ids</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span> {
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">BLOCKS_IDS</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='doccomment'>///Lookup the users that have been muted by the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Note that while loading a user&#39;s mutes list is a cursored search, it does not allow you to set</span>
-<span class='doccomment'>///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
-<span class='doccomment'>///change the page size used by the network call. Setting `page_size` manually may result in an</span>
-<span class='doccomment'>///error from Twitter.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mutes</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>UserCursor</span><span class='op'>&gt;</span> {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>MUTES_LIST</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+<span class="doccomment">///Lookup the users that have been muted by the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Note that while loading a user&#39;s mutes list is a cursored search, it does not allow you to set</span>
+<span class="doccomment">///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
+<span class="doccomment">///change the page size used by the network call. Setting `page_size` manually may result in an</span>
+<span class="doccomment">///error from Twitter.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">UserCursor</span><span class="op">&gt;</span> {
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">MUTES_LIST</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='doccomment'>///Lookup the users that have been muted by the authenticated user, but only return their user IDs.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Choosing only to load the user IDs instead of the full user information results in a call that</span>
-<span class='doccomment'>///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
-<span class='doccomment'>///several results and don&#39;t need all the user information.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Note that while loading a user&#39;s mutes list is a cursored search, it does not allow you to set</span>
-<span class='doccomment'>///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
-<span class='doccomment'>///change the page size used by the network call. Setting `page_size` manually may result in an</span>
-<span class='doccomment'>///error from Twitter.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mutes_ids</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span> {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>MUTES_IDS</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+<span class="doccomment">///Lookup the users that have been muted by the authenticated user, but only return their user IDs.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Choosing only to load the user IDs instead of the full user information results in a call that</span>
+<span class="doccomment">///can return more accounts per-page, which can be useful if you anticipate having to page through</span>
+<span class="doccomment">///several results and don&#39;t need all the user information.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Note that while loading a user&#39;s mutes list is a cursored search, it does not allow you to set</span>
+<span class="doccomment">///the page size. Calling `with_page_size` on the iterator returned by this function will not</span>
+<span class="doccomment">///change the page size used by the network call. Setting `page_size` manually may result in an</span>
+<span class="doccomment">///error from Twitter.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mutes_ids</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>) <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span> {
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">MUTES_IDS</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='doccomment'>///Lookup the user IDs who have pending requests to follow the authenticated protected user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///If the authenticated user is not a protected account, this will return an empty collection.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>incoming_requests</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the user IDs who have pending requests to follow the authenticated protected user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///If the authenticated user is not a protected account, this will return an empty collection.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">incoming_requests</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span>
 {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDSHIPS_INCOMING</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDSHIPS_INCOMING</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='doccomment'>///Lookup the user IDs with which the authenticating user has a pending follow request.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>outgoing_requests</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>cursor</span>::<span class='ident'>IDCursor</span><span class='op'>&gt;</span>
+<span class="doccomment">///Lookup the user IDs with which the authenticating user has a pending follow request.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">outgoing_requests</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">cursor</span>::<span class="ident">CursorIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">cursor</span>::<span class="ident">IDCursor</span><span class="op">&gt;</span>
 {
-    <span class='ident'>cursor</span>::<span class='ident'>CursorIter</span>::<span class='ident'>new</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDSHIPS_OUTGOING</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>None</span>, <span class='prelude-val'>None</span>)
+    <span class="ident">cursor</span>::<span class="ident">CursorIter</span>::<span class="ident">new</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDSHIPS_OUTGOING</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
 }
 
-<span class='comment'>//---User actions---</span>
+<span class="comment">//---User actions---</span>
 
-<span class='doccomment'>///Follow the given account with the authenticated user, and set whether device notifications</span>
-<span class='doccomment'>///should be enabled.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the user that was just followed, even when</span>
-<span class='doccomment'>///following a protected account. In the latter case, this indicates that the follow request was</span>
-<span class='doccomment'>///successfully sent.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Calling this with an account the user already follows may return an error, or (&quot;for performance</span>
-<span class='doccomment'>///reasons&quot;) may return success without changing any account settings.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>follow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>notifications</span>: <span class='ident'>bool</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Follow the given account with the authenticated user, and set whether device notifications</span>
+<span class="doccomment">///should be enabled.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the user that was just followed, even when</span>
+<span class="doccomment">///following a protected account. In the latter case, this indicates that the follow request was</span>
+<span class="doccomment">///successfully sent.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Calling this with an account the user already follows may return an error, or (&quot;for performance</span>
+<span class="doccomment">///reasons&quot;) may return success without changing any account settings.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">follow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">notifications</span>: <span class="ident">bool</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;follow&quot;</span>, <span class='ident'>notifications</span>.<span class='ident'>to_string</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;follow&quot;</span>, <span class="ident">notifications</span>.<span class="ident">to_string</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FOLLOW</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FOLLOW</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Unfollow the given account with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the user that was just unfollowed.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Calling this with an account the user doesn&#39;t follow will return success, even though it doesn&#39;t</span>
-<span class='doccomment'>///change any settings.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unfollow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Unfollow the given account with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the user that was just unfollowed.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Calling this with an account the user doesn&#39;t follow will return success, even though it doesn&#39;t</span>
+<span class="doccomment">///change any settings.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unfollow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>UNFOLLOW</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">UNFOLLOW</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Update notification settings and reweet visibility for the given user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Calling this for an account the authenticated user does not already follow will not cause them</span>
-<span class='doccomment'>///to follow that user. It will return an error if you pass `Some(true)` for `notifications` or</span>
-<span class='doccomment'>///`Some(false)` for `retweets`. Any other combination of arguments will return a `Relationship` as</span>
-<span class='doccomment'>///if you had called `relation` between the authenticated user and the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>update_follow</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>notifications</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>, <span class='ident'>retweets</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>,
-                            <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>Relationship</span><span class='op'>&gt;</span>
-    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span>
+<span class="doccomment">///Update notification settings and reweet visibility for the given user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Calling this for an account the authenticated user does not already follow will not cause them</span>
+<span class="doccomment">///to follow that user. It will return an error if you pass `Some(true)` for `notifications` or</span>
+<span class="doccomment">///`Some(false)` for `retweets`. Any other combination of arguments will return a `Relationship` as</span>
+<span class="doccomment">///if you had called `relation` between the authenticated user and the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_follow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">notifications</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">retweets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+                            <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">Relationship</span><span class="op">&gt;</span>
+    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>notifications</span>) <span class='op'>=</span> <span class='ident'>notifications</span> {
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;device&quot;</span>, <span class='ident'>notifications</span>.<span class='ident'>to_string</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">notifications</span>) <span class="op">=</span> <span class="ident">notifications</span> {
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;device&quot;</span>, <span class="ident">notifications</span>.<span class="ident">to_string</span>());
     }
-    <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>retweets</span>) <span class='op'>=</span> <span class='ident'>retweets</span> {
-        <span class='ident'>add_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='string'>&quot;retweets&quot;</span>, <span class='ident'>retweets</span>.<span class='ident'>to_string</span>());
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">retweets</span>) <span class="op">=</span> <span class="ident">retweets</span> {
+        <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="string">&quot;retweets&quot;</span>, <span class="ident">retweets</span>.<span class="ident">to_string</span>());
     }
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>FRIENDSHIP_UPDATE</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">FRIENDSHIP_UPDATE</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Block the given account with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>block</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Block the given account with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>BLOCK</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">BLOCK</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Block the given account and report it for spam, with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>report_spam</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Block the given account and report it for spam, with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">report_spam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>REPORT_SPAM</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">REPORT_SPAM</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Unblock the given user with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unblock</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Unblock the given user with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unblock</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>UNBLOCK</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">UNBLOCK</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Mute the given user with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mute</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Mute the given user with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>MUTE</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">MUTE</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 
-<span class='doccomment'>///Unmute the given user with the authenticated user.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>///Upon success, this function returns `Ok` with the given user.</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unmute</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Into</span><span class='op'>&lt;</span><span class='ident'>UserID</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>(<span class='ident'>acct</span>: <span class='ident'>T</span>, <span class='ident'>con_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>, <span class='ident'>access_token</span>: <span class='kw-2'>&amp;</span><span class='ident'>auth</span>::<span class='ident'>Token</span>)
-    <span class='op'>-&gt;</span> <span class='ident'>WebResponse</span><span class='op'>&lt;</span><span class='ident'>TwitterUser</span><span class='op'>&gt;</span>
+<span class="doccomment">///Unmute the given user with the authenticated user.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///Upon success, this function returns `Ok` with the given user.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserID</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>(<span class="ident">acct</span>: <span class="ident">T</span>, <span class="ident">con_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>, <span class="ident">access_token</span>: <span class="kw-2">&amp;</span><span class="ident">auth</span>::<span class="ident">Token</span>)
+    <span class="op">-&gt;</span> <span class="ident">WebResponse</span><span class="op">&lt;</span><span class="ident">TwitterUser</span><span class="op">&gt;</span>
 {
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>params</span> <span class='op'>=</span> <span class='ident'>HashMap</span>::<span class='ident'>new</span>();
-    <span class='ident'>add_name_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>params</span>, <span class='kw-2'>&amp;</span><span class='ident'>acct</span>.<span class='ident'>into</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
+    <span class="ident">add_name_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">acct</span>.<span class="ident">into</span>());
 
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>resp</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>auth</span>::<span class='ident'>post</span>(<span class='ident'>links</span>::<span class='ident'>users</span>::<span class='ident'>UNMUTE</span>, <span class='ident'>con_token</span>, <span class='ident'>access_token</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='ident'>params</span>)));
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="macro">try</span><span class="macro">!</span>(<span class="ident">auth</span>::<span class="ident">post</span>(<span class="ident">links</span>::<span class="ident">users</span>::<span class="ident">UNMUTE</span>, <span class="ident">con_token</span>, <span class="ident">access_token</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>)));
 
-    <span class='ident'>parse_response</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>resp</span>)
+    <span class="ident">parse_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">resp</span>)
 }
 </pre>
 </section>
@@ -1069,18 +1081,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1113,7 +1129,6 @@
         window.rootPath = "../../../";
         window.currentCrate = "egg_mode";
     </script>
-    <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     <script defer src="../../../search-index.js"></script>
 </body>

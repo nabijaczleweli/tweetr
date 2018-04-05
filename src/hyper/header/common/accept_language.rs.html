@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/header/common/accept_language.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/header/common/accept_language.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>accept_language.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css" id="themeStyle">
+    <script src="../../../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -112,77 +124,77 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-</pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>language_tags</span>::<span class='ident'>LanguageTag</span>;
-<span class='kw'>use</span> <span class='ident'>header</span>::<span class='ident'>QualityItem</span>;
+</pre><pre class="rust ">
+<span class="kw">use</span> <span class="ident">language_tags</span>::<span class="ident">LanguageTag</span>;
+<span class="kw">use</span> <span class="ident">header</span>::<span class="ident">QualityItem</span>;
 
-<span class='macro'>header</span><span class='macro'>!</span> {
-    <span class='doccomment'>/// `Accept-Language` header, defined in</span>
-    <span class='doccomment'>/// [RFC7231](http://tools.ietf.org/html/rfc7231#section-5.3.5)</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The `Accept-Language` header field can be used by user agents to</span>
-    <span class='doccomment'>/// indicate the set of natural languages that are preferred in the</span>
-    <span class='doccomment'>/// response.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # ABNF</span>
-    <span class='doccomment'>/// ```plain</span>
-    <span class='doccomment'>/// Accept-Language = 1#( language-range [ weight ] )</span>
-    <span class='doccomment'>/// language-range  = &lt;language-range, see [RFC4647], Section 2.1&gt;</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Example values</span>
-    <span class='doccomment'>/// * `da, en-gb;q=0.8, en;q=0.7`</span>
-    <span class='doccomment'>/// * `en-us;q=1.0, en;q=0.5, fr`</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use hyper::LanguageTag;</span>
-    <span class='doccomment'>/// use hyper::header::{Headers, AcceptLanguage, qitem};</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// let mut langtag: LanguageTag = Default::default();</span>
-    <span class='doccomment'>/// langtag.language = Some(&quot;en&quot;.to_owned());</span>
-    <span class='doccomment'>/// langtag.region = Some(&quot;US&quot;.to_owned());</span>
-    <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     AcceptLanguage(vec![</span>
-    <span class='doccomment'>///         qitem(langtag),</span>
-    <span class='doccomment'>///     ])</span>
-    <span class='doccomment'>/// );</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// # extern crate hyper;</span>
-    <span class='doccomment'>/// # #[macro_use] extern crate language_tags;</span>
-    <span class='doccomment'>/// # use hyper::header::{Headers, AcceptLanguage, QualityItem, Quality, qitem};</span>
-    <span class='doccomment'>/// #</span>
-    <span class='doccomment'>/// # fn main() {</span>
-    <span class='doccomment'>/// let mut headers = Headers::new();</span>
-    <span class='doccomment'>/// headers.set(</span>
-    <span class='doccomment'>///     AcceptLanguage(vec![</span>
-    <span class='doccomment'>///         qitem(langtag!(da)),</span>
-    <span class='doccomment'>///         QualityItem::new(langtag!(en;;;GB), Quality(800)),</span>
-    <span class='doccomment'>///         QualityItem::new(langtag!(en), Quality(700)),</span>
-    <span class='doccomment'>///     ])</span>
-    <span class='doccomment'>/// );</span>
-    <span class='doccomment'>/// # }</span>
-    <span class='doccomment'>/// ```</span>
-    (<span class='ident'>AcceptLanguage</span>, <span class='string'>&quot;Accept-Language&quot;</span>) <span class='op'>=&gt;</span> (<span class='ident'>QualityItem</span><span class='op'>&lt;</span><span class='ident'>LanguageTag</span><span class='op'>&gt;</span>)<span class='op'>+</span>
+<span class="macro">header</span><span class="macro">!</span> {
+    <span class="doccomment">/// `Accept-Language` header, defined in</span>
+    <span class="doccomment">/// [RFC7231](http://tools.ietf.org/html/rfc7231#section-5.3.5)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `Accept-Language` header field can be used by user agents to</span>
+    <span class="doccomment">/// indicate the set of natural languages that are preferred in the</span>
+    <span class="doccomment">/// response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # ABNF</span>
+    <span class="doccomment">/// ```plain</span>
+    <span class="doccomment">/// Accept-Language = 1#( language-range [ weight ] )</span>
+    <span class="doccomment">/// language-range  = &lt;language-range, see [RFC4647], Section 2.1&gt;</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example values</span>
+    <span class="doccomment">/// * `da, en-gb;q=0.8, en;q=0.7`</span>
+    <span class="doccomment">/// * `en-us;q=1.0, en;q=0.5, fr`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use hyper::LanguageTag;</span>
+    <span class="doccomment">/// use hyper::header::{Headers, AcceptLanguage, qitem};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// let mut langtag: LanguageTag = Default::default();</span>
+    <span class="doccomment">/// langtag.language = Some(&quot;en&quot;.to_owned());</span>
+    <span class="doccomment">/// langtag.region = Some(&quot;US&quot;.to_owned());</span>
+    <span class="doccomment">/// headers.set(</span>
+    <span class="doccomment">///     AcceptLanguage(vec![</span>
+    <span class="doccomment">///         qitem(langtag),</span>
+    <span class="doccomment">///     ])</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # extern crate hyper;</span>
+    <span class="doccomment">/// # #[macro_use] extern crate language_tags;</span>
+    <span class="doccomment">/// # use hyper::header::{Headers, AcceptLanguage, QualityItem, Quality, qitem};</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # fn main() {</span>
+    <span class="doccomment">/// let mut headers = Headers::new();</span>
+    <span class="doccomment">/// headers.set(</span>
+    <span class="doccomment">///     AcceptLanguage(vec![</span>
+    <span class="doccomment">///         qitem(langtag!(da)),</span>
+    <span class="doccomment">///         QualityItem::new(langtag!(en;;;GB), Quality(800)),</span>
+    <span class="doccomment">///         QualityItem::new(langtag!(en), Quality(700)),</span>
+    <span class="doccomment">///     ])</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    (<span class="ident">AcceptLanguage</span>, <span class="string">&quot;Accept-Language&quot;</span>) <span class="op">=&gt;</span> (<span class="ident">QualityItem</span><span class="op">&lt;</span><span class="ident">LanguageTag</span><span class="op">&gt;</span>)<span class="op">+</span>
 
-    <span class='ident'>test_accept_language</span> {
-        <span class='comment'>// From the RFC</span>
-        <span class='macro'>test_header</span><span class='macro'>!</span>(<span class='ident'>test1</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;da, en-gb;q=0.8, en;q=0.7&quot;</span>]);
-        <span class='comment'>// Own test</span>
-        <span class='macro'>test_header</span><span class='macro'>!</span>(
-            <span class='ident'>test2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;en-US, en; q=0.5, fr&quot;</span>],
-            <span class='prelude-val'>Some</span>(<span class='ident'>AcceptLanguage</span>(<span class='macro'>vec</span><span class='macro'>!</span>[
-                <span class='ident'>qitem</span>(<span class='macro'>langtag</span><span class='macro'>!</span>(<span class='ident'>en</span>;;;<span class='ident'>US</span>)),
-                <span class='ident'>QualityItem</span>::<span class='ident'>new</span>(<span class='macro'>langtag</span><span class='macro'>!</span>(<span class='ident'>en</span>), <span class='ident'>Quality</span>(<span class='number'>500</span>)),
-                <span class='ident'>qitem</span>(<span class='macro'>langtag</span><span class='macro'>!</span>(<span class='ident'>fr</span>)),
+    <span class="ident">test_accept_language</span> {
+        <span class="comment">// From the RFC</span>
+        <span class="macro">test_header</span><span class="macro">!</span>(<span class="ident">test1</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;da, en-gb;q=0.8, en;q=0.7&quot;</span>]);
+        <span class="comment">// Own test</span>
+        <span class="macro">test_header</span><span class="macro">!</span>(
+            <span class="ident">test2</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;en-US, en; q=0.5, fr&quot;</span>],
+            <span class="prelude-val">Some</span>(<span class="ident">AcceptLanguage</span>(<span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">qitem</span>(<span class="macro">langtag</span><span class="macro">!</span>(<span class="ident">en</span>;;;<span class="ident">US</span>)),
+                <span class="ident">QualityItem</span>::<span class="ident">new</span>(<span class="macro">langtag</span><span class="macro">!</span>(<span class="ident">en</span>), <span class="ident">Quality</span>(<span class="number">500</span>)),
+                <span class="ident">qitem</span>(<span class="macro">langtag</span><span class="macro">!</span>(<span class="ident">fr</span>)),
         ])));
     }
 }
 
-<span class='macro'>bench_header</span><span class='macro'>!</span>(<span class='ident'>bench</span>, <span class='ident'>AcceptLanguage</span>,
-              { <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>b&quot;en-us;q=1.0, en;q=0.5, fr&quot;</span>.<span class='ident'>to_vec</span>()] });
+<span class="macro">bench_header</span><span class="macro">!</span>(<span class="ident">bench</span>, <span class="ident">AcceptLanguage</span>,
+              { <span class="macro">vec</span><span class="macro">!</span>[<span class="string">b&quot;en-us;q=1.0, en;q=0.5, fr&quot;</span>.<span class="ident">to_vec</span>()] });
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -197,18 +209,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -241,7 +257,6 @@
         window.rootPath = "../../../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>

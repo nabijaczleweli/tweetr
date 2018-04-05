@@ -9,14 +9,18 @@
 
     <title>blake2s.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -566,529 +578,529 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-</pre><pre class='rust '>
-<span class='comment'>// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class='comment'>// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class='comment'>// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class='comment'>// option. This file may not be copied, modified, or distributed</span>
-<span class='comment'>// except according to those terms.</span>
+</pre><pre class="rust ">
+<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="comment">// option. This file may not be copied, modified, or distributed</span>
+<span class="comment">// except according to those terms.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>repeat</span>;
-<span class='kw'>use</span> <span class='ident'>cryptoutil</span>::{<span class='ident'>copy_memory</span>, <span class='ident'>read_u32v_le</span>, <span class='ident'>write_u32v_le</span>};
-<span class='kw'>use</span> <span class='ident'>digest</span>::<span class='ident'>Digest</span>;
-<span class='kw'>use</span> <span class='ident'>mac</span>::{<span class='ident'>Mac</span>, <span class='ident'>MacResult</span>};
-<span class='kw'>use</span> <span class='ident'>util</span>::<span class='ident'>secure_memset</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">repeat</span>;
+<span class="kw">use</span> <span class="ident">cryptoutil</span>::{<span class="ident">copy_memory</span>, <span class="ident">read_u32v_le</span>, <span class="ident">write_u32v_le</span>};
+<span class="kw">use</span> <span class="ident">digest</span>::<span class="ident">Digest</span>;
+<span class="kw">use</span> <span class="ident">mac</span>::{<span class="ident">Mac</span>, <span class="ident">MacResult</span>};
+<span class="kw">use</span> <span class="ident">util</span>::<span class="ident">secure_memset</span>;
 
-<span class='kw'>static</span> <span class='ident'>IV</span> : [<span class='ident'>u32</span>; <span class='number'>8</span>] <span class='op'>=</span> [
-  <span class='number'>0x6A09E667</span>, <span class='number'>0xBB67AE85</span>, <span class='number'>0x3C6EF372</span>, <span class='number'>0xA54FF53A</span>,
-  <span class='number'>0x510E527F</span>, <span class='number'>0x9B05688C</span>, <span class='number'>0x1F83D9AB</span>, <span class='number'>0x5BE0CD19</span>
+<span class="kw">static</span> <span class="ident">IV</span> : [<span class="ident">u32</span>; <span class="number">8</span>] <span class="op">=</span> [
+  <span class="number">0x6A09E667</span>, <span class="number">0xBB67AE85</span>, <span class="number">0x3C6EF372</span>, <span class="number">0xA54FF53A</span>,
+  <span class="number">0x510E527F</span>, <span class="number">0x9B05688C</span>, <span class="number">0x1F83D9AB</span>, <span class="number">0x5BE0CD19</span>
 ];
 
-<span class='kw'>static</span> <span class='ident'>SIGMA</span> : [[<span class='ident'>usize</span>; <span class='number'>16</span>]; <span class='number'>10</span>] <span class='op'>=</span> [
-  [  <span class='number'>0</span>,  <span class='number'>1</span>,  <span class='number'>2</span>,  <span class='number'>3</span>,  <span class='number'>4</span>,  <span class='number'>5</span>,  <span class='number'>6</span>,  <span class='number'>7</span>,  <span class='number'>8</span>,  <span class='number'>9</span>, <span class='number'>10</span>, <span class='number'>11</span>, <span class='number'>12</span>, <span class='number'>13</span>, <span class='number'>14</span>, <span class='number'>15</span> ],
-  [ <span class='number'>14</span>, <span class='number'>10</span>,  <span class='number'>4</span>,  <span class='number'>8</span>,  <span class='number'>9</span>, <span class='number'>15</span>, <span class='number'>13</span>,  <span class='number'>6</span>,  <span class='number'>1</span>, <span class='number'>12</span>,  <span class='number'>0</span>,  <span class='number'>2</span>, <span class='number'>11</span>,  <span class='number'>7</span>,  <span class='number'>5</span>,  <span class='number'>3</span> ],
-  [ <span class='number'>11</span>,  <span class='number'>8</span>, <span class='number'>12</span>,  <span class='number'>0</span>,  <span class='number'>5</span>,  <span class='number'>2</span>, <span class='number'>15</span>, <span class='number'>13</span>, <span class='number'>10</span>, <span class='number'>14</span>,  <span class='number'>3</span>,  <span class='number'>6</span>,  <span class='number'>7</span>,  <span class='number'>1</span>,  <span class='number'>9</span>,  <span class='number'>4</span> ],
-  [  <span class='number'>7</span>,  <span class='number'>9</span>,  <span class='number'>3</span>,  <span class='number'>1</span>, <span class='number'>13</span>, <span class='number'>12</span>, <span class='number'>11</span>, <span class='number'>14</span>,  <span class='number'>2</span>,  <span class='number'>6</span>,  <span class='number'>5</span>, <span class='number'>10</span>,  <span class='number'>4</span>,  <span class='number'>0</span>, <span class='number'>15</span>,  <span class='number'>8</span> ],
-  [  <span class='number'>9</span>,  <span class='number'>0</span>,  <span class='number'>5</span>,  <span class='number'>7</span>,  <span class='number'>2</span>,  <span class='number'>4</span>, <span class='number'>10</span>, <span class='number'>15</span>, <span class='number'>14</span>,  <span class='number'>1</span>, <span class='number'>11</span>, <span class='number'>12</span>,  <span class='number'>6</span>,  <span class='number'>8</span>,  <span class='number'>3</span>, <span class='number'>13</span> ],
-  [  <span class='number'>2</span>, <span class='number'>12</span>,  <span class='number'>6</span>, <span class='number'>10</span>,  <span class='number'>0</span>, <span class='number'>11</span>,  <span class='number'>8</span>,  <span class='number'>3</span>,  <span class='number'>4</span>, <span class='number'>13</span>,  <span class='number'>7</span>,  <span class='number'>5</span>, <span class='number'>15</span>, <span class='number'>14</span>,  <span class='number'>1</span>,  <span class='number'>9</span> ],
-  [ <span class='number'>12</span>,  <span class='number'>5</span>,  <span class='number'>1</span>, <span class='number'>15</span>, <span class='number'>14</span>, <span class='number'>13</span>,  <span class='number'>4</span>, <span class='number'>10</span>,  <span class='number'>0</span>,  <span class='number'>7</span>,  <span class='number'>6</span>,  <span class='number'>3</span>,  <span class='number'>9</span>,  <span class='number'>2</span>,  <span class='number'>8</span>, <span class='number'>11</span> ],
-  [ <span class='number'>13</span>, <span class='number'>11</span>,  <span class='number'>7</span>, <span class='number'>14</span>, <span class='number'>12</span>,  <span class='number'>1</span>,  <span class='number'>3</span>,  <span class='number'>9</span>,  <span class='number'>5</span>,  <span class='number'>0</span>, <span class='number'>15</span>,  <span class='number'>4</span>,  <span class='number'>8</span>,  <span class='number'>6</span>,  <span class='number'>2</span>, <span class='number'>10</span> ],
-  [  <span class='number'>6</span>, <span class='number'>15</span>, <span class='number'>14</span>,  <span class='number'>9</span>, <span class='number'>11</span>,  <span class='number'>3</span>,  <span class='number'>0</span>,  <span class='number'>8</span>, <span class='number'>12</span>,  <span class='number'>2</span>, <span class='number'>13</span>,  <span class='number'>7</span>,  <span class='number'>1</span>,  <span class='number'>4</span>, <span class='number'>10</span>,  <span class='number'>5</span> ],
-  [ <span class='number'>10</span>,  <span class='number'>2</span>,  <span class='number'>8</span>,  <span class='number'>4</span>,  <span class='number'>7</span>,  <span class='number'>6</span>,  <span class='number'>1</span>,  <span class='number'>5</span>, <span class='number'>15</span>, <span class='number'>11</span>,  <span class='number'>9</span>, <span class='number'>14</span>,  <span class='number'>3</span>, <span class='number'>12</span>, <span class='number'>13</span> , <span class='number'>0</span> ]
+<span class="kw">static</span> <span class="ident">SIGMA</span> : [[<span class="ident">usize</span>; <span class="number">16</span>]; <span class="number">10</span>] <span class="op">=</span> [
+  [  <span class="number">0</span>,  <span class="number">1</span>,  <span class="number">2</span>,  <span class="number">3</span>,  <span class="number">4</span>,  <span class="number">5</span>,  <span class="number">6</span>,  <span class="number">7</span>,  <span class="number">8</span>,  <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">15</span> ],
+  [ <span class="number">14</span>, <span class="number">10</span>,  <span class="number">4</span>,  <span class="number">8</span>,  <span class="number">9</span>, <span class="number">15</span>, <span class="number">13</span>,  <span class="number">6</span>,  <span class="number">1</span>, <span class="number">12</span>,  <span class="number">0</span>,  <span class="number">2</span>, <span class="number">11</span>,  <span class="number">7</span>,  <span class="number">5</span>,  <span class="number">3</span> ],
+  [ <span class="number">11</span>,  <span class="number">8</span>, <span class="number">12</span>,  <span class="number">0</span>,  <span class="number">5</span>,  <span class="number">2</span>, <span class="number">15</span>, <span class="number">13</span>, <span class="number">10</span>, <span class="number">14</span>,  <span class="number">3</span>,  <span class="number">6</span>,  <span class="number">7</span>,  <span class="number">1</span>,  <span class="number">9</span>,  <span class="number">4</span> ],
+  [  <span class="number">7</span>,  <span class="number">9</span>,  <span class="number">3</span>,  <span class="number">1</span>, <span class="number">13</span>, <span class="number">12</span>, <span class="number">11</span>, <span class="number">14</span>,  <span class="number">2</span>,  <span class="number">6</span>,  <span class="number">5</span>, <span class="number">10</span>,  <span class="number">4</span>,  <span class="number">0</span>, <span class="number">15</span>,  <span class="number">8</span> ],
+  [  <span class="number">9</span>,  <span class="number">0</span>,  <span class="number">5</span>,  <span class="number">7</span>,  <span class="number">2</span>,  <span class="number">4</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">14</span>,  <span class="number">1</span>, <span class="number">11</span>, <span class="number">12</span>,  <span class="number">6</span>,  <span class="number">8</span>,  <span class="number">3</span>, <span class="number">13</span> ],
+  [  <span class="number">2</span>, <span class="number">12</span>,  <span class="number">6</span>, <span class="number">10</span>,  <span class="number">0</span>, <span class="number">11</span>,  <span class="number">8</span>,  <span class="number">3</span>,  <span class="number">4</span>, <span class="number">13</span>,  <span class="number">7</span>,  <span class="number">5</span>, <span class="number">15</span>, <span class="number">14</span>,  <span class="number">1</span>,  <span class="number">9</span> ],
+  [ <span class="number">12</span>,  <span class="number">5</span>,  <span class="number">1</span>, <span class="number">15</span>, <span class="number">14</span>, <span class="number">13</span>,  <span class="number">4</span>, <span class="number">10</span>,  <span class="number">0</span>,  <span class="number">7</span>,  <span class="number">6</span>,  <span class="number">3</span>,  <span class="number">9</span>,  <span class="number">2</span>,  <span class="number">8</span>, <span class="number">11</span> ],
+  [ <span class="number">13</span>, <span class="number">11</span>,  <span class="number">7</span>, <span class="number">14</span>, <span class="number">12</span>,  <span class="number">1</span>,  <span class="number">3</span>,  <span class="number">9</span>,  <span class="number">5</span>,  <span class="number">0</span>, <span class="number">15</span>,  <span class="number">4</span>,  <span class="number">8</span>,  <span class="number">6</span>,  <span class="number">2</span>, <span class="number">10</span> ],
+  [  <span class="number">6</span>, <span class="number">15</span>, <span class="number">14</span>,  <span class="number">9</span>, <span class="number">11</span>,  <span class="number">3</span>,  <span class="number">0</span>,  <span class="number">8</span>, <span class="number">12</span>,  <span class="number">2</span>, <span class="number">13</span>,  <span class="number">7</span>,  <span class="number">1</span>,  <span class="number">4</span>, <span class="number">10</span>,  <span class="number">5</span> ],
+  [ <span class="number">10</span>,  <span class="number">2</span>,  <span class="number">8</span>,  <span class="number">4</span>,  <span class="number">7</span>,  <span class="number">6</span>,  <span class="number">1</span>,  <span class="number">5</span>, <span class="number">15</span>, <span class="number">11</span>,  <span class="number">9</span>, <span class="number">14</span>,  <span class="number">3</span>, <span class="number">12</span>, <span class="number">13</span> , <span class="number">0</span> ]
 ];
 
-<span class='kw'>const</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span> : <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>64</span>;
-<span class='kw'>const</span> <span class='ident'>BLAKE2S_OUTBYTES</span> : <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>32</span>;
-<span class='kw'>const</span> <span class='ident'>BLAKE2S_KEYBYTES</span> : <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>32</span>;
-<span class='kw'>const</span> <span class='ident'>BLAKE2S_SALTBYTES</span> : <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>8</span>;
-<span class='kw'>const</span> <span class='ident'>BLAKE2S_PERSONALBYTES</span> : <span class='ident'>usize</span> <span class='op'>=</span> <span class='number'>8</span>;
+<span class="kw">const</span> <span class="ident">BLAKE2S_BLOCKBYTES</span> : <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
+<span class="kw">const</span> <span class="ident">BLAKE2S_OUTBYTES</span> : <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">const</span> <span class="ident">BLAKE2S_KEYBYTES</span> : <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">const</span> <span class="ident">BLAKE2S_SALTBYTES</span> : <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="kw">const</span> <span class="ident">BLAKE2S_PERSONALBYTES</span> : <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Blake2s</span> {
-    <span class='ident'>h</span>: [<span class='ident'>u32</span>; <span class='number'>8</span>],
-    <span class='ident'>t</span>: [<span class='ident'>u32</span>; <span class='number'>2</span>],
-    <span class='ident'>f</span>: [<span class='ident'>u32</span>; <span class='number'>2</span>],
-    <span class='ident'>buf</span>: [<span class='ident'>u8</span>; <span class='number'>2</span><span class='op'>*</span><span class='ident'>BLAKE2S_BLOCKBYTES</span>],
-    <span class='ident'>buflen</span>: <span class='ident'>usize</span>,
-    <span class='ident'>key</span>: [<span class='ident'>u8</span>; <span class='ident'>BLAKE2S_KEYBYTES</span>],
-    <span class='ident'>key_length</span>: <span class='ident'>u8</span>,
-    <span class='ident'>last_node</span>: <span class='ident'>u8</span>,
-    <span class='ident'>digest_length</span>: <span class='ident'>u8</span>,
-    <span class='ident'>computed</span>: <span class='ident'>bool</span>, <span class='comment'>// whether the final digest has been computed</span>
-    <span class='ident'>param</span>: <span class='ident'>Blake2sParam</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Blake2s</span> {
+    <span class="ident">h</span>: [<span class="ident">u32</span>; <span class="number">8</span>],
+    <span class="ident">t</span>: [<span class="ident">u32</span>; <span class="number">2</span>],
+    <span class="ident">f</span>: [<span class="ident">u32</span>; <span class="number">2</span>],
+    <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">2</span><span class="kw-2">*</span><span class="ident">BLAKE2S_BLOCKBYTES</span>],
+    <span class="ident">buflen</span>: <span class="ident">usize</span>,
+    <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="ident">BLAKE2S_KEYBYTES</span>],
+    <span class="ident">key_length</span>: <span class="ident">u8</span>,
+    <span class="ident">last_node</span>: <span class="ident">u8</span>,
+    <span class="ident">digest_length</span>: <span class="ident">u8</span>,
+    <span class="ident">computed</span>: <span class="ident">bool</span>, <span class="comment">// whether the final digest has been computed</span>
+    <span class="ident">param</span>: <span class="ident">Blake2sParam</span>
 }
 
-<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>Blake2s</span> { <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Blake2s</span> { <span class='op'>*</span><span class='self'>self</span> } }
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Blake2s</span> { <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Blake2s</span> { <span class="kw-2">*</span><span class="self">self</span> } }
 
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Copy</span>, <span class='ident'>Clone</span>)]</span>
-<span class='kw'>struct</span> <span class='ident'>Blake2sParam</span> {
-    <span class='ident'>digest_length</span>: <span class='ident'>u8</span>,
-    <span class='ident'>key_length</span>: <span class='ident'>u8</span>,
-    <span class='ident'>fanout</span>: <span class='ident'>u8</span>,
-    <span class='ident'>depth</span>: <span class='ident'>u8</span>,
-    <span class='ident'>leaf_length</span>: <span class='ident'>u32</span>,
-    <span class='ident'>node_offset</span>: [<span class='ident'>u8</span>; <span class='number'>6</span>],
-    <span class='ident'>node_depth</span>: <span class='ident'>u8</span>,
-    <span class='ident'>inner_length</span>: <span class='ident'>u8</span>,
-    <span class='ident'>salt</span>: [<span class='ident'>u8</span>; <span class='ident'>BLAKE2S_SALTBYTES</span>],
-    <span class='ident'>personal</span>: [<span class='ident'>u8</span>; <span class='ident'>BLAKE2S_PERSONALBYTES</span>],
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Blake2sParam</span> {
+    <span class="ident">digest_length</span>: <span class="ident">u8</span>,
+    <span class="ident">key_length</span>: <span class="ident">u8</span>,
+    <span class="ident">fanout</span>: <span class="ident">u8</span>,
+    <span class="ident">depth</span>: <span class="ident">u8</span>,
+    <span class="ident">leaf_length</span>: <span class="ident">u32</span>,
+    <span class="ident">node_offset</span>: [<span class="ident">u8</span>; <span class="number">6</span>],
+    <span class="ident">node_depth</span>: <span class="ident">u8</span>,
+    <span class="ident">inner_length</span>: <span class="ident">u8</span>,
+    <span class="ident">salt</span>: [<span class="ident">u8</span>; <span class="ident">BLAKE2S_SALTBYTES</span>],
+    <span class="ident">personal</span>: [<span class="ident">u8</span>; <span class="ident">BLAKE2S_PERSONALBYTES</span>],
 }
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>G</span>( (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> ({
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>.<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>).<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>[<span class='ident'>SIGMA</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>][<span class='number'>2</span><span class='op'>*</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span><span class='op'>+</span><span class='number'>0</span>]]);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span> <span class='op'>=</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span> <span class='op'>^</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>).<span class='ident'>rotate_right</span>(<span class='number'>16</span>);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span>);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span> <span class='op'>=</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span> <span class='op'>^</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>).<span class='ident'>rotate_right</span>(<span class='number'>12</span>);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>.<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span>).<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>[<span class='ident'>SIGMA</span>[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>][<span class='number'>2</span><span class='op'>*</span><span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span><span class='op'>+</span><span class='number'>1</span>]]);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span> <span class='op'>=</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span> <span class='op'>^</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>a</span>).<span class='ident'>rotate_right</span>(<span class='number'>8</span>);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>.<span class='ident'>wrapping_add</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>d</span>);
-    <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span> <span class='op'>=</span> (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>b</span> <span class='op'>^</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>c</span>).<span class='ident'>rotate_right</span>(<span class='number'>7</span>);
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">G</span>( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> ({
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>).<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>[<span class="ident">SIGMA</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>][<span class="number">2</span><span class="kw-2">*</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">+</span><span class="number">0</span>]]);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>).<span class="ident">rotate_right</span>(<span class="number">16</span>);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span>);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>).<span class="ident">rotate_right</span>(<span class="number">12</span>);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>).<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>[<span class="ident">SIGMA</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>][<span class="number">2</span><span class="kw-2">*</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">+</span><span class="number">1</span>]]);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>).<span class="ident">rotate_right</span>(<span class="number">8</span>);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>.<span class="ident">wrapping_add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span>);
+    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>).<span class="ident">rotate_right</span>(<span class="number">7</span>);
 }));
 
-<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>round</span>( (<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>:<span class='ident'>expr</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>:<span class='ident'>expr</span>) <span class='op'>=&gt;</span> ( {
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>0</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>0</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>4</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>8</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>12</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>1</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>1</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>5</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>9</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>13</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>2</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>2</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>6</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>10</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>14</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>3</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>3</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>7</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>11</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>15</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>4</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>0</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>5</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>10</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>15</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>5</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>1</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>6</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>11</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>12</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>6</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>2</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>7</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>8</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>13</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
-    <span class='macro'>G</span><span class='macro'>!</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>r</span>,<span class='number'>7</span>,<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>3</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>4</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[ <span class='number'>9</span>],<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>v</span>[<span class='number'>14</span>], <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>m</span>);
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">round</span>( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>) <span class="op">=&gt;</span> ( {
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">0</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">0</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">4</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">8</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">12</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">1</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">1</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">5</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">9</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">13</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">2</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">2</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">6</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">10</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">14</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">3</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">3</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">7</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">11</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">15</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">4</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">0</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">5</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">10</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">15</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">5</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">1</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">6</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">11</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">12</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">6</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">2</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">7</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">8</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">13</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
+    <span class="macro">G</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>,<span class="number">7</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">3</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">4</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[ <span class="number">9</span>],<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>[<span class="number">14</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
   }
 ));
 
-<span class='kw'>impl</span> <span class='ident'>Blake2s</span> {
-    <span class='kw'>fn</span> <span class='ident'>set_lastnode</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='self'>self</span>.<span class='ident'>f</span>[<span class='number'>1</span>] <span class='op'>=</span> <span class='number'>0xFFFFFFFF</span>;
+<span class="kw">impl</span> <span class="ident">Blake2s</span> {
+    <span class="kw">fn</span> <span class="ident">set_lastnode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">f</span>[<span class="number">1</span>] <span class="op">=</span> <span class="number">0xFFFFFFFF</span>;
     }
 
-    <span class='kw'>fn</span> <span class='ident'>set_lastblock</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>last_node</span><span class='op'>!=</span><span class='number'>0</span> {
-            <span class='self'>self</span>.<span class='ident'>set_lastnode</span>();
+    <span class="kw">fn</span> <span class="ident">set_lastblock</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_node</span><span class="op">!=</span><span class="number">0</span> {
+            <span class="self">self</span>.<span class="ident">set_lastnode</span>();
         }
-        <span class='self'>self</span>.<span class='ident'>f</span>[<span class='number'>0</span>] <span class='op'>=</span> <span class='number'>0xFFFFFFFF</span>;
+        <span class="self">self</span>.<span class="ident">f</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0xFFFFFFFF</span>;
     }
 
-    <span class='kw'>fn</span> <span class='ident'>increment_counter</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inc</span> : <span class='ident'>u32</span>) {
-        <span class='self'>self</span>.<span class='ident'>t</span>[<span class='number'>0</span>] <span class='op'>+=</span> <span class='ident'>inc</span>;
-        <span class='self'>self</span>.<span class='ident'>t</span>[<span class='number'>1</span>] <span class='op'>+=</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>t</span>[<span class='number'>0</span>] <span class='op'>&lt;</span> <span class='ident'>inc</span> { <span class='number'>1</span> } <span class='kw'>else</span> { <span class='number'>0</span> };
+    <span class="kw">fn</span> <span class="ident">increment_counter</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">inc</span> : <span class="ident">u32</span>) {
+        <span class="self">self</span>.<span class="ident">t</span>[<span class="number">0</span>] <span class="op">+=</span> <span class="ident">inc</span>;
+        <span class="self">self</span>.<span class="ident">t</span>[<span class="number">1</span>] <span class="op">+=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">t</span>[<span class="number">0</span>] <span class="op">&lt;</span> <span class="ident">inc</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> };
     }
 
-    <span class='kw'>fn</span> <span class='ident'>init0</span>(<span class='ident'>param</span>: <span class='ident'>Blake2sParam</span>, <span class='ident'>digest_length</span>: <span class='ident'>u8</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) <span class='op'>-&gt;</span> <span class='ident'>Blake2s</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>key</span>.<span class='ident'>len</span>() <span class='op'>&lt;=</span> <span class='ident'>BLAKE2S_KEYBYTES</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Blake2s</span> {
-            <span class='ident'>h</span>: <span class='ident'>IV</span>,
-            <span class='ident'>t</span>: [<span class='number'>0</span>,<span class='number'>0</span>],
-            <span class='ident'>f</span>: [<span class='number'>0</span>,<span class='number'>0</span>],
-            <span class='ident'>buf</span>: [<span class='number'>0</span>; <span class='number'>2</span><span class='op'>*</span><span class='ident'>BLAKE2S_BLOCKBYTES</span>],
-            <span class='ident'>buflen</span>: <span class='number'>0</span>,
-            <span class='ident'>last_node</span>: <span class='number'>0</span>,
-            <span class='ident'>digest_length</span>: <span class='ident'>digest_length</span>,
-            <span class='ident'>computed</span>: <span class='bool-val'>false</span>,
-            <span class='ident'>key</span>: [<span class='number'>0</span>; <span class='ident'>BLAKE2S_KEYBYTES</span>],
-            <span class='ident'>key_length</span>: <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u8</span>,
-            <span class='ident'>param</span>: <span class='ident'>param</span>
+    <span class="kw">fn</span> <span class="ident">init0</span>(<span class="ident">param</span>: <span class="ident">Blake2sParam</span>, <span class="ident">digest_length</span>: <span class="ident">u8</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Blake2s</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&lt;=</span> <span class="ident">BLAKE2S_KEYBYTES</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Blake2s</span> {
+            <span class="ident">h</span>: <span class="ident">IV</span>,
+            <span class="ident">t</span>: [<span class="number">0</span>,<span class="number">0</span>],
+            <span class="ident">f</span>: [<span class="number">0</span>,<span class="number">0</span>],
+            <span class="ident">buf</span>: [<span class="number">0</span>; <span class="number">2</span><span class="kw-2">*</span><span class="ident">BLAKE2S_BLOCKBYTES</span>],
+            <span class="ident">buflen</span>: <span class="number">0</span>,
+            <span class="ident">last_node</span>: <span class="number">0</span>,
+            <span class="ident">digest_length</span>: <span class="ident">digest_length</span>,
+            <span class="ident">computed</span>: <span class="bool-val">false</span>,
+            <span class="ident">key</span>: [<span class="number">0</span>; <span class="ident">BLAKE2S_KEYBYTES</span>],
+            <span class="ident">key_length</span>: <span class="ident">key</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">param</span>: <span class="ident">param</span>
         };
-        <span class='ident'>copy_memory</span>(<span class='ident'>key</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>b</span>.<span class='ident'>key</span>);
-        <span class='ident'>b</span>
+        <span class="ident">copy_memory</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>.<span class="ident">key</span>);
+        <span class="ident">b</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>apply_param</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::<span class='ident'>Write</span>;
-        <span class='kw'>use</span> <span class='ident'>cryptoutil</span>::<span class='ident'>WriteExt</span>;
+    <span class="kw">fn</span> <span class="ident">apply_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;
+        <span class="kw">use</span> <span class="ident">cryptoutil</span>::<span class="ident">WriteExt</span>;
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>param_bytes</span> : [<span class='ident'>u8</span>; <span class='number'>32</span>] <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>32</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param_bytes</span> : [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">32</span>];
         {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>writer</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>] <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>param_bytes</span>;
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>digest_length</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>key_length</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>fanout</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>depth</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u32_le</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>leaf_length</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>node_offset</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>node_depth</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_u8</span>(<span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>inner_length</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>salt</span>).<span class='ident'>unwrap</span>();
-            <span class='ident'>writer</span>.<span class='ident'>write_all</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>param</span>.<span class='ident'>personal</span>).<span class='ident'>unwrap</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">param_bytes</span>;
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">digest_length</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">key_length</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">fanout</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">depth</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u32_le</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">leaf_length</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">param</span>.<span class="ident">node_offset</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">node_depth</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="self">self</span>.<span class="ident">param</span>.<span class="ident">inner_length</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">param</span>.<span class="ident">salt</span>).<span class="ident">unwrap</span>();
+            <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">param</span>.<span class="ident">personal</span>).<span class="ident">unwrap</span>();
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>param_words</span> : [<span class='ident'>u32</span>; <span class='number'>8</span>] <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>8</span>];
-        <span class='ident'>read_u32v_le</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>param_words</span>, <span class='kw-2'>&amp;</span><span class='ident'>param_bytes</span>);
-        <span class='kw'>for</span> (<span class='ident'>h</span>, <span class='ident'>param_word</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>h</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>param_words</span>.<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>h</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>h</span> <span class='op'>^</span> <span class='op'>*</span><span class='ident'>param_word</span>;
-        }
-    }
-
-
-    <span class='comment'>// init xors IV with input parameter block</span>
-    <span class='kw'>fn</span> <span class='ident'>init_param</span>( <span class='ident'>p</span>: <span class='ident'>Blake2sParam</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>] ) <span class='op'>-&gt;</span> <span class='ident'>Blake2s</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>init0</span>(<span class='ident'>p</span>, <span class='ident'>p</span>.<span class='ident'>digest_length</span>, <span class='ident'>key</span>);
-        <span class='ident'>b</span>.<span class='ident'>apply_param</span>();
-        <span class='ident'>b</span>
-    }
-
-    <span class='kw'>fn</span> <span class='ident'>default_param</span>(<span class='ident'>outlen</span>: <span class='ident'>u8</span>) <span class='op'>-&gt;</span> <span class='ident'>Blake2sParam</span> {
-        <span class='ident'>Blake2sParam</span> {
-            <span class='ident'>digest_length</span>: <span class='ident'>outlen</span>,
-            <span class='ident'>key_length</span>: <span class='number'>0</span>,
-            <span class='ident'>fanout</span>: <span class='number'>1</span>,
-            <span class='ident'>depth</span>: <span class='number'>1</span>,
-            <span class='ident'>leaf_length</span>: <span class='number'>0</span>,
-            <span class='ident'>node_offset</span>: [<span class='number'>0</span>; <span class='number'>6</span>],
-            <span class='ident'>node_depth</span>: <span class='number'>0</span>,
-            <span class='ident'>inner_length</span>: <span class='number'>0</span>,
-            <span class='ident'>salt</span>: [<span class='number'>0</span>; <span class='ident'>BLAKE2S_SALTBYTES</span>],
-            <span class='ident'>personal</span>: [<span class='number'>0</span>; <span class='ident'>BLAKE2S_PERSONALBYTES</span>],
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param_words</span> : [<span class="ident">u32</span>; <span class="number">8</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
+        <span class="ident">read_u32v_le</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">param_words</span>, <span class="kw-2">&amp;</span><span class="ident">param_bytes</span>);
+        <span class="kw">for</span> (<span class="ident">h</span>, <span class="ident">param_word</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">h</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">param_words</span>.<span class="ident">iter</span>()) {
+            <span class="kw-2">*</span><span class="ident">h</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">h</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">param_word</span>;
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>outlen</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Blake2s</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>outlen</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='ident'>outlen</span> <span class='op'>&lt;=</span> <span class='ident'>BLAKE2S_OUTBYTES</span>);
-        <span class='ident'>Blake2s</span>::<span class='ident'>init_param</span>(<span class='ident'>Blake2s</span>::<span class='ident'>default_param</span>(<span class='ident'>outlen</span> <span class='kw'>as</span> <span class='ident'>u8</span>), <span class='kw-2'>&amp;</span>[])
+
+    <span class="comment">// init xors IV with input parameter block</span>
+    <span class="kw">fn</span> <span class="ident">init_param</span>( <span class="ident">p</span>: <span class="ident">Blake2sParam</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] ) <span class="op">-&gt;</span> <span class="ident">Blake2s</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">init0</span>(<span class="ident">p</span>, <span class="ident">p</span>.<span class="ident">digest_length</span>, <span class="ident">key</span>);
+        <span class="ident">b</span>.<span class="ident">apply_param</span>();
+        <span class="ident">b</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>apply_key</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>block</span> : [<span class='ident'>u8</span>; <span class='ident'>BLAKE2S_BLOCKBYTES</span>] <span class='op'>=</span> [<span class='number'>0</span>; <span class='ident'>BLAKE2S_BLOCKBYTES</span>];
-        <span class='ident'>copy_memory</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>key</span>[..<span class='self'>self</span>.<span class='ident'>key_length</span> <span class='kw'>as</span> <span class='ident'>usize</span>], <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>block</span>);
-        <span class='self'>self</span>.<span class='ident'>update</span>(<span class='kw-2'>&amp;</span><span class='ident'>block</span>);
-        <span class='ident'>secure_memset</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>block</span>[..], <span class='number'>0</span>);
+    <span class="kw">fn</span> <span class="ident">default_param</span>(<span class="ident">outlen</span>: <span class="ident">u8</span>) <span class="op">-&gt;</span> <span class="ident">Blake2sParam</span> {
+        <span class="ident">Blake2sParam</span> {
+            <span class="ident">digest_length</span>: <span class="ident">outlen</span>,
+            <span class="ident">key_length</span>: <span class="number">0</span>,
+            <span class="ident">fanout</span>: <span class="number">1</span>,
+            <span class="ident">depth</span>: <span class="number">1</span>,
+            <span class="ident">leaf_length</span>: <span class="number">0</span>,
+            <span class="ident">node_offset</span>: [<span class="number">0</span>; <span class="number">6</span>],
+            <span class="ident">node_depth</span>: <span class="number">0</span>,
+            <span class="ident">inner_length</span>: <span class="number">0</span>,
+            <span class="ident">salt</span>: [<span class="number">0</span>; <span class="ident">BLAKE2S_SALTBYTES</span>],
+            <span class="ident">personal</span>: [<span class="number">0</span>; <span class="ident">BLAKE2S_PERSONALBYTES</span>],
+        }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_keyed</span>(<span class='ident'>outlen</span>: <span class='ident'>usize</span>, <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>] ) <span class='op'>-&gt;</span> <span class='ident'>Blake2s</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>outlen</span> <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='ident'>outlen</span> <span class='op'>&lt;=</span> <span class='ident'>BLAKE2S_OUTBYTES</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>key</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='op'>&lt;=</span> <span class='ident'>BLAKE2S_KEYBYTES</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">outlen</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="ident">Blake2s</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">outlen</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">outlen</span> <span class="op">&lt;=</span> <span class="ident">BLAKE2S_OUTBYTES</span>);
+        <span class="ident">Blake2s</span>::<span class="ident">init_param</span>(<span class="ident">Blake2s</span>::<span class="ident">default_param</span>(<span class="ident">outlen</span> <span class="kw">as</span> <span class="ident">u8</span>), <span class="kw-2">&amp;</span>[])
+    }
 
-        <span class='kw'>let</span> <span class='ident'>param</span> <span class='op'>=</span> <span class='ident'>Blake2sParam</span> {
-            <span class='ident'>digest_length</span>: <span class='ident'>outlen</span> <span class='kw'>as</span> <span class='ident'>u8</span>,
-            <span class='ident'>key_length</span>: <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u8</span>,
-            <span class='ident'>fanout</span>: <span class='number'>1</span>,
-            <span class='ident'>depth</span>: <span class='number'>1</span>,
-            <span class='ident'>leaf_length</span>: <span class='number'>0</span>,
-            <span class='ident'>node_offset</span>: [<span class='number'>0</span>; <span class='number'>6</span>],
-            <span class='ident'>node_depth</span>: <span class='number'>0</span>,
-            <span class='ident'>inner_length</span>: <span class='number'>0</span>,
-            <span class='ident'>salt</span>: [<span class='number'>0</span>; <span class='ident'>BLAKE2S_SALTBYTES</span>],
-            <span class='ident'>personal</span>: [<span class='number'>0</span>; <span class='ident'>BLAKE2S_PERSONALBYTES</span>],
+    <span class="kw">fn</span> <span class="ident">apply_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> : [<span class="ident">u8</span>; <span class="ident">BLAKE2S_BLOCKBYTES</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="ident">BLAKE2S_BLOCKBYTES</span>];
+        <span class="ident">copy_memory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>[..<span class="self">self</span>.<span class="ident">key_length</span> <span class="kw">as</span> <span class="ident">usize</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">block</span>);
+        <span class="self">self</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">block</span>);
+        <span class="ident">secure_memset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">block</span>[..], <span class="number">0</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_keyed</span>(<span class="ident">outlen</span>: <span class="ident">usize</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] ) <span class="op">-&gt;</span> <span class="ident">Blake2s</span> {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">outlen</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">outlen</span> <span class="op">&lt;=</span> <span class="ident">BLAKE2S_OUTBYTES</span>);
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&lt;=</span> <span class="ident">BLAKE2S_KEYBYTES</span>);
+
+        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="ident">Blake2sParam</span> {
+            <span class="ident">digest_length</span>: <span class="ident">outlen</span> <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">key_length</span>: <span class="ident">key</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>,
+            <span class="ident">fanout</span>: <span class="number">1</span>,
+            <span class="ident">depth</span>: <span class="number">1</span>,
+            <span class="ident">leaf_length</span>: <span class="number">0</span>,
+            <span class="ident">node_offset</span>: [<span class="number">0</span>; <span class="number">6</span>],
+            <span class="ident">node_depth</span>: <span class="number">0</span>,
+            <span class="ident">inner_length</span>: <span class="number">0</span>,
+            <span class="ident">salt</span>: [<span class="number">0</span>; <span class="ident">BLAKE2S_SALTBYTES</span>],
+            <span class="ident">personal</span>: [<span class="number">0</span>; <span class="ident">BLAKE2S_PERSONALBYTES</span>],
         };
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>init_param</span>(<span class='ident'>param</span>, <span class='ident'>key</span>);
-        <span class='ident'>b</span>.<span class='ident'>apply_key</span>();
-        <span class='ident'>b</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">init_param</span>(<span class="ident">param</span>, <span class="ident">key</span>);
+        <span class="ident">b</span>.<span class="ident">apply_key</span>();
+        <span class="ident">b</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>compress</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ms</span>: [<span class='ident'>u32</span>; <span class='number'>16</span>] <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>16</span>];
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vs</span>: [<span class='ident'>u32</span>; <span class='number'>16</span>] <span class='op'>=</span> [<span class='number'>0</span>; <span class='number'>16</span>];
+    <span class="kw">fn</span> <span class="ident">compress</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ms</span>: [<span class="ident">u32</span>; <span class="number">16</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">16</span>];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vs</span>: [<span class="ident">u32</span>; <span class="number">16</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">16</span>];
 
-        <span class='ident'>read_u32v_le</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ms</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>buf</span>[<span class='number'>0</span>..<span class='ident'>BLAKE2S_BLOCKBYTES</span>]);
+        <span class="ident">read_u32v_le</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ms</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="number">0</span>..<span class="ident">BLAKE2S_BLOCKBYTES</span>]);
 
-        <span class='kw'>for</span> (<span class='ident'>v</span>, <span class='ident'>h</span>) <span class='kw'>in</span> <span class='ident'>vs</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='self'>self</span>.<span class='ident'>h</span>.<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>v</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>h</span>;
+        <span class="kw">for</span> (<span class="ident">v</span>, <span class="ident">h</span>) <span class="kw">in</span> <span class="ident">vs</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">h</span>.<span class="ident">iter</span>()) {
+            <span class="kw-2">*</span><span class="ident">v</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">h</span>;
         }
 
-        <span class='ident'>vs</span>[ <span class='number'>8</span>] <span class='op'>=</span> <span class='ident'>IV</span>[<span class='number'>0</span>];
-        <span class='ident'>vs</span>[ <span class='number'>9</span>] <span class='op'>=</span> <span class='ident'>IV</span>[<span class='number'>1</span>];
-        <span class='ident'>vs</span>[<span class='number'>10</span>] <span class='op'>=</span> <span class='ident'>IV</span>[<span class='number'>2</span>];
-        <span class='ident'>vs</span>[<span class='number'>11</span>] <span class='op'>=</span> <span class='ident'>IV</span>[<span class='number'>3</span>];
-        <span class='ident'>vs</span>[<span class='number'>12</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>t</span>[<span class='number'>0</span>] <span class='op'>^</span> <span class='ident'>IV</span>[<span class='number'>4</span>];
-        <span class='ident'>vs</span>[<span class='number'>13</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>t</span>[<span class='number'>1</span>] <span class='op'>^</span> <span class='ident'>IV</span>[<span class='number'>5</span>];
-        <span class='ident'>vs</span>[<span class='number'>14</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>f</span>[<span class='number'>0</span>] <span class='op'>^</span> <span class='ident'>IV</span>[<span class='number'>6</span>];
-        <span class='ident'>vs</span>[<span class='number'>15</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>f</span>[<span class='number'>1</span>] <span class='op'>^</span> <span class='ident'>IV</span>[<span class='number'>7</span>];
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>0</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>1</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>2</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>3</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>4</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>5</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>6</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>7</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>8</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
-        <span class='macro'>round</span><span class='macro'>!</span>(  <span class='number'>9</span>, <span class='ident'>vs</span>, <span class='ident'>ms</span> );
+        <span class="ident">vs</span>[ <span class="number">8</span>] <span class="op">=</span> <span class="ident">IV</span>[<span class="number">0</span>];
+        <span class="ident">vs</span>[ <span class="number">9</span>] <span class="op">=</span> <span class="ident">IV</span>[<span class="number">1</span>];
+        <span class="ident">vs</span>[<span class="number">10</span>] <span class="op">=</span> <span class="ident">IV</span>[<span class="number">2</span>];
+        <span class="ident">vs</span>[<span class="number">11</span>] <span class="op">=</span> <span class="ident">IV</span>[<span class="number">3</span>];
+        <span class="ident">vs</span>[<span class="number">12</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">t</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">IV</span>[<span class="number">4</span>];
+        <span class="ident">vs</span>[<span class="number">13</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">t</span>[<span class="number">1</span>] <span class="op">^</span> <span class="ident">IV</span>[<span class="number">5</span>];
+        <span class="ident">vs</span>[<span class="number">14</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">IV</span>[<span class="number">6</span>];
+        <span class="ident">vs</span>[<span class="number">15</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span>[<span class="number">1</span>] <span class="op">^</span> <span class="ident">IV</span>[<span class="number">7</span>];
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">0</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">1</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">2</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">3</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">4</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">5</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">6</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">7</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">8</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
+        <span class="macro">round</span><span class="macro">!</span>(  <span class="number">9</span>, <span class="ident">vs</span>, <span class="ident">ms</span> );
 
-        <span class='kw'>for</span> (<span class='ident'>h_elem</span>, (<span class='ident'>v_low</span>, <span class='ident'>v_high</span>)) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>h</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>( <span class='ident'>vs</span>[<span class='number'>0</span>..<span class='number'>8</span>].<span class='ident'>iter</span>().<span class='ident'>zip</span>(<span class='ident'>vs</span>[<span class='number'>8</span>..<span class='number'>16</span>].<span class='ident'>iter</span>()) ) {
-            <span class='op'>*</span><span class='ident'>h_elem</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>h_elem</span> <span class='op'>^</span> <span class='op'>*</span><span class='ident'>v_low</span> <span class='op'>^</span> <span class='op'>*</span><span class='ident'>v_high</span>;
+        <span class="kw">for</span> (<span class="ident">h_elem</span>, (<span class="ident">v_low</span>, <span class="ident">v_high</span>)) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">h</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>( <span class="ident">vs</span>[<span class="number">0</span>..<span class="number">8</span>].<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">vs</span>[<span class="number">8</span>..<span class="number">16</span>].<span class="ident">iter</span>()) ) {
+            <span class="kw-2">*</span><span class="ident">h_elem</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">h_elem</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">v_low</span> <span class="op">^</span> <span class="kw-2">*</span><span class="ident">v_high</span>;
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update</span>( <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>input</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>] ) {
-        <span class='kw'>while</span> <span class='ident'>input</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-            <span class='kw'>let</span> <span class='ident'>left</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buflen</span>;
-            <span class='kw'>let</span> <span class='ident'>fill</span> <span class='op'>=</span> <span class='number'>2</span> <span class='op'>*</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span> <span class='op'>-</span> <span class='ident'>left</span>;
+    <span class="kw">fn</span> <span class="ident">update</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] ) {
+        <span class="kw">while</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buflen</span>;
+            <span class="kw">let</span> <span class="ident">fill</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">BLAKE2S_BLOCKBYTES</span> <span class="op">-</span> <span class="ident">left</span>;
 
-            <span class='kw'>if</span> <span class='ident'>input</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='ident'>fill</span> {
-                <span class='ident'>copy_memory</span>(<span class='kw-2'>&amp;</span><span class='ident'>input</span>[<span class='number'>0</span>..<span class='ident'>fill</span>], <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>buf</span>[<span class='ident'>left</span>..]); <span class='comment'>// Fill buffer</span>
-                <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>+=</span> <span class='ident'>fill</span>;
-                <span class='self'>self</span>.<span class='ident'>increment_counter</span>( <span class='ident'>BLAKE2S_BLOCKBYTES</span> <span class='kw'>as</span> <span class='ident'>u32</span>);
-                <span class='self'>self</span>.<span class='ident'>compress</span>();
+            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">fill</span> {
+                <span class="ident">copy_memory</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">0</span>..<span class="ident">fill</span>], <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">left</span>..]); <span class="comment">// Fill buffer</span>
+                <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">+=</span> <span class="ident">fill</span>;
+                <span class="self">self</span>.<span class="ident">increment_counter</span>( <span class="ident">BLAKE2S_BLOCKBYTES</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                <span class="self">self</span>.<span class="ident">compress</span>();
 
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>halves</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buf</span>.<span class='ident'>chunks_mut</span>(<span class='ident'>BLAKE2S_BLOCKBYTES</span>);
-                <span class='kw'>let</span> <span class='ident'>first_half</span> <span class='op'>=</span> <span class='ident'>halves</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
-                <span class='kw'>let</span> <span class='ident'>second_half</span> <span class='op'>=</span> <span class='ident'>halves</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
-                <span class='ident'>copy_memory</span>(<span class='ident'>second_half</span>, <span class='ident'>first_half</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">halves</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">chunks_mut</span>(<span class="ident">BLAKE2S_BLOCKBYTES</span>);
+                <span class="kw">let</span> <span class="ident">first_half</span> <span class="op">=</span> <span class="ident">halves</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let</span> <span class="ident">second_half</span> <span class="op">=</span> <span class="ident">halves</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                <span class="ident">copy_memory</span>(<span class="ident">second_half</span>, <span class="ident">first_half</span>);
 
-                <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>-=</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span>;
-                <span class='ident'>input</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>input</span>[<span class='ident'>fill</span>..<span class='ident'>input</span>.<span class='ident'>len</span>()];
-            } <span class='kw'>else</span> { <span class='comment'>// inlen &lt;= fill</span>
-                <span class='ident'>copy_memory</span>(<span class='ident'>input</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>buf</span>[<span class='ident'>left</span>..]);
-                <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>+=</span> <span class='ident'>input</span>.<span class='ident'>len</span>();
-                <span class='kw'>break</span>;
+                <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">-=</span> <span class="ident">BLAKE2S_BLOCKBYTES</span>;
+                <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">fill</span>..<span class="ident">input</span>.<span class="ident">len</span>()];
+            } <span class="kw">else</span> { <span class="comment">// inlen &lt;= fill</span>
+                <span class="ident">copy_memory</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">left</span>..]);
+                <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">+=</span> <span class="ident">input</span>.<span class="ident">len</span>();
+                <span class="kw">break</span>;
             }
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>finalize</span>( <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>out</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>] ) {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>out</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>digest_length</span> <span class='kw'>as</span> <span class='ident'>usize</span>);
-        <span class='kw'>if</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>computed</span> {
-            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>&gt;</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span> {
-                <span class='self'>self</span>.<span class='ident'>increment_counter</span>(<span class='ident'>BLAKE2S_BLOCKBYTES</span> <span class='kw'>as</span> <span class='ident'>u32</span>);
-                <span class='self'>self</span>.<span class='ident'>compress</span>();
-                <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>-=</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span>;
+    <span class="kw">fn</span> <span class="ident">finalize</span>( <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] ) {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">out</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">digest_length</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">computed</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">&gt;</span> <span class="ident">BLAKE2S_BLOCKBYTES</span> {
+                <span class="self">self</span>.<span class="ident">increment_counter</span>(<span class="ident">BLAKE2S_BLOCKBYTES</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                <span class="self">self</span>.<span class="ident">compress</span>();
+                <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">-=</span> <span class="ident">BLAKE2S_BLOCKBYTES</span>;
 
-                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>halves</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buf</span>.<span class='ident'>chunks_mut</span>(<span class='ident'>BLAKE2S_BLOCKBYTES</span>);
-                <span class='kw'>let</span> <span class='ident'>first_half</span> <span class='op'>=</span> <span class='ident'>halves</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
-                <span class='kw'>let</span> <span class='ident'>second_half</span> <span class='op'>=</span> <span class='ident'>halves</span>.<span class='ident'>next</span>().<span class='ident'>unwrap</span>();
-                <span class='ident'>copy_memory</span>(<span class='ident'>second_half</span>, <span class='ident'>first_half</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">halves</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">chunks_mut</span>(<span class="ident">BLAKE2S_BLOCKBYTES</span>);
+                <span class="kw">let</span> <span class="ident">first_half</span> <span class="op">=</span> <span class="ident">halves</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let</span> <span class="ident">second_half</span> <span class="op">=</span> <span class="ident">halves</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                <span class="ident">copy_memory</span>(<span class="ident">second_half</span>, <span class="ident">first_half</span>);
             }
 
-            <span class='kw'>let</span> <span class='ident'>incby</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='kw'>as</span> <span class='ident'>u32</span>;
-            <span class='self'>self</span>.<span class='ident'>increment_counter</span>(<span class='ident'>incby</span>);
-            <span class='self'>self</span>.<span class='ident'>set_lastblock</span>();
-            <span class='kw'>for</span> <span class='ident'>b</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>buf</span>[<span class='self'>self</span>.<span class='ident'>buflen</span>..].<span class='ident'>iter_mut</span>() {
-                <span class='op'>*</span><span class='ident'>b</span> <span class='op'>=</span> <span class='number'>0</span>;
+            <span class="kw">let</span> <span class="ident">incby</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buflen</span> <span class="kw">as</span> <span class="ident">u32</span>;
+            <span class="self">self</span>.<span class="ident">increment_counter</span>(<span class="ident">incby</span>);
+            <span class="self">self</span>.<span class="ident">set_lastblock</span>();
+            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">buflen</span>..].<span class="ident">iter_mut</span>() {
+                <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span> <span class="number">0</span>;
             }
-            <span class='self'>self</span>.<span class='ident'>compress</span>();
+            <span class="self">self</span>.<span class="ident">compress</span>();
 
-            <span class='ident'>write_u32v_le</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>.<span class='ident'>buf</span>[<span class='number'>0</span>..<span class='number'>32</span>], <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>h</span>);
-            <span class='self'>self</span>.<span class='ident'>computed</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+            <span class="ident">write_u32v_le</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="number">0</span>..<span class="number">32</span>], <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">h</span>);
+            <span class="self">self</span>.<span class="ident">computed</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
-        <span class='kw'>let</span> <span class='ident'>outlen</span> <span class='op'>=</span> <span class='ident'>out</span>.<span class='ident'>len</span>();
-        <span class='ident'>copy_memory</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>buf</span>[<span class='number'>0</span>..<span class='ident'>outlen</span>], <span class='ident'>out</span>);
+        <span class="kw">let</span> <span class="ident">outlen</span> <span class="op">=</span> <span class="ident">out</span>.<span class="ident">len</span>();
+        <span class="ident">copy_memory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="number">0</span>..<span class="ident">outlen</span>], <span class="ident">out</span>);
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reset</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='kw'>for</span> (<span class='ident'>h_elem</span>, <span class='ident'>iv_elem</span>) <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>h</span>.<span class='ident'>iter_mut</span>().<span class='ident'>zip</span>(<span class='ident'>IV</span>.<span class='ident'>iter</span>()) {
-            <span class='op'>*</span><span class='ident'>h_elem</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>iv_elem</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">for</span> (<span class="ident">h_elem</span>, <span class="ident">iv_elem</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">h</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">IV</span>.<span class="ident">iter</span>()) {
+            <span class="kw-2">*</span><span class="ident">h_elem</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">iv_elem</span>;
         }
-        <span class='kw'>for</span> <span class='ident'>t_elem</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>t</span>.<span class='ident'>iter_mut</span>() {
-            <span class='op'>*</span><span class='ident'>t_elem</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class="kw">for</span> <span class="ident">t_elem</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">t</span>.<span class="ident">iter_mut</span>() {
+            <span class="kw-2">*</span><span class="ident">t_elem</span> <span class="op">=</span> <span class="number">0</span>;
         }
-        <span class='kw'>for</span> <span class='ident'>f_elem</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>f</span>.<span class='ident'>iter_mut</span>() {
-            <span class='op'>*</span><span class='ident'>f_elem</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class="kw">for</span> <span class="ident">f_elem</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">f</span>.<span class="ident">iter_mut</span>() {
+            <span class="kw-2">*</span><span class="ident">f_elem</span> <span class="op">=</span> <span class="number">0</span>;
         }
-        <span class='kw'>for</span> <span class='ident'>b</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>buf</span>.<span class='ident'>iter_mut</span>() {
-            <span class='op'>*</span><span class='ident'>b</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">iter_mut</span>() {
+            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span> <span class="number">0</span>;
         }
-        <span class='self'>self</span>.<span class='ident'>buflen</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='self'>self</span>.<span class='ident'>last_node</span> <span class='op'>=</span> <span class='number'>0</span>;
-        <span class='self'>self</span>.<span class='ident'>computed</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
-        <span class='self'>self</span>.<span class='ident'>apply_param</span>();
-        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>key_length</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-            <span class='self'>self</span>.<span class='ident'>apply_key</span>();
+        <span class="self">self</span>.<span class="ident">buflen</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">last_node</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.<span class="ident">computed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="self">self</span>.<span class="ident">apply_param</span>();
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">key_length</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="self">self</span>.<span class="ident">apply_key</span>();
         }
     }
 
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blake2s</span>(<span class='ident'>out</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span>[<span class='ident'>u8</span>], <span class='ident'>input</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>], <span class='ident'>key</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>hasher</span> : <span class='ident'>Blake2s</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>key</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> { <span class='ident'>Blake2s</span>::<span class='ident'>new_keyed</span>(<span class='ident'>out</span>.<span class='ident'>len</span>(), <span class='ident'>key</span>) } <span class='kw'>else</span> { <span class='ident'>Blake2s</span>::<span class='ident'>new</span>(<span class='ident'>out</span>.<span class='ident'>len</span>()) };
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blake2s</span>(<span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span>[<span class="ident">u8</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> : <span class="ident">Blake2s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> { <span class="ident">Blake2s</span>::<span class="ident">new_keyed</span>(<span class="ident">out</span>.<span class="ident">len</span>(), <span class="ident">key</span>) } <span class="kw">else</span> { <span class="ident">Blake2s</span>::<span class="ident">new</span>(<span class="ident">out</span>.<span class="ident">len</span>()) };
 
-        <span class='ident'>hasher</span>.<span class='ident'>update</span>(<span class='ident'>input</span>);
-        <span class='ident'>hasher</span>.<span class='ident'>finalize</span>(<span class='ident'>out</span>);
+        <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">input</span>);
+        <span class="ident">hasher</span>.<span class="ident">finalize</span>(<span class="ident">out</span>);
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Digest</span> <span class='kw'>for</span> <span class='ident'>Blake2s</span> {
-    <span class='kw'>fn</span> <span class='ident'>reset</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) { <span class='ident'>Blake2s</span>::<span class='ident'>reset</span>(<span class='self'>self</span>); }
-    <span class='kw'>fn</span> <span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>msg</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) { <span class='self'>self</span>.<span class='ident'>update</span>(<span class='ident'>msg</span>); }
-    <span class='kw'>fn</span> <span class='ident'>result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>out</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) { <span class='self'>self</span>.<span class='ident'>finalize</span>(<span class='ident'>out</span>); }
-    <span class='kw'>fn</span> <span class='ident'>output_bits</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>8</span> <span class='op'>*</span> (<span class='self'>self</span>.<span class='ident'>digest_length</span> <span class='kw'>as</span> <span class='ident'>usize</span>) }
-    <span class='kw'>fn</span> <span class='ident'>block_size</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='number'>8</span> <span class='op'>*</span> <span class='ident'>BLAKE2S_BLOCKBYTES</span> }
+<span class="kw">impl</span> <span class="ident">Digest</span> <span class="kw">for</span> <span class="ident">Blake2s</span> {
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) { <span class="ident">Blake2s</span>::<span class="ident">reset</span>(<span class="self">self</span>); }
+    <span class="kw">fn</span> <span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) { <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">msg</span>); }
+    <span class="kw">fn</span> <span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) { <span class="self">self</span>.<span class="ident">finalize</span>(<span class="ident">out</span>); }
+    <span class="kw">fn</span> <span class="ident">output_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> { <span class="number">8</span> <span class="op">*</span> (<span class="self">self</span>.<span class="ident">digest_length</span> <span class="kw">as</span> <span class="ident">usize</span>) }
+    <span class="kw">fn</span> <span class="ident">block_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> { <span class="number">8</span> <span class="op">*</span> <span class="ident">BLAKE2S_BLOCKBYTES</span> }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Mac</span> <span class='kw'>for</span> <span class='ident'>Blake2s</span> {
-    <span class='doccomment'>/**
+<span class="kw">impl</span> <span class="ident">Mac</span> <span class="kw">for</span> <span class="ident">Blake2s</span> {
+    <span class="doccomment">/**
      * Process input data.
      *
      * # Arguments
      * * data - The input data to process.
      *
      */</span>
-    <span class='kw'>fn</span> <span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>u8</span>]) {
-        <span class='self'>self</span>.<span class='ident'>update</span>(<span class='ident'>data</span>);
+    <span class="kw">fn</span> <span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="self">self</span>.<span class="ident">update</span>(<span class="ident">data</span>);
     }
 
-    <span class='doccomment'>/**
+    <span class="doccomment">/**
      * Reset the Mac state to begin processing another input stream.
      */</span>
-    <span class='kw'>fn</span> <span class='ident'>reset</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-        <span class='ident'>Blake2s</span>::<span class='ident'>reset</span>(<span class='self'>self</span>);
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="ident">Blake2s</span>::<span class="ident">reset</span>(<span class="self">self</span>);
     }
 
-    <span class='doccomment'>/**
+    <span class="doccomment">/**
      * Obtain the result of a Mac computation as a MacResult.
      */</span>
-    <span class='kw'>fn</span> <span class='ident'>result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>MacResult</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>mac</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>repeat</span>(<span class='number'>0</span>).<span class='ident'>take</span>(<span class='self'>self</span>.<span class='ident'>digest_length</span> <span class='kw'>as</span> <span class='ident'>usize</span>).<span class='ident'>collect</span>();
-        <span class='self'>self</span>.<span class='ident'>raw_result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>mac</span>);
-        <span class='ident'>MacResult</span>::<span class='ident'>new_from_owned</span>(<span class='ident'>mac</span>)
+    <span class="kw">fn</span> <span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">MacResult</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">repeat</span>(<span class="number">0</span>).<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">digest_length</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">collect</span>();
+        <span class="self">self</span>.<span class="ident">raw_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mac</span>);
+        <span class="ident">MacResult</span>::<span class="ident">new_from_owned</span>(<span class="ident">mac</span>)
     }
 
-    <span class='doccomment'>/**
+    <span class="doccomment">/**
      * Obtain the result of a Mac computation as [u8]. This method should be used very carefully
      * since incorrect use of the Mac code could result in permitting a timing attack which defeats
      * the security provided by a Mac function.
      */</span>
-    <span class='kw'>fn</span> <span class='ident'>raw_result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>u8</span>]) {
-        <span class='self'>self</span>.<span class='ident'>finalize</span>(<span class='ident'>output</span>);
+    <span class="kw">fn</span> <span class="ident">raw_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+        <span class="self">self</span>.<span class="ident">finalize</span>(<span class="ident">output</span>);
     }
 
-    <span class='doccomment'>/**
+    <span class="doccomment">/**
      * Get the size of the Mac code, in bytes.
      */</span>
-    <span class='kw'>fn</span> <span class='ident'>output_bytes</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> { <span class='self'>self</span>.<span class='ident'>digest_length</span> <span class='kw'>as</span> <span class='ident'>usize</span> }
+    <span class="kw">fn</span> <span class="ident">output_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">digest_length</span> <span class="kw">as</span> <span class="ident">usize</span> }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>digest_tests</span> {
-    <span class='comment'>//use cryptoutil::test::test_digest_1million_random;</span>
-    <span class='kw'>use</span> <span class='ident'>blake2s</span>::<span class='ident'>Blake2s</span>;
-    <span class='kw'>use</span> <span class='ident'>digest</span>::<span class='ident'>Digest</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">digest_tests</span> {
+    <span class="comment">//use cryptoutil::test::test_digest_1million_random;</span>
+    <span class="kw">use</span> <span class="ident">blake2s</span>::<span class="ident">Blake2s</span>;
+    <span class="kw">use</span> <span class="ident">digest</span>::<span class="ident">Digest</span>;
 
 
-    <span class='kw'>struct</span> <span class='ident'>Test</span> {
-        <span class='ident'>input</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-        <span class='ident'>output</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span>,
-        <span class='ident'>key</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;&gt;</span>,
+    <span class="kw">struct</span> <span class="ident">Test</span> {
+        <span class="ident">input</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>,
     }
 
-    <span class='kw'>fn</span> <span class='ident'>test_hash</span>(<span class='ident'>tests</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>Test</span>]) {
-        <span class='kw'>for</span> <span class='ident'>t</span> <span class='kw'>in</span> <span class='ident'>tests</span> {
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sh</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>t</span>.<span class='ident'>key</span> {
-                <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>key</span>) <span class='op'>=&gt;</span> <span class='ident'>Blake2s</span>::<span class='ident'>new_keyed</span>(<span class='number'>32</span>, <span class='kw-2'>&amp;</span><span class='ident'>key</span>),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>Blake2s</span>::<span class='ident'>new</span>(<span class='number'>32</span>)
+    <span class="kw">fn</span> <span class="ident">test_hash</span>(<span class="ident">tests</span>: <span class="kw-2">&amp;</span>[<span class="ident">Test</span>]) {
+        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">tests</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sh</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">t</span>.<span class="ident">key</span> {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">key</span>) <span class="op">=&gt;</span> <span class="ident">Blake2s</span>::<span class="ident">new_keyed</span>(<span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>),
+                <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="ident">Blake2s</span>::<span class="ident">new</span>(<span class="number">32</span>)
             };
 
-            <span class='comment'>// Test that it works when accepting the message all at once</span>
-            <span class='ident'>sh</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>input</span>[..]);
+            <span class="comment">// Test that it works when accepting the message all at once</span>
+            <span class="ident">sh</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">input</span>[..]);
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>out</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>32</span>];
-            <span class='ident'>sh</span>.<span class='ident'>result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>out</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>out</span>[..] <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>output</span>[..]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
+            <span class="ident">sh</span>.<span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>[..] <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">output</span>[..]);
 
-            <span class='ident'>sh</span>.<span class='ident'>reset</span>();
+            <span class="ident">sh</span>.<span class="ident">reset</span>();
 
-            <span class='comment'>// Test that it works when accepting the message in pieces</span>
-            <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>t</span>.<span class='ident'>input</span>.<span class='ident'>len</span>();
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>left</span> <span class='op'>=</span> <span class='ident'>len</span>;
-            <span class='kw'>while</span> <span class='ident'>left</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-                <span class='kw'>let</span> <span class='ident'>take</span> <span class='op'>=</span> (<span class='ident'>left</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>/</span> <span class='number'>2</span>;
-                <span class='ident'>sh</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>input</span>[<span class='ident'>len</span> <span class='op'>-</span> <span class='ident'>left</span>..<span class='ident'>take</span> <span class='op'>+</span> <span class='ident'>len</span> <span class='op'>-</span> <span class='ident'>left</span>]);
-                <span class='ident'>left</span> <span class='op'>-=</span> <span class='ident'>take</span>;
+            <span class="comment">// Test that it works when accepting the message in pieces</span>
+            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">input</span>.<span class="ident">len</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">len</span>;
+            <span class="kw">while</span> <span class="ident">left</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                <span class="kw">let</span> <span class="ident">take</span> <span class="op">=</span> (<span class="ident">left</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>;
+                <span class="ident">sh</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">input</span>[<span class="ident">len</span> <span class="op">-</span> <span class="ident">left</span>..<span class="ident">take</span> <span class="op">+</span> <span class="ident">len</span> <span class="op">-</span> <span class="ident">left</span>]);
+                <span class="ident">left</span> <span class="op">-=</span> <span class="ident">take</span>;
             }
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>out</span> <span class='op'>=</span> [<span class='number'>0u8</span>; <span class='number'>32</span>];
-            <span class='ident'>sh</span>.<span class='ident'>result</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>out</span>);
-            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='ident'>out</span>[..] <span class='op'>==</span> <span class='kw-2'>&amp;</span><span class='ident'>t</span>.<span class='ident'>output</span>[..]);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
+            <span class="ident">sh</span>.<span class="ident">result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>);
+            <span class="macro">assert</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>[..] <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">output</span>[..]);
 
-            <span class='ident'>sh</span>.<span class='ident'>reset</span>();
+            <span class="ident">sh</span>.<span class="ident">reset</span>();
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_blake2s_digest</span>() {
-        <span class='kw'>let</span> <span class='ident'>tests</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='comment'>// from: https://github.com/BLAKE2/BLAKE2/blob/master/testvectors/blake2s-test.txt</span>
-            <span class='ident'>Test</span> {
-                <span class='ident'>input</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0x00</span>, <span class='number'>0x01</span>, <span class='number'>0x02</span>, <span class='number'>0x03</span>, <span class='number'>0x04</span>, <span class='number'>0x05</span>, <span class='number'>0x06</span>, <span class='number'>0x07</span>, <span class='number'>0x08</span>, <span class='number'>0x09</span>, <span class='number'>0x0a</span>, <span class='number'>0x0b</span>,
-                            <span class='number'>0x0c</span>, <span class='number'>0x0d</span>, <span class='number'>0x0e</span>, <span class='number'>0x0f</span>, <span class='number'>0x10</span>, <span class='number'>0x11</span>, <span class='number'>0x12</span>, <span class='number'>0x13</span>, <span class='number'>0x14</span>, <span class='number'>0x15</span>, <span class='number'>0x16</span>, <span class='number'>0x17</span>,
-                            <span class='number'>0x18</span>, <span class='number'>0x19</span>, <span class='number'>0x1a</span>, <span class='number'>0x1b</span>, <span class='number'>0x1c</span>, <span class='number'>0x1d</span>, <span class='number'>0x1e</span>, <span class='number'>0x1f</span>, <span class='number'>0x20</span>, <span class='number'>0x21</span>, <span class='number'>0x22</span>, <span class='number'>0x23</span>,
-                            <span class='number'>0x24</span>, <span class='number'>0x25</span>, <span class='number'>0x26</span>, <span class='number'>0x27</span>, <span class='number'>0x28</span>, <span class='number'>0x29</span>, <span class='number'>0x2a</span>, <span class='number'>0x2b</span>, <span class='number'>0x2c</span>, <span class='number'>0x2d</span>, <span class='number'>0x2e</span>, <span class='number'>0x2f</span>,
-                            <span class='number'>0x30</span>, <span class='number'>0x31</span>, <span class='number'>0x32</span>, <span class='number'>0x33</span>, <span class='number'>0x34</span>, <span class='number'>0x35</span>, <span class='number'>0x36</span>, <span class='number'>0x37</span>, <span class='number'>0x38</span>, <span class='number'>0x39</span>, <span class='number'>0x3a</span>, <span class='number'>0x3b</span>,
-                            <span class='number'>0x3c</span>, <span class='number'>0x3d</span>, <span class='number'>0x3e</span>, <span class='number'>0x3f</span>, <span class='number'>0x40</span>, <span class='number'>0x41</span>, <span class='number'>0x42</span>, <span class='number'>0x43</span>, <span class='number'>0x44</span>, <span class='number'>0x45</span>, <span class='number'>0x46</span>, <span class='number'>0x47</span>,
-                            <span class='number'>0x48</span>, <span class='number'>0x49</span>, <span class='number'>0x4a</span>, <span class='number'>0x4b</span>, <span class='number'>0x4c</span>, <span class='number'>0x4d</span>, <span class='number'>0x4e</span>, <span class='number'>0x4f</span>, <span class='number'>0x50</span>, <span class='number'>0x51</span>, <span class='number'>0x52</span>, <span class='number'>0x53</span>,
-                            <span class='number'>0x54</span>, <span class='number'>0x55</span>, <span class='number'>0x56</span>, <span class='number'>0x57</span>, <span class='number'>0x58</span>, <span class='number'>0x59</span>, <span class='number'>0x5a</span>, <span class='number'>0x5b</span>, <span class='number'>0x5c</span>, <span class='number'>0x5d</span>, <span class='number'>0x5e</span>, <span class='number'>0x5f</span>,
-                            <span class='number'>0x60</span>, <span class='number'>0x61</span>, <span class='number'>0x62</span>, <span class='number'>0x63</span>, <span class='number'>0x64</span>, <span class='number'>0x65</span>, <span class='number'>0x66</span>, <span class='number'>0x67</span>, <span class='number'>0x68</span>, <span class='number'>0x69</span>, <span class='number'>0x6a</span>, <span class='number'>0x6b</span>,
-                            <span class='number'>0x6c</span>, <span class='number'>0x6d</span>, <span class='number'>0x6e</span>, <span class='number'>0x6f</span>, <span class='number'>0x70</span>, <span class='number'>0x71</span>, <span class='number'>0x72</span>, <span class='number'>0x73</span>, <span class='number'>0x74</span>, <span class='number'>0x75</span>, <span class='number'>0x76</span>, <span class='number'>0x77</span>,
-                            <span class='number'>0x78</span>, <span class='number'>0x79</span>, <span class='number'>0x7a</span>, <span class='number'>0x7b</span>, <span class='number'>0x7c</span>, <span class='number'>0x7d</span>, <span class='number'>0x7e</span>, <span class='number'>0x7f</span>, <span class='number'>0x80</span>, <span class='number'>0x81</span>, <span class='number'>0x82</span>, <span class='number'>0x83</span>,
-                            <span class='number'>0x84</span>, <span class='number'>0x85</span>, <span class='number'>0x86</span>, <span class='number'>0x87</span>, <span class='number'>0x88</span>, <span class='number'>0x89</span>, <span class='number'>0x8a</span>, <span class='number'>0x8b</span>, <span class='number'>0x8c</span>, <span class='number'>0x8d</span>, <span class='number'>0x8e</span>, <span class='number'>0x8f</span>,
-                            <span class='number'>0x90</span>, <span class='number'>0x91</span>, <span class='number'>0x92</span>, <span class='number'>0x93</span>, <span class='number'>0x94</span>, <span class='number'>0x95</span>, <span class='number'>0x96</span>, <span class='number'>0x97</span>, <span class='number'>0x98</span>, <span class='number'>0x99</span>, <span class='number'>0x9a</span>, <span class='number'>0x9b</span>,
-                            <span class='number'>0x9c</span>, <span class='number'>0x9d</span>, <span class='number'>0x9e</span>, <span class='number'>0x9f</span>, <span class='number'>0xa0</span>, <span class='number'>0xa1</span>, <span class='number'>0xa2</span>, <span class='number'>0xa3</span>, <span class='number'>0xa4</span>, <span class='number'>0xa5</span>, <span class='number'>0xa6</span>, <span class='number'>0xa7</span>,
-                            <span class='number'>0xa8</span>, <span class='number'>0xa9</span>, <span class='number'>0xaa</span>, <span class='number'>0xab</span>, <span class='number'>0xac</span>, <span class='number'>0xad</span>, <span class='number'>0xae</span>, <span class='number'>0xaf</span>, <span class='number'>0xb0</span>, <span class='number'>0xb1</span>, <span class='number'>0xb2</span>, <span class='number'>0xb3</span>,
-                            <span class='number'>0xb4</span>, <span class='number'>0xb5</span>, <span class='number'>0xb6</span>, <span class='number'>0xb7</span>, <span class='number'>0xb8</span>, <span class='number'>0xb9</span>, <span class='number'>0xba</span>, <span class='number'>0xbb</span>, <span class='number'>0xbc</span>, <span class='number'>0xbd</span>, <span class='number'>0xbe</span>, <span class='number'>0xbf</span>,
-                            <span class='number'>0xc0</span>, <span class='number'>0xc1</span>, <span class='number'>0xc2</span>, <span class='number'>0xc3</span>, <span class='number'>0xc4</span>, <span class='number'>0xc5</span>, <span class='number'>0xc6</span>, <span class='number'>0xc7</span>, <span class='number'>0xc8</span>, <span class='number'>0xc9</span>, <span class='number'>0xca</span>, <span class='number'>0xcb</span>,
-                            <span class='number'>0xcc</span>, <span class='number'>0xcd</span>, <span class='number'>0xce</span>, <span class='number'>0xcf</span>, <span class='number'>0xd0</span>, <span class='number'>0xd1</span>, <span class='number'>0xd2</span>, <span class='number'>0xd3</span>, <span class='number'>0xd4</span>, <span class='number'>0xd5</span>, <span class='number'>0xd6</span>, <span class='number'>0xd7</span>,
-                            <span class='number'>0xd8</span>, <span class='number'>0xd9</span>, <span class='number'>0xda</span>, <span class='number'>0xdb</span>, <span class='number'>0xdc</span>, <span class='number'>0xdd</span>, <span class='number'>0xde</span>, <span class='number'>0xdf</span>, <span class='number'>0xe0</span>, <span class='number'>0xe1</span>, <span class='number'>0xe2</span>, <span class='number'>0xe3</span>,
-                            <span class='number'>0xe4</span>, <span class='number'>0xe5</span>, <span class='number'>0xe6</span>, <span class='number'>0xe7</span>, <span class='number'>0xe8</span>, <span class='number'>0xe9</span>, <span class='number'>0xea</span>, <span class='number'>0xeb</span>, <span class='number'>0xec</span>, <span class='number'>0xed</span>, <span class='number'>0xee</span>, <span class='number'>0xef</span>,
-                            <span class='number'>0xf0</span>, <span class='number'>0xf1</span>, <span class='number'>0xf2</span>, <span class='number'>0xf3</span>, <span class='number'>0xf4</span>, <span class='number'>0xf5</span>, <span class='number'>0xf6</span>, <span class='number'>0xf7</span>, <span class='number'>0xf8</span>, <span class='number'>0xf9</span>, <span class='number'>0xfa</span>, <span class='number'>0xfb</span>,
-                            <span class='number'>0xfc</span>, <span class='number'>0xfd</span>, <span class='number'>0xfe</span>],
-                <span class='ident'>output</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0x3f</span>, <span class='number'>0xb7</span>, <span class='number'>0x35</span>, <span class='number'>0x06</span>, <span class='number'>0x1a</span>, <span class='number'>0xbc</span>, <span class='number'>0x51</span>, <span class='number'>0x9d</span>, <span class='number'>0xfe</span>, <span class='number'>0x97</span>, <span class='number'>0x9e</span>,
-                             <span class='number'>0x54</span>, <span class='number'>0xc1</span>, <span class='number'>0xee</span>, <span class='number'>0x5b</span>, <span class='number'>0xfa</span>, <span class='number'>0xd0</span>, <span class='number'>0xa9</span>, <span class='number'>0xd8</span>, <span class='number'>0x58</span>, <span class='number'>0xb3</span>, <span class='number'>0x31</span>,
-                             <span class='number'>0x5b</span>, <span class='number'>0xad</span>, <span class='number'>0x34</span>, <span class='number'>0xbd</span>, <span class='number'>0xe9</span>, <span class='number'>0x99</span>, <span class='number'>0xef</span>, <span class='number'>0xd7</span>, <span class='number'>0x24</span>, <span class='number'>0xdd</span>],
-                <span class='ident'>key</span>: <span class='prelude-val'>Some</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0x00</span>, <span class='number'>0x01</span>, <span class='number'>0x02</span>, <span class='number'>0x03</span>, <span class='number'>0x04</span>, <span class='number'>0x05</span>, <span class='number'>0x06</span>, <span class='number'>0x07</span>, <span class='number'>0x08</span>, <span class='number'>0x09</span>, <span class='number'>0x0a</span>,
-                               <span class='number'>0x0b</span>, <span class='number'>0x0c</span>, <span class='number'>0x0d</span>, <span class='number'>0x0e</span>, <span class='number'>0x0f</span>, <span class='number'>0x10</span>, <span class='number'>0x11</span>, <span class='number'>0x12</span>, <span class='number'>0x13</span>, <span class='number'>0x14</span>, <span class='number'>0x15</span>,
-                               <span class='number'>0x16</span>, <span class='number'>0x17</span>, <span class='number'>0x18</span>, <span class='number'>0x19</span>, <span class='number'>0x1a</span>, <span class='number'>0x1b</span>, <span class='number'>0x1c</span>, <span class='number'>0x1d</span>, <span class='number'>0x1e</span>, <span class='number'>0x1f</span>])
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_blake2s_digest</span>() {
+        <span class="kw">let</span> <span class="ident">tests</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+            <span class="comment">// from: https://github.com/BLAKE2/BLAKE2/blob/master/testvectors/blake2s-test.txt</span>
+            <span class="ident">Test</span> {
+                <span class="ident">input</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x05</span>, <span class="number">0x06</span>, <span class="number">0x07</span>, <span class="number">0x08</span>, <span class="number">0x09</span>, <span class="number">0x0a</span>, <span class="number">0x0b</span>,
+                            <span class="number">0x0c</span>, <span class="number">0x0d</span>, <span class="number">0x0e</span>, <span class="number">0x0f</span>, <span class="number">0x10</span>, <span class="number">0x11</span>, <span class="number">0x12</span>, <span class="number">0x13</span>, <span class="number">0x14</span>, <span class="number">0x15</span>, <span class="number">0x16</span>, <span class="number">0x17</span>,
+                            <span class="number">0x18</span>, <span class="number">0x19</span>, <span class="number">0x1a</span>, <span class="number">0x1b</span>, <span class="number">0x1c</span>, <span class="number">0x1d</span>, <span class="number">0x1e</span>, <span class="number">0x1f</span>, <span class="number">0x20</span>, <span class="number">0x21</span>, <span class="number">0x22</span>, <span class="number">0x23</span>,
+                            <span class="number">0x24</span>, <span class="number">0x25</span>, <span class="number">0x26</span>, <span class="number">0x27</span>, <span class="number">0x28</span>, <span class="number">0x29</span>, <span class="number">0x2a</span>, <span class="number">0x2b</span>, <span class="number">0x2c</span>, <span class="number">0x2d</span>, <span class="number">0x2e</span>, <span class="number">0x2f</span>,
+                            <span class="number">0x30</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>, <span class="number">0x36</span>, <span class="number">0x37</span>, <span class="number">0x38</span>, <span class="number">0x39</span>, <span class="number">0x3a</span>, <span class="number">0x3b</span>,
+                            <span class="number">0x3c</span>, <span class="number">0x3d</span>, <span class="number">0x3e</span>, <span class="number">0x3f</span>, <span class="number">0x40</span>, <span class="number">0x41</span>, <span class="number">0x42</span>, <span class="number">0x43</span>, <span class="number">0x44</span>, <span class="number">0x45</span>, <span class="number">0x46</span>, <span class="number">0x47</span>,
+                            <span class="number">0x48</span>, <span class="number">0x49</span>, <span class="number">0x4a</span>, <span class="number">0x4b</span>, <span class="number">0x4c</span>, <span class="number">0x4d</span>, <span class="number">0x4e</span>, <span class="number">0x4f</span>, <span class="number">0x50</span>, <span class="number">0x51</span>, <span class="number">0x52</span>, <span class="number">0x53</span>,
+                            <span class="number">0x54</span>, <span class="number">0x55</span>, <span class="number">0x56</span>, <span class="number">0x57</span>, <span class="number">0x58</span>, <span class="number">0x59</span>, <span class="number">0x5a</span>, <span class="number">0x5b</span>, <span class="number">0x5c</span>, <span class="number">0x5d</span>, <span class="number">0x5e</span>, <span class="number">0x5f</span>,
+                            <span class="number">0x60</span>, <span class="number">0x61</span>, <span class="number">0x62</span>, <span class="number">0x63</span>, <span class="number">0x64</span>, <span class="number">0x65</span>, <span class="number">0x66</span>, <span class="number">0x67</span>, <span class="number">0x68</span>, <span class="number">0x69</span>, <span class="number">0x6a</span>, <span class="number">0x6b</span>,
+                            <span class="number">0x6c</span>, <span class="number">0x6d</span>, <span class="number">0x6e</span>, <span class="number">0x6f</span>, <span class="number">0x70</span>, <span class="number">0x71</span>, <span class="number">0x72</span>, <span class="number">0x73</span>, <span class="number">0x74</span>, <span class="number">0x75</span>, <span class="number">0x76</span>, <span class="number">0x77</span>,
+                            <span class="number">0x78</span>, <span class="number">0x79</span>, <span class="number">0x7a</span>, <span class="number">0x7b</span>, <span class="number">0x7c</span>, <span class="number">0x7d</span>, <span class="number">0x7e</span>, <span class="number">0x7f</span>, <span class="number">0x80</span>, <span class="number">0x81</span>, <span class="number">0x82</span>, <span class="number">0x83</span>,
+                            <span class="number">0x84</span>, <span class="number">0x85</span>, <span class="number">0x86</span>, <span class="number">0x87</span>, <span class="number">0x88</span>, <span class="number">0x89</span>, <span class="number">0x8a</span>, <span class="number">0x8b</span>, <span class="number">0x8c</span>, <span class="number">0x8d</span>, <span class="number">0x8e</span>, <span class="number">0x8f</span>,
+                            <span class="number">0x90</span>, <span class="number">0x91</span>, <span class="number">0x92</span>, <span class="number">0x93</span>, <span class="number">0x94</span>, <span class="number">0x95</span>, <span class="number">0x96</span>, <span class="number">0x97</span>, <span class="number">0x98</span>, <span class="number">0x99</span>, <span class="number">0x9a</span>, <span class="number">0x9b</span>,
+                            <span class="number">0x9c</span>, <span class="number">0x9d</span>, <span class="number">0x9e</span>, <span class="number">0x9f</span>, <span class="number">0xa0</span>, <span class="number">0xa1</span>, <span class="number">0xa2</span>, <span class="number">0xa3</span>, <span class="number">0xa4</span>, <span class="number">0xa5</span>, <span class="number">0xa6</span>, <span class="number">0xa7</span>,
+                            <span class="number">0xa8</span>, <span class="number">0xa9</span>, <span class="number">0xaa</span>, <span class="number">0xab</span>, <span class="number">0xac</span>, <span class="number">0xad</span>, <span class="number">0xae</span>, <span class="number">0xaf</span>, <span class="number">0xb0</span>, <span class="number">0xb1</span>, <span class="number">0xb2</span>, <span class="number">0xb3</span>,
+                            <span class="number">0xb4</span>, <span class="number">0xb5</span>, <span class="number">0xb6</span>, <span class="number">0xb7</span>, <span class="number">0xb8</span>, <span class="number">0xb9</span>, <span class="number">0xba</span>, <span class="number">0xbb</span>, <span class="number">0xbc</span>, <span class="number">0xbd</span>, <span class="number">0xbe</span>, <span class="number">0xbf</span>,
+                            <span class="number">0xc0</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xc3</span>, <span class="number">0xc4</span>, <span class="number">0xc5</span>, <span class="number">0xc6</span>, <span class="number">0xc7</span>, <span class="number">0xc8</span>, <span class="number">0xc9</span>, <span class="number">0xca</span>, <span class="number">0xcb</span>,
+                            <span class="number">0xcc</span>, <span class="number">0xcd</span>, <span class="number">0xce</span>, <span class="number">0xcf</span>, <span class="number">0xd0</span>, <span class="number">0xd1</span>, <span class="number">0xd2</span>, <span class="number">0xd3</span>, <span class="number">0xd4</span>, <span class="number">0xd5</span>, <span class="number">0xd6</span>, <span class="number">0xd7</span>,
+                            <span class="number">0xd8</span>, <span class="number">0xd9</span>, <span class="number">0xda</span>, <span class="number">0xdb</span>, <span class="number">0xdc</span>, <span class="number">0xdd</span>, <span class="number">0xde</span>, <span class="number">0xdf</span>, <span class="number">0xe0</span>, <span class="number">0xe1</span>, <span class="number">0xe2</span>, <span class="number">0xe3</span>,
+                            <span class="number">0xe4</span>, <span class="number">0xe5</span>, <span class="number">0xe6</span>, <span class="number">0xe7</span>, <span class="number">0xe8</span>, <span class="number">0xe9</span>, <span class="number">0xea</span>, <span class="number">0xeb</span>, <span class="number">0xec</span>, <span class="number">0xed</span>, <span class="number">0xee</span>, <span class="number">0xef</span>,
+                            <span class="number">0xf0</span>, <span class="number">0xf1</span>, <span class="number">0xf2</span>, <span class="number">0xf3</span>, <span class="number">0xf4</span>, <span class="number">0xf5</span>, <span class="number">0xf6</span>, <span class="number">0xf7</span>, <span class="number">0xf8</span>, <span class="number">0xf9</span>, <span class="number">0xfa</span>, <span class="number">0xfb</span>,
+                            <span class="number">0xfc</span>, <span class="number">0xfd</span>, <span class="number">0xfe</span>],
+                <span class="ident">output</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0x3f</span>, <span class="number">0xb7</span>, <span class="number">0x35</span>, <span class="number">0x06</span>, <span class="number">0x1a</span>, <span class="number">0xbc</span>, <span class="number">0x51</span>, <span class="number">0x9d</span>, <span class="number">0xfe</span>, <span class="number">0x97</span>, <span class="number">0x9e</span>,
+                             <span class="number">0x54</span>, <span class="number">0xc1</span>, <span class="number">0xee</span>, <span class="number">0x5b</span>, <span class="number">0xfa</span>, <span class="number">0xd0</span>, <span class="number">0xa9</span>, <span class="number">0xd8</span>, <span class="number">0x58</span>, <span class="number">0xb3</span>, <span class="number">0x31</span>,
+                             <span class="number">0x5b</span>, <span class="number">0xad</span>, <span class="number">0x34</span>, <span class="number">0xbd</span>, <span class="number">0xe9</span>, <span class="number">0x99</span>, <span class="number">0xef</span>, <span class="number">0xd7</span>, <span class="number">0x24</span>, <span class="number">0xdd</span>],
+                <span class="ident">key</span>: <span class="prelude-val">Some</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x02</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x05</span>, <span class="number">0x06</span>, <span class="number">0x07</span>, <span class="number">0x08</span>, <span class="number">0x09</span>, <span class="number">0x0a</span>,
+                               <span class="number">0x0b</span>, <span class="number">0x0c</span>, <span class="number">0x0d</span>, <span class="number">0x0e</span>, <span class="number">0x0f</span>, <span class="number">0x10</span>, <span class="number">0x11</span>, <span class="number">0x12</span>, <span class="number">0x13</span>, <span class="number">0x14</span>, <span class="number">0x15</span>,
+                               <span class="number">0x16</span>, <span class="number">0x17</span>, <span class="number">0x18</span>, <span class="number">0x19</span>, <span class="number">0x1a</span>, <span class="number">0x1b</span>, <span class="number">0x1c</span>, <span class="number">0x1d</span>, <span class="number">0x1e</span>, <span class="number">0x1f</span>])
             },
         ];
 
-        <span class='ident'>test_hash</span>(<span class='kw-2'>&amp;</span><span class='ident'>tests</span>[..]);
+        <span class="ident">test_hash</span>(<span class="kw-2">&amp;</span><span class="ident">tests</span>[..]);
     }
 }
 
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>mac_tests</span> {
-    <span class='kw'>use</span> <span class='ident'>blake2s</span>::<span class='ident'>Blake2s</span>;
-    <span class='kw'>use</span> <span class='ident'>mac</span>::<span class='ident'>Mac</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">mac_tests</span> {
+    <span class="kw">use</span> <span class="ident">blake2s</span>::<span class="ident">Blake2s</span>;
+    <span class="kw">use</span> <span class="ident">mac</span>::<span class="ident">Mac</span>;
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_blake2s_mac</span>() {
-        <span class='kw'>let</span> <span class='ident'>key</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>u8</span><span class='op'>&gt;</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>32</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>i</span><span class='op'>|</span> <span class='ident'>i</span>).<span class='ident'>collect</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>new_keyed</span>(<span class='number'>32</span>, <span class='kw-2'>&amp;</span><span class='ident'>key</span>[..]);
-        <span class='ident'>m</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span>[<span class='number'>1</span>,<span class='number'>2</span>,<span class='number'>4</span>,<span class='number'>8</span>]);
-        <span class='kw'>let</span> <span class='ident'>expected</span> <span class='op'>=</span> [
-            <span class='number'>0x0e</span>, <span class='number'>0x88</span>, <span class='number'>0xf6</span>, <span class='number'>0x8a</span>, <span class='number'>0xaa</span>, <span class='number'>0x5c</span>, <span class='number'>0x4e</span>, <span class='number'>0xd8</span>,
-            <span class='number'>0xf7</span>, <span class='number'>0xed</span>, <span class='number'>0x28</span>, <span class='number'>0xf8</span>, <span class='number'>0x04</span>, <span class='number'>0x45</span>, <span class='number'>0x01</span>, <span class='number'>0x9c</span>,
-            <span class='number'>0x7e</span>, <span class='number'>0xf9</span>, <span class='number'>0x76</span>, <span class='number'>0x2b</span>, <span class='number'>0x4f</span>, <span class='number'>0xf1</span>, <span class='number'>0xad</span>, <span class='number'>0x7e</span>,
-            <span class='number'>0x05</span>, <span class='number'>0x5b</span>, <span class='number'>0xa8</span>, <span class='number'>0xc8</span>, <span class='number'>0x82</span>, <span class='number'>0x9e</span>, <span class='number'>0xe2</span>, <span class='number'>0x49</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_blake2s_mac</span>() {
+        <span class="kw">let</span> <span class="ident">key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="number">32</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>).<span class="ident">collect</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">new_keyed</span>(<span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>[..]);
+        <span class="ident">m</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">8</span>]);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> [
+            <span class="number">0x0e</span>, <span class="number">0x88</span>, <span class="number">0xf6</span>, <span class="number">0x8a</span>, <span class="number">0xaa</span>, <span class="number">0x5c</span>, <span class="number">0x4e</span>, <span class="number">0xd8</span>,
+            <span class="number">0xf7</span>, <span class="number">0xed</span>, <span class="number">0x28</span>, <span class="number">0xf8</span>, <span class="number">0x04</span>, <span class="number">0x45</span>, <span class="number">0x01</span>, <span class="number">0x9c</span>,
+            <span class="number">0x7e</span>, <span class="number">0xf9</span>, <span class="number">0x76</span>, <span class="number">0x2b</span>, <span class="number">0x4f</span>, <span class="number">0xf1</span>, <span class="number">0xad</span>, <span class="number">0x7e</span>,
+            <span class="number">0x05</span>, <span class="number">0x5b</span>, <span class="number">0xa8</span>, <span class="number">0xc8</span>, <span class="number">0x82</span>, <span class="number">0x9e</span>, <span class="number">0xe2</span>, <span class="number">0x49</span>
         ];
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>m</span>.<span class='ident'>result</span>().<span class='ident'>code</span>().<span class='ident'>to_vec</span>(), <span class='ident'>expected</span>.<span class='ident'>to_vec</span>());
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">m</span>.<span class="ident">result</span>().<span class="ident">code</span>().<span class="ident">to_vec</span>(), <span class="ident">expected</span>.<span class="ident">to_vec</span>());
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>test</span>, <span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;with-bench&quot;</span>))]</span>
-<span class='kw'>mod</span> <span class='ident'>bench</span> {
-    <span class='kw'>use</span> <span class='ident'>test</span>::<span class='ident'>Bencher</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-bench&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">bench</span> {
+    <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
 
-    <span class='kw'>use</span> <span class='ident'>digest</span>::<span class='ident'>Digest</span>;
-    <span class='kw'>use</span> <span class='ident'>blake2s</span>::<span class='ident'>Blake2s</span>;
+    <span class="kw">use</span> <span class="ident">digest</span>::<span class="ident">Digest</span>;
+    <span class="kw">use</span> <span class="ident">blake2s</span>::<span class="ident">Blake2s</span>;
 
 
-    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blake2s_10</span>(<span class='ident'>bh</span>: <span class='kw-2'>&amp;</span> <span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sh</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>new</span>(<span class='number'>32</span>);
-        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> [<span class='number'>1u8</span>; <span class='number'>10</span>];
-        <span class='ident'>bh</span>.<span class='ident'>iter</span>( <span class='op'>||</span> {
-            <span class='ident'>sh</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>);
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blake2s_10</span>(<span class="ident">bh</span>: <span class="op">&amp;</span> <span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sh</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">new</span>(<span class="number">32</span>);
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">10</span>];
+        <span class="ident">bh</span>.<span class="ident">iter</span>( <span class="op">||</span> {
+            <span class="ident">sh</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
         });
-        <span class='ident'>bh</span>.<span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>bytes</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>;
+        <span class="ident">bh</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
     }
 
-    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blake2s_1k</span>(<span class='ident'>bh</span>: <span class='kw-2'>&amp;</span> <span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sh</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>new</span>(<span class='number'>32</span>);
-        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> [<span class='number'>1u8</span>; <span class='number'>1024</span>];
-        <span class='ident'>bh</span>.<span class='ident'>iter</span>( <span class='op'>||</span> {
-            <span class='ident'>sh</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>);
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blake2s_1k</span>(<span class="ident">bh</span>: <span class="op">&amp;</span> <span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sh</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">new</span>(<span class="number">32</span>);
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">1024</span>];
+        <span class="ident">bh</span>.<span class="ident">iter</span>( <span class="op">||</span> {
+            <span class="ident">sh</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
         });
-        <span class='ident'>bh</span>.<span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>bytes</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>;
+        <span class="ident">bh</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
     }
 
-    <span class='attribute'>#[<span class='ident'>bench</span>]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>blake2s_64k</span>(<span class='ident'>bh</span>: <span class='kw-2'>&amp;</span> <span class='kw-2'>mut</span> <span class='ident'>Bencher</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sh</span> <span class='op'>=</span> <span class='ident'>Blake2s</span>::<span class='ident'>new</span>(<span class='number'>32</span>);
-        <span class='kw'>let</span> <span class='ident'>bytes</span> <span class='op'>=</span> [<span class='number'>1u8</span>; <span class='number'>65536</span>];
-        <span class='ident'>bh</span>.<span class='ident'>iter</span>( <span class='op'>||</span> {
-            <span class='ident'>sh</span>.<span class='ident'>input</span>(<span class='kw-2'>&amp;</span><span class='ident'>bytes</span>);
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blake2s_64k</span>(<span class="ident">bh</span>: <span class="op">&amp;</span> <span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sh</span> <span class="op">=</span> <span class="ident">Blake2s</span>::<span class="ident">new</span>(<span class="number">32</span>);
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">65536</span>];
+        <span class="ident">bh</span>.<span class="ident">iter</span>( <span class="op">||</span> {
+            <span class="ident">sh</span>.<span class="ident">input</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
         });
-        <span class='ident'>bh</span>.<span class='ident'>bytes</span> <span class='op'>=</span> <span class='ident'>bytes</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>u64</span>;
+        <span class="ident">bh</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
     }
 }
 </pre>
@@ -1105,18 +1117,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1149,7 +1165,6 @@
         window.rootPath = "../../";
         window.currentCrate = "crypto";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

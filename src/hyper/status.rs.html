@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.14/src/status.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.9.18/src/status.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>status.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle">
+    
+    <link rel="stylesheet" type="text/css" href="../../dark.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css" id="themeStyle">
+    <script src="../../storage.js"></script>
     
 
     
     
 </head>
-<body class="rustdoc">
+<body class="rustdoc source">
     <!--[if lte IE 8]>
     <div class="warning">
         This old browser is unsupported and will most likely display funky
@@ -27,10 +31,18 @@
     
 
     <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
         
         
     </nav>
 
+    <div class="theme-picker">
+        <button id="theme-picker" aria-label="Pick another theme!">
+            <img src="../../brush.svg" width="18" alt="Pick another theme!">
+        </button>
+        <div id="theme-choices"></div>
+    </div>
+    <script src="../../theme.js"></script>
     <nav class="sub">
         <form class="search-form js-only">
             <div class="search-container">
@@ -42,7 +54,7 @@
         </form>
     </nav>
 
-    <section id='main' class="content source"><pre class="line-numbers"><span id="1">  1</span>
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -790,752 +802,752 @@
 <span id="746">746</span>
 <span id="747">747</span>
 <span id="748">748</span>
-</pre><pre class='rust '>
-<span class='doccomment'>//! HTTP status codes</span>
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>::<span class='ident'>Ordering</span>;
+</pre><pre class="rust ">
+<span class="doccomment">//! HTTP status codes</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
 
-<span class='comment'>// shamelessly lifted from Teepee. I tried a few schemes, this really</span>
-<span class='comment'>// does seem like the best. Improved scheme to support arbitrary status codes.</span>
+<span class="comment">// shamelessly lifted from Teepee. I tried a few schemes, this really</span>
+<span class="comment">// does seem like the best. Improved scheme to support arbitrary status codes.</span>
 
-<span class='doccomment'>/// An HTTP status code (`status-code` in RFC 7230 et al.).</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This enum contains all common status codes and an Unregistered</span>
-<span class='doccomment'>/// extension variant. It allows status codes in the range [0, 65535], as any</span>
-<span class='doccomment'>/// `u16` integer may be used as a status code for XHR requests. It is</span>
-<span class='doccomment'>/// recommended to only use values between [100, 599], since only these are</span>
-<span class='doccomment'>/// defined as valid status codes with a status class by HTTP.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// If you encounter a status code that you do not know how to deal with, you</span>
-<span class='doccomment'>/// should treat it as the `x00` status code—e.g. for code 123, treat it as</span>
-<span class='doccomment'>/// 100 (Continue). This can be achieved with</span>
-<span class='doccomment'>/// `self.class().default_code()`:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust</span>
-<span class='doccomment'>/// # use hyper::status::StatusCode;</span>
-<span class='doccomment'>/// let status = StatusCode::Unregistered(123);</span>
-<span class='doccomment'>/// assert_eq!(status.class().default_code(), StatusCode::Continue);</span>
-<span class='doccomment'>/// ```</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// IANA maintain the [Hypertext Transfer Protocol (HTTP) Status Code</span>
-<span class='doccomment'>/// Registry](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) which is</span>
-<span class='doccomment'>/// the source for this enum (with one exception, 418 I&#39;m a teapot, which is</span>
-<span class='doccomment'>/// inexplicably not in the register).</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Hash</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StatusCode</span> {
-    <span class='doccomment'>/// 100 Continue</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.2.1](https://tools.ietf.org/html/rfc7231#section-6.2.1)]</span>
-    <span class='ident'>Continue</span>,
-    <span class='doccomment'>/// 101 Switching Protocols</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.2.2](https://tools.ietf.org/html/rfc7231#section-6.2.2)]</span>
-    <span class='ident'>SwitchingProtocols</span>,
-    <span class='doccomment'>/// 102 Processing</span>
-    <span class='doccomment'>/// [[RFC2518](https://tools.ietf.org/html/rfc2518)]</span>
-    <span class='ident'>Processing</span>,
+<span class="doccomment">/// An HTTP status code (`status-code` in RFC 7230 et al.).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This enum contains all common status codes and an Unregistered</span>
+<span class="doccomment">/// extension variant. It allows status codes in the range [0, 65535], as any</span>
+<span class="doccomment">/// `u16` integer may be used as a status code for XHR requests. It is</span>
+<span class="doccomment">/// recommended to only use values between [100, 599], since only these are</span>
+<span class="doccomment">/// defined as valid status codes with a status class by HTTP.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// If you encounter a status code that you do not know how to deal with, you</span>
+<span class="doccomment">/// should treat it as the `x00` status code—e.g. for code 123, treat it as</span>
+<span class="doccomment">/// 100 (Continue). This can be achieved with</span>
+<span class="doccomment">/// `self.class().default_code()`:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # use hyper::status::StatusCode;</span>
+<span class="doccomment">/// let status = StatusCode::Unregistered(123);</span>
+<span class="doccomment">/// assert_eq!(status.class().default_code(), StatusCode::Continue);</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// IANA maintain the [Hypertext Transfer Protocol (HTTP) Status Code</span>
+<span class="doccomment">/// Registry](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) which is</span>
+<span class="doccomment">/// the source for this enum (with one exception, 418 I&#39;m a teapot, which is</span>
+<span class="doccomment">/// inexplicably not in the register).</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StatusCode</span> {
+    <span class="doccomment">/// 100 Continue</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.2.1](https://tools.ietf.org/html/rfc7231#section-6.2.1)]</span>
+    <span class="ident">Continue</span>,
+    <span class="doccomment">/// 101 Switching Protocols</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.2.2](https://tools.ietf.org/html/rfc7231#section-6.2.2)]</span>
+    <span class="ident">SwitchingProtocols</span>,
+    <span class="doccomment">/// 102 Processing</span>
+    <span class="doccomment">/// [[RFC2518](https://tools.ietf.org/html/rfc2518)]</span>
+    <span class="ident">Processing</span>,
 
-    <span class='doccomment'>/// 200 OK</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.1](https://tools.ietf.org/html/rfc7231#section-6.3.1)]</span>
-    <span class='prelude-val'>Ok</span>,
-    <span class='doccomment'>/// 201 Created</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.2](https://tools.ietf.org/html/rfc7231#section-6.3.2)]</span>
-    <span class='ident'>Created</span>,
-    <span class='doccomment'>/// 202 Accepted</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.3](https://tools.ietf.org/html/rfc7231#section-6.3.3)]</span>
-    <span class='ident'>Accepted</span>,
-    <span class='doccomment'>/// 203 Non-Authoritative Information</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.4](https://tools.ietf.org/html/rfc7231#section-6.3.4)]</span>
-    <span class='ident'>NonAuthoritativeInformation</span>,
-    <span class='doccomment'>/// 204 No Content</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.5](https://tools.ietf.org/html/rfc7231#section-6.3.5)]</span>
-    <span class='ident'>NoContent</span>,
-    <span class='doccomment'>/// 205 Reset Content</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.3.6](https://tools.ietf.org/html/rfc7231#section-6.3.6)]</span>
-    <span class='ident'>ResetContent</span>,
-    <span class='doccomment'>/// 206 Partial Content</span>
-    <span class='doccomment'>/// [[RFC7233, Section 4.1](https://tools.ietf.org/html/rfc7233#section-4.1)]</span>
-    <span class='ident'>PartialContent</span>,
-    <span class='doccomment'>/// 207 Multi-Status</span>
-    <span class='doccomment'>/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
-    <span class='ident'>MultiStatus</span>,
-    <span class='doccomment'>/// 208 Already Reported</span>
-    <span class='doccomment'>/// [[RFC5842](https://tools.ietf.org/html/rfc5842)]</span>
-    <span class='ident'>AlreadyReported</span>,
+    <span class="doccomment">/// 200 OK</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.1](https://tools.ietf.org/html/rfc7231#section-6.3.1)]</span>
+    <span class="prelude-val">Ok</span>,
+    <span class="doccomment">/// 201 Created</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.2](https://tools.ietf.org/html/rfc7231#section-6.3.2)]</span>
+    <span class="ident">Created</span>,
+    <span class="doccomment">/// 202 Accepted</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.3](https://tools.ietf.org/html/rfc7231#section-6.3.3)]</span>
+    <span class="ident">Accepted</span>,
+    <span class="doccomment">/// 203 Non-Authoritative Information</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.4](https://tools.ietf.org/html/rfc7231#section-6.3.4)]</span>
+    <span class="ident">NonAuthoritativeInformation</span>,
+    <span class="doccomment">/// 204 No Content</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.5](https://tools.ietf.org/html/rfc7231#section-6.3.5)]</span>
+    <span class="ident">NoContent</span>,
+    <span class="doccomment">/// 205 Reset Content</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.3.6](https://tools.ietf.org/html/rfc7231#section-6.3.6)]</span>
+    <span class="ident">ResetContent</span>,
+    <span class="doccomment">/// 206 Partial Content</span>
+    <span class="doccomment">/// [[RFC7233, Section 4.1](https://tools.ietf.org/html/rfc7233#section-4.1)]</span>
+    <span class="ident">PartialContent</span>,
+    <span class="doccomment">/// 207 Multi-Status</span>
+    <span class="doccomment">/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
+    <span class="ident">MultiStatus</span>,
+    <span class="doccomment">/// 208 Already Reported</span>
+    <span class="doccomment">/// [[RFC5842](https://tools.ietf.org/html/rfc5842)]</span>
+    <span class="ident">AlreadyReported</span>,
 
-    <span class='doccomment'>/// 226 IM Used</span>
-    <span class='doccomment'>/// [[RFC3229](https://tools.ietf.org/html/rfc3229)]</span>
-    <span class='ident'>ImUsed</span>,
+    <span class="doccomment">/// 226 IM Used</span>
+    <span class="doccomment">/// [[RFC3229](https://tools.ietf.org/html/rfc3229)]</span>
+    <span class="ident">ImUsed</span>,
 
-    <span class='doccomment'>/// 300 Multiple Choices</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.1](https://tools.ietf.org/html/rfc7231#section-6.4.1)]</span>
-    <span class='ident'>MultipleChoices</span>,
-    <span class='doccomment'>/// 301 Moved Permanently</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.2](https://tools.ietf.org/html/rfc7231#section-6.4.2)]</span>
-    <span class='ident'>MovedPermanently</span>,
-    <span class='doccomment'>/// 302 Found</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.3](https://tools.ietf.org/html/rfc7231#section-6.4.3)]</span>
-    <span class='ident'>Found</span>,
-    <span class='doccomment'>/// 303 See Other</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.4](https://tools.ietf.org/html/rfc7231#section-6.4.4)]</span>
-    <span class='ident'>SeeOther</span>,
-    <span class='doccomment'>/// 304 Not Modified</span>
-    <span class='doccomment'>/// [[RFC7232, Section 4.1](https://tools.ietf.org/html/rfc7232#section-4.1)]</span>
-    <span class='ident'>NotModified</span>,
-    <span class='doccomment'>/// 305 Use Proxy</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.5](https://tools.ietf.org/html/rfc7231#section-6.4.5)]</span>
-    <span class='ident'>UseProxy</span>,
-    <span class='doccomment'>/// 307 Temporary Redirect</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.4.7](https://tools.ietf.org/html/rfc7231#section-6.4.7)]</span>
-    <span class='ident'>TemporaryRedirect</span>,
-    <span class='doccomment'>/// 308 Permanent Redirect</span>
-    <span class='doccomment'>/// [[RFC7238](https://tools.ietf.org/html/rfc7238)]</span>
-    <span class='ident'>PermanentRedirect</span>,
+    <span class="doccomment">/// 300 Multiple Choices</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.1](https://tools.ietf.org/html/rfc7231#section-6.4.1)]</span>
+    <span class="ident">MultipleChoices</span>,
+    <span class="doccomment">/// 301 Moved Permanently</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.2](https://tools.ietf.org/html/rfc7231#section-6.4.2)]</span>
+    <span class="ident">MovedPermanently</span>,
+    <span class="doccomment">/// 302 Found</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.3](https://tools.ietf.org/html/rfc7231#section-6.4.3)]</span>
+    <span class="ident">Found</span>,
+    <span class="doccomment">/// 303 See Other</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.4](https://tools.ietf.org/html/rfc7231#section-6.4.4)]</span>
+    <span class="ident">SeeOther</span>,
+    <span class="doccomment">/// 304 Not Modified</span>
+    <span class="doccomment">/// [[RFC7232, Section 4.1](https://tools.ietf.org/html/rfc7232#section-4.1)]</span>
+    <span class="ident">NotModified</span>,
+    <span class="doccomment">/// 305 Use Proxy</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.5](https://tools.ietf.org/html/rfc7231#section-6.4.5)]</span>
+    <span class="ident">UseProxy</span>,
+    <span class="doccomment">/// 307 Temporary Redirect</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.4.7](https://tools.ietf.org/html/rfc7231#section-6.4.7)]</span>
+    <span class="ident">TemporaryRedirect</span>,
+    <span class="doccomment">/// 308 Permanent Redirect</span>
+    <span class="doccomment">/// [[RFC7238](https://tools.ietf.org/html/rfc7238)]</span>
+    <span class="ident">PermanentRedirect</span>,
 
-    <span class='doccomment'>/// 400 Bad Request</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.1](https://tools.ietf.org/html/rfc7231#section-6.5.1)]</span>
-    <span class='ident'>BadRequest</span>,
-    <span class='doccomment'>/// 401 Unauthorized</span>
-    <span class='doccomment'>/// [[RFC7235, Section 3.1](https://tools.ietf.org/html/rfc7235#section-3.1)]</span>
-    <span class='ident'>Unauthorized</span>,
-    <span class='doccomment'>/// 402 Payment Required</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.2](https://tools.ietf.org/html/rfc7231#section-6.5.2)]</span>
-    <span class='ident'>PaymentRequired</span>,
-    <span class='doccomment'>/// 403 Forbidden</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.3](https://tools.ietf.org/html/rfc7231#section-6.5.3)]</span>
-    <span class='ident'>Forbidden</span>,
-    <span class='doccomment'>/// 404 Not Found</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.4](https://tools.ietf.org/html/rfc7231#section-6.5.4)]</span>
-    <span class='ident'>NotFound</span>,
-    <span class='doccomment'>/// 405 Method Not Allowed</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.5](https://tools.ietf.org/html/rfc7231#section-6.5.5)]</span>
-    <span class='ident'>MethodNotAllowed</span>,
-    <span class='doccomment'>/// 406 Not Acceptable</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.6](https://tools.ietf.org/html/rfc7231#section-6.5.6)]</span>
-    <span class='ident'>NotAcceptable</span>,
-    <span class='doccomment'>/// 407 Proxy Authentication Required</span>
-    <span class='doccomment'>/// [[RFC7235, Section 3.2](https://tools.ietf.org/html/rfc7235#section-3.2)]</span>
-    <span class='ident'>ProxyAuthenticationRequired</span>,
-    <span class='doccomment'>/// 408 Request Timeout</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.7](https://tools.ietf.org/html/rfc7231#section-6.5.7)]</span>
-    <span class='ident'>RequestTimeout</span>,
-    <span class='doccomment'>/// 409 Conflict</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.8](https://tools.ietf.org/html/rfc7231#section-6.5.8)]</span>
-    <span class='ident'>Conflict</span>,
-    <span class='doccomment'>/// 410 Gone</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.9](https://tools.ietf.org/html/rfc7231#section-6.5.9)]</span>
-    <span class='ident'>Gone</span>,
-    <span class='doccomment'>/// 411 Length Required</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.10](https://tools.ietf.org/html/rfc7231#section-6.5.10)]</span>
-    <span class='ident'>LengthRequired</span>,
-    <span class='doccomment'>/// 412 Precondition Failed</span>
-    <span class='doccomment'>/// [[RFC7232, Section 4.2](https://tools.ietf.org/html/rfc7232#section-4.2)]</span>
-    <span class='ident'>PreconditionFailed</span>,
-    <span class='doccomment'>/// 413 Payload Too Large</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.11](https://tools.ietf.org/html/rfc7231#section-6.5.11)]</span>
-    <span class='ident'>PayloadTooLarge</span>,
-    <span class='doccomment'>/// 414 URI Too Long</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.12](https://tools.ietf.org/html/rfc7231#section-6.5.12)]</span>
-    <span class='ident'>UriTooLong</span>,
-    <span class='doccomment'>/// 415 Unsupported Media Type</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.13](https://tools.ietf.org/html/rfc7231#section-6.5.13)]</span>
-    <span class='ident'>UnsupportedMediaType</span>,
-    <span class='doccomment'>/// 416 Range Not Satisfiable</span>
-    <span class='doccomment'>/// [[RFC7233, Section 4.4](https://tools.ietf.org/html/rfc7233#section-4.4)]</span>
-    <span class='ident'>RangeNotSatisfiable</span>,
-    <span class='doccomment'>/// 417 Expectation Failed</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.14](https://tools.ietf.org/html/rfc7231#section-6.5.14)]</span>
-    <span class='ident'>ExpectationFailed</span>,
-    <span class='doccomment'>/// 418 I&#39;m a teapot</span>
-    <span class='doccomment'>/// [curiously, not registered by IANA, but [RFC2324](https://tools.ietf.org/html/rfc2324)]</span>
-    <span class='ident'>ImATeapot</span>,
+    <span class="doccomment">/// 400 Bad Request</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.1](https://tools.ietf.org/html/rfc7231#section-6.5.1)]</span>
+    <span class="ident">BadRequest</span>,
+    <span class="doccomment">/// 401 Unauthorized</span>
+    <span class="doccomment">/// [[RFC7235, Section 3.1](https://tools.ietf.org/html/rfc7235#section-3.1)]</span>
+    <span class="ident">Unauthorized</span>,
+    <span class="doccomment">/// 402 Payment Required</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.2](https://tools.ietf.org/html/rfc7231#section-6.5.2)]</span>
+    <span class="ident">PaymentRequired</span>,
+    <span class="doccomment">/// 403 Forbidden</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.3](https://tools.ietf.org/html/rfc7231#section-6.5.3)]</span>
+    <span class="ident">Forbidden</span>,
+    <span class="doccomment">/// 404 Not Found</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.4](https://tools.ietf.org/html/rfc7231#section-6.5.4)]</span>
+    <span class="ident">NotFound</span>,
+    <span class="doccomment">/// 405 Method Not Allowed</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.5](https://tools.ietf.org/html/rfc7231#section-6.5.5)]</span>
+    <span class="ident">MethodNotAllowed</span>,
+    <span class="doccomment">/// 406 Not Acceptable</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.6](https://tools.ietf.org/html/rfc7231#section-6.5.6)]</span>
+    <span class="ident">NotAcceptable</span>,
+    <span class="doccomment">/// 407 Proxy Authentication Required</span>
+    <span class="doccomment">/// [[RFC7235, Section 3.2](https://tools.ietf.org/html/rfc7235#section-3.2)]</span>
+    <span class="ident">ProxyAuthenticationRequired</span>,
+    <span class="doccomment">/// 408 Request Timeout</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.7](https://tools.ietf.org/html/rfc7231#section-6.5.7)]</span>
+    <span class="ident">RequestTimeout</span>,
+    <span class="doccomment">/// 409 Conflict</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.8](https://tools.ietf.org/html/rfc7231#section-6.5.8)]</span>
+    <span class="ident">Conflict</span>,
+    <span class="doccomment">/// 410 Gone</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.9](https://tools.ietf.org/html/rfc7231#section-6.5.9)]</span>
+    <span class="ident">Gone</span>,
+    <span class="doccomment">/// 411 Length Required</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.10](https://tools.ietf.org/html/rfc7231#section-6.5.10)]</span>
+    <span class="ident">LengthRequired</span>,
+    <span class="doccomment">/// 412 Precondition Failed</span>
+    <span class="doccomment">/// [[RFC7232, Section 4.2](https://tools.ietf.org/html/rfc7232#section-4.2)]</span>
+    <span class="ident">PreconditionFailed</span>,
+    <span class="doccomment">/// 413 Payload Too Large</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.11](https://tools.ietf.org/html/rfc7231#section-6.5.11)]</span>
+    <span class="ident">PayloadTooLarge</span>,
+    <span class="doccomment">/// 414 URI Too Long</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.12](https://tools.ietf.org/html/rfc7231#section-6.5.12)]</span>
+    <span class="ident">UriTooLong</span>,
+    <span class="doccomment">/// 415 Unsupported Media Type</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.13](https://tools.ietf.org/html/rfc7231#section-6.5.13)]</span>
+    <span class="ident">UnsupportedMediaType</span>,
+    <span class="doccomment">/// 416 Range Not Satisfiable</span>
+    <span class="doccomment">/// [[RFC7233, Section 4.4](https://tools.ietf.org/html/rfc7233#section-4.4)]</span>
+    <span class="ident">RangeNotSatisfiable</span>,
+    <span class="doccomment">/// 417 Expectation Failed</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.14](https://tools.ietf.org/html/rfc7231#section-6.5.14)]</span>
+    <span class="ident">ExpectationFailed</span>,
+    <span class="doccomment">/// 418 I&#39;m a teapot</span>
+    <span class="doccomment">/// [curiously, not registered by IANA, but [RFC2324](https://tools.ietf.org/html/rfc2324)]</span>
+    <span class="ident">ImATeapot</span>,
 
-    <span class='doccomment'>/// 421 Misdirected Request</span>
-    <span class='doccomment'>/// [RFC7540, Section 9.1.2](http://tools.ietf.org/html/rfc7540#section-9.1.2)</span>
-    <span class='ident'>MisdirectedRequest</span>,
-    <span class='doccomment'>/// 422 Unprocessable Entity</span>
-    <span class='doccomment'>/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
-    <span class='ident'>UnprocessableEntity</span>,
-    <span class='doccomment'>/// 423 Locked</span>
-    <span class='doccomment'>/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
-    <span class='ident'>Locked</span>,
-    <span class='doccomment'>/// 424 Failed Dependency</span>
-    <span class='doccomment'>/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
-    <span class='ident'>FailedDependency</span>,
+    <span class="doccomment">/// 421 Misdirected Request</span>
+    <span class="doccomment">/// [RFC7540, Section 9.1.2](http://tools.ietf.org/html/rfc7540#section-9.1.2)</span>
+    <span class="ident">MisdirectedRequest</span>,
+    <span class="doccomment">/// 422 Unprocessable Entity</span>
+    <span class="doccomment">/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
+    <span class="ident">UnprocessableEntity</span>,
+    <span class="doccomment">/// 423 Locked</span>
+    <span class="doccomment">/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
+    <span class="ident">Locked</span>,
+    <span class="doccomment">/// 424 Failed Dependency</span>
+    <span class="doccomment">/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
+    <span class="ident">FailedDependency</span>,
 
-    <span class='doccomment'>/// 426 Upgrade Required</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.5.15](https://tools.ietf.org/html/rfc7231#section-6.5.15)]</span>
-    <span class='ident'>UpgradeRequired</span>,
+    <span class="doccomment">/// 426 Upgrade Required</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.5.15](https://tools.ietf.org/html/rfc7231#section-6.5.15)]</span>
+    <span class="ident">UpgradeRequired</span>,
 
-    <span class='doccomment'>/// 428 Precondition Required</span>
-    <span class='doccomment'>/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
-    <span class='ident'>PreconditionRequired</span>,
-    <span class='doccomment'>/// 429 Too Many Requests</span>
-    <span class='doccomment'>/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
-    <span class='ident'>TooManyRequests</span>,
+    <span class="doccomment">/// 428 Precondition Required</span>
+    <span class="doccomment">/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
+    <span class="ident">PreconditionRequired</span>,
+    <span class="doccomment">/// 429 Too Many Requests</span>
+    <span class="doccomment">/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
+    <span class="ident">TooManyRequests</span>,
 
-    <span class='doccomment'>/// 431 Request Header Fields Too Large</span>
-    <span class='doccomment'>/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
-    <span class='ident'>RequestHeaderFieldsTooLarge</span>,
+    <span class="doccomment">/// 431 Request Header Fields Too Large</span>
+    <span class="doccomment">/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
+    <span class="ident">RequestHeaderFieldsTooLarge</span>,
 
-    <span class='doccomment'>/// 451 Unavailable For Legal Reasons</span>
-    <span class='doccomment'>/// [[RFC7725](http://tools.ietf.org/html/rfc7725)]</span>
-    <span class='ident'>UnavailableForLegalReasons</span>,
+    <span class="doccomment">/// 451 Unavailable For Legal Reasons</span>
+    <span class="doccomment">/// [[RFC7725](http://tools.ietf.org/html/rfc7725)]</span>
+    <span class="ident">UnavailableForLegalReasons</span>,
 
-    <span class='doccomment'>/// 500 Internal Server Error</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.1](https://tools.ietf.org/html/rfc7231#section-6.6.1)]</span>
-    <span class='ident'>InternalServerError</span>,
-    <span class='doccomment'>/// 501 Not Implemented</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.2](https://tools.ietf.org/html/rfc7231#section-6.6.2)]</span>
-    <span class='ident'>NotImplemented</span>,
-    <span class='doccomment'>/// 502 Bad Gateway</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.3](https://tools.ietf.org/html/rfc7231#section-6.6.3)]</span>
-    <span class='ident'>BadGateway</span>,
-    <span class='doccomment'>/// 503 Service Unavailable</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.4](https://tools.ietf.org/html/rfc7231#section-6.6.4)]</span>
-    <span class='ident'>ServiceUnavailable</span>,
-    <span class='doccomment'>/// 504 Gateway Timeout</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.5](https://tools.ietf.org/html/rfc7231#section-6.6.5)]</span>
-    <span class='ident'>GatewayTimeout</span>,
-    <span class='doccomment'>/// 505 HTTP Version Not Supported</span>
-    <span class='doccomment'>/// [[RFC7231, Section 6.6.6](https://tools.ietf.org/html/rfc7231#section-6.6.6)]</span>
-    <span class='ident'>HttpVersionNotSupported</span>,
-    <span class='doccomment'>/// 506 Variant Also Negotiates</span>
-    <span class='doccomment'>/// [[RFC2295](https://tools.ietf.org/html/rfc2295)]</span>
-    <span class='ident'>VariantAlsoNegotiates</span>,
-    <span class='doccomment'>/// 507 Insufficient Storage</span>
-    <span class='doccomment'>/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
-    <span class='ident'>InsufficientStorage</span>,
-    <span class='doccomment'>/// 508 Loop Detected</span>
-    <span class='doccomment'>/// [[RFC5842](https://tools.ietf.org/html/rfc5842)]</span>
-    <span class='ident'>LoopDetected</span>,
+    <span class="doccomment">/// 500 Internal Server Error</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.1](https://tools.ietf.org/html/rfc7231#section-6.6.1)]</span>
+    <span class="ident">InternalServerError</span>,
+    <span class="doccomment">/// 501 Not Implemented</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.2](https://tools.ietf.org/html/rfc7231#section-6.6.2)]</span>
+    <span class="ident">NotImplemented</span>,
+    <span class="doccomment">/// 502 Bad Gateway</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.3](https://tools.ietf.org/html/rfc7231#section-6.6.3)]</span>
+    <span class="ident">BadGateway</span>,
+    <span class="doccomment">/// 503 Service Unavailable</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.4](https://tools.ietf.org/html/rfc7231#section-6.6.4)]</span>
+    <span class="ident">ServiceUnavailable</span>,
+    <span class="doccomment">/// 504 Gateway Timeout</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.5](https://tools.ietf.org/html/rfc7231#section-6.6.5)]</span>
+    <span class="ident">GatewayTimeout</span>,
+    <span class="doccomment">/// 505 HTTP Version Not Supported</span>
+    <span class="doccomment">/// [[RFC7231, Section 6.6.6](https://tools.ietf.org/html/rfc7231#section-6.6.6)]</span>
+    <span class="ident">HttpVersionNotSupported</span>,
+    <span class="doccomment">/// 506 Variant Also Negotiates</span>
+    <span class="doccomment">/// [[RFC2295](https://tools.ietf.org/html/rfc2295)]</span>
+    <span class="ident">VariantAlsoNegotiates</span>,
+    <span class="doccomment">/// 507 Insufficient Storage</span>
+    <span class="doccomment">/// [[RFC4918](https://tools.ietf.org/html/rfc4918)]</span>
+    <span class="ident">InsufficientStorage</span>,
+    <span class="doccomment">/// 508 Loop Detected</span>
+    <span class="doccomment">/// [[RFC5842](https://tools.ietf.org/html/rfc5842)]</span>
+    <span class="ident">LoopDetected</span>,
 
-    <span class='doccomment'>/// 510 Not Extended</span>
-    <span class='doccomment'>/// [[RFC2774](https://tools.ietf.org/html/rfc2774)]</span>
-    <span class='ident'>NotExtended</span>,
-    <span class='doccomment'>/// 511 Network Authentication Required</span>
-    <span class='doccomment'>/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
-    <span class='ident'>NetworkAuthenticationRequired</span>,
+    <span class="doccomment">/// 510 Not Extended</span>
+    <span class="doccomment">/// [[RFC2774](https://tools.ietf.org/html/rfc2774)]</span>
+    <span class="ident">NotExtended</span>,
+    <span class="doccomment">/// 511 Network Authentication Required</span>
+    <span class="doccomment">/// [[RFC6585](https://tools.ietf.org/html/rfc6585)]</span>
+    <span class="ident">NetworkAuthenticationRequired</span>,
 
-    <span class='doccomment'>/// A status code not in the IANA HTTP status code registry or very well known</span>
-    <span class='comment'>// `ImATeapot` is not registered.</span>
-    <span class='ident'>Unregistered</span>(<span class='ident'>u16</span>),
+    <span class="doccomment">/// A status code not in the IANA HTTP status code registry or very well known</span>
+    <span class="comment">// `ImATeapot` is not registered.</span>
+    <span class="ident">Unregistered</span>(<span class="ident">u16</span>),
 }
 
-<span class='kw'>impl</span> <span class='ident'>StatusCode</span> {
+<span class="kw">impl</span> <span class="ident">StatusCode</span> {
 
-    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_u16</span>(<span class='ident'>n</span>: <span class='ident'>u16</span>) <span class='op'>-&gt;</span> <span class='ident'>StatusCode</span> {
-        <span class='kw'>match</span> <span class='ident'>n</span> {
-            <span class='number'>100</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Continue</span>,
-            <span class='number'>101</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>SwitchingProtocols</span>,
-            <span class='number'>102</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Processing</span>,
-            <span class='number'>200</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span>,
-            <span class='number'>201</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Created</span>,
-            <span class='number'>202</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Accepted</span>,
-            <span class='number'>203</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NonAuthoritativeInformation</span>,
-            <span class='number'>204</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NoContent</span>,
-            <span class='number'>205</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ResetContent</span>,
-            <span class='number'>206</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PartialContent</span>,
-            <span class='number'>207</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MultiStatus</span>,
-            <span class='number'>208</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>AlreadyReported</span>,
-            <span class='number'>226</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ImUsed</span>,
-            <span class='number'>300</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MultipleChoices</span>,
-            <span class='number'>301</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MovedPermanently</span>,
-            <span class='number'>302</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Found</span>,
-            <span class='number'>303</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>SeeOther</span>,
-            <span class='number'>304</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotModified</span>,
-            <span class='number'>305</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UseProxy</span>,
-            <span class='number'>307</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>TemporaryRedirect</span>,
-            <span class='number'>308</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PermanentRedirect</span>,
-            <span class='number'>400</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>BadRequest</span>,
-            <span class='number'>401</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Unauthorized</span>,
-            <span class='number'>402</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PaymentRequired</span>,
-            <span class='number'>403</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Forbidden</span>,
-            <span class='number'>404</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotFound</span>,
-            <span class='number'>405</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MethodNotAllowed</span>,
-            <span class='number'>406</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotAcceptable</span>,
-            <span class='number'>407</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ProxyAuthenticationRequired</span>,
-            <span class='number'>408</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>RequestTimeout</span>,
-            <span class='number'>409</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Conflict</span>,
-            <span class='number'>410</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Gone</span>,
-            <span class='number'>411</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>LengthRequired</span>,
-            <span class='number'>412</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionFailed</span>,
-            <span class='number'>413</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PayloadTooLarge</span>,
-            <span class='number'>414</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UriTooLong</span>,
-            <span class='number'>415</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UnsupportedMediaType</span>,
-            <span class='number'>416</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>RangeNotSatisfiable</span>,
-            <span class='number'>417</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ExpectationFailed</span>,
-            <span class='number'>418</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ImATeapot</span>,
-            <span class='number'>421</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MisdirectedRequest</span>,
-            <span class='number'>422</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UnprocessableEntity</span>,
-            <span class='number'>423</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Locked</span>,
-            <span class='number'>424</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>FailedDependency</span>,
-            <span class='number'>426</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UpgradeRequired</span>,
-            <span class='number'>428</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionRequired</span>,
-            <span class='number'>429</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>TooManyRequests</span>,
-            <span class='number'>431</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>RequestHeaderFieldsTooLarge</span>,
-            <span class='number'>451</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>UnavailableForLegalReasons</span>,
-            <span class='number'>500</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>InternalServerError</span>,
-            <span class='number'>501</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotImplemented</span>,
-            <span class='number'>502</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>BadGateway</span>,
-            <span class='number'>503</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>ServiceUnavailable</span>,
-            <span class='number'>504</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>GatewayTimeout</span>,
-            <span class='number'>505</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>HttpVersionNotSupported</span>,
-            <span class='number'>506</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>VariantAlsoNegotiates</span>,
-            <span class='number'>507</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>InsufficientStorage</span>,
-            <span class='number'>508</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>LoopDetected</span>,
-            <span class='number'>510</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NotExtended</span>,
-            <span class='number'>511</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>NetworkAuthenticationRequired</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Unregistered</span>(<span class='ident'>n</span>),
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">n</span>: <span class="ident">u16</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+        <span class="kw">match</span> <span class="ident">n</span> {
+            <span class="number">100</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Continue</span>,
+            <span class="number">101</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span>,
+            <span class="number">102</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Processing</span>,
+            <span class="number">200</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span>,
+            <span class="number">201</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Created</span>,
+            <span class="number">202</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Accepted</span>,
+            <span class="number">203</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NonAuthoritativeInformation</span>,
+            <span class="number">204</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NoContent</span>,
+            <span class="number">205</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ResetContent</span>,
+            <span class="number">206</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PartialContent</span>,
+            <span class="number">207</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MultiStatus</span>,
+            <span class="number">208</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">AlreadyReported</span>,
+            <span class="number">226</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ImUsed</span>,
+            <span class="number">300</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MultipleChoices</span>,
+            <span class="number">301</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MovedPermanently</span>,
+            <span class="number">302</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Found</span>,
+            <span class="number">303</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">SeeOther</span>,
+            <span class="number">304</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NotModified</span>,
+            <span class="number">305</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UseProxy</span>,
+            <span class="number">307</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">TemporaryRedirect</span>,
+            <span class="number">308</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PermanentRedirect</span>,
+            <span class="number">400</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">BadRequest</span>,
+            <span class="number">401</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Unauthorized</span>,
+            <span class="number">402</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PaymentRequired</span>,
+            <span class="number">403</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Forbidden</span>,
+            <span class="number">404</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NotFound</span>,
+            <span class="number">405</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MethodNotAllowed</span>,
+            <span class="number">406</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NotAcceptable</span>,
+            <span class="number">407</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ProxyAuthenticationRequired</span>,
+            <span class="number">408</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">RequestTimeout</span>,
+            <span class="number">409</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Conflict</span>,
+            <span class="number">410</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Gone</span>,
+            <span class="number">411</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">LengthRequired</span>,
+            <span class="number">412</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PreconditionFailed</span>,
+            <span class="number">413</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PayloadTooLarge</span>,
+            <span class="number">414</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UriTooLong</span>,
+            <span class="number">415</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UnsupportedMediaType</span>,
+            <span class="number">416</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">RangeNotSatisfiable</span>,
+            <span class="number">417</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ExpectationFailed</span>,
+            <span class="number">418</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ImATeapot</span>,
+            <span class="number">421</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MisdirectedRequest</span>,
+            <span class="number">422</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UnprocessableEntity</span>,
+            <span class="number">423</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Locked</span>,
+            <span class="number">424</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">FailedDependency</span>,
+            <span class="number">426</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UpgradeRequired</span>,
+            <span class="number">428</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">PreconditionRequired</span>,
+            <span class="number">429</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">TooManyRequests</span>,
+            <span class="number">431</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">RequestHeaderFieldsTooLarge</span>,
+            <span class="number">451</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">UnavailableForLegalReasons</span>,
+            <span class="number">500</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">InternalServerError</span>,
+            <span class="number">501</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NotImplemented</span>,
+            <span class="number">502</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">BadGateway</span>,
+            <span class="number">503</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">ServiceUnavailable</span>,
+            <span class="number">504</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">GatewayTimeout</span>,
+            <span class="number">505</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">HttpVersionNotSupported</span>,
+            <span class="number">506</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">VariantAlsoNegotiates</span>,
+            <span class="number">507</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">InsufficientStorage</span>,
+            <span class="number">508</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">LoopDetected</span>,
+            <span class="number">510</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NotExtended</span>,
+            <span class="number">511</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">NetworkAuthenticationRequired</span>,
+            _ <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Unregistered</span>(<span class="ident">n</span>),
         }
     }
 
-    <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_u16</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>u16</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>StatusCode</span>::<span class='ident'>Continue</span> <span class='op'>=&gt;</span> <span class='number'>100</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>SwitchingProtocols</span> <span class='op'>=&gt;</span> <span class='number'>101</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Processing</span> <span class='op'>=&gt;</span> <span class='number'>102</span>,
-            <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span> <span class='op'>=&gt;</span> <span class='number'>200</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Created</span> <span class='op'>=&gt;</span> <span class='number'>201</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Accepted</span> <span class='op'>=&gt;</span> <span class='number'>202</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NonAuthoritativeInformation</span> <span class='op'>=&gt;</span> <span class='number'>203</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NoContent</span> <span class='op'>=&gt;</span> <span class='number'>204</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ResetContent</span> <span class='op'>=&gt;</span> <span class='number'>205</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PartialContent</span> <span class='op'>=&gt;</span> <span class='number'>206</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>MultiStatus</span> <span class='op'>=&gt;</span> <span class='number'>207</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>AlreadyReported</span> <span class='op'>=&gt;</span> <span class='number'>208</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ImUsed</span> <span class='op'>=&gt;</span> <span class='number'>226</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>MultipleChoices</span> <span class='op'>=&gt;</span> <span class='number'>300</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>MovedPermanently</span> <span class='op'>=&gt;</span> <span class='number'>301</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Found</span> <span class='op'>=&gt;</span> <span class='number'>302</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>SeeOther</span> <span class='op'>=&gt;</span> <span class='number'>303</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotModified</span> <span class='op'>=&gt;</span> <span class='number'>304</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UseProxy</span> <span class='op'>=&gt;</span> <span class='number'>305</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>TemporaryRedirect</span> <span class='op'>=&gt;</span> <span class='number'>307</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PermanentRedirect</span> <span class='op'>=&gt;</span> <span class='number'>308</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>BadRequest</span> <span class='op'>=&gt;</span> <span class='number'>400</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Unauthorized</span> <span class='op'>=&gt;</span> <span class='number'>401</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PaymentRequired</span> <span class='op'>=&gt;</span> <span class='number'>402</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Forbidden</span> <span class='op'>=&gt;</span> <span class='number'>403</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotFound</span> <span class='op'>=&gt;</span> <span class='number'>404</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>MethodNotAllowed</span> <span class='op'>=&gt;</span> <span class='number'>405</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotAcceptable</span> <span class='op'>=&gt;</span> <span class='number'>406</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ProxyAuthenticationRequired</span> <span class='op'>=&gt;</span> <span class='number'>407</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>RequestTimeout</span> <span class='op'>=&gt;</span> <span class='number'>408</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Conflict</span> <span class='op'>=&gt;</span> <span class='number'>409</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Gone</span> <span class='op'>=&gt;</span> <span class='number'>410</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>LengthRequired</span> <span class='op'>=&gt;</span> <span class='number'>411</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionFailed</span> <span class='op'>=&gt;</span> <span class='number'>412</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PayloadTooLarge</span> <span class='op'>=&gt;</span> <span class='number'>413</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UriTooLong</span> <span class='op'>=&gt;</span> <span class='number'>414</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnsupportedMediaType</span> <span class='op'>=&gt;</span> <span class='number'>415</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>RangeNotSatisfiable</span> <span class='op'>=&gt;</span> <span class='number'>416</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ExpectationFailed</span> <span class='op'>=&gt;</span> <span class='number'>417</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ImATeapot</span> <span class='op'>=&gt;</span> <span class='number'>418</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>MisdirectedRequest</span> <span class='op'>=&gt;</span> <span class='number'>421</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnprocessableEntity</span> <span class='op'>=&gt;</span> <span class='number'>422</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Locked</span> <span class='op'>=&gt;</span> <span class='number'>423</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>FailedDependency</span> <span class='op'>=&gt;</span> <span class='number'>424</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UpgradeRequired</span> <span class='op'>=&gt;</span> <span class='number'>426</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionRequired</span> <span class='op'>=&gt;</span> <span class='number'>428</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>TooManyRequests</span> <span class='op'>=&gt;</span> <span class='number'>429</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>RequestHeaderFieldsTooLarge</span> <span class='op'>=&gt;</span> <span class='number'>431</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnavailableForLegalReasons</span> <span class='op'>=&gt;</span> <span class='number'>451</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>InternalServerError</span> <span class='op'>=&gt;</span> <span class='number'>500</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotImplemented</span> <span class='op'>=&gt;</span> <span class='number'>501</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>BadGateway</span> <span class='op'>=&gt;</span> <span class='number'>502</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>ServiceUnavailable</span> <span class='op'>=&gt;</span> <span class='number'>503</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>GatewayTimeout</span> <span class='op'>=&gt;</span> <span class='number'>504</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>HttpVersionNotSupported</span> <span class='op'>=&gt;</span> <span class='number'>505</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>VariantAlsoNegotiates</span> <span class='op'>=&gt;</span> <span class='number'>506</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>InsufficientStorage</span> <span class='op'>=&gt;</span> <span class='number'>507</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>LoopDetected</span> <span class='op'>=&gt;</span> <span class='number'>508</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotExtended</span> <span class='op'>=&gt;</span> <span class='number'>510</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>NetworkAuthenticationRequired</span> <span class='op'>=&gt;</span> <span class='number'>511</span>,
-            <span class='ident'>StatusCode</span>::<span class='ident'>Unregistered</span>(<span class='ident'>n</span>) <span class='op'>=&gt;</span> <span class='ident'>n</span>,
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">StatusCode</span>::<span class="ident">Continue</span> <span class="op">=&gt;</span> <span class="number">100</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span> <span class="op">=&gt;</span> <span class="number">101</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Processing</span> <span class="op">=&gt;</span> <span class="number">102</span>,
+            <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span> <span class="op">=&gt;</span> <span class="number">200</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Created</span> <span class="op">=&gt;</span> <span class="number">201</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Accepted</span> <span class="op">=&gt;</span> <span class="number">202</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NonAuthoritativeInformation</span> <span class="op">=&gt;</span> <span class="number">203</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NoContent</span> <span class="op">=&gt;</span> <span class="number">204</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ResetContent</span> <span class="op">=&gt;</span> <span class="number">205</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PartialContent</span> <span class="op">=&gt;</span> <span class="number">206</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">MultiStatus</span> <span class="op">=&gt;</span> <span class="number">207</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">AlreadyReported</span> <span class="op">=&gt;</span> <span class="number">208</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ImUsed</span> <span class="op">=&gt;</span> <span class="number">226</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">MultipleChoices</span> <span class="op">=&gt;</span> <span class="number">300</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">MovedPermanently</span> <span class="op">=&gt;</span> <span class="number">301</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Found</span> <span class="op">=&gt;</span> <span class="number">302</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">SeeOther</span> <span class="op">=&gt;</span> <span class="number">303</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NotModified</span> <span class="op">=&gt;</span> <span class="number">304</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UseProxy</span> <span class="op">=&gt;</span> <span class="number">305</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">TemporaryRedirect</span> <span class="op">=&gt;</span> <span class="number">307</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PermanentRedirect</span> <span class="op">=&gt;</span> <span class="number">308</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">BadRequest</span> <span class="op">=&gt;</span> <span class="number">400</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Unauthorized</span> <span class="op">=&gt;</span> <span class="number">401</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PaymentRequired</span> <span class="op">=&gt;</span> <span class="number">402</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Forbidden</span> <span class="op">=&gt;</span> <span class="number">403</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NotFound</span> <span class="op">=&gt;</span> <span class="number">404</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">MethodNotAllowed</span> <span class="op">=&gt;</span> <span class="number">405</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NotAcceptable</span> <span class="op">=&gt;</span> <span class="number">406</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ProxyAuthenticationRequired</span> <span class="op">=&gt;</span> <span class="number">407</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">RequestTimeout</span> <span class="op">=&gt;</span> <span class="number">408</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Conflict</span> <span class="op">=&gt;</span> <span class="number">409</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Gone</span> <span class="op">=&gt;</span> <span class="number">410</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">LengthRequired</span> <span class="op">=&gt;</span> <span class="number">411</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PreconditionFailed</span> <span class="op">=&gt;</span> <span class="number">412</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PayloadTooLarge</span> <span class="op">=&gt;</span> <span class="number">413</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UriTooLong</span> <span class="op">=&gt;</span> <span class="number">414</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UnsupportedMediaType</span> <span class="op">=&gt;</span> <span class="number">415</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">RangeNotSatisfiable</span> <span class="op">=&gt;</span> <span class="number">416</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ExpectationFailed</span> <span class="op">=&gt;</span> <span class="number">417</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ImATeapot</span> <span class="op">=&gt;</span> <span class="number">418</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">MisdirectedRequest</span> <span class="op">=&gt;</span> <span class="number">421</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UnprocessableEntity</span> <span class="op">=&gt;</span> <span class="number">422</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Locked</span> <span class="op">=&gt;</span> <span class="number">423</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">FailedDependency</span> <span class="op">=&gt;</span> <span class="number">424</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UpgradeRequired</span> <span class="op">=&gt;</span> <span class="number">426</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">PreconditionRequired</span> <span class="op">=&gt;</span> <span class="number">428</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">TooManyRequests</span> <span class="op">=&gt;</span> <span class="number">429</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">RequestHeaderFieldsTooLarge</span> <span class="op">=&gt;</span> <span class="number">431</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">UnavailableForLegalReasons</span> <span class="op">=&gt;</span> <span class="number">451</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">InternalServerError</span> <span class="op">=&gt;</span> <span class="number">500</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NotImplemented</span> <span class="op">=&gt;</span> <span class="number">501</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">BadGateway</span> <span class="op">=&gt;</span> <span class="number">502</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">ServiceUnavailable</span> <span class="op">=&gt;</span> <span class="number">503</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">GatewayTimeout</span> <span class="op">=&gt;</span> <span class="number">504</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">HttpVersionNotSupported</span> <span class="op">=&gt;</span> <span class="number">505</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">VariantAlsoNegotiates</span> <span class="op">=&gt;</span> <span class="number">506</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">InsufficientStorage</span> <span class="op">=&gt;</span> <span class="number">507</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">LoopDetected</span> <span class="op">=&gt;</span> <span class="number">508</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NotExtended</span> <span class="op">=&gt;</span> <span class="number">510</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">NetworkAuthenticationRequired</span> <span class="op">=&gt;</span> <span class="number">511</span>,
+            <span class="ident">StatusCode</span>::<span class="ident">Unregistered</span>(<span class="ident">n</span>) <span class="op">=&gt;</span> <span class="ident">n</span>,
         }
     }
 
-    <span class='doccomment'>/// Get the standardised `reason-phrase` for this status code.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This is mostly here for servers writing responses, but could potentially have application</span>
-    <span class='doccomment'>/// at other times.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The reason phrase is defined as being exclusively for human readers. You should avoid</span>
-    <span class='doccomment'>/// deriving any meaning from it at all costs.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Bear in mind also that in HTTP/2.0 the reason phrase is abolished from transmission, and so</span>
-    <span class='doccomment'>/// this canonical reason phrase really is the only reason phrase you’ll find.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>canonical_reason</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span><span class='op'>&gt;</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>StatusCode</span>::<span class='ident'>Continue</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Continue&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>SwitchingProtocols</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Switching Protocols&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Processing</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Processing&quot;</span>),
+    <span class="doccomment">/// Get the standardised `reason-phrase` for this status code.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is mostly here for servers writing responses, but could potentially have application</span>
+    <span class="doccomment">/// at other times.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The reason phrase is defined as being exclusively for human readers. You should avoid</span>
+    <span class="doccomment">/// deriving any meaning from it at all costs.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Bear in mind also that in HTTP/2.0 the reason phrase is abolished from transmission, and so</span>
+    <span class="doccomment">/// this canonical reason phrase really is the only reason phrase you’ll find.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">canonical_reason</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">StatusCode</span>::<span class="ident">Continue</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Continue&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">SwitchingProtocols</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Switching Protocols&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Processing</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Processing&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;OK&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Created</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Created&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Accepted</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Accepted&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NonAuthoritativeInformation</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Non-Authoritative Information&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NoContent</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;No Content&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>ResetContent</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Reset Content&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>PartialContent</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Partial Content&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>MultiStatus</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Multi-Status&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>AlreadyReported</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Already Reported&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;OK&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Created</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Created&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Accepted</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Accepted&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NonAuthoritativeInformation</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Non-Authoritative Information&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NoContent</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;No Content&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ResetContent</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Reset Content&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PartialContent</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Partial Content&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">MultiStatus</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Multi-Status&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">AlreadyReported</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Already Reported&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>ImUsed</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;IM Used&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ImUsed</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;IM Used&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>MultipleChoices</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Multiple Choices&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>MovedPermanently</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Moved Permanently&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Found</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Found&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>SeeOther</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;See Other&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotModified</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Modified&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>UseProxy</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Use Proxy&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">MultipleChoices</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Multiple Choices&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">MovedPermanently</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Moved Permanently&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Found</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Found&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">SeeOther</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;See Other&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NotModified</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Not Modified&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UseProxy</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Use Proxy&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>TemporaryRedirect</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Temporary Redirect&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>PermanentRedirect</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Permanent Redirect&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">TemporaryRedirect</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Temporary Redirect&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PermanentRedirect</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Permanent Redirect&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>BadRequest</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Bad Request&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Unauthorized</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unauthorized&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>PaymentRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Payment Required&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Forbidden</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Forbidden&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotFound</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Found&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>MethodNotAllowed</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Method Not Allowed&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotAcceptable</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Acceptable&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>ProxyAuthenticationRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Proxy Authentication Required&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>RequestTimeout</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Request Timeout&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Conflict</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Conflict&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Gone</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Gone&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>LengthRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Length Required&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionFailed</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Precondition Failed&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>PayloadTooLarge</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Payload Too Large&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>UriTooLong</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;URI Too Long&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnsupportedMediaType</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unsupported Media Type&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>RangeNotSatisfiable</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Range Not Satisfiable&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>ExpectationFailed</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Expectation Failed&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>ImATeapot</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;I&#39;m a teapot&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">BadRequest</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Bad Request&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Unauthorized</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Unauthorized&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PaymentRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Payment Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Forbidden</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Forbidden&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NotFound</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Not Found&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">MethodNotAllowed</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Method Not Allowed&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NotAcceptable</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Not Acceptable&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ProxyAuthenticationRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Proxy Authentication Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">RequestTimeout</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Request Timeout&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Conflict</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Conflict&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Gone</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Gone&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">LengthRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Length Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PreconditionFailed</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Precondition Failed&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PayloadTooLarge</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Payload Too Large&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UriTooLong</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;URI Too Long&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UnsupportedMediaType</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Unsupported Media Type&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">RangeNotSatisfiable</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Range Not Satisfiable&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ExpectationFailed</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Expectation Failed&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ImATeapot</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;I&#39;m a teapot&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>MisdirectedRequest</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Misdirected Request&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnprocessableEntity</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unprocessable Entity&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Locked</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Locked&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>FailedDependency</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Failed Dependency&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">MisdirectedRequest</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Misdirected Request&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UnprocessableEntity</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Unprocessable Entity&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Locked</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Locked&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">FailedDependency</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Failed Dependency&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>UpgradeRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Upgrade Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UpgradeRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Upgrade Required&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>PreconditionRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Precondition Required&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>TooManyRequests</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Too Many Requests&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">PreconditionRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Precondition Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">TooManyRequests</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Too Many Requests&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>RequestHeaderFieldsTooLarge</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Request Header Fields Too Large&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">RequestHeaderFieldsTooLarge</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Request Header Fields Too Large&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>UnavailableForLegalReasons</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unavailable For Legal Reasons&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">UnavailableForLegalReasons</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Unavailable For Legal Reasons&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>InternalServerError</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Internal Server Error&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotImplemented</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Implemented&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>BadGateway</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Bad Gateway&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>ServiceUnavailable</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Service Unavailable&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>GatewayTimeout</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Gateway Timeout&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>HttpVersionNotSupported</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;HTTP Version Not Supported&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>VariantAlsoNegotiates</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Variant Also Negotiates&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>InsufficientStorage</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Insufficient Storage&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>LoopDetected</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Loop Detected&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">InternalServerError</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Internal Server Error&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NotImplemented</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Not Implemented&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">BadGateway</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Bad Gateway&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">ServiceUnavailable</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Service Unavailable&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">GatewayTimeout</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Gateway Timeout&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">HttpVersionNotSupported</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;HTTP Version Not Supported&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">VariantAlsoNegotiates</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Variant Also Negotiates&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">InsufficientStorage</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Insufficient Storage&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">LoopDetected</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Loop Detected&quot;</span>),
 
-            <span class='ident'>StatusCode</span>::<span class='ident'>NotExtended</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Extended&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>NetworkAuthenticationRequired</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='string'>&quot;Network Authentication Required&quot;</span>),
-            <span class='ident'>StatusCode</span>::<span class='ident'>Unregistered</span>(..) <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+            <span class="ident">StatusCode</span>::<span class="ident">NotExtended</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Not Extended&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">NetworkAuthenticationRequired</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Network Authentication Required&quot;</span>),
+            <span class="ident">StatusCode</span>::<span class="ident">Unregistered</span>(..) <span class="op">=&gt;</span> <span class="prelude-val">None</span>
         }
     }
 
-    <span class='doccomment'>/// Determine the class of a status code, based on its first digit.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>class</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StatusClass</span> {
-        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>to_u16</span>() {
-            <span class='number'>100</span>...<span class='number'>199</span> <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>Informational</span>,
-            <span class='number'>200</span>...<span class='number'>299</span> <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>Success</span>,
-            <span class='number'>300</span>...<span class='number'>399</span> <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>Redirection</span>,
-            <span class='number'>400</span>...<span class='number'>499</span> <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>ClientError</span>,
-            <span class='number'>500</span>...<span class='number'>599</span> <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>ServerError</span>,
-            _ <span class='op'>=&gt;</span> <span class='ident'>StatusClass</span>::<span class='ident'>NoClass</span>,
+    <span class="doccomment">/// Determine the class of a status code, based on its first digit.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">class</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StatusClass</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_u16</span>() {
+            <span class="number">100</span>...<span class="number">199</span> <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">Informational</span>,
+            <span class="number">200</span>...<span class="number">299</span> <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">Success</span>,
+            <span class="number">300</span>...<span class="number">399</span> <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">Redirection</span>,
+            <span class="number">400</span>...<span class="number">499</span> <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">ClientError</span>,
+            <span class="number">500</span>...<span class="number">599</span> <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">ServerError</span>,
+            _ <span class="op">=&gt;</span> <span class="ident">StatusClass</span>::<span class="ident">NoClass</span>,
         }
     }
 
-    <span class='doccomment'>/// Check if class is Informational.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_informational</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>Informational</span>
+    <span class="doccomment">/// Check if class is Informational.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_informational</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">Informational</span>
     }
 
-    <span class='doccomment'>/// Check if class is Success.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_success</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>Success</span>
+    <span class="doccomment">/// Check if class is Success.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">Success</span>
     }
 
-    <span class='doccomment'>/// Check if class is Redirection.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_redirection</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>Redirection</span>
+    <span class="doccomment">/// Check if class is Redirection.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_redirection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">Redirection</span>
     }
 
-    <span class='doccomment'>/// Check if class is ClientError.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_client_error</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>ClientError</span>
+    <span class="doccomment">/// Check if class is ClientError.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_client_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">ClientError</span>
     }
 
-    <span class='doccomment'>/// Check if class is ServerError.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_server_error</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>ServerError</span>
+    <span class="doccomment">/// Check if class is ServerError.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_server_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">ServerError</span>
     }
 
-    <span class='doccomment'>/// Check if class is NoClass</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_strange_status</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>class</span>() <span class='op'>==</span> <span class='ident'>StatusClass</span>::<span class='ident'>NoClass</span>
-    }
-}
-
-<span class='kw'>impl</span> <span class='ident'>Copy</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {}
-
-<span class='doccomment'>/// Formats the status code, *including* the canonical reason.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// ```rust</span>
-<span class='doccomment'>/// # use hyper::status::StatusCode::{ImATeapot, Unregistered};</span>
-<span class='doccomment'>/// assert_eq!(format!(&quot;{}&quot;, ImATeapot), &quot;418 I&#39;m a teapot&quot;);</span>
-<span class='doccomment'>/// assert_eq!(format!(&quot;{}&quot;, Unregistered(123)),</span>
-<span class='doccomment'>///            &quot;123 &lt;unknown status code&gt;&quot;);</span>
-<span class='doccomment'>/// ```</span>
-<span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Display</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {
-    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} {}&quot;</span>, <span class='self'>self</span>.<span class='ident'>to_u16</span>(),
-               <span class='self'>self</span>.<span class='ident'>canonical_reason</span>().<span class='ident'>unwrap_or</span>(<span class='string'>&quot;&lt;unknown status code&gt;&quot;</span>))
+    <span class="doccomment">/// Check if class is NoClass</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_strange_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">class</span>() <span class="op">==</span> <span class="ident">StatusClass</span>::<span class="ident">NoClass</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>PartialEq</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>StatusCode</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-        <span class='self'>self</span>.<span class='ident'>to_u16</span>() <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>to_u16</span>()
+<span class="kw">impl</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {}
+
+<span class="doccomment">/// Formats the status code, *including* the canonical reason.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # use hyper::status::StatusCode::{ImATeapot, Unregistered};</span>
+<span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, ImATeapot), &quot;418 I&#39;m a teapot&quot;);</span>
+<span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, Unregistered(123)),</span>
+<span class="doccomment">///            &quot;123 &lt;unknown status code&gt;&quot;);</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">to_u16</span>(),
+               <span class="self">self</span>.<span class="ident">canonical_reason</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;unknown status code&gt;&quot;</span>))
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Eq</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {}
-
-<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StatusCode</span> {
-        <span class='op'>*</span><span class='self'>self</span>
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">to_u16</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">to_u16</span>()
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>PartialOrd</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>StatusCode</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Ordering</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>to_u16</span>().<span class='ident'>partial_cmp</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>other</span>.<span class='ident'>to_u16</span>()))
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {}
+
+<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+        <span class="kw-2">*</span><span class="self">self</span>
     }
 }
 
-<span class='kw'>impl</span> <span class='ident'>Ord</span> <span class='kw'>for</span> <span class='ident'>StatusCode</span> {
-    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>cmp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>: <span class='kw-2'>&amp;</span><span class='ident'>StatusCode</span>) <span class='op'>-&gt;</span> <span class='ident'>Ordering</span> {
-        <span class='kw'>if</span> <span class='op'>*</span><span class='self'>self</span> <span class='op'>&lt;</span> <span class='op'>*</span><span class='ident'>other</span> {
-            <span class='ident'>Ordering</span>::<span class='ident'>Less</span>
-        } <span class='kw'>else</span> <span class='kw'>if</span> <span class='op'>*</span><span class='self'>self</span> <span class='op'>&gt;</span> <span class='op'>*</span><span class='ident'>other</span> {
-            <span class='ident'>Ordering</span>::<span class='ident'>Greater</span>
-        } <span class='kw'>else</span> {
-            <span class='ident'>Ordering</span>::<span class='ident'>Equal</span>
-        }
+<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">to_u16</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">other</span>.<span class="ident">to_u16</span>()))
     }
 }
 
-<span class='doccomment'>/// The class of an HTTP `status-code`.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// [RFC 7231, section 6 (Response Status Codes)](https://tools.ietf.org/html/rfc7231#section-6):</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// &gt; The first digit of the status-code defines the class of response.</span>
-<span class='doccomment'>/// &gt; The last two digits do not have any categorization role.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// And:</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// &gt; HTTP status codes are extensible.  HTTP clients are not required to</span>
-<span class='doccomment'>/// &gt; understand the meaning of all registered status codes, though such</span>
-<span class='doccomment'>/// &gt; understanding is obviously desirable.  However, a client MUST</span>
-<span class='doccomment'>/// &gt; understand the class of any status code, as indicated by the first</span>
-<span class='doccomment'>/// &gt; digit, and treat an unrecognized status code as being equivalent to</span>
-<span class='doccomment'>/// &gt; the x00 status code of that class, with the exception that a</span>
-<span class='doccomment'>/// &gt; recipient MUST NOT cache a response with an unrecognized status code.</span>
-<span class='doccomment'>/// &gt;</span>
-<span class='doccomment'>/// &gt; For example, if an unrecognized status code of 471 is received by a</span>
-<span class='doccomment'>/// &gt; client, the client can assume that there was something wrong with its</span>
-<span class='doccomment'>/// &gt; request and treat the response as if it had received a 400 (Bad</span>
-<span class='doccomment'>/// &gt; Request) status code.  The response message will usually contain a</span>
-<span class='doccomment'>/// &gt; representation that explains the status.</span>
-<span class='doccomment'>///</span>
-<span class='doccomment'>/// This can be used in cases where a status code’s meaning is unknown, also,</span>
-<span class='doccomment'>/// to get the appropriate *category* of status.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>, <span class='ident'>Eq</span>, <span class='ident'>PartialOrd</span>, <span class='ident'>Ord</span>, <span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StatusClass</span> {
-    <span class='doccomment'>/// 1xx (Informational): The request was received, continuing process</span>
-    <span class='ident'>Informational</span>,
-
-    <span class='doccomment'>/// 2xx (Success): The request was successfully received, understood, and accepted</span>
-    <span class='ident'>Success</span>,
-
-    <span class='doccomment'>/// 3xx (Redirection): Further action needs to be taken in order to complete the request</span>
-    <span class='ident'>Redirection</span>,
-
-    <span class='doccomment'>/// 4xx (Client Error): The request contains bad syntax or cannot be fulfilled</span>
-    <span class='ident'>ClientError</span>,
-
-    <span class='doccomment'>/// 5xx (Server Error): The server failed to fulfill an apparently valid request</span>
-    <span class='ident'>ServerError</span>,
-
-    <span class='doccomment'>/// A status code lower than 100 or higher than 599. These codes do no belong to any class.</span>
-    <span class='ident'>NoClass</span>,
-}
-
-<span class='kw'>impl</span> <span class='ident'>StatusClass</span> {
-    <span class='doccomment'>/// Get the default status code for the class.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This produces the x00 status code; thus, for `ClientError` (4xx), for</span>
-    <span class='doccomment'>/// example, this will produce `BadRequest` (400):</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```rust</span>
-    <span class='doccomment'>/// # use hyper::status::StatusClass::ClientError;</span>
-    <span class='doccomment'>/// # use hyper::status::StatusCode::BadRequest;</span>
-    <span class='doccomment'>/// assert_eq!(ClientError.default_code(), BadRequest);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The use for this is outlined in [RFC 7231, section 6 (Response Status</span>
-    <span class='doccomment'>/// Codes)](https://tools.ietf.org/html/rfc7231#section-6):</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// &gt; HTTP status codes are extensible.  HTTP clients are not required to</span>
-    <span class='doccomment'>/// &gt; understand the meaning of all registered status codes, though such</span>
-    <span class='doccomment'>/// &gt; understanding is obviously desirable.  However, a client MUST</span>
-    <span class='doccomment'>/// &gt; understand the class of any status code, as indicated by the first</span>
-    <span class='doccomment'>/// &gt; digit, and treat an unrecognized status code as being equivalent to</span>
-    <span class='doccomment'>/// &gt; the x00 status code of that class, with the exception that a</span>
-    <span class='doccomment'>/// &gt; recipient MUST NOT cache a response with an unrecognized status code.</span>
-    <span class='doccomment'>/// &gt;</span>
-    <span class='doccomment'>/// &gt; For example, if an unrecognized status code of 471 is received by a</span>
-    <span class='doccomment'>/// &gt; client, the client can assume that there was something wrong with its</span>
-    <span class='doccomment'>/// &gt; request and treat the response as if it had received a 400 (Bad</span>
-    <span class='doccomment'>/// &gt; Request) status code.  The response message will usually contain a</span>
-    <span class='doccomment'>/// &gt; representation that explains the status.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This is demonstrated thusly:</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```rust</span>
-    <span class='doccomment'>/// # use hyper::status::StatusCode::{Unregistered, BadRequest};</span>
-    <span class='doccomment'>/// // Suppose we have received this status code.</span>
-    <span class='doccomment'>/// // You will never directly create an unregistered status code.</span>
-    <span class='doccomment'>/// let status = Unregistered(471);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // Uh oh! Don’t know what to do with it.</span>
-    <span class='doccomment'>/// // Let’s fall back to the default:</span>
-    <span class='doccomment'>/// let status = status.class().default_code();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // And look! That is 400 Bad Request.</span>
-    <span class='doccomment'>/// assert_eq!(status, BadRequest);</span>
-    <span class='doccomment'>/// // So now let’s treat it as that.</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// All status codes that do not map to an existing status class are matched</span>
-    <span class='doccomment'>/// by a `NoClass`, variant that resolves to 200 (Ok) as default code.</span>
-    <span class='doccomment'>/// This is a common handling for unknown status codes in major browsers.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>default_code</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>StatusCode</span> {
-        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-            <span class='ident'>StatusClass</span>::<span class='ident'>Informational</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>Continue</span>,
-            <span class='ident'>StatusClass</span>::<span class='ident'>Success</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span>,
-            <span class='ident'>StatusClass</span>::<span class='ident'>Redirection</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>MultipleChoices</span>,
-            <span class='ident'>StatusClass</span>::<span class='ident'>ClientError</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>BadRequest</span>,
-            <span class='ident'>StatusClass</span>::<span class='ident'>ServerError</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='ident'>InternalServerError</span>,
-            <span class='ident'>StatusClass</span>::<span class='ident'>NoClass</span> <span class='op'>=&gt;</span> <span class='ident'>StatusCode</span>::<span class='prelude-val'>Ok</span>,
+<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">StatusCode</span> {
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StatusCode</span>) <span class="op">-&gt;</span> <span class="ident">Ordering</span> {
+        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">other</span> {
+            <span class="ident">Ordering</span>::<span class="ident">Less</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">other</span> {
+            <span class="ident">Ordering</span>::<span class="ident">Greater</span>
+        } <span class="kw">else</span> {
+            <span class="ident">Ordering</span>::<span class="ident">Equal</span>
         }
     }
 }
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>mod</span> <span class='ident'>tests</span> {
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>StatusCode</span>::<span class='op'>*</span>;
+<span class="doccomment">/// The class of an HTTP `status-code`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [RFC 7231, section 6 (Response Status Codes)](https://tools.ietf.org/html/rfc7231#section-6):</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; The first digit of the status-code defines the class of response.</span>
+<span class="doccomment">/// &gt; The last two digits do not have any categorization role.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// And:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &gt; HTTP status codes are extensible.  HTTP clients are not required to</span>
+<span class="doccomment">/// &gt; understand the meaning of all registered status codes, though such</span>
+<span class="doccomment">/// &gt; understanding is obviously desirable.  However, a client MUST</span>
+<span class="doccomment">/// &gt; understand the class of any status code, as indicated by the first</span>
+<span class="doccomment">/// &gt; digit, and treat an unrecognized status code as being equivalent to</span>
+<span class="doccomment">/// &gt; the x00 status code of that class, with the exception that a</span>
+<span class="doccomment">/// &gt; recipient MUST NOT cache a response with an unrecognized status code.</span>
+<span class="doccomment">/// &gt;</span>
+<span class="doccomment">/// &gt; For example, if an unrecognized status code of 471 is received by a</span>
+<span class="doccomment">/// &gt; client, the client can assume that there was something wrong with its</span>
+<span class="doccomment">/// &gt; request and treat the response as if it had received a 400 (Bad</span>
+<span class="doccomment">/// &gt; Request) status code.  The response message will usually contain a</span>
+<span class="doccomment">/// &gt; representation that explains the status.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This can be used in cases where a status code’s meaning is unknown, also,</span>
+<span class="doccomment">/// to get the appropriate *category* of status.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Copy</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StatusClass</span> {
+    <span class="doccomment">/// 1xx (Informational): The request was received, continuing process</span>
+    <span class="ident">Informational</span>,
 
-    <span class='comment'>// Check that the following entities are properly inter-connected:</span>
-    <span class='comment'>//   - numerical code</span>
-    <span class='comment'>//   - status code</span>
-    <span class='comment'>//   - default code (for the given status code)</span>
-    <span class='comment'>//   - canonical reason</span>
-    <span class='kw'>fn</span> <span class='ident'>validate</span>(<span class='ident'>num</span>: <span class='ident'>u16</span>, <span class='ident'>status_code</span>: <span class='ident'>StatusCode</span>, <span class='ident'>default_code</span>: <span class='ident'>StatusCode</span>, <span class='ident'>reason</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>str</span><span class='op'>&gt;</span>) {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>StatusCode</span>::<span class='ident'>from_u16</span>(<span class='ident'>num</span>), <span class='ident'>status_code</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>status_code</span>.<span class='ident'>to_u16</span>(), <span class='ident'>num</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>status_code</span>.<span class='ident'>class</span>().<span class='ident'>default_code</span>(), <span class='ident'>default_code</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>status_code</span>.<span class='ident'>canonical_reason</span>(), <span class='ident'>reason</span>);
+    <span class="doccomment">/// 2xx (Success): The request was successfully received, understood, and accepted</span>
+    <span class="ident">Success</span>,
+
+    <span class="doccomment">/// 3xx (Redirection): Further action needs to be taken in order to complete the request</span>
+    <span class="ident">Redirection</span>,
+
+    <span class="doccomment">/// 4xx (Client Error): The request contains bad syntax or cannot be fulfilled</span>
+    <span class="ident">ClientError</span>,
+
+    <span class="doccomment">/// 5xx (Server Error): The server failed to fulfill an apparently valid request</span>
+    <span class="ident">ServerError</span>,
+
+    <span class="doccomment">/// A status code lower than 100 or higher than 599. These codes do no belong to any class.</span>
+    <span class="ident">NoClass</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">StatusClass</span> {
+    <span class="doccomment">/// Get the default status code for the class.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This produces the x00 status code; thus, for `ClientError` (4xx), for</span>
+    <span class="doccomment">/// example, this will produce `BadRequest` (400):</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use hyper::status::StatusClass::ClientError;</span>
+    <span class="doccomment">/// # use hyper::status::StatusCode::BadRequest;</span>
+    <span class="doccomment">/// assert_eq!(ClientError.default_code(), BadRequest);</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The use for this is outlined in [RFC 7231, section 6 (Response Status</span>
+    <span class="doccomment">/// Codes)](https://tools.ietf.org/html/rfc7231#section-6):</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// &gt; HTTP status codes are extensible.  HTTP clients are not required to</span>
+    <span class="doccomment">/// &gt; understand the meaning of all registered status codes, though such</span>
+    <span class="doccomment">/// &gt; understanding is obviously desirable.  However, a client MUST</span>
+    <span class="doccomment">/// &gt; understand the class of any status code, as indicated by the first</span>
+    <span class="doccomment">/// &gt; digit, and treat an unrecognized status code as being equivalent to</span>
+    <span class="doccomment">/// &gt; the x00 status code of that class, with the exception that a</span>
+    <span class="doccomment">/// &gt; recipient MUST NOT cache a response with an unrecognized status code.</span>
+    <span class="doccomment">/// &gt;</span>
+    <span class="doccomment">/// &gt; For example, if an unrecognized status code of 471 is received by a</span>
+    <span class="doccomment">/// &gt; client, the client can assume that there was something wrong with its</span>
+    <span class="doccomment">/// &gt; request and treat the response as if it had received a 400 (Bad</span>
+    <span class="doccomment">/// &gt; Request) status code.  The response message will usually contain a</span>
+    <span class="doccomment">/// &gt; representation that explains the status.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This is demonstrated thusly:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust</span>
+    <span class="doccomment">/// # use hyper::status::StatusCode::{Unregistered, BadRequest};</span>
+    <span class="doccomment">/// // Suppose we have received this status code.</span>
+    <span class="doccomment">/// // You will never directly create an unregistered status code.</span>
+    <span class="doccomment">/// let status = Unregistered(471);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Uh oh! Don’t know what to do with it.</span>
+    <span class="doccomment">/// // Let’s fall back to the default:</span>
+    <span class="doccomment">/// let status = status.class().default_code();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // And look! That is 400 Bad Request.</span>
+    <span class="doccomment">/// assert_eq!(status, BadRequest);</span>
+    <span class="doccomment">/// // So now let’s treat it as that.</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// All status codes that do not map to an existing status class are matched</span>
+    <span class="doccomment">/// by a `NoClass`, variant that resolves to 200 (Ok) as default code.</span>
+    <span class="doccomment">/// This is a common handling for unknown status codes in major browsers.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">StatusCode</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">StatusClass</span>::<span class="ident">Informational</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">Continue</span>,
+            <span class="ident">StatusClass</span>::<span class="ident">Success</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span>,
+            <span class="ident">StatusClass</span>::<span class="ident">Redirection</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">MultipleChoices</span>,
+            <span class="ident">StatusClass</span>::<span class="ident">ClientError</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">BadRequest</span>,
+            <span class="ident">StatusClass</span>::<span class="ident">ServerError</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="ident">InternalServerError</span>,
+            <span class="ident">StatusClass</span>::<span class="ident">NoClass</span> <span class="op">=&gt;</span> <span class="ident">StatusCode</span>::<span class="prelude-val">Ok</span>,
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">StatusCode</span>::<span class="kw-2">*</span>;
+
+    <span class="comment">// Check that the following entities are properly inter-connected:</span>
+    <span class="comment">//   - numerical code</span>
+    <span class="comment">//   - status code</span>
+    <span class="comment">//   - default code (for the given status code)</span>
+    <span class="comment">//   - canonical reason</span>
+    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">num</span>: <span class="ident">u16</span>, <span class="ident">status_code</span>: <span class="ident">StatusCode</span>, <span class="ident">default_code</span>: <span class="ident">StatusCode</span>, <span class="ident">reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) {
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">StatusCode</span>::<span class="ident">from_u16</span>(<span class="ident">num</span>), <span class="ident">status_code</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status_code</span>.<span class="ident">to_u16</span>(), <span class="ident">num</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status_code</span>.<span class="ident">class</span>().<span class="ident">default_code</span>(), <span class="ident">default_code</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">status_code</span>.<span class="ident">canonical_reason</span>(), <span class="ident">reason</span>);
     }
 
-    <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_status_code</span>() {
-        <span class='ident'>validate</span>(<span class='number'>99</span>, <span class='ident'>Unregistered</span>(<span class='number'>99</span>), <span class='prelude-val'>Ok</span>, <span class='prelude-val'>None</span>);
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_status_code</span>() {
+        <span class="ident">validate</span>(<span class="number">99</span>, <span class="ident">Unregistered</span>(<span class="number">99</span>), <span class="prelude-val">Ok</span>, <span class="prelude-val">None</span>);
 
-        <span class='ident'>validate</span>(<span class='number'>100</span>, <span class='ident'>Continue</span>, <span class='ident'>Continue</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Continue&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>101</span>, <span class='ident'>SwitchingProtocols</span>, <span class='ident'>Continue</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Switching Protocols&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>102</span>, <span class='ident'>Processing</span>, <span class='ident'>Continue</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Processing&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">100</span>, <span class="ident">Continue</span>, <span class="ident">Continue</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Continue&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">101</span>, <span class="ident">SwitchingProtocols</span>, <span class="ident">Continue</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Switching Protocols&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">102</span>, <span class="ident">Processing</span>, <span class="ident">Continue</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Processing&quot;</span>));
 
-        <span class='ident'>validate</span>(<span class='number'>200</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;OK&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>201</span>, <span class='ident'>Created</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Created&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>202</span>, <span class='ident'>Accepted</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Accepted&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>203</span>, <span class='ident'>NonAuthoritativeInformation</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Non-Authoritative Information&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>204</span>, <span class='ident'>NoContent</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;No Content&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>205</span>, <span class='ident'>ResetContent</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Reset Content&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>206</span>, <span class='ident'>PartialContent</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Partial Content&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>207</span>, <span class='ident'>MultiStatus</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Multi-Status&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>208</span>, <span class='ident'>AlreadyReported</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Already Reported&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>226</span>, <span class='ident'>ImUsed</span>, <span class='prelude-val'>Ok</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;IM Used&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">200</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;OK&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">201</span>, <span class="ident">Created</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Created&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">202</span>, <span class="ident">Accepted</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Accepted&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">203</span>, <span class="ident">NonAuthoritativeInformation</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Non-Authoritative Information&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">204</span>, <span class="ident">NoContent</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;No Content&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">205</span>, <span class="ident">ResetContent</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Reset Content&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">206</span>, <span class="ident">PartialContent</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Partial Content&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">207</span>, <span class="ident">MultiStatus</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Multi-Status&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">208</span>, <span class="ident">AlreadyReported</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Already Reported&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">226</span>, <span class="ident">ImUsed</span>, <span class="prelude-val">Ok</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;IM Used&quot;</span>));
 
-        <span class='ident'>validate</span>(<span class='number'>300</span>, <span class='ident'>MultipleChoices</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Multiple Choices&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>301</span>, <span class='ident'>MovedPermanently</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Moved Permanently&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>302</span>, <span class='ident'>Found</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Found&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>303</span>, <span class='ident'>SeeOther</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;See Other&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>304</span>, <span class='ident'>NotModified</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Modified&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>305</span>, <span class='ident'>UseProxy</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Use Proxy&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>307</span>, <span class='ident'>TemporaryRedirect</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Temporary Redirect&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>308</span>, <span class='ident'>PermanentRedirect</span>, <span class='ident'>MultipleChoices</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Permanent Redirect&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">300</span>, <span class="ident">MultipleChoices</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Multiple Choices&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">301</span>, <span class="ident">MovedPermanently</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Moved Permanently&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">302</span>, <span class="ident">Found</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Found&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">303</span>, <span class="ident">SeeOther</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;See Other&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">304</span>, <span class="ident">NotModified</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Not Modified&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">305</span>, <span class="ident">UseProxy</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Use Proxy&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">307</span>, <span class="ident">TemporaryRedirect</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Temporary Redirect&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">308</span>, <span class="ident">PermanentRedirect</span>, <span class="ident">MultipleChoices</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Permanent Redirect&quot;</span>));
 
-        <span class='ident'>validate</span>(<span class='number'>400</span>, <span class='ident'>BadRequest</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Bad Request&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>401</span>, <span class='ident'>Unauthorized</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unauthorized&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>402</span>, <span class='ident'>PaymentRequired</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Payment Required&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>403</span>, <span class='ident'>Forbidden</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Forbidden&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>404</span>, <span class='ident'>NotFound</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Found&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>405</span>, <span class='ident'>MethodNotAllowed</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Method Not Allowed&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>406</span>, <span class='ident'>NotAcceptable</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Acceptable&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>407</span>, <span class='ident'>ProxyAuthenticationRequired</span>, <span class='ident'>BadRequest</span>,
-            <span class='prelude-val'>Some</span>(<span class='string'>&quot;Proxy Authentication Required&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>408</span>, <span class='ident'>RequestTimeout</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Request Timeout&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>409</span>, <span class='ident'>Conflict</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Conflict&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>410</span>, <span class='ident'>Gone</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Gone&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>411</span>, <span class='ident'>LengthRequired</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Length Required&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>412</span>, <span class='ident'>PreconditionFailed</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Precondition Failed&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>413</span>, <span class='ident'>PayloadTooLarge</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Payload Too Large&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>414</span>, <span class='ident'>UriTooLong</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;URI Too Long&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>415</span>, <span class='ident'>UnsupportedMediaType</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unsupported Media Type&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>416</span>, <span class='ident'>RangeNotSatisfiable</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Range Not Satisfiable&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>417</span>, <span class='ident'>ExpectationFailed</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Expectation Failed&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>418</span>, <span class='ident'>ImATeapot</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;I&#39;m a teapot&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>421</span>, <span class='ident'>MisdirectedRequest</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Misdirected Request&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>422</span>, <span class='ident'>UnprocessableEntity</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unprocessable Entity&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>423</span>, <span class='ident'>Locked</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Locked&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>424</span>, <span class='ident'>FailedDependency</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Failed Dependency&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>426</span>, <span class='ident'>UpgradeRequired</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Upgrade Required&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>428</span>, <span class='ident'>PreconditionRequired</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Precondition Required&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>429</span>, <span class='ident'>TooManyRequests</span>, <span class='ident'>BadRequest</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Too Many Requests&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>431</span>, <span class='ident'>RequestHeaderFieldsTooLarge</span>, <span class='ident'>BadRequest</span>,
-            <span class='prelude-val'>Some</span>(<span class='string'>&quot;Request Header Fields Too Large&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>451</span>, <span class='ident'>UnavailableForLegalReasons</span>, <span class='ident'>BadRequest</span>,
-            <span class='prelude-val'>Some</span>(<span class='string'>&quot;Unavailable For Legal Reasons&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">400</span>, <span class="ident">BadRequest</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Bad Request&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">401</span>, <span class="ident">Unauthorized</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Unauthorized&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">402</span>, <span class="ident">PaymentRequired</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Payment Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">403</span>, <span class="ident">Forbidden</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Forbidden&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">404</span>, <span class="ident">NotFound</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Not Found&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">405</span>, <span class="ident">MethodNotAllowed</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Method Not Allowed&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">406</span>, <span class="ident">NotAcceptable</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Not Acceptable&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">407</span>, <span class="ident">ProxyAuthenticationRequired</span>, <span class="ident">BadRequest</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Proxy Authentication Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">408</span>, <span class="ident">RequestTimeout</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Request Timeout&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">409</span>, <span class="ident">Conflict</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Conflict&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">410</span>, <span class="ident">Gone</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Gone&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">411</span>, <span class="ident">LengthRequired</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Length Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">412</span>, <span class="ident">PreconditionFailed</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Precondition Failed&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">413</span>, <span class="ident">PayloadTooLarge</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Payload Too Large&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">414</span>, <span class="ident">UriTooLong</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;URI Too Long&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">415</span>, <span class="ident">UnsupportedMediaType</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Unsupported Media Type&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">416</span>, <span class="ident">RangeNotSatisfiable</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Range Not Satisfiable&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">417</span>, <span class="ident">ExpectationFailed</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Expectation Failed&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">418</span>, <span class="ident">ImATeapot</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;I&#39;m a teapot&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">421</span>, <span class="ident">MisdirectedRequest</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Misdirected Request&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">422</span>, <span class="ident">UnprocessableEntity</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Unprocessable Entity&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">423</span>, <span class="ident">Locked</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Locked&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">424</span>, <span class="ident">FailedDependency</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Failed Dependency&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">426</span>, <span class="ident">UpgradeRequired</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Upgrade Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">428</span>, <span class="ident">PreconditionRequired</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Precondition Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">429</span>, <span class="ident">TooManyRequests</span>, <span class="ident">BadRequest</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Too Many Requests&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">431</span>, <span class="ident">RequestHeaderFieldsTooLarge</span>, <span class="ident">BadRequest</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Request Header Fields Too Large&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">451</span>, <span class="ident">UnavailableForLegalReasons</span>, <span class="ident">BadRequest</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Unavailable For Legal Reasons&quot;</span>));
 
-        <span class='ident'>validate</span>(<span class='number'>500</span>, <span class='ident'>InternalServerError</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Internal Server Error&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>501</span>, <span class='ident'>NotImplemented</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Implemented&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>502</span>, <span class='ident'>BadGateway</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Bad Gateway&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>503</span>, <span class='ident'>ServiceUnavailable</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Service Unavailable&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>504</span>, <span class='ident'>GatewayTimeout</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Gateway Timeout&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>505</span>, <span class='ident'>HttpVersionNotSupported</span>, <span class='ident'>InternalServerError</span>,
-            <span class='prelude-val'>Some</span>(<span class='string'>&quot;HTTP Version Not Supported&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>506</span>, <span class='ident'>VariantAlsoNegotiates</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Variant Also Negotiates&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>507</span>, <span class='ident'>InsufficientStorage</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Insufficient Storage&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>508</span>, <span class='ident'>LoopDetected</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Loop Detected&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>510</span>, <span class='ident'>NotExtended</span>, <span class='ident'>InternalServerError</span>, <span class='prelude-val'>Some</span>(<span class='string'>&quot;Not Extended&quot;</span>));
-        <span class='ident'>validate</span>(<span class='number'>511</span>, <span class='ident'>NetworkAuthenticationRequired</span>, <span class='ident'>InternalServerError</span>,
-            <span class='prelude-val'>Some</span>(<span class='string'>&quot;Network Authentication Required&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">500</span>, <span class="ident">InternalServerError</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Internal Server Error&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">501</span>, <span class="ident">NotImplemented</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Not Implemented&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">502</span>, <span class="ident">BadGateway</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Bad Gateway&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">503</span>, <span class="ident">ServiceUnavailable</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Service Unavailable&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">504</span>, <span class="ident">GatewayTimeout</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Gateway Timeout&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">505</span>, <span class="ident">HttpVersionNotSupported</span>, <span class="ident">InternalServerError</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;HTTP Version Not Supported&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">506</span>, <span class="ident">VariantAlsoNegotiates</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Variant Also Negotiates&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">507</span>, <span class="ident">InsufficientStorage</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Insufficient Storage&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">508</span>, <span class="ident">LoopDetected</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Loop Detected&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">510</span>, <span class="ident">NotExtended</span>, <span class="ident">InternalServerError</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Not Extended&quot;</span>));
+        <span class="ident">validate</span>(<span class="number">511</span>, <span class="ident">NetworkAuthenticationRequired</span>, <span class="ident">InternalServerError</span>,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;Network Authentication Required&quot;</span>));
 
     }
 }
@@ -1553,18 +1565,22 @@
                 <h2>Keyboard Shortcuts</h2>
 
                 <dl>
-                    <dt>?</dt>
+                    <dt><kbd>?</kbd></dt>
                     <dd>Show this help dialog</dd>
-                    <dt>S</dt>
+                    <dt><kbd>S</kbd></dt>
                     <dd>Focus the search field</dd>
-                    <dt>&larrb;</dt>
+                    <dt><kbd>↑</kbd></dt>
                     <dd>Move up in search results</dd>
-                    <dt>&rarrb;</dt>
+                    <dt><kbd>↓</kbd></dt>
                     <dd>Move down in search results</dd>
-                    <dt>&#9166;</dt>
+                    <dt><kbd>↹</kbd></dt>
+                    <dd>Switch tab</dd>
+                    <dt><kbd>&#9166;</kbd></dt>
                     <dd>Go to active search result</dd>
-                    <dt>+</dt>
-                    <dd>Collapse/expand all sections</dd>
+                    <dt><kbd>+</kbd></dt>
+                    <dd>Expand all sections</dd>
+                    <dt><kbd>-</kbd></dt>
+                    <dd>Collapse all sections</dd>
                 </dl>
             </div>
 
@@ -1597,7 +1613,6 @@
         window.rootPath = "../../";
         window.currentCrate = "hyper";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>
