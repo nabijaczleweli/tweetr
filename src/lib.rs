@@ -25,7 +25,7 @@
 //!
 //! ## Executable manpage
 //!
-//! [All manpages](https://cdn.rawgit.com/nabijaczleweli/tweetr/man/index.html)
+//! [All manpages](https://rawcdn.githack.com/nabijaczleweli/tweetr/man/index.html)
 
 
 extern crate rustc_serialize;
